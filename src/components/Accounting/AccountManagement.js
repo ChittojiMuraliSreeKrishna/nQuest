@@ -17,6 +17,7 @@ import DebitNotes from "./DebitNotes";
 import Domain from './Domain.js';
 import Stores from './Stores.js';
 import AccountingService from '../services/AccountingService';
+import scss from '../../assets/styles/HeaderStyles.scss';
 
 
 var deviceWidth = Dimensions.get("window").width;
@@ -60,6 +61,7 @@ export default class AccountManagement extends Component {
           console.log(res.data);
           if (res) {
             if (res.data) {
+
               let len = res.data.parentPrivileges.length;
               for (let i = 0; i < len; i++) {
                 let privilege = res.data.parentPrivileges[i];
@@ -121,7 +123,6 @@ export default class AccountManagement extends Component {
   }
 
   // Navigation Functions
-
   topbarAction = (item, index) => {
     if (item.name === "Dashboard") {
       this.setState({ flagDashboard: true });
@@ -179,11 +180,15 @@ export default class AccountManagement extends Component {
   }
 
   navigateToAddHsnCode() {
-    this.props.navigation.navigate('AddHsnCode');
+    this.props.navigation.navigate('AddHsnCode', {
+      onGoBack: () => this.child.getAllHsnCode()
+    });
   }
 
   navigateToAddTax() {
-    this.props.navigation.navigate('AddTaxMaster');
+    this.props.navigation.navigate('AddTaxMaster', {
+      onGoBack: () => this.child.getTaxMaster(),
+    });
   }
 
   navigateToAddDomain() {
@@ -249,6 +254,8 @@ export default class AccountManagement extends Component {
 
 
   render() {
+    const { privilages } = this.state;
+    console.log({ privilages });
     return (
       <View style={styles.mainContainer}>
         {this.state.loading &&
@@ -295,8 +302,8 @@ export default class AccountManagement extends Component {
                 showsHorizontalScrollIndicator={false}
                 ListEmptyComponent={<Text style={{ color: '#cc241d', textAlign: "center", fontFamily: "bold", fontSize: Device.isTablet ? 21 : 17, marginTop: deviceheight / 3, marginLeft: deviceWidth / 3.5 }}>&#9888; Privileges  Not Found</Text>}
                 renderItem={({ item, index }) => (
-                  <TouchableOpacity style={[pageNavigationBtn, { backgroundColor: item.bool ? '#ED1C24' : '#FFFFFF', borderColor: item.bool ? '#ED1C24' : '#858585', }]} onPress={() => this.topbarAction(item, index)} >
-                    <Text style={[pageNavigationBtnText, { color: item.bool ? "#FFFFFF" : '#858585', }]}>
+                  <TouchableOpacity style={[scss.pageNavigationBtn, { borderColor: item.bool ? '#ED1C24' : '#858585', }]} onPress={() => this.topbarAction(item, index)} >
+                    <Text style={[scss.pageNavigationBtnText, { color: item.bool ? "#ED1C24" : '#858585', }]}>
                       {item.name}
                     </Text>
                   </TouchableOpacity>
@@ -334,14 +341,14 @@ export default class AccountManagement extends Component {
               {this.state.flagTaxMaster && (
                 <CreateTaxMaster
                   navigation={this.props.navigation}
-                  ref={instance => { this.child = instance; }}
+                  onRef={instance => { this.child = instance; }}
                 />
               )}
 
               {this.state.flagHSNCode && (
                 <CreateHSNCode
                   navigation={this.props.navigation}
-                  ref={instance => { this.child = instance; }}
+                  ref={this.child}
                 />
               )}
 
