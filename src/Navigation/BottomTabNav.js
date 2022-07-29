@@ -1,6 +1,7 @@
-import React, { Component, useState } from 'react'
+import React, { Component, useState } from 'react';
 import { Dimensions, TouchableOpacity, StyleSheet, View, Text } from 'react-native';
 import I18n from 'react-native-i18n';
+
 import HomeIcon from 'react-native-vector-icons/Entypo'
 import ProfileIcon from 'react-native-vector-icons/Feather'
 import { screenMapping } from './TopBar'
@@ -8,8 +9,10 @@ import UrmService from '../components/services/UrmService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-global.homeButtonClicked = false
-global.profileButtonClicked = false
+
+global.homeButtonClicked = false;
+global.profileButtonClicked = false;
+
 
 class BottomTabNav extends Component {
     constructor(props) {
@@ -126,25 +129,25 @@ class BottomTabNav extends Component {
 }
 
 const styles = StyleSheet.create({
-    bottomContainer: {
-        flexDirection: 'column',
-    },
-    footer: {
-        position: 'absolute',
-        flex: 0.1,
-        left: 0,
-        right: 0,
-        bottom: -10,
-        backgroundColor: '#fff',
-        flexDirection: 'row',
-        height: 80,
-        alignItems: 'center',
-    },
-    bottomButtons: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        flex: 1,
-    }
+  bottomContainer: {
+    flexDirection: 'column',
+  },
+  footer: {
+    position: 'absolute',
+    flex: 0.1,
+    left: 0,
+    right: 0,
+    bottom: -10,
+    backgroundColor: '#fff',
+    flexDirection: 'row',
+    height: 80,
+    alignItems: 'center',
+  },
+  bottomButtons: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+  }
 
-})
-export default BottomTabNav
+});
+export default BottomTabNav;

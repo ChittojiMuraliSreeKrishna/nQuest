@@ -7,6 +7,7 @@ import { buttonContainer, buttonImageStyle, buttonStyle, buttonStyle1, flatListH
 import AccountingService from '../services/AccountingService';
 var deviceWidth = Dimensions.get("window").width;
 import Loader from '../../commonUtils/loader';
+import scss from '../../assets/styles/style.scss';
 
 export default class CreateHSNCode extends Component {
 
@@ -21,40 +22,43 @@ export default class CreateHSNCode extends Component {
   }
 
 
-  componentDidMount() {
-    this.getAllHsnCode()
+  async componentDidMount() {
+    this.getAllHsnCode();
   }
 
+  // Getting All HsnCodes
   async getAllHsnCode() {
-    this.setState({ loading: true })
+    this.setState({ loading: true });
     AccountingService.getAllHsnCodes().then(res => {
       if (res) {
-        console.log(res.data)
-        this.setState({ hsnList: res.data.result })
+        console.log(res.data);
+        this.setState({ hsnList: res.data.result });
       }
-      this.setState({ loading: false })
+      this.setState({ loading: false });
     }).catch(err => {
-      this.setState({ loading: false })
-      console.log(err)
-    })
+      this.setState({ loading: false });
+      console.log(err);
+    });
   }
 
+  // Filter Model Actions
   modelCancel() {
     this.setState({ modalVisible: false });
   }
 
+  // Edit Hsn
   handleeditHsn(item, index) {
     this.props.navigation.navigate('AddHsnCode', {
       item: item, isEdit: true,
     });
   }
 
-  handledeleteHsn(item, index) {
-    this.setState({ deleteHsnCode: true, modalVisible: true });
-  }
-
-  deleteHsn(item, index) {
-
+  // Add Hsn
+  navigateToAddHsnCode() {
+    this.props.navigation.navigate('AddHsnCode', {
+      isEdit: false,
+      onGoBack: () => this.getAllHsnCode()
+    });
   }
 
   render() {
@@ -65,14 +69,15 @@ export default class CreateHSNCode extends Component {
             loading={this.state.loading} />
         }
         <FlatList
-          ListHeaderComponent={<View style={flatListHeaderContainer}>
+          ListHeaderComponent={<View style={scss.headerContainer}>
             <Text style={flatListTitle}>Create HSN Code</Text>
+            <TouchableOpacity onPress={() => this.navigateToAddHsnCode()}><Text style={{ fontSize: 20 }}>+</Text></TouchableOpacity>
           </View>}
           data={this.state.hsnList}
           style={{ marginTop: 20 }}
           scrollEnabled={true}
           renderItem={({ item, index }) => (
-            <View style={flatListMainContainer} >
+            <View style={flatListMainContainer}>
               <View style={flatlistSubContainer}>
                 <View style={textContainer}>
                   <Text style={highText}>HSN CODE: {item.hsnCode}</Text>

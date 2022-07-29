@@ -4,6 +4,7 @@ import { BASE_URL } from "../../commonUtils/Base";
 
 class CustomerService {
   createDeliverySlip(createObj) {
+    console.log({ createObj });
     return axios.post(BASE_URL + NEW_SALE_URL.saveDelivery, createObj);
   }
 

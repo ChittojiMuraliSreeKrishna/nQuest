@@ -1,19 +1,17 @@
 import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity } from 'react-native';
 import React, { Component } from 'react';
 import { Dropdown } from 'react-native-element-dropdown';
-import { RW, RF } from '../Responsive';
+import { RW, RF, RH } from '../Responsive';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import UrmService from '../components/services/UrmService';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+
 import I18n from 'react-native-i18n';
 import Modal from 'react-native-modal'
 import style from '../../src/assets/styles/topBar.scss';
 
-var data = [
-
-];
-
+var data = [];
 var currentSelection = '';
 var dataCleared = true;
 
@@ -27,7 +25,7 @@ export const screenMapping = {
   "Reports": "ReportsNavigation",
   "URM Portal": "UrmNavigation"
 
-}
+};
 
 
 const GetImageBasedOnPrevilageName = (name) => {
@@ -40,8 +38,8 @@ const GetImageBasedOnPrevilageName = (name) => {
               name === "Reports" ? require('../components/assets/images/reports.png') :
                 name === "URM Portal" ? require('../components/assets/images/urmportal.png') :
                   <></>
-  )
-}
+  );
+};
 
 
 
@@ -176,7 +174,9 @@ export class TopBar extends Component {
                 }
                 data = Array.from(privilegesSet);
               }
+
               this.getData()
+
             }
           });
         }).catch((err) => {
@@ -195,9 +195,11 @@ export class TopBar extends Component {
     }
   };
 
+
   modalHandle() {
     this.setState({ modalVisibleData: !this.state.modalVisibleData })
   }
+
 
 
   refresh() {
@@ -210,12 +212,14 @@ export class TopBar extends Component {
     console.log("placeholder data: " + this.state.firstDisplayName + ",current selection " + currentSelection);
     return (
       <View style={styles.headerContainer} >
-        <View>
+        <View
+        >
           <Image
             style={styles.logoimage}
-            source={require('../components/assets/images/easy_retail_logo.png')}
+            source={require('../assets/Images/retail_logo_head.png')}
           ></Image>
         </View>
+
         <>
           <TouchableOpacity style={{ flexDirection: 'row', padding: 15 }} onPress={() => this.modalHandle()}>
             <Image style={styles.icon} source={GetImageBasedOnPrevilageName(currentSelection === '' ? this.state.firstDisplayName : currentSelection)} />
@@ -247,6 +251,7 @@ export class TopBar extends Component {
           }
           {/* <Dropdown
             style={styles.dropdown}
+
             placeholderStyle={styles.placeholderStyle}
             selectedTextStyle={styles.selectedTextStyle}
             inputSearchStyle={styles.inputSearchStyle}
@@ -263,11 +268,11 @@ export class TopBar extends Component {
             onChange={item => {
               //          console.log("current selection before onchange", currentSelection);
               var screenName = screenMapping[item.label];
-              currentSelection = item.label
+              currentSelection = item.label;
               this.setState({ firstDisplayName: item.label });
               //              console.log("screenName : " + screenName + ", displayname: " + item.label + ", currentSelection " + currentSelection);
               //this.setState({currentSelection:item.label});
-              //            console.log("current selection after on change", currentSelection);
+
               global.homeButtonClicked = false;
               global.profileButtonClicked = false;
               this.props.navigation.navigate(screenName);
@@ -279,7 +284,7 @@ export class TopBar extends Component {
           /> */}
         </>
       </View>
-    )
+    );
   }
 }
 
@@ -289,8 +294,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+
     padding: 1,
     backgroundColor: '#fff'
+
   },
   icon: {
     marginRight: 5,
@@ -304,6 +311,7 @@ const styles = StyleSheet.create({
     padding: 15
   },
   textItem: {
+
     fontSize: RF(14),
     fontFamily: 'bold'
   },
@@ -332,6 +340,7 @@ const styles = StyleSheet.create({
   test: {
    height:"1%",
  
+
   }
-})
+});
 export default TopBar;

@@ -19,7 +19,8 @@ export default class Privilages extends Component {
       domain: "",
       parentlist: [],
       child: [],
-      childlist: [],
+      subList: [],
+      childList: [],
       isselected: [],
     };
   }
@@ -44,98 +45,112 @@ export default class Privilages extends Component {
     UrmService.getAllPrivillages().then((res) => {
       if (res) {
         if (res.data) {
-          let privilegesRes = res.data.result.mobilePrivileges
-          console.log({ privilegesRes })
+          let privilegesRes = res.data.result.mobilePrivileges;
+          console.log({ privilegesRes });
           let len = privilegesRes.length;
-          console.log({ len })
+          console.log({ len });
           if (len > 0) {
-            this.setState({ loading: false })
+            this.setState({ loading: false });
             for (let i = 0; i < len; i++) {
-              let privilege = privilegesRes[i]
-              let previlagename = privilegesRes[i].name
-              console.log({ privilege })
+              let privilege = privilegesRes[i];
+              let previlagename = privilegesRes[i].name;
+              console.log({ previlagename });
+              // Sub Privileges
               if (privilege.subPrivilege !== null) {
-                let subPrivilegeRes = privilege.subPrivilege
-                let subLen = subPrivilegeRes.length
-                console.log({ subPrivilegeRes })
+                let subPrivilegeRes = privilege.subPrivilege;
+                let subLen = subPrivilegeRes.length;
+                console.log({ subPrivilegeRes });
                 var subprivilagesArray = [];
-                var namesArray = []
-                var parentArray = []
+                var childPrivillagesArray = [];
+                var namesArray = [];
+                var parentArray = [];
                 if (subLen > 0) {
                   for (let j = 0; j < subLen; j++) {
                     if (privilege.id === subPrivilegeRes[j].parentPrivilegeId) {
-                      let subPrivilege = subPrivilegeRes[j]
+                      let subPrivilege = subPrivilegeRes[j];
                       for (let k = 0; k < this.state.parentlist.length; k++) {
                         if (this.state.parentlist[k].name === privilege.name) {
                           if (this.state.parentlist.includes(privilege.name)) { }
                           else {
-                            parentArray.push(privilege.name)
+                            parentArray.push(privilege.name);
                           }
                         }
                       }
-                      console.log({ parentArray })
+                      console.log({ parentArray });
+                      // SubParent Privileges
                       if (parentArray.includes(privilege.name)) {
                         for (let m = 0; m < this.state.child.length; m++) {
                           if (subPrivilege.name === this.state.child[m].name) {
                             if (namesArray.includes(subPrivilege.name)) { }
                             else {
-                              this.state.childlist.push({ title: subPrivilege.name, description: subPrivilege.description, parent: privilege.name, id: privilege.id, subPrivileges: subPrivilege })
-                              subprivilagesArray.push({ name: subPrivilege.name, selectedindex: 1, description: subPrivilege.description, subPrivilege: subPrivilege })
-                              namesArray.push(subPrivilege.name)
-                              console.log({ namesArray })
+                              this.state.subList.push({ title: subPrivilege.name, description: subPrivilege.description, parent: privilege.name, id: privilege.id, subPrivileges: subPrivilege });
+                              subprivilagesArray.push({ name: subPrivilege.name, selectedindex: 1, description: subPrivilege.description, subPrivilege: subPrivilege });
+                              namesArray.push(subPrivilege.name);
+                              console.log({ namesArray });
                             }
                           }
                         }
                       }
                       else { }
+                      if (privilege.childPrivillages !== null) {
+                        let childLen = privilege.childPrivillages.length;
+                        for (let p = 0; p < childLen; p++) {
+                          if (subPrivilegeRes[j].id === privilege.childPrivillages[p].subPrivillageId) {
+                            childPrivillagesArray.push(privilege.childPrivillages[p]);
+                          }
+                        }
+                      }
+                      console.log({ childPrivillagesArray });
                       if (namesArray.includes(subPrivilege.name)) { }
                       else {
-                        subprivilagesArray.push({ name: subPrivilege.name, selectedindex: 0, description: subPrivilege.description, subPrivilege: subPrivilege })
+                        subprivilagesArray.push({ name: subPrivilege.name, selectedindex: 0, description: subPrivilege.description, subPrivilege: subPrivilege });
                       }
                     }
                   }
                 }
               }
-              this.state.previlages.push({ title: previlagename, data: subprivilagesArray, id: privilege.id });
-              this.setState({ previlages: this.state.previlages });
-              this.setState({ childlist: this.state.childlist });
+              this.state.previlages.push({ title: previlagename, data: subprivilagesArray, child: childPrivillagesArray, id: privilege.id });
+              this.setState({ previlages: this.state.previlages },
+                console.error(this.state.previlages)
+              );
+              this.setState({ subList: this.state.subList });
             }
           }
         }
       } else {
-        this.setState({ loading: false })
+        this.setState({ loading: false });
       }
     }).catch(err => {
-      console.log({ err })
-    })
+      console.log({ err });
+    });
   }
 
   saveRole() {
     global.privilages = [];
-    this.state.childlist = [];
-    let privileges = this.state.previlages
-    let len = privileges.length
-    console.log({ privileges, len })
+    this.state.subList = [];
+    let privileges = this.state.previlages;
+    let len = privileges.length;
+    console.log({ privileges, len });
     for (let i = 0; i < len; i++) {
       let sublen = privileges[i].data.length;
-      console.log({ sublen })
+      console.log({ sublen });
       for (let j = 0; j < sublen; j++) {
         if (this.state.previlages[i].data[j].selectedindex === 1) {
-          this.state.childlist.push({
+          this.state.subList.push({
             title: this.state.previlages[i].data[j].name,
             description: this.state.previlages[i].data[j].description,
             parent: this.state.previlages[i].title,
             id: this.state.previlages[i].id,
             subPrivillages: this.state.previlages[i].data[j].subPrivilege
           });
-          let childlist = this.state.childlist
-          console.log({ childlist });
+          let subList = this.state.subList;
+          console.log({ subList });
         }
       }
 
     }
-    this.setState({ childlist: this.state.childlist });
-    global.privilages = this.state.childlist;
+    this.setState({ subList: this.state.subList });
+    global.privilages = this.state.subList;
     this.props.route.params.onGoBack();
     this.props.navigation.goBack();
   }
@@ -146,9 +161,9 @@ export default class Privilages extends Component {
     }
     else {
       item.selectedindex = 0;
-      const list = this.state.childlist;
+      const list = this.state.subList;
       list.splice(index, 1);
-      this.setState({ childlist: list });
+      this.setState({ subList: list });
     }
     this.setState({ previlages: this.state.previlages });
   };
@@ -191,6 +206,8 @@ export default class Privilages extends Component {
                   <Image source={require('../assets/images/langunselect.png')} />
                 )}
               </View>
+
+
             </TouchableOpacity>
           )}
           ListFooterComponent={

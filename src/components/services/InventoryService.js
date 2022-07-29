@@ -58,6 +58,7 @@ class InventoryService {
   }
 
   saveBarCode(list, domain, isEdit, value) {
+    console.log({ list, domain, isEdit, value });
     if (domain && domain.label === "Retail") {
       if (isEdit) {
         return axios.put(BASE_URL + INVENTORY_PORTAL.updateBarcodes, list);
@@ -85,8 +86,17 @@ class InventoryService {
     return BASE_URL + "/inventory/inventory-management/barcodes/filter";
   }
 
-  getTextileBarcodesDetails() {
-    return BASE_URL + "/inventory/inventoryTextile/getBarcodeTextile";
+  // Getting Barcode Details
+  getBarcodesDetails(storesId, domain, barcodeId) {
+    if (domain && domain.label === "Retail") {
+      const RetailDetails = '?barcode=' + barcodeId + '&storeId=' + storesId;
+      console.log({ RetailDetails });
+      return axios.get(BASE_URL + INVENTORY_PORTAL.getRetailBarcodeDetails + RetailDetails);
+    } else {
+      const TextileDetails = '?barcode=' + barcodeId + '&storeId=' + storesId;
+      console.log({ TextileDetails });
+      return axios.get(BASE_URL + INVENTORY_PORTAL.getTextileBarcodeDetails + TextileDetails);
+    }
   }
 
   deleteTextileBarcode() {

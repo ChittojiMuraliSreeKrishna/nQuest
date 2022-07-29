@@ -21,6 +21,7 @@ import Users from './users';
 import Roles from './Roles';
 import Stores from '../Accounting/Stores';
 
+import scss from '../../assets/styles/HeaderStyles.scss';
 var deviceheight = Dimensions.get("window").height;
 var deviceWidth = Dimensions.get("window").width;
 
@@ -63,53 +64,53 @@ export default class UserManagement extends Component {
   async componentDidMount() {
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     this.setState({ clientId: clientId });
-    console.log({ clientId })
+    console.log({ clientId });
     AsyncStorage.getItem("rolename").then(value => {
-      console.log({ value })
+      console.log({ value });
       if (value === "config_user") {
         for (let i = 0; i < this.state.configHeaders.length; i++) {
           if (i === 0) {
-            this.state.privilages.push({ bool: true, name: this.state.configHeaders[i].name })
-            this.setState({ flagStore: true })
+            this.state.privilages.push({ bool: true, name: this.state.configHeaders[i].name });
+            this.setState({ flagStore: true });
           } else {
-            this.state.privilages.push({ bool: false, name: this.state.configHeaders[i].name })
+            this.state.privilages.push({ bool: false, name: this.state.configHeaders[i].name });
           }
         }
       } else {
         axios.get(UrmService.getPrivillagesByRoleName() + value).then(res => {
           if (res) {
             if (res.data) {
-              let len = res.data.parentPrivileges.length
+              let len = res.data.parentPrivileges.length;
               for (let i = 0; i < len; i++) {
-                let privilege = res.data.parentPrivileges[i]
+                let privilege = res.data.parentPrivileges[i];
                 if (privilege.name === "URM Portal") {
-                  let privilegeId = privilege.id
-                  let sublen = res.data.subPrivileges.length
-                  let subPrivileges = res.data.subPrivileges
+                  let privilegeId = privilege.id;
+                  let sublen = res.data.subPrivileges.length;
+                  let subPrivileges = res.data.subPrivileges;
                   for (let i = 0; i < sublen; i++) {
                     if (privilegeId === subPrivileges[i].parentPrivilegeId) {
-                      let routes = subPrivileges[i].name
-                      this.state.headerNames.push({ name: routes })
-                      console.log("Header Names", this.state.headerNames)
+                      let routes = subPrivileges[i].name;
+                      this.state.headerNames.push({ name: routes });
+                      console.log("Header Names", this.state.headerNames);
                     }
                   }
                   this.setState({ headerNames: this.state.headerNames }, () => {
                     for (let j = 0; j < this.state.headerNames.length; j++) {
                       if (j === 0) {
-                        this.state.privilages.push({ bool: true, name: this.state.headerNames[j].name })
+                        this.state.privilages.push({ bool: true, name: this.state.headerNames[j].name });
                       } else {
                         this.state.privilages.push({ bool: false, name: this.state.headerNames[j].name });
                       }
                     }
-                  })
-                  this.initialNavigation()
+                  });
+                  this.initialNavigation();
                 }
               }
             }
           }
-        })
+        });
       }
-    })
+    });
   }
 
 
@@ -124,11 +125,11 @@ export default class UserManagement extends Component {
         } else if (this.state.privilages[0].name === "Roles") {
           this.setState({ flagUser: false, flagRole: true, flagDashboard: false, filterButton: true, filterActive: false });
         } else if (this.state.privilages[0].name === "Stores") {
-          this.setState({ flagStore: true })
+          this.setState({ flagStore: true });
         }
         else {
           this.setState({ flagUser: false, flagRole: false, flagDashboard: false, filterButton: true, filterActive: false, flagStore: false });
-          console.log("please update the privilages in Line.no: 161")
+          console.log("please update the privilages in Line.no: 161");
         }
       }
     });
@@ -150,7 +151,7 @@ export default class UserManagement extends Component {
         }
         this.setState({ rolesData: this.state.rolesData, rolesError: "", loading: false });
       } else {
-        this.setState({ rolesError: "Records Not Found", loading: false })
+        this.setState({ rolesError: "Records Not Found", loading: false });
       }
     }).catch(() => {
       this.setState({ loading: false, rolesError: "Records Not Found" });
@@ -210,13 +211,13 @@ export default class UserManagement extends Component {
   clearFilterAction() {
     if (this.state.flagUser === true) {
       this.setState({ filterActive: false }, () => {
-        this.setState({ userType: "", role: "", branch: "" })
+        this.setState({ userType: "", role: "", branch: "" });
       });
     }
     else if (this.state.flagRole === true) {
       this.setState({ filterActive: false }, () => {
         this.getRolesList();
-        this.setState({ role: "", createdBy: "", createdDate: "" })
+        this.setState({ role: "", createdBy: "", createdDate: "" });
       });
     }
   }
@@ -306,7 +307,7 @@ export default class UserManagement extends Component {
   };
 
   applyRoleFilter() {
-    console.log("creatBy", this.state.createdBy)
+    console.log("creatBy", this.state.createdBy);
     const searchRole = {
       "roleName": this.state.role ? this.state.role : null,
       "createdBy": this.state.createdBy ? this.state.createdBy : null,
@@ -314,7 +315,7 @@ export default class UserManagement extends Component {
     };
     console.log(searchRole);
     axios.post(UrmService.getRolesBySearch(), searchRole).then((res) => {
-      console.log("KKKKK", res)
+      console.log("KKKKK", res);
       if (res) {
         if (res.data.isSuccess === "true") {
           this.setState({ rolesData: res.data.result, modalVisible: false, flagFilterRoles: false, createdDate: "", role: "", createdBy: "" }, () => {
@@ -323,7 +324,7 @@ export default class UserManagement extends Component {
         } else {
           this.setState({ modalVisible: false, flagFilterRoles: false, userType: "", role: "", createdBy: "", rolesData: "" },
             () => {
-              this.setState({ filterActive: true, rolesError: "Records Not Found" })
+              this.setState({ filterActive: true, rolesError: "Records Not Found" });
             });
           console.log("ooooo", res.data);
         }
@@ -387,7 +388,7 @@ export default class UserManagement extends Component {
         } else {
           this.setState({ modalVisible: false, userType: "", role: "", createdBy: "", branch: '', usersData: "" },
             () => {
-              this.setState({ filterActive: true, usersError: "Records Not Found" })
+              this.setState({ filterActive: true, usersError: "Records Not Found" });
               console.log("records not found");
             });
         }
@@ -428,7 +429,7 @@ export default class UserManagement extends Component {
       });
   }
 
-  
+
 
   render() {
     return (
@@ -476,8 +477,8 @@ export default class UserManagement extends Component {
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
                 renderItem={({ item, index }) => (
-                  <TouchableOpacity style={[pageNavigationBtn, { backgroundColor: item.bool ? '#ED1C24' : '#FFFFFF', borderColor: item.bool ? '#ED1C24' : '#858585', }]} onPress={() => this.topbarAction(item, index)} >
-                    <Text style={[pageNavigationBtnText, { color: item.bool ? "#FFFFFF" : '#858585', }]}>
+                  <TouchableOpacity style={[scss.pageNavigationBtn, { borderColor: item.bool ? '#ED1C24' : '#d7d7d7', }]} onPress={() => this.topbarAction(item, index)} >
+                    <Text style={[scss.pageNavigationBtnText, { color: item.bool ? "#ED1C24" : '#00000073', }]}>
                       {item.name}
                     </Text>
                   </TouchableOpacity>
@@ -495,19 +496,19 @@ export default class UserManagement extends Component {
             )}
             {this.state.flagRole && (
               <Roles
-                ref={instance => { this.child = instance }}
+                ref={instance => { this.child = instance; }}
                 navigation={this.props.navigation}
               />
             )}
             {this.state.flagUser && (
               <Users
-                ref={instance => { this.child = instance }}
+                ref={instance => { this.child = instance; }}
                 navigation={this.props.navigation}
               />
             )}
             {this.state.flagStore && (
               <Stores
-                ref={instance => { this.child = instance }}
+                ref={instance => { this.child = instance; }}
                 navigation={this.props.navigation}
               />
             )}
