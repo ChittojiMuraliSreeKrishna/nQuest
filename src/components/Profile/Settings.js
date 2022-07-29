@@ -435,7 +435,7 @@ class Settings extends Component {
                     </TouchableOpacity> */}
 
                 {/* </View> */}
-                <TopBar {...this.props} />
+                {/* <TopBar {...this.props} /> */}
                 <View>
                     <TouchableOpacity
                         onPress={() => { this.props.navigation.navigate('Login'); }}>

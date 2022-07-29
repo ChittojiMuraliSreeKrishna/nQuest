@@ -12,6 +12,7 @@ import CustomerRetailNavigation from './CustomerRetailNavigation';
 import PromoNavigation from './PromoNavigation';
 import InventoryNavigation from './InventoryNavigation';
 import UrmNavigation from './UrmNavigation';
+import BottomTabNav from './BottomTabNav';
 
 
 const Stack = createStackNavigator();
@@ -20,10 +21,11 @@ const Stack = createStackNavigator();
 export default class TopBarNavigation extends Component {
   render() {
     return (
+      <>
+      <TopBar {...this.props}/>
       <Stack.Navigator >
         <Stack.Screen name="TopBar" options={{ headerShown: false }} component={TopBar} />
-        <Stack.Screen name="Home" options={{ headerShown: false }} component={Home} />
-        <Stack.Screen name="Settings" options={{ headerShown: false }} component={Settings} />
+        {/* <Stack.Screen name="Home" options={{ headerShown: false }} component={Home} /> */}
         <Stack.Screen name="PromoNavigation" options={{ headerShown: false }} component={PromoNavigation} />
         <Stack.Screen name="InventoryNavigation" options={{ headerShown: false }} component={InventoryNavigation} />
         <Stack.Screen name="UrmNavigation" options={{ headerShown: false }} component={UrmNavigation} />
@@ -33,7 +35,10 @@ export default class TopBarNavigation extends Component {
         <Stack.Screen name="CustomerRetailNavigation" options={{ headerShown: false }} component={CustomerRetailNavigation} />
         <Stack.Screen name="NewSaleNavigation" options={{ headerShown: false }} component={NewSaleNavigation} />
         <Stack.Screen name="InventoryRetailNavigation" options={{ headerShown: false }} component={InventoryRetailNavigation} />
+        <Stack.Screen name="Settings" options={{ headerShown: false }} component={Settings} />
       </Stack.Navigator>
+      <BottomTabNav {...this.props}/>
+      </>
     );
   }
 }

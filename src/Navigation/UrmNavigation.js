@@ -12,11 +12,11 @@ import BottomTabBar from './BottomTabBar';
 import BottomTabNav from './BottomTabNav';
 
 const Stack = createStackNavigator();
-export default class UrmNavigation extends Component {
+export default class UrmNavigation extends Component { 
   render() {
     return (
       <>
-      <TopBar {...this.props}/>
+      {/* <TopBar {...this.props}/> */}
       <Stack.Navigator initialRouteName='UserManagement' >
         <Stack.Screen name='UserManagement' options={{ headerShown: false }} component={UserManagement} />
         <Stack.Screen name='AddUser' options={{ headerShown: false }} component={AddUser} />

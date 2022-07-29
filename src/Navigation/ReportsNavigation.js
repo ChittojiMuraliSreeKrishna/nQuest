@@ -9,7 +9,7 @@ export default class ReportsNavigation extends Component {
     render() {
         return (
             <>
-                <TopBar {...this.props} />
+                {/* <TopBar {...this.props} /> */}
                 <Stack.Navigator initialRouteName='Reports' >
                     <Stack.Screen name='Reports' options={{ headerShown: false }} component={Reports} />
                 </Stack.Navigator>

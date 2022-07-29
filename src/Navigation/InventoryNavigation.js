@@ -12,7 +12,7 @@ export default class InventoryNavigation extends Component {
     render() {
         return (
             <>
-            <TopBar {...this.props}/>
+            {/* <TopBar {...this.props}/> */}
             <Stack.Navigator>
                 <Stack.Screen name="Inventory" options={{ headerShown: false }} component={Inventory} />
                 <Stack.Screen name="AddBarcode" options={{ headerShown: false }} component={AddBarcode} />

@@ -15,7 +15,7 @@ export default class ProductsNavigation extends React.Component {
     render() {
         return (
             <>
-            <TopBar {...this.props}/>
+            {/* <TopBar {...this.props}/> */}
             <Stack.Navigator>
                 <Stack.Screen name="Pramotions" options={{ headerShown: false }} component={Pramotions} />
                 <Stack.Screen name="ListOfPromo" options={{ headerShown: false }} component={ListOfPromo} />

@@ -15,7 +15,7 @@ export default class AccountingNaviagtion extends Component {
     render() {
         return (
             <>
-            <TopBar {...this.props}/>
+            {/* <TopBar {...this.props}/> */}
             <Stack.Navigator initialRouteName='AccountManagement' >
                 <Stack.Screen name='AccountManagement' options={{ headerShown: false }} component={AccountManagement} />
                 <Stack.Screen name='AddStore' options={{ headerShown: false }} component={AddStore} />

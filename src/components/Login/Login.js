@@ -230,7 +230,7 @@ export default class Login extends Component {
         global.storeName = String(res.data[0].name);
         AsyncStorage.setItem("storeName", String(res.data[0].name)).catch(err => {
         });
-        this.props.navigation.navigate('HomeNavigation');
+        this.props.navigation.navigate('TopBarNavigation');
       }
     });
   }
@@ -251,7 +251,7 @@ export default class Login extends Component {
       AsyncStorage.setItem("storeId", storeId);
       global.storeName = storeName;
       AsyncStorage.setItem("storeName", storeName).then(() => {
-        this.props.navigation.navigate('HomeNavigation');
+        this.props.navigation.navigate('TopBarNavigation');
       });
     }
   }
