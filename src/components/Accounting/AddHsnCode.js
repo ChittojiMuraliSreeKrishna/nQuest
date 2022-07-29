@@ -41,9 +41,11 @@ export default class AddHsnCode extends Component {
   componentDidMount() {
     if (this.props.route.params) {
       this.setState({ isEdit: this.props.route.params.isEdit });
-      const { taxAppliesOn, taxId, description, taxType, hsnCode, fromPrice, toPrice, taxAppliedType, taxLabel, taxList } = this.props.route.params.item;
-      this.setState({ taxAppliesOn: taxAppliesOn, taxId: taxId, description: description, taxType: taxType, hsnCode: JSON.stringify(hsnCode), fromPrice: fromPrice, id: JSON.stringify(this.props.route.params.item.id), toPrice: toPrice, taxType: taxAppliedType });
-      console.log("oooo", this.props.route.params.item);
+      if (this.state.isEdit) {
+        const { taxAppliesOn, taxId, description, taxType, hsnCode, fromPrice, toPrice, taxAppliedType, taxLabel, taxList } = this.props.route.params.item;
+        this.setState({ taxAppliesOn: taxAppliesOn, taxId: taxId, description: description, taxType: taxType, hsnCode: JSON.stringify(hsnCode), fromPrice: fromPrice, id: JSON.stringify(this.props.route.params.item.id), toPrice: toPrice, taxType: taxAppliedType });
+        console.log("oooo", this.props.route.params.item);
+      }
     }
     this.getAllTaxes();
     this.getDescription();

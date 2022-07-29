@@ -44,33 +44,14 @@ export default class Inventory extends Component {
     this.onEndReachedCalledDuringMomentum = true;
   }
 
-  handleBackButtonClick() {
-    this.props.navigation.openDrawer();
-  }
-
-
   async componentDidMount() {
-    var storeStringId = "";
-    var storeName = "";
+    // Store Details
+    const storeId = AsyncStorage.getItem("storeId");
+    const storeName = AsyncStorage.getItem("storeName");
+    this.setState({ storeId: storeId, storeName: storeName });
+    console.log({ storeId, storeName });
 
-    AsyncStorage.getItem("storeId").then((value) => {
-      storeStringId = value;
-      this.setState({ storeId: parseInt(storeStringId) });
-      console.log(this.state.storeId);
-
-    }).catch(() => {
-      this.setState({ loading: false });
-      console.log('There is error getting storeId');
-    });
-
-    AsyncStorage.getItem("storeName").then((value) => {
-      storeName = value;
-      this.setState({ storeName: storeName });
-    }).catch(() => {
-      this.setState({ loading: false });
-      console.log('There is error getting storeId');
-    });
-
+    // Getting Privileges
     AsyncStorage.getItem("rolename").then(value => {
       console.log({ value });
       axios.get(UrmService.getPrivillagesByRoleName() + value).then(res => {
@@ -99,6 +80,7 @@ export default class Inventory extends Component {
                     }
                   }
                 });
+                this.setState({ privilages: this.state.privilages });
                 this.initialNavigation();
               }
             }
@@ -143,8 +125,6 @@ export default class Inventory extends Component {
     } else {
       this.setState({ flagProductCombo: false });
     }
-
-
     if (this.state.privilages[index].bool === true) {
       this.state.privilages[index].bool = false;
     }
@@ -155,18 +135,25 @@ export default class Inventory extends Component {
       if (index != i) {
         this.state.privilages[i].bool = false;
       }
-      this.setState({ privilages: this.state.privilages });
+      this.setState({ privilages: this.state.privilages }, () => {
+        const { privilages } = this.state;
+        console.log({ privilages });
+      });
     }
   };
 
-
+  // Add Barcode
   navigateToAddBarcode() {
     this.props.navigation.navigate('AddBarcode', {
       isEdit: false,
-      onGoBack: () => this.child.getAllBarcodes(),
+      onGoBack: () => {
+        this.setState({ flagBarcode: true });
+        this.child.getAllBarcodes();
+      },
     });
   }
 
+  // Add Product Combo
   navigateToAddProductCombo() {
     this.props.navigation.navigate('AddProduct', {
       isEdit: false,
@@ -180,7 +167,8 @@ export default class Inventory extends Component {
 
 
   render() {
-
+    const { privilages } = this.state;
+    console.log({ privilages });
     return (
       <View style={styles.mainContainer}>
         {this.state.loading &&
@@ -189,25 +177,26 @@ export default class Inventory extends Component {
         }
         <ScrollView>
           <View style={styles.container}>
-            <FlatList
-              style={scss.pageNavigationContainer}
-              horizontal
-              data={this.state.privilages}
-              showsVerticalScrollIndicator={false}
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={(item, i) => i.toString()}
-              renderItem={({ item, index }) => (
-                <TouchableOpacity style={[scss.pageNavigationBtn, {
-                  borderColor: item.bool ? '#ED1C24' : '#d7d7d7',
-                }]} onPress={() => this.topbarAction1(item, index)} >
+            <View>
+              <FlatList
+                style={scss.pageNavigationContainer}
+                horizontal
+                data={this.state.privilages}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item, i) => i.toString()}
+                renderItem={({ item, index }) => (
+                  <TouchableOpacity style={[scss.pageNavigationBtn, {
+                    borderColor: item.bool ? '#ED1C24' : '#d7d7d7',
+                  }]} onPress={() => this.topbarAction1(item, index)} >
 
-                  <Text style={[pageNavigationBtnText, { color: item.bool ? "#ED1C24" : '#00000073', }]}>
-                    {item.name}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            />
-
+                    <Text style={[scss.pageNavigationBtnText, { color: item.bool ? "#ED1C24" : '#00000073', }]}>
+                      {item.name}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
             {this.state.flagBarcode && (
               <Barcode
                 ref={instance => { this.child = instance; }}
