@@ -10,7 +10,8 @@
 }
 
 .flatListBody {
-  // background-color: $white;
+  background-color: $white;
+  height: 100%;
 }
 
 .flatListContainer {
@@ -51,7 +52,7 @@
 }
 
 .flatListFooter {
-  background: $grey;
+  background: $grey-light;
   min-height: 25%;
   width: 100%;
   border-bottom-left-radius: 8px;
@@ -64,19 +65,19 @@
 }
 
 .textStyleMedium {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold;
   color: $secondary-color;
 }
 
 .textStyleLight {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: medium;
   color: $grey-light;
 }
 
 .highText {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold;
   color: $primary-color;
 }

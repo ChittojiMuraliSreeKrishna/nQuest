@@ -105,18 +105,8 @@ class AddBarcode extends Component {
     this.setState({ isEdit: this.props.route.params.isEdit });
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     this.setState({ clientId: clientId });
-
-    AsyncStorage.getItem("storeId").then((value) => {
-      storeStringId = value;
-      this.setState({ storeId: parseInt(storeStringId) },
-        () => {
-        });
-      console.log(this.state.storeId);
-    }).catch(() => {
-      this.setState({ loading: false });
-      console.log('There is error getting storeId');
-      // alert('There is error getting storeId');
-    });
+    const storeId = AsyncStorage.getItem("storeId");
+    console.log({ storeId: storeId });
     this.getAllstores();
     this.getAllHSNCodes();
   }
@@ -150,30 +140,25 @@ class AddBarcode extends Component {
 
   // Division Actions
   getAllDivisions(data) {
+    let divisions = [];
     InventoryService.getAllDivisions(data).then((res) => {
       if (res?.data) {
-        res.data.forEach((ele, index) => {
-          console.log({ ele });
-          const divisionObj = {
-            id: ele.id,
-            value: ele.name,
-            label: ele.name
-          };
-          console.log({ divisionObj });
-          this.state.divisionsList.push(divisionObj);
-        });
-        this.setState({ divisionsList: this.state.divisionsList, divisionArray: this.state.divisionsList });
+        for (let i = 0; i < res.data.length; i++) {
+          divisions.push({
+            value: res.data[i].id,
+            label: res.data[i].name,
+          });
+        }
+        console.log({ divisions });
+        this.setState({ divisionsList: divisions });
       }
     });
   }
   handleDivision = (value) => {
-    for (let i = 0; i < this.state.divisionArray.length; i++) {
-      if (this.state.divisionArray[i].name === value) {
-        this.setState({ divisionId: this.state.divisionArray[i].id, subSectionsList: [], subSectionId: "" });
-        this.getAllSections(this.state.divisionId, this.state.selectedDomain);
-      }
-    }
-    this.setState({ selectedDivision: value });
+    console.log({ value });
+    this.setState({ divisionId: value, selectedDivision: value }, () => {
+      this.getAllSections(this.state.divisionId, this.state.selectedDomain);
+    });
     if (this.state.divisionId !== null) {
       this.setState({ divisionValid: true });
     }
@@ -183,56 +168,51 @@ class AddBarcode extends Component {
   // Section Actions
   getAllSections(id, data) {
     this.setState({ sectionsList: [] });
+    let section = [];
     InventoryService.getAllSections(id, data).then(res => {
       if (res?.data) {
-        res.data.forEach((ele, index) => {
-          const sectionsObj = {
-            id: ele.id,
-            value: ele.name,
-            label: ele.name
-          };
-          console.log({ sectionsObj });
-          this.state.sectionsList.push(sectionsObj);
-        });
-        this.setState({ sectionsList: this.state.sectionsList, secionArray: this.state.sectionsList });
+        for (let i = 0; i < res.data.length; i++) {
+          section.push({
+            value: res.data[i].id,
+            label: res.data[i].name,
+          });
+        }
+        console.log({ section });
+        this.setState({ sectionsList: section });
       }
     });
   }
   handleSection = (value) => {
-    for (let i = 0; i < this.state.secionArray.length; i++) {
-      if (this.state.secionArray[i].name === value) {
-        this.setState({ sectionId: this.state.secionArray[i].id });
-      }
-    }
-    this.setState({ section: value });
+    this.setState({ sectionId: value, section: value }, () => {
+      this.getAllSubsections(this.state.sectionId, this.state.selectedDomain);
+    });
     if (this.state.sectionId !== null) {
       this.setState({ sectionValid: true });
     }
-    this.getAllSubsections(this.state.sectionId, this.state.selectedDomain);
   };
 
   // SubSection Actions
   getAllSubsections(id, data) {
     this.setState({ subSectionsList: [] });
+    let subSection = [];
     InventoryService.getAllSections(id, data).then(res => {
       if (res?.data) {
-        res.data.forEach((ele, index) => {
-          const subSectionObj = {
-            id: ele.id,
-            value: ele.name,
-            label: ele.name
-          };
-          console.log({ subSectionObj });
-          this.state.subSectionsList.push(subSectionObj);
-        });
-        this.setState({ subSectionsList: this.state.subSectionsList, subsecionArray: this.state.subSectionsList });
+        for (let i = 0; i < res.data.length; i++) {
+          subSection.push({
+            value: res.data[i].name,
+            label: res.data[i].name,
+            id: res.data[i].id
+          });
+        }
+        console.log({ subSection });
+        this.setState({ subSectionsList: subSection });
       }
     });
   }
   handleSubSection = (value) => {
-    for (let i = 0; i < this.state.subsecionArray.length; i++) {
-      if (this.state.subsecionArray[i].name === value) {
-        this.setState({ subsectionId: this.state.subsecionArray[i].id });
+    for (let i = 0; i < this.state.subSectionsList.length; i++) {
+      if (this.state.subSectionsList[i].name === value) {
+        this.setState({ subsectionId: this.state.subSectionsList[i].id });
       }
     }
     this.setState({ subSection: value });
@@ -244,25 +224,25 @@ class AddBarcode extends Component {
   // Category Actions
   getAllCatogiries(data) {
     this.setState({ categoriesList: [] });
+    let categories = [];
     InventoryService.getAllCategories(data).then(res => {
       if (res?.data) {
-        res.data.forEach((ele, index) => {
-          const categoryObj = {
-            id: ele.id,
-            value: ele.name,
-            label: ele.name
-          };
-          console.log({ categoryObj });
-          this.state.categoriesList.push(categoryObj);
-        });
-        this.setState({ categoriesList: this.state.categoriesList, catogiriesArray: this.state.categoriesList });
+        for (let i = 0; i < res.data.length; i++) {
+          categories.push({
+            value: res.data[i].name,
+            label: res.data[i].name,
+            id: res.data[i].id,
+          });
+        }
+        console.log({ categories });
+        this.setState({ categoriesList: categories });
       }
     });
   }
   handleCateory = (value) => {
-    for (let i = 0; i < this.state.catogiriesArray.length; i++) {
-      if (this.state.catogiriesArray[i].name === value) {
-        this.setState({ catogirieId: this.state.catogiriesArray[i].id });
+    for (let i = 0; i < this.state.categoriesList.length; i++) {
+      if (this.state.categoriesList[i].name === value) {
+        this.setState({ catogirieId: this.state.categoriesList[i].id });
       }
     }
     this.setState({ category: value });
@@ -274,26 +254,23 @@ class AddBarcode extends Component {
   // UOM Actions
   getAllUOM() {
     this.setState({ uomList: [] });
+    let uomList = [];
     InventoryService.getUOM().then(res => {
-      res?.data.forEach((ele, index) => {
-        const uomObj = {
-          id: ele.id,
-          value: ele.uomName,
-          label: ele.uomName
-        };
-        console.log({ uomObj });
-        this.state.uomList.push(uomObj);
-      });
-      this.setState({ uomList: this.state.uomList, uomArray: this.state.uomList });
+      if (res?.data) {
+        console.log("UOMS", res.data);
+        for (let i = 0; i < res.data.length; i++) {
+          uomList.push({
+            value: res.data[i].id,
+            label: res.data[i].uomName
+          });
+        }
+        console.log({ uomList });
+        this.setState({ uomList: uomList });
+      }
     });
   }
   handleUOM = (value) => {
-    for (let i = 0; i < this.state.uomArray.length; i++) {
-      if (this.state.uomArray[i].name === value) {
-        this.setState({ uomId: this.state.uomArray[i].id });
-      }
-    }
-    this.setState({ uomName: value });
+    this.setState({ uomId: value, uomName: value });
     if (this.state.uomId !== null) {
       this.setState({ uomValid: true });
     }
@@ -302,29 +279,23 @@ class AddBarcode extends Component {
   // HSNCodes Actions
   getAllHSNCodes() {
     this.setState({ hsnCodesList: [] });
-    const { hsnCodesList } = this.state;
+    let hsnList = [];
     InventoryService.getAllHsnList().then(res => {
       if (res?.data) {
-        res.data.result.forEach((ele, index) => {
-          const hsnObj = {
-            id: ele.id,
-            value: ele.hsnCode,
-            label: ele.hsnCode,
-          };
-          console.log({ hsnObj });
-          hsnCodesList.push(hsnObj);
-        });
-        this.setState({ hsnCodesList: hsnCodesList, hsncodesArray: hsnCodesList });
+        console.log("HSNS", res.data);
+        for (let i = 0; i < res.data.result.length; i++) {
+          hsnList.push({
+            value: res.data.result[i].id,
+            label: res.data.result[i].hsnCode
+          });
+        }
+        console.log({ hsnList });
+        this.setState({ hsnCodesList: hsnList });
       }
     });
   }
   handleHSNCode = (value) => {
-    for (let i = 0; i < this.state.hsncodesArray.length; i++) {
-      if (this.state.hsncodesArray[i].name === value) {
-        this.setState({ hsnId: this.state.hsncodesArray[i].id });
-      }
-    }
-    this.setState({ hsnCode: value });
+    this.setState({ hsnId: value, hsnCode: value });
     if (this.state.hsnId !== null) {
       this.setState({ hsnValid: true });
     }
@@ -333,35 +304,28 @@ class AddBarcode extends Component {
   // Store Actions
   async getAllstores() {
     this.setState({ storesList: [] });
+    let storesList = [];
     const { clientId } = this.state;
     InventoryService.getAllStores(clientId).then(res => {
+      console.log("Stores", res.data);
       if (res?.data) {
-        res.data.forEach((ele, index) => {
-          const storeObj = {
-            id: ele.id,
-            value: ele.name,
-            label: ele.name
-          };
-          this.state.storesList.push(storeObj);
-        });
-        console.log({ storeObj });
-        this.setState({ storesList: this.state.storesList });
+        for (let i = 0; i < res.data.length; i++) {
+          storesList.push({
+            value: res.data[i].id,
+            label: res.data[i].name
+          });
+        }
+        console.log({ storesList });
+        this.setState({ storesList: storesList });
       }
     });
   }
   handleStore = (value) => {
-    console.log("value", this.state.storeNamesArray);
-    for (let i = 0; i < this.state.storeNamesArray.length; i++) {
-      if (this.state.storeNamesArray[i].name === value) {
-        this.setState({ selectedstoreId: this.state.storeNamesArray[i].id });
-      }
-    }
-    console.log(this.state.selectedstoreId);
-    this.setState({ store: value });
+    this.setState({ storeId: value, store: value });
   };
 
 
-  // Colour Actions
+  // Color Actions
   handleColour = (value) => {
     this.setState({ colour: value });
   };
@@ -614,9 +578,8 @@ class AddBarcode extends Component {
                 return <Chevron style={styles.imagealign} size={1.5} color={divisionValid ? "gray" : "#dd0000"} />;
               }}
               items={data1}
-              onValueChange={this.handleDomain}
+              onValueChange={(value) => { this.handleDomain(value); }}
               on
-              onChangeText={() => { this.getAllDivisions(this.state.selectedDomain); }}
               style={divisionValid ? rnPicker : rnPickerError}
               value={this.state.selectedDomain}
               useNativeAndroidPickerStyle={false}
@@ -634,7 +597,7 @@ class AddBarcode extends Component {
                     return <Chevron style={styles.imagealign} size={1.5} color={divisionValid ? "gray" : "#dd0000"} />;
                   }}
                   items={this.state.divisionsList}
-                  onValueChange={this.handleDivision}
+                  onValueChange={(value) => this.handleDivision(value)}
                   style={divisionValid ? rnPicker : rnPickerError}
                   value={this.state.selectedDivision}
                   useNativeAndroidPickerStyle={false}

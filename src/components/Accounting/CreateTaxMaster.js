@@ -22,21 +22,22 @@ export default class CreateTaxMaster extends Component {
   }
 
   componentDidMount() {
-    this.getTaxMaster()
+    this.getTaxMaster();
+    this.props.onRef(this);
   }
 
   async getTaxMaster() {
-    this.setState({ loading: true })
+    this.setState({ loading: true });
     AccountingService.getAllMasterTax().then(res => {
       if (res) {
-        console.log(res.data)
-        this.setState({ taxList: res.data.result })
+        console.log(res.data);
+        this.setState({ taxList: res.data.result });
       }
-      this.setState({ loading: false })
+      this.setState({ loading: false });
     }).catch(err => {
-      this.setState({ loading: false })
-      console.log(err)
-    })
+      this.setState({ loading: false });
+      console.log(err);
+    });
   }
 
   modelCancel() {
@@ -54,9 +55,16 @@ export default class CreateTaxMaster extends Component {
       });
   };
 
-  deleteTax(item, index) {
-
+  navigateToAddTax() {
+    this.props.navigation.navigate('AddTaxMaster', {
+      isEdit: false,
+      onGoBack: () => {
+        this.child.getTaxMaster();
+        alert("hey");
+      },
+    });
   }
+
 
   render() {
     return (
@@ -68,6 +76,7 @@ export default class CreateTaxMaster extends Component {
         <FlatList
           ListHeaderComponent={<View style={flatListHeaderContainer}>
             <Text style={flatListTitle}>Create Tax Master</Text>
+            <TouchableOpacity onPress={() => this.navigateToAddTax()}><Text style={{ fontSize: 20 }}>+</Text></TouchableOpacity>
           </View>}
           data={this.state.taxList}
           style={{ marginTop: 20 }}

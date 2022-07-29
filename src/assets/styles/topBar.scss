@@ -1,11 +1,21 @@
+@import './Colors.scss';
+
 .container {
-  height: 50%;
-  width: 80%;
-  border-radius:2.5rem;
-  position: absolute;
-  top: 15%;
-  margin:0px auto;
-  left:9.5%;
-  padding:5%;
-  background-color: #fff;
+  background: $white;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1px;
+}
+
+.dropDown {
+  height: 60px;
+  margin: 16px;
+  border-bottom-width: 2px;
+  border-color: $grey;
+  width: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

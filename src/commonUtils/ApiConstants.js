@@ -25,6 +25,12 @@ export const NEW_SALE_URL = {
 };
 
 export const INVENTORY_PORTAL = {
+  // Retail
+  updateBarcodes: "/inventory/inventoryRetail/updateBarcode",
+  addBarcodes: "/inventory/inventoryRetail/createBarcode",
+  getRetailBarcodeDetails: "/inventory/inventoryRetail/getBarcodeId",
+
+  // Textile
   getAllBarcodes: "/inventory/inventoryTextile/getAllBarcodeTextiles",
   getAllProductBundleList: "/inventory/productBundle/all",
   getAllDivisions: "/inventory/catalog/divisions",
@@ -33,11 +39,10 @@ export const INVENTORY_PORTAL = {
   getAllCategories: "/inventory/catalog/categories",
   getAllHsnList: "/hsn-details/hsn-details/getHsnDetails",
   getStoreNamesByIds: '/user-management/store/storeList',
-  updateBarcodes: "/inventory/inventoryRetail/updateBarcode",
-  addBarcodes: "/inventory/inventoryRetail/createBarcode",
   updatTextileBarcodes: "/inventory/inventory-management/product",
   addTextileBarcodes: "/inventory/inventory-management/product",
   updateBarcodesQuntity: "/inventory/inventory-management/product-qty",
+  getTextileBarcodeDetails: "/inventory/inventory-management/barcode",
 };
 
 export const BILLING_PORTAL = {

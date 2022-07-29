@@ -56,7 +56,7 @@ export default class Barcode extends Component {
     const newstoreId = await AsyncStorage.getItem("newstoreId");
     console.log({ newstoreId });
     console.log({ storeId });
-    this.setState({ storeId: newstoreId });
+    this.setState({ storeId: storeId });
     this.getAllBarcodes();
     console.log({ scss });
   }
@@ -230,7 +230,7 @@ export default class Barcode extends Component {
   handleAddBarcode() {
     this.props.navigation.navigate('AddBarcode', {
       isEdit: false,
-      onGoBack: () => this.child.getAllBarcodes(),
+      onGoBack: () => this.getAllBarcodes(),
     });
   }
 

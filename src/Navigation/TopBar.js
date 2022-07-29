@@ -1,12 +1,12 @@
 import { View, Text, StyleSheet, Image } from 'react-native';
 import React, { Component } from 'react';
 import { Dropdown } from 'react-native-element-dropdown';
-import { RW, RF } from '../Responsive';
+import { RW, RF, RH } from '../Responsive';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import UrmService from '../components/services/UrmService';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
+import scss from '../assets/styles/topBar.scss';
 
 const data = [
 
@@ -24,7 +24,7 @@ const screenMapping = {
   "Reports": "ReportsNavigation",
   "URM Portal": "UrmNavigation"
 
-}
+};
 
 
 const GetImageBasedOnPrevilageName = (name) => {
@@ -37,8 +37,8 @@ const GetImageBasedOnPrevilageName = (name) => {
               name === "Reports" ? require('../components/assets/images/reports.png') :
                 name === "URM Portal" ? require('../components/assets/images/urmportal.png') :
                   <></>
-  )
-}
+  );
+};
 
 
 
@@ -170,7 +170,7 @@ export class TopBar extends Component {
                 //this.setState({ loading: false });
               }
 
-              this.getData()
+              this.getData();
             }
           });
         }).catch((err) => {
@@ -193,21 +193,22 @@ export class TopBar extends Component {
 
   render() {
     const active = this.props.active;
-    var placeholderData = currentSelection === '' ? this.state.firstDisplayName : currentSelection
-    console.log("placeholderData in topbar", placeholderData, currentSelection)
+    var placeholderData = currentSelection === '' ? this.state.firstDisplayName : currentSelection;
+    console.log("placeholderData in topbar", placeholderData, currentSelection);
 
     return (
       <View style={styles.headerContainer} >
-        <View>
+        <View
+        >
           <Image
             style={styles.logoimage}
-            source={require('../components/assets/images/easy_retail_logo.png')}
+            source={require('../assets/Images/retail_logo_head.png')}
           ></Image>
         </View>
         <View>
 
           <Dropdown
-            style={styles.dropdown}
+            style={scss.dropDown}
             placeholderStyle={styles.placeholderStyle}
             selectedTextStyle={styles.selectedTextStyle}
             inputSearchStyle={styles.inputSearchStyle}
@@ -222,13 +223,13 @@ export class TopBar extends Component {
             onChange={item => {
               console.log("current selection before onchange", currentSelection);
               var screenName = screenMapping[item.label];
-              currentSelection = item.label
+              currentSelection = item.label;
               this.setState({ firstDisplayName: item.label });
               console.log("screenName : " + screenName + ", displayname: " + item.label + ", currentSelection " + currentSelection);
               //this.setState({currentSelection:item.label});
               console.log("current selection after on change", currentSelection);
-              global.homeButtonClicked=false;
-              global.profileButtonClicked=false;
+              global.homeButtonClicked = false;
+              global.profileButtonClicked = false;
               this.props.navigation.navigate(screenName);
             }}
             renderLeftIcon={() => (
@@ -238,7 +239,7 @@ export class TopBar extends Component {
           />
         </View>
       </View>
-    )
+    );
   }
 }
 
@@ -260,9 +261,9 @@ const styles = StyleSheet.create({
     width: RW(170)
   },
   placeholderStyle: {
-    fontSize: RF(16),
+    fontSize: RF(12),
     fontFamily: 'bold',
-    color: "#353C40"
+    color: "#353C40",
   },
   selectedTextStyle: {
     fontSize: 16,
@@ -289,8 +290,12 @@ const styles = StyleSheet.create({
   },
   textItem: {
     flex: 1,
-    fontSize: RF(14),
+    fontSize: RF(10),
     fontFamily: 'bold'
+  },
+  logoimage: {
+    width: RW(160),
+    height: RH(60)
   }
-})
+});
 export default TopBar;

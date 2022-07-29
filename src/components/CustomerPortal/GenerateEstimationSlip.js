@@ -82,8 +82,8 @@ class GenerateEstimationSlip extends Component {
       uom: '',
       store: '',
       storeId: 0,
-      itemsList: [1],
-      barList: [1],
+      itemsList: [],
+      barList: [],
       mrpAmount: 0,
       promoDisc: 0,
       totalAmount: 0,
@@ -267,6 +267,9 @@ class GenerateEstimationSlip extends Component {
               }
             }
           }
+          if (count === false) {
+            this.state.itemsList.push(res.data);
+          }
         }
         this.setState({ barList: this.state.itemsList }, () => {
           this.state.barList.forEach(element => {
@@ -293,6 +296,7 @@ class GenerateEstimationSlip extends Component {
       this.setState({ loading: false });
       alert("please enter a valid Barcode / smNumber");
     });
+    console.log("BarListst", this.state.barList);
   }
 
   calculateTotal() {
@@ -745,39 +749,38 @@ class GenerateEstimationSlip extends Component {
         )
         }
 
-        {
-          this.state.resultModel && (
-            <View>
-              <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
-                <View style={sucessContainer}>
-                  <View>
-                    <View style={sucessHeader}>
-                      <View>
-                        <Text style={sucessHeading} > ES Number </Text>
-                      </View>
-                      <View>
-                        <TouchableOpacity style={deleteCloseBtn} onPress={() => this.modelCancel()}>
-                          <Image style={{ width: Device.isTablet ? 20 : 15, height: Device.isTablet ? 20 : 15 }} source={require('../assets/images/modalCloseWhite.png')} />
-                        </TouchableOpacity>
-                      </View>
+        {this.state.resultModel && (
+          <View>
+            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
+              <View style={sucessContainer}>
+                <View>
+                  <View style={sucessHeader}>
+                    <View>
+                      <Text style={sucessHeading} > ES Number </Text>
                     </View>
-                  </View>
-                  <View>
-                    <View style={{ alignItems: 'center', marginTop: 20 }}>
-                      <Text>Es Number:</Text>
-                      <Text></Text>
-                      <Text selectable={true} style={sucessText}>{this.state.resultDsNumber}</Text>
+                    <View>
+                      <TouchableOpacity style={deleteCloseBtn} onPress={() => this.modelCancel()}>
+                        <Image style={{ width: Device.isTablet ? 20 : 15, height: Device.isTablet ? 20 : 15 }} source={require('../assets/images/modalCloseWhite.png')} />
+                      </TouchableOpacity>
                     </View>
-                    <TouchableOpacity
-                      style={sucessBtn} onPress={() => this.modelCancel()}
-                    >
-                      <Text style={sucessBtnText}  > {I18n.t("BACK TO DASHBOARD")} </Text>
-                    </TouchableOpacity>
                   </View>
                 </View>
-              </Modal>
-            </View>
-          )
+                <View>
+                  <View style={{ alignItems: 'center', marginTop: 20 }}>
+                    <Text>Es Number:</Text>
+                    <Text></Text>
+                    <Text selectable={true} style={sucessText}>{this.state.resultDsNumber}</Text>
+                  </View>
+                  <TouchableOpacity
+                    style={sucessBtn} onPress={() => this.modelCancel()}
+                  >
+                    <Text style={sucessBtnText}  > {I18n.t("BACK TO DASHBOARD")} </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+          </View>
+        )
         }
 
 

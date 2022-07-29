@@ -59,6 +59,14 @@ export default class Roles extends Component {
     this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
+  // Page Navigation
+  navigateToCreateRoles() {
+    this.props.navigation.navigate('CreateRole', {
+      isEdit: false,
+      onGoBack: () => this.refresh(),
+    });
+  }
+
   clearFilterAction() {
     this.setState({ filterActive: false });
     this.getRolesList();
@@ -136,23 +144,26 @@ export default class Roles extends Component {
       <View>
         <FlatList
           style={scss.flatListBody}
-          ListHeaderComponent={<View style={flatListHeaderContainer}>
+          ListHeaderComponent={<View style={scss.headerContainer}>
             <Text style={flatListTitle}>Roles</Text>
-            {!this.state.filterActive &&
-              <TouchableOpacity
-                style={filterBtn}
-                onPress={() => this.filterAction()} >
-                <Image style={{ alignSelf: 'center', top: 5 }} source={require('../assets/images/promofilter.png')} />
-              </TouchableOpacity>
+            <View style={scss.headerContainer}>
+              <TouchableOpacity style={filterBtn} onPress={() => this.navigateToCreateRoles()}><Text style={{ fontSize: 20 }}>+</Text></TouchableOpacity>
+              {!this.state.filterActive &&
+                <TouchableOpacity
+                  style={filterBtn}
+                  onPress={() => this.filterAction()} >
+                  <Image style={{ alignSelf: 'center', top: 5 }} source={require('../assets/images/promofilter.png')} />
+                </TouchableOpacity>
 
-            }
-            {this.state.filterActive &&
-              <TouchableOpacity
-                style={filterBtn}
-                onPress={() => this.clearFilterAction()} >
-                <Image style={{ alignSelf: 'center', top: 5 }} source={require('../assets/images/clearFilterSearch.png')} />
-              </TouchableOpacity>
-            }
+              }
+              {this.state.filterActive &&
+                <TouchableOpacity
+                  style={filterBtn}
+                  onPress={() => this.clearFilterAction()} >
+                  <Image style={{ alignSelf: 'center', top: 5 }} source={require('../assets/images/clearFilterSearch.png')} />
+                </TouchableOpacity>
+              }
+            </View>
           </View>}
           data={filterActive ? filterRolesData : rolesData}
           ListEmptyComponent={<EmptyList message={this.state.rolesError} />}

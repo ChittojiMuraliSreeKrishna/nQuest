@@ -101,8 +101,6 @@ export default class DebitNotes extends Component {
     this.setState({ date: new Date(), enddate: new Date(), datepickerOpen: false, datepickerendOpen: false });
   }
 
-
-
   modelCancel() {
     this.setState({ modalVisible: false })
   }
