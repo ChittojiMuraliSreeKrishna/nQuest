@@ -13,7 +13,7 @@ export default class CustomerNavigation extends Component {
     render() {
         return (
             <>
-                <TopBar {...this.props} />
+                {/* <TopBar {...this.props} /> */}
                 <Stack.Navigator initialRouteName='NewSaleTextile'>
                     <Stack.Screen name='NewSaleTextile' options={{ headerShown: false }} component={NewSaleTextile} />
                     <Stack.Screen name='TextilePayment' options={{ headerShown: false }} component={TextilePayment} />
