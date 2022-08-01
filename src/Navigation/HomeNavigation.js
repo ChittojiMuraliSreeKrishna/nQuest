@@ -16,7 +16,6 @@ export default class HomeNavigation extends React.Component {
   render() {
     return (
       <Stack.Navigator>
-        <Stack.Screen name="TopBarNavigation" options={{ headerShown: false }} component={TopBarNavigation} />
         <Stack.Screen name="Login" options={{ headerShown: false }} component={Login} />
         <Stack.Screen name="LoginAfterLanguageSelect" options={{ headerShown: false }} component={LoginAfterLanguageSelect} />
         <Stack.Screen name="SelectStore" options={{ headerShown: false }} component={SelectStore} />

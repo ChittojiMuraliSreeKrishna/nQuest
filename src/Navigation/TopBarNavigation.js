@@ -25,7 +25,7 @@ export default class TopBarNavigation extends Component {
       <TopBar {...this.props}/>
       <Stack.Navigator >
         <Stack.Screen name="TopBar" options={{ headerShown: false }} component={TopBar} />
-        {/* <Stack.Screen name="Home" options={{ headerShown: false }} component={Home} /> */}
+        <Stack.Screen name="Home" options={{ headerShown: false }} component={Home} />
         <Stack.Screen name="PromoNavigation" options={{ headerShown: false }} component={PromoNavigation} />
         <Stack.Screen name="InventoryNavigation" options={{ headerShown: false }} component={InventoryNavigation} />
         <Stack.Screen name="UrmNavigation" options={{ headerShown: false }} component={UrmNavigation} />

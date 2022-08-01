@@ -10,11 +10,12 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import I18n from 'react-native-i18n';
 import Modal from 'react-native-modal'
 import style from '../../src/assets/styles/topBar.scss';
+import BottomTabNav from './BottomTabNav';
 
 var data = [];
 var currentSelection = '';
 var dataCleared = true;
-
+var firstDisplayRoute = ''
 export const screenMapping = {
 
   "Dashboard": "Home",
@@ -30,7 +31,7 @@ export const screenMapping = {
 
 const GetImageBasedOnPrevilageName = (name) => {
   return (
-    name === "Dashboard" ? <Icon name="home" /> :
+    name === "Dashboard" ? require('../components/assets/images/home.png') :
       name === "Billing Portal" ? require('../components/assets/images/customerportal.png') :
         name === "Inventory Portal" ? require('../components/assets/images/inventoryportal.png') :
           name === "Promotions & Loyalty" ? require('../components/assets/images/promotions.png') :
@@ -63,6 +64,8 @@ export class TopBar extends Component {
       <TouchableOpacity style={styles.item}
         onPress={() => {
           currentSelection = previlage.item
+          global.profileButtonClicked = false
+          global.homeButtonClicked = false
           this.props.navigation.navigate(screenMapping[currentSelection], this.refresh());
           this.setState({ modalVisibleData: false })
         }}>
@@ -73,6 +76,7 @@ export class TopBar extends Component {
   }
 
   componentWillUnmount() {
+    currentSelection = ''
     console.log("topbar component unmount", this.props.route.name);
   }
 
@@ -144,6 +148,7 @@ export class TopBar extends Component {
               if (len > 0) {
                 this.setState({ firstDisplayName: res.data.parentPrivileges[0].name });
                 const firstDisplayName = this.state.firstDisplayName;
+                firstDisplayRoute = res.data.parentPrivileges[0].name
                 var privilegesSet = new Set();
                 // this.props.navigation.navigate(firstDisplayName);
                 for (let i = 0; i < len; i++) {
@@ -188,10 +193,14 @@ export class TopBar extends Component {
   }
   async getData() {
     const { firstDisplayName, firstDisplayNameScreen } = this.state;
+    console.log("data in get data", firstDisplayName, currentSelection);
     if (currentSelection === '') {
       currentSelection = firstDisplayName;
       this.setState({ firstDisplayNameScreen: screenMapping[firstDisplayName] });
       this.props.navigation.navigate(this.state.firstDisplayNameScreen, this.refresh());
+    }
+    else if (firstDisplayRoute === currentSelection) {
+      this.props.navigation.navigate(screenMapping[firstDisplayRoute], this.refresh())
     }
   };
 
@@ -211,45 +220,46 @@ export class TopBar extends Component {
     var displayName = currentSelection === '' ? this.state.firstDisplayName : currentSelection
     console.log("placeholder data: " + this.state.firstDisplayName + ",current selection " + currentSelection);
     return (
-      <View style={styles.headerContainer} >
-        <View
-        >
-          <Image
-            style={styles.logoimage}
-            source={require('../assets/Images/retail_logo_head.png')}
-          ></Image>
-        </View>
+      <>
+        <View style={styles.headerContainer} >
+          <View
+          >
+            <Image
+              style={styles.logoimage}
+              source={require('../assets/Images/retail_logo_head.png')}
+            ></Image>
+          </View>
 
-        <>
-          <TouchableOpacity style={{ flexDirection: 'row', padding: 15 }} onPress={() => this.modalHandle()}>
-            <Image style={styles.icon} source={GetImageBasedOnPrevilageName(currentSelection === '' ? this.state.firstDisplayName : currentSelection)} />
-            <Text style={styles.textItem}>
-              {I18n.t(displayName)}
-            </Text>
-            <Image style={{ margin: 10 }} source={require('../components/assets/images/list_trangle.png')} />
-          </TouchableOpacity>
-          {this.state.modalVisibleData &&
-           <View>
-           <Modal
-              transparent={true}
-              visible={this.state.modalVisibleData}
-            onRequestClose={() => { this.modalHandle() }}
-            onBackButtonPress={() => this.modalHandle()}
-            onBackdropPress={() => this.modalHandle()}
-            >
-              <View style={styles.modalContainer}>
-                <View style={styles.modalView}>
-                  <FlatList
-                    data={data}
-                    renderItem={(item) => this._renderItem(item)}
-                    keyExtractor={item => item}
-                  />
-                </View>
+          <>
+            <TouchableOpacity style={{ flexDirection: 'row', padding: 15 }} onPress={() => this.modalHandle()}>
+              <Image style={styles.icon} source={GetImageBasedOnPrevilageName(currentSelection === '' ? this.state.firstDisplayName : currentSelection)} />
+              <Text style={styles.textItem}>
+                {I18n.t(displayName)}
+              </Text>
+              <Image style={{ margin: 10 }} source={require('../components/assets/images/list_trangle.png')} />
+            </TouchableOpacity>
+            {this.state.modalVisibleData &&
+              <View>
+                <Modal
+                  transparent={true}
+                  visible={this.state.modalVisibleData}
+                  onRequestClose={() => { this.modalHandle() }}
+                  onBackButtonPress={() => this.modalHandle()}
+                  onBackdropPress={() => this.modalHandle()}
+                >
+                  <View style={styles.modalContainer}>
+                    <View style={styles.modalView}>
+                      <FlatList
+                        data={data}
+                        renderItem={(item) => this._renderItem(item)}
+                        keyExtractor={item => item}
+                      />
+                    </View>
+                  </View>
+                </Modal>
               </View>
-            </Modal>
-            </View>
-          }
-          {/* <Dropdown
+            }
+            {/* <Dropdown
             style={styles.dropdown}
 
             placeholderStyle={styles.placeholderStyle}
@@ -282,8 +292,9 @@ export class TopBar extends Component {
             )}
             renderItem={item => this._renderItem(item)}
           /> */}
-        </>
-      </View>
+          </>
+        </View>
+      </>
     );
   }
 }
@@ -326,7 +337,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     backgroundColor: "white",
-    justifyContent:'center',
+    justifyContent: 'center',
     // position: "relative",
     // width: "70%",
     // margin: "0 auto",
@@ -338,8 +349,8 @@ const styles = StyleSheet.create({
     // padding: 5
   },
   test: {
-   height:"1%",
- 
+    height: "1%",
+
 
   }
 });

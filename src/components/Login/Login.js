@@ -250,6 +250,7 @@ export default class Login extends Component {
       console.log({ storeId });
       AsyncStorage.setItem("storeId", storeId);
       global.storeName = storeName;
+      console.log("IN login",this.props.navigation)
       AsyncStorage.setItem("storeName", storeName).then(() => {
         this.props.navigation.navigate('TopBarNavigation');
       });

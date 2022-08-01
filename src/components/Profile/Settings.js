@@ -438,7 +438,10 @@ class Settings extends Component {
                 {/* <TopBar {...this.props} /> */}
                 <View>
                     <TouchableOpacity
-                        onPress={() => { this.props.navigation.navigate('Login'); }}>
+                        onPress={() => {
+                            AsyncStorage.clear()
+                            this.props.navigation.navigate('Login');
+                        }}>
                         <Text> {I18n.t("Sign Out")}</Text>
                     </TouchableOpacity>
                 </View>
