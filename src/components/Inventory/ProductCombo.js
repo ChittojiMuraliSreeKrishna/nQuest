@@ -15,7 +15,7 @@ import Loader from '../../commonUtils/loader';
 import { cancelBtn, cancelBtnText, datePicker, datePickerBtnText, datePickerButton1, datePickerButton2, dateSelector, dateText, submitBtn, submitBtnText } from '../Styles/FormFields';
 import { filterCloseImage, filterHeading, filterMainContainer, filterSubContainer } from '../Styles/PopupStyles';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import scss from '../../assets/styles/style.scss';
+import scss from '../../commonUtils/assets/styles/style.scss';
 
 export default class ProductCombo extends Component {
 
@@ -136,9 +136,9 @@ export default class ProductCombo extends Component {
         <FlatList
           style={scss.flatListBody}
           ListHeaderComponent={<View style={scss.headerContainer}>
-            <Text style={flatListTitle}>Products Combo</Text>
+            <Text style={flatListTitle}>Products Combo - <Text style={{ color: '#ED1C24' }}>{this.state.productComboList.length}</Text> </Text>
             <View style={scss.headerContainer}>
-              <TouchableOpacity style={filterBtn} onPress={() => this.handleAddProductCombo()}><Text style={{ fontSize: 20 }}>+</Text></TouchableOpacity>
+              <TouchableOpacity style={filterBtn} onPress={() => this.handleAddProductCombo()}><Image style={{ marginTop: 8 }} source={require('../../commonUtils/assets/Images/add_barcode.png')} /></TouchableOpacity>
               {!this.state.filterActive &&
                 <TouchableOpacity
                   style={filterBtn}

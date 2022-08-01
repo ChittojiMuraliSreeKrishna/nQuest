@@ -6,10 +6,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import UrmService from '../components/services/UrmService';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
 import I18n from 'react-native-i18n';
-import Modal from 'react-native-modal'
-import style from '../../src/assets/styles/topBar.scss';
+import Modal from 'react-native-modal';
 
 var data = [];
 var currentSelection = '';
@@ -62,9 +60,9 @@ export class TopBar extends Component {
     return (
       <TouchableOpacity style={styles.item}
         onPress={() => {
-          currentSelection = previlage.item
+          currentSelection = previlage.item;
           this.props.navigation.navigate(screenMapping[currentSelection], this.refresh());
-          this.setState({ modalVisibleData: false })
+          this.setState({ modalVisibleData: false });
         }}>
         <Image style={styles.icon} source={GetImageBasedOnPrevilageName(previlage.item)} />
         <Text style={styles.textItem}>{previlage.item}</Text>
@@ -175,7 +173,7 @@ export class TopBar extends Component {
                 data = Array.from(privilegesSet);
               }
 
-              this.getData()
+              this.getData();
 
             }
           });
@@ -197,7 +195,7 @@ export class TopBar extends Component {
 
 
   modalHandle() {
-    this.setState({ modalVisibleData: !this.state.modalVisibleData })
+    this.setState({ modalVisibleData: !this.state.modalVisibleData });
   }
 
 
@@ -208,7 +206,7 @@ export class TopBar extends Component {
   }
 
   render() {
-    var displayName = currentSelection === '' ? this.state.firstDisplayName : currentSelection
+    var displayName = currentSelection === '' ? this.state.firstDisplayName : currentSelection;
     console.log("placeholder data: " + this.state.firstDisplayName + ",current selection " + currentSelection);
     return (
       <View style={styles.headerContainer} >
@@ -216,7 +214,7 @@ export class TopBar extends Component {
         >
           <Image
             style={styles.logoimage}
-            source={require('../assets/Images/retail_logo_head.png')}
+            source={require('../commonUtils/assets/Images/retail_logo_head.png')}
           ></Image>
         </View>
 
@@ -229,24 +227,24 @@ export class TopBar extends Component {
             <Image style={{ margin: 10 }} source={require('../components/assets/images/list_trangle.png')} />
           </TouchableOpacity>
           {this.state.modalVisibleData &&
-           <View>
-           <Modal
-              transparent={true}
-              visible={this.state.modalVisibleData}
-            onRequestClose={() => { this.modalHandle() }}
-            onBackButtonPress={() => this.modalHandle()}
-            onBackdropPress={() => this.modalHandle()}
-            >
-              <View style={styles.modalContainer}>
-                <View style={styles.modalView}>
-                  <FlatList
-                    data={data}
-                    renderItem={(item) => this._renderItem(item)}
-                    keyExtractor={item => item}
-                  />
+            <View>
+              <Modal
+                transparent={true}
+                visible={this.state.modalVisibleData}
+                onRequestClose={() => { this.modalHandle(); }}
+                onBackButtonPress={() => this.modalHandle()}
+                onBackdropPress={() => this.modalHandle()}
+              >
+                <View style={styles.modalContainer}>
+                  <View style={styles.modalView}>
+                    <FlatList
+                      data={data}
+                      renderItem={(item) => this._renderItem(item)}
+                      keyExtractor={item => item}
+                    />
+                  </View>
                 </View>
-              </View>
-            </Modal>
+              </Modal>
             </View>
           }
           {/* <Dropdown
@@ -326,7 +324,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     backgroundColor: "white",
-    justifyContent:'center',
+    justifyContent: 'center',
     // position: "relative",
     // width: "70%",
     // margin: "0 auto",
@@ -338,8 +336,8 @@ const styles = StyleSheet.create({
     // padding: 5
   },
   test: {
-   height:"1%",
- 
+    height: "1%",
+
 
   }
 });

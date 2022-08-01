@@ -21,7 +21,7 @@ import Users from './users';
 import Roles from './Roles';
 import Stores from '../Accounting/Stores';
 
-import scss from '../../assets/styles/HeaderStyles.scss';
+import scss from '../../commonUtils/assets/styles/HeaderStyles.scss';
 var deviceheight = Dimensions.get("window").height;
 var deviceWidth = Dimensions.get("window").width;
 
@@ -191,245 +191,12 @@ export default class UserManagement extends Component {
       }
       this.setState({ privilages: this.state.privilages });
     }
-
   };
-
-  filterAction() {
-    if (this.state.flagRole === true) {
-      this.setState({ flagFilterRoles: true, filterActive: false });
-    } else {
-      this.setState({ flagFilterRoles: false });
-    }
-    if (this.state.flagUser === true) {
-      this.setState({ flagFilterUsers: true });
-    } else {
-      this.setState({ flagFilterUsers: false });
-    }
-    this.setState({ modalVisible: true });
-  }
-
-  clearFilterAction() {
-    if (this.state.flagUser === true) {
-      this.setState({ filterActive: false }, () => {
-        this.setState({ userType: "", role: "", branch: "" });
-      });
-    }
-    else if (this.state.flagRole === true) {
-      this.setState({ filterActive: false }, () => {
-        this.getRolesList();
-        this.setState({ role: "", createdBy: "", createdDate: "" });
-      });
-    }
-  }
-
-  modelCancel() {
-    this.setState({ modalVisible: false, flagFilterRoles: false, flagFilterUsers: false });
-  }
-
-  navigateToCreateRoles() {
-    this.props.navigation.navigate('CreateRole', {
-      isEdit: false,
-      onGoBack: () => this.refresh(),
-    });
-  }
-
-  refresh() {
-    this.getRolesList();
-  }
-
 
 
   handleBackButtonClick() {
     this.props.navigation.openDrawer();
   }
-
-  navigateToAddUsers() {
-    this.props.navigation.navigate('AddUser', {
-      isEdit: false,
-      onGoBack: () => this.child.getAllUsers(),
-    });
-  }
-
-  navigateToAddStores() {
-    this.props.navigation.navigate('AddStore', {
-      isEdit: false,
-      onGoBack: () => this.child.getStoresList(),
-    });
-  }
-
-  topbarAction1() {
-    this.setState({ flagUser: true, flagRole: false });
-  }
-
-  topbarAction2() {
-    this.getRolesList();
-    this.setState({ flagRole: true, flagUser: false });
-  }
-
-  filterDatepickerClicked() {
-    this.setState({ datepickerOpen: true });
-  }
-
-  filterDatepickerDoneClicked() {
-    console.log(this.state.date);
-    if (parseInt(this.state.date.getDate()) < 10 && parseInt(this.state.date.getMonth()) < 10) {
-      this.setState({ createdDate: this.state.date.getFullYear() + "-0" + (this.state.date.getMonth() + 1) + "-0" + this.state.date.getDate(), doneButtonClicked: true, datepickerOpen: false });
-    }
-    else if (parseInt(this.state.date.getMonth()) < 10) {
-      this.setState({ createdDate: this.state.date.getFullYear() + "-0" + (this.state.date.getMonth() + 1) + "-" + this.state.date.getDate(), doneButtonClicked: true, datepickerOpen: false });
-    }
-    else if (parseInt(this.state.date.getDate()) < 10) {
-      this.setState({ createdDate: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-0" + this.state.date.getDate(), doneButtonClicked: true, datepickerOpen: false });
-    }
-    else {
-      this.setState({ createdDate: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-" + this.state.date.getDate(), doneButtonClicked: true, datepickerOpen: false });
-    }
-  }
-
-  filterDatepickerCancelClicked() {
-    this.setState({ date: new Date(), datepickerOpen: false });
-  }
-
-  handleCreatedBy = (value) => {
-    this.setState({ createdBy: value });
-  };
-
-  handleRole = (value) => {
-    this.setState({ role: value });
-  };
-
-  handleUSerType = (value) => {
-    this.setState({ userType: value });
-  };
-
-  handleBranch = (value) => {
-    this.setState({ branch: value });
-  };
-
-  applyRoleFilter() {
-    console.log("creatBy", this.state.createdBy);
-    const searchRole = {
-      "roleName": this.state.role ? this.state.role : null,
-      "createdBy": this.state.createdBy ? this.state.createdBy : null,
-      "createdDate": this.state.createdDate ? this.state.createdDate : null
-    };
-    console.log(searchRole);
-    axios.post(UrmService.getRolesBySearch(), searchRole).then((res) => {
-      console.log("KKKKK", res);
-      if (res) {
-        if (res.data.isSuccess === "true") {
-          this.setState({ rolesData: res.data.result, modalVisible: false, flagFilterRoles: false, createdDate: "", role: "", createdBy: "" }, () => {
-            this.setState({ filterActive: true, rolesError: "" });
-          });
-        } else {
-          this.setState({ modalVisible: false, flagFilterRoles: false, userType: "", role: "", createdBy: "", rolesData: "" },
-            () => {
-              this.setState({ filterActive: true, rolesError: "Records Not Found" });
-            });
-          console.log("ooooo", res.data);
-        }
-
-      } else {
-        this.setState({ rolesData: "", modalVisible: false, flagFilterRoles: false, createdDate: "", role: "", createdBy: "" }, () => {
-          this.setState({ filterActive: true, rolesError: "Records Not Found" });
-        });
-      }
-    }).catch((err) => {
-      this.setState({ loading: false, rolesError: "Records Not Found", rolesData: "" });
-      console.warn(err, "fkjnksjdf");
-    });
-  }
-
-  applyUserFilter() {
-    this.setState({ usersData: [] });
-    const obj = {
-      "id": null,
-      "phoneNo": null,
-      "name": null,
-      "active": this.state.userType === "Active" ? "True" : "False",
-      "inActive": this.state.userType === "InActive" ? "True" : "False",
-      "roleName": this.state.role ? this.state.role : null,
-      "storeName": this.state.branch ? this.state.branch : null,
-      "clientDomainId": this.state.clientId,
-    };
-    console.log('search filter', obj);
-    axios.post(UrmService.getUserBySearch(), obj).then((res) => {
-      if (res) {
-        console.log("users Data", res.data.result);
-        if (res.data.isSuccess === "true") {
-
-          let len = res.data["result"].length;
-          if (len > 0) {
-            for (let i = 0; i < len; i++) {
-              let number = res.data.result[i];
-              console.log(number);
-              this.setState({ loading: false });
-
-              // console.log('sadsddsad' + number.stores);
-              let len = number.stores.length;
-              number.storeName = "";
-              if (len > 0) {
-                for (let i = 0; i < len; i++) {
-                  if (number.storeName === "") {
-                    number.storeName = number.storeName + number.stores[i].name;
-                  }
-                  else {
-                    number.storeName = number.storeName + "," + number.stores[i].name;
-                  }
-                }
-              }
-              this.state.usersData.push(number);
-            }
-            this.setState({ usersData: this.state.usersData, modalVisible: false, userType: "", role: "", createdBy: "", branch: "" },
-              () => {
-                this.setState({ filterActive: true, usersError: "" });
-              });
-          }
-        } else {
-          this.setState({ modalVisible: false, userType: "", role: "", createdBy: "", branch: '', usersData: "" },
-            () => {
-              this.setState({ filterActive: true, usersError: "Records Not Found" });
-              console.log("records not found");
-            });
-        }
-
-      } else {
-        this.setState({ modalVisible: false, userType: "", role: "", createdBy: "", branch: "", usersData: "" }, () => {
-          this.setState({ filterActive: true, usersError: "Records Not Found" });
-        });
-      }
-
-    }).catch((err) => {
-      this.setState({ loading: false, usersError: "Records Not Found", usersData: "" });
-      console.warn(err);
-    });
-  }
-
-
-
-
-  updateRoles() {
-    this.getAllRoles();
-  }
-
-
-  handleedituser(item, index) {
-    this.props.navigation.navigate('AddUser',
-      {
-        item: item, isEdit: true,
-        onGoBack: () => this.child.getAllUsers(),
-      });
-  }
-
-  handleeditRole(item, index) {
-    this.props.navigation.navigate('CreateRole',
-      {
-        item: item, isEdit: true,
-        onGoBack: () => this.child.getRolesList(),
-      });
-  }
-
-
 
   render() {
     return (
@@ -439,34 +206,6 @@ export default class UserManagement extends Component {
             loading={this.state.loading} />
         }
         <SafeAreaView style={styles.mainContainer}>
-          {/* <View style={headerTitleContainer} >
-            <View style={headerTitleSubContainer}>
-              <TouchableOpacity style={menuButton} onPress={() => this.handleBackButtonClick()}>
-                <Image source={require('../assets/images/menu.png')} />
-              </TouchableOpacity>
-              <Text style={headerTitle}>
-                {I18n.t("URM Portal")}
-              </Text>
-            </View>
-            <View style={headerTitleSubContainer2}>
-              {this.state.flagRole && (
-                <TouchableOpacity style={headerNavigationBtn} onPress={() => this.navigateToCreateRoles()}>
-                  <Text style={headerNavigationBtnText}>{I18n.t("Create Role")}</Text>
-                </TouchableOpacity>
-              )}
-              {this.state.flagUser && (
-                <TouchableOpacity style={[headerNavigationBtn, I18n.locale === "telugu" ? { height: 40 } : {}]} onPress={() => this.navigateToAddUsers()}>
-                  <Text style={headerNavigationBtnText}>{I18n.t("Add User")}</Text>
-                </TouchableOpacity>
-              )}
-              {this.state.flagStore && (
-                <TouchableOpacity style={headerNavigationBtn} onPress={() => this.navigateToAddStores()}>
-                  <Text style={headerNavigationBtnText}>{I18n.t("Add Store")}</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          </View> */}
-
           <ScrollView>
             <View style={styles.container}>
               <FlatList
@@ -485,12 +224,8 @@ export default class UserManagement extends Component {
                 )}
                 ListFooterComponent={<View style={{ width: 15 }}></View>}
               />
-
               {console.log(this.state.privilages)}
-
             </View>
-
-
             {this.state.flagDashboard && (
               <UrmDashboard />
             )}

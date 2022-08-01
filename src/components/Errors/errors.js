@@ -16,7 +16,7 @@ export const urmErrorMessages = {
   verificationCode: '/ Please enter the verification code',
   userStatus: '/Please Select The User Status',
   selectedStores: '/Please Select Atleast One Store'
-}
+};
 
 export const inventoryErrorMessages = {
   name: "/ Name must be 3-25 characters long",
@@ -34,8 +34,9 @@ export const inventoryErrorMessages = {
   qty: "/ Please enter the Qty",
   products: "/ Please add atleast one barcode",
   comboName: "/ Please enter a valid comboName",
-  comboQty: "/please enter a valid comboQty"
-}
+  comboQty: "/please enter a valid comboQty",
+  comboPrice: "/please enter the price"
+};
 
 export const accountingErrorMessages = {
   domain: "/ Please select the Domain",
@@ -44,7 +45,7 @@ export const accountingErrorMessages = {
   storeName: "/ Store Name must be 3 characters or more",
   gst: "/ Enter the valid 15 Digit GST Number",
   store: "/ Please select the store"
-}
+};
 
 export const errorLength = {
   name: 3,
@@ -59,7 +60,7 @@ export const errorLength = {
   orginisation: 3,
   gstNumber: 15,
   gvNumber: 8,
-}
+};
 
 export const errorLengthMax = {
   name: 25,
@@ -69,4 +70,4 @@ export const errorLengthMax = {
   color: 12,
   empId: 10,
   organisation: 25
-}
+};

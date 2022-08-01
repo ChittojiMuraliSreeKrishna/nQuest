@@ -7,7 +7,7 @@ import { buttonContainer, buttonImageStyle, buttonStyle, buttonStyle1, flatListH
 import AccountingService from '../services/AccountingService';
 var deviceWidth = Dimensions.get("window").width;
 import Loader from '../../commonUtils/loader';
-import scss from '../../assets/styles/style.scss';
+import scss from '../../commonUtils/assets/styles/style.scss';
 
 export default class CreateHSNCode extends Component {
 
@@ -50,6 +50,7 @@ export default class CreateHSNCode extends Component {
   handleeditHsn(item, index) {
     this.props.navigation.navigate('AddHsnCode', {
       item: item, isEdit: true,
+      onGoBack: () => this.getAllHsnCode()
     });
   }
 

@@ -69,24 +69,23 @@ export default class AddUser extends Component {
 
   async componentDidMount() {
     const clientId = await AsyncStorage.getItem("custom:clientId1");
-    const userId = await AsyncStorage.getItem("userId")
+    const userId = await AsyncStorage.getItem("userId");
     this.setState({ isEdit: this.props.route.params.isEdit });
     if (this.state.isEdit === true) {
-      let userDetails = this.props.route.params.item
-      console.log({ userDetails })
-      let newStoresArray = []
-      newStoresArray = userDetails.stores
-      console.log({ newStoresArray })
+      let userDetails = this.props.route.params.item;
+      console.log({ userDetails });
+    let newStoresArray = [];
+      newStoresArray = userDetails.stores;
+      console.log({ newStoresArray });
       this.setState({
-        userId: this.props.route.params.item.userId,
-        name: this.props.route.params.item.userName,
-        gender: this.props.route.params.item.gender,
-        dob: this.props.route.params.item.dob,
-        email: this.props.route.params.item.email,
-        address: this.props.route.params.item.address,
-        issuperAdmin: this.props.route.params.item.superAdmin,
-        domainId: this.props.route.params.item.domian,
-        role: this.props.route.params.item.roleName,
+        userId: userDetails.id,
+        name: userDetails.userName,
+        gender: userDetails.gender,
+        dob: userDetails.dob,
+        email: userDetails.email,
+        address: userDetails.address,
+        issuperAdmin: userDetails.superAdmin,
+        domainId: userDetails.domian,
         selectedEditStoresArray: newStoresArray,
         mobile: userDetails.phoneNumber,
         userStatus: userDetails.isActive,
@@ -98,81 +97,81 @@ export default class AddUser extends Component {
       this.setState({ navtext: 'Add User' });
     }
     this.setState({ clientId: clientId });
-    this.setState({ userId: userId })
-    this.getStores()
-    this.getRoles()
+    // this.setState({ userId: userId });
+    this.getStores();
+    this.getRoles();
   }
 
   async getStores() {
     const clientId = await AsyncStorage.getItem("custom:clientId1");
-    console.log({ clientId })
-    const { selectedEditStoresArray } = this.state
-    console.log({ selectedEditStoresArray })
-    let storesArray = [] // for normal push
-    let storesEditArray = [] // for Edited Stores Push
-    let cleanedStoresArray = [] // for removing the duplicates
-    const isActive = true
-    const pageNumber = 0
+    console.log({ clientId });
+    const { selectedEditStoresArray } = this.state;
+    console.log({ selectedEditStoresArray });
+    let storesArray = []; // for normal push
+    let storesEditArray = []; // for Edited Stores Push
+    let cleanedStoresArray = []; // for removing the duplicates
+    const isActive = true;
+    const pageNumber = 0;
     await UrmService.getAllStores(clientId, pageNumber, isActive).then(res => {
       if (res) {
-        let response = res.data
-        console.log({ response })
+        let response = res.data;
+        console.log({ response });
         if (response.length > 0) {
           for (let i = 0; i < response.length; i++) {
-            let stores = response[i]
-            let storeNames = stores.name
-            console.log({ stores })
+            let stores = response[i];
+            let storeNames = stores.name;
+            console.log({ stores });
             for (let k = 0; k < selectedEditStoresArray.length; k++) {
               if (selectedEditStoresArray[k].name === stores.name) {
                 if (selectedEditStoresArray.includes(stores.name)) { }
                 else {
-                  storesEditArray.push(stores.name)
+                  storesEditArray.push(stores.name);
                 }
               }
             }
             console.log([{ storesEditArray }, {
               storeNames
-            }])
+            }]);
             if (storesEditArray.includes(stores.name)) {
               for (let m = 0; m < selectedEditStoresArray.length; m++) {
                 if (stores.name === selectedEditStoresArray[m].name) {
                   if (cleanedStoresArray.includes(selectedEditStoresArray[i].name)) { }
                   else {
-                    storesArray.push({ name: selectedEditStoresArray[m].name, id: selectedEditStoresArray[m].id, selectedindex: 1 })
-                    cleanedStoresArray.push(selectedEditStoresArray[m].name)
-                    console.log({ cleanedStoresArray })
+                    storesArray.push({ name: selectedEditStoresArray[m].name, id: selectedEditStoresArray[m].id, selectedindex: 1 });
+                    cleanedStoresArray.push(selectedEditStoresArray[m].name);
+                    console.log({ cleanedStoresArray });
                   }
                 }
               }
             } else { }
             if (cleanedStoresArray.includes(stores.name)) { }
             else {
-              storesArray.push({ name: stores.name, id: stores.id, selectedindex: 0 })
+              storesArray.push({ name: stores.name, id: stores.id, selectedindex: 0 });
             }
           }
-          this.setState({ storesArray: storesArray })
+          this.setState({ storesArray: storesArray });
         }
       }
-    })
+    });
   }
 
 
 
   async getRoles() {
-    const clientId = await AsyncStorage.getItem("custom:clientId1")
+    const clientId = await AsyncStorage.getItem("custom:clientId1");
     UrmService.getRolesByDomainId(clientId).then(res => {
       if (res) {
-        let roleResponse = res.data
-        console.log({ roleResponse })
+        let roleResponse = res.data;
+        console.log({ roleResponse });
         if (roleResponse.length > 0) {
           for (let i = 0; i < roleResponse.length; i++) {
-            this.state.rolesArray.push({ name: roleResponse[i].roleName, id: roleResponse[i].id })
-            this.state.roles.push({ value: roleResponse[i].roleName, label: roleResponse[i].roleName })
+            this.state.rolesArray.push({ name: roleResponse[i].roleName, id: roleResponse[i].id });
+            this.state.roles.push({ value: roleResponse[i].roleName, label: roleResponse[i].roleName });
           }
         }
-        this.setState({ roles: this.state.roles, rolesArray: this.state.rolesArray })
+        this.setState({ roles: this.state.roles, rolesArray: this.state.rolesArray });
       }
-    })
+    });
   }
 
   datepickerClicked() {
@@ -238,10 +237,10 @@ export default class AddUser extends Component {
     if (item.selectedindex === 0) {
       item.selectedindex = 1;
       this.state.selectedStoresArray.push({ name: item.name, id: item.id, selectedindex: 1 });
-      console.log(this.state.selectedStoresArray)
+      console.log(this.state.selectedStoresArray);
     }
     else {
-      console.log({ item })
+      console.log({ item });
       item.selectedindex = 0;
       this.state.selectedStoresArray.splice(index, 1);
       this.setState({ selectedStoresArray: this.state.selectedStoresArray });
@@ -295,66 +294,66 @@ export default class AddUser extends Component {
   handleEmailValid = () => {
     const emailReg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     if (emailReg.test(this.state.email) === true) {
-      this.setState({ emailValid: true })
+      this.setState({ emailValid: true });
     }
-  }
+  };
 
   handleMobileValid = () => {
     if (this.state.mobile.length >= errorLength.mobile) {
-      this.setState({ mobileValid: true })
+      this.setState({ mobileValid: true });
     }
-  }
+  };
 
   handleNameValid = () => {
     if (this.state.name.length >= errorLength.name) {
-      this.setState({ nameValid: true })
+      this.setState({ nameValid: true });
     }
-  }
+  };
 
   handleStatus = (value) => {
-    this.setState({ userStatus: value })
-  }
+    this.setState({ userStatus: value });
+  };
 
   validationForm() {
     const emailReg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     const mobReg = /^[0-9\b]+$/;
-    let isFormValid = true
-    let errors = {}
+    let isFormValid = true;
+    let errors = {};
     if (this.state.name.length < errorLength.name) {
-      isFormValid = false
-      errors["name"] = urmErrorMessages.name
-      this.setState({ nameValid: false })
+      isFormValid = false;
+      errors["name"] = urmErrorMessages.name;
+      this.setState({ nameValid: false });
     }
 
     if (this.state.mobile.length !== errorLength.mobile || mobReg.test(this.state.mobile) === false) {
-      isFormValid = false
-      errors["mobile"] = urmErrorMessages.mobile
-      this.setState({ mobileValid: false })
+      isFormValid = false;
+      errors["mobile"] = urmErrorMessages.mobile;
+      this.setState({ mobileValid: false });
     }
 
     if (emailReg.test(this.state.email) === false) {
-      isFormValid = false
-      errors["email"] = urmErrorMessages.email
-      this.setState({ emailValid: false })
+      isFormValid = false;
+      errors["email"] = urmErrorMessages.email;
+      this.setState({ emailValid: false });
     }
 
     if (this.state.userStatus === "") {
-      isFormValid = false
-      errors["status"] = urmErrorMessages.userStatus
-      this.setState({ statusValid: false })
+      isFormValid = false;
+      errors["status"] = urmErrorMessages.userStatus;
+      this.setState({ statusValid: false });
     }
 
     if (this.state.isSuperAdmin === false) {
-      console.log(this.state.selectedStoresArray.length)
+      console.log(this.state.selectedStoresArray.length);
       if (this.state.selectedStoresArray.length === 0) {
-        isFormValid = false
-        errors["selectedStore"] = urmErrorMessages.selectedStores
-        this.setState({ selectedStoreValid: false })
+        isFormValid = false;
+        errors["selectedStore"] = urmErrorMessages.selectedStores;
+        this.setState({ selectedStoreValid: false });
       }
     }
 
-    this.setState({ errors: errors })
-    return isFormValid
+    this.setState({ errors: errors });
+    return isFormValid;
   }
 
   saveUser() {
@@ -364,10 +363,9 @@ export default class AddUser extends Component {
       }
     }
     console.log(this.state.selectedStoresFinalArray);
-    const isFormValid = this.validationForm()
-
-    if (isFormValid) {
-      if (this.state.isEdit === false) {
+    const isFormValid = this.validationForm();
+    if (this.state.isEdit === false) {
+      if (isFormValid) {
         const clientDomain = this.state.domainId !== "" ? this.state.domainId : this.state.clientId;
         const saveObj = {
           "email": this.state.email,
@@ -393,69 +391,67 @@ export default class AddUser extends Component {
         this.setState({ loading: true });
         UrmService.saveUser(saveObj).then((res) => {
           if (res) {
-            console.log({ res })
-            alert("User Created Successfully")
+            console.log({ res });
+            alert("User Created Successfully");
           }
-          this.props.navigation.goBack()
+          this.props.navigation.goBack();
         }).catch(err => {
-          alert(err)
-          this.props.navigation.goBack()
-        })
-
-      }
-      else {
-        const clientDomain = this.state.domainId !== 0 ? this.state.domainId : this.state.clientId;
-        const saveObj = {
-          "email": this.state.email,
-          "userId": this.state.userId,
-          "phoneNumber": "+91".concat(this.state.mobile),
-          "birthDate": this.state.dob,
-          "gender": this.state.gender,
-          "name": this.state.name,
-          "username": this.state.name,
-          "assginedStores": "kphb",
-          "parentId": "1",
-          "domianId": this.state.domainId,
-          "address": this.state.address,
-          "role": {
-            "roleName": this.state.isSuperAdmin ? this.state.adminRole : this.state.role,
-          },
-          "roleName": this.state.isSuperAdmin ? this.state.adminRole : this.state.role,
-          "stores": this.state.selectedStoresArray,
-          "clientId": this.state.clientId,
-          "isConfigUser": "false",
-          "clientDomain": [clientDomain],
-          "isSuperAdmin": JSON.stringify(this.state.isSuperAdmin),
-          "createdBy": global.username,
-
-        };
-        console.log('params are' + JSON.stringify(saveObj));
-        this.setState({ loading: true });
-        axios.put(UrmService.editUser(), saveObj).then((res) => {
-          if (res.data && res.data["isSuccess"] === "true") {
-            global.privilages = [];
-            this.props.route.params.onGoBack();
-            this.props.navigation.goBack();
-          }
-          else {
-            this.setState({ loading: false });
-            alert(res.data.message);
-          }
-        }
-        ).catch((err) => {
-          this.setState({ loading: false });
-          this.setState({ loading: false });
           alert(err);
+          this.props.navigation.goBack();
         });
       }
     }
   }
 
+  editUser() {
+    if (this.state.isEdit === true) {
+      const clientDomain = this.state.domainId !== 0 ? this.state.domainId : this.state.clientId;
+      const saveObj = {
+        "id": this.state.userId,
+        "email": this.state.email,
+        "phoneNumber": this.state.mobile,
+        "birthDate": this.state.dob,
+        "gender": this.state.gender,
+        "name": this.state.name,
+        "username": this.state.name,
+        "address": this.state.address,
+        "role": {
+          "roleName": this.state.role,
+        },
+        "roleName": this.state.role,
+        "stores": this.state.storeNames,
+        "clientId": this.state.clientId,
+        "isConfigUser": false,
+        "clientDomain": [clientDomain],
+        "isSuperAdmin": JSON.stringify(this.state.isSuperAdmin),
+        "createdBy": this.state.userId,
+        "isActive": this.state.userStatus
+      };
+      console.log('params are' + JSON.stringify(saveObj));
+      this.setState({ loading: true });
+      axios.put(UrmService.editUser(), saveObj).then((res) => {
+        if (res.data && res.data["isSuccess"] === "true") {
+          global.privilages = [];
+          this.props.route.params.onGoBack();
+          this.props.navigation.goBack();
+        }
+        else {
+          this.setState({ loading: false });
+          alert(res.data.message);
+        }
+      }
+      ).catch((err) => {
+        this.setState({ loading: false });
+        this.setState({ loading: false });
+        alert(err);
+      });
+    }
+  }
 
 
 
   render() {
-    const { nameValid, mobileValid, emailValid, statusValid, selectedStoreValid } = this.state
+    const { nameValid, mobileValid, emailValid, statusValid, selectedStoreValid } = this.state;
     return (
       <View style={styles.mainContainer}>
         {this.state.loading &&
@@ -486,6 +482,7 @@ export default class AddUser extends Component {
             autoCapitalize="none"
             onBlur={this.handleNameValid}
             maxLength={25}
+            editable={this.state.isEdit ? false : true}
             value={this.state.name}
             onChangeText={this.handleName}
           />
@@ -545,8 +542,8 @@ export default class AddUser extends Component {
             placeholder={I18n.t("Mobile")}
             placeholderTextColor={mobileValid ? color.border : color.accent}
             textAlignVertical="center"
-            onBlur={this.handleMobileValid}
-            maxLength={10}
+            onBlur={this.state.isEdit ? '' : this.handleMobileValid}
+            maxLength={this.state.isEdit ? 13 : 10}
             keyboardType={'numeric'}
             textContentType='telephoneNumber'
             autoCapitalize="none"
@@ -563,6 +560,7 @@ export default class AddUser extends Component {
             placeholderTextColor={emailValid ? color.border : color.accent}
             keyboardType='email-address'
             textAlignVertical="center"
+            editable={this.state.isEdit ? false : true}
             autoCapitalize="none"
             value={this.state.email}
             onChangeText={this.handleEmail}
@@ -645,7 +643,7 @@ export default class AddUser extends Component {
 
 
           <TouchableOpacity style={submitBtn}
-            onPress={() => this.saveUser()}>
+            onPress={this.state.isEdit ? () => this.editUser() : () => this.saveUser()}>
             <Text style={submitBtnText}>{I18n.t("SAVE")}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={cancelBtn}
@@ -688,18 +686,18 @@ const adminBtn = {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center'
-}
+};
 
 const adminBtnImage = {
   height: Device.isTablet ? RH(30) : RH(25),
   width: Device.isTablet ? RW(30) : RW(25),
   marginRight: RW(10)
-}
+};
 
 const adminBtnText = {
   fontSize: RF(13),
   color: '#000000',
-}
+};
 
 const storesSelectorBtn = {
   height: Device.isTablet ? RH(54) : RH(44),
@@ -711,14 +709,14 @@ const storesSelectorBtn = {
   borderBottomWidth: 1,
   marginBottom: 5,
   borderRadius: Device.isTablet ? 10 : 5,
-}
+};
 
 const storesSelector = {
   display: 'flex',
   flexDirection: 'row',
   paddingLeft: 10,
   paddingTop: 7,
-}
+};
 
 const styles = StyleSheet.create({
   mainContainer: {

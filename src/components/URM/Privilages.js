@@ -31,9 +31,11 @@ export default class Privilages extends Component {
   }
 
   async componentDidMount() {
+    const editPriv = this.props.route.params;
+    console.log({ editPriv });
     this.setState({
-      parentlist: this.props.route.params.parentlist,
-      child: this.props.route.params.child,
+      parentlist: editPriv.parentlist,
+      child: editPriv.child,
     });
     this.getPrivilages();
   }
@@ -211,10 +213,13 @@ export default class Privilages extends Component {
             </TouchableOpacity>
           )}
           ListFooterComponent={
-            <TouchableOpacity style={submitBtn}
-              onPress={() => this.saveRole()}>
-              <Text style={submitBtnText}>{I18n.t("SAVE")}</Text>
-            </TouchableOpacity>
+            <View>
+              <TouchableOpacity style={submitBtn}
+                onPress={() => this.saveRole()}>
+                <Text style={submitBtnText}>{I18n.t("SAVE")}</Text>
+              </TouchableOpacity>
+              <View style={{ margin: 20 }}></View>
+            </View>
           }
         />
 

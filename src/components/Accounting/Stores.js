@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, StyleSheet, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -15,7 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loader from '../../commonUtils/loader';
 var deviceWidth = Dimensions.get("window").width;
 var deviceHeight = Dimensions.get("window").height;
-import scss from '../../assets/styles/style.scss';
+import scss from '../../commonUtils/assets/styles/style.scss';
 
 export default class Stores extends Component {
 
@@ -51,26 +51,7 @@ export default class Stores extends Component {
     this.getMasterDistrictsList();
   }
 
-  deleteStore() {
-    alert("you have deleted store");
-    this.setState({ storesDelete: false, modalVisible: false });
-  };
-
-  storeModelCancel() {
-    this.setState({ modalVisible: false });
-  }
-
-  handledeleteStore(item, index) {
-    let param = '?id=' + item.id;
-    axios.delete(UrmService.deleteStore() + param).then(res => {
-      console.log(res.data);
-      this.getStoresList();
-      alert(res.data.result);
-    }).catch(err => {
-      alert(err);
-    });
-  }
-
+  // Edit Store Navigation
   handleeditStore(item, index) {
     console.log(item);
     this.props.navigation.navigate('AddStore'
@@ -80,9 +61,17 @@ export default class Stores extends Component {
       });
   }
 
+  // Create Store Navigation
+  handleCreateStore(item, index) {
+    this.props.navigation.navigate('AddStore', {
+      isEdit: false,
+      onGoBack: () => this.getStoresList()
+    });
+  }
 
-
+  // Get All Stores
   async getStoresList() {
+    this.setState({ storesList: [], });
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     console.log({ clientId });
     this.setState({ loading: true });
@@ -107,30 +96,15 @@ export default class Stores extends Component {
     });
   }
 
-
-  handleStoreState = (value) => {
-    for (let i = 0; i < this.state.statesArray.length; i++) {
-      if (this.state.statesArray[i].name === value) {
-        this.setState({ stateId: this.state.statesArray[i].id });
-        this.setState({ statecode: this.state.statesArray[i].code });
-      }
-    }
-    this.setState({ storeState: value }, () => {
-      this.getMasterDistrictsList();
-    });
-  };
-
-
+  // Filter Actions
+  // Store States
   getMasterStatesList() {
     this.setState({ states: [] });
     this.setState({ loading: false });
     var states = [];
     axios.get(UrmService.getStates()).then((res) => {
       if (res.data["result"]) {
-
         for (var i = 0; i < res.data["result"].length; i++) {
-
-
           this.state.statesArray.push({ name: res.data["result"][i].stateName, id: res.data["result"][i].stateId, code: res.data["result"][i].stateCode });
           states.push({
             value: this.state.statesArray[i].name,
@@ -149,13 +123,22 @@ export default class Stores extends Component {
         });
         this.setState({ statesArray: this.state.statesArray });
       }
-
     });
   }
+  handleStoreState = (value) => {
+    for (let i = 0; i < this.state.statesArray.length; i++) {
+      if (this.state.statesArray[i].name === value) {
+        this.setState({ stateId: this.state.statesArray[i].id });
+        this.setState({ statecode: this.state.statesArray[i].code });
+      }
+    }
+    this.setState({ storeState: value }, () => {
+      this.getMasterDistrictsList();
+    });
+  };
 
-
+  // Store Districts
   getMasterDistrictsList() {
-
     this.setState({ loading: false, dictricts: [], dictrictArray: [] });
     const params = {
       "stateCode": this.state.statecode
@@ -183,11 +166,8 @@ export default class Stores extends Component {
           }
         }
       }
-
     });
   }
-
-
   handleDistrict = (value) => {
     for (let i = 0; i < this.state.dictrictArray.length; i++) {
       if (this.state.dictrictArray[i].name === value) {
@@ -197,16 +177,12 @@ export default class Stores extends Component {
     this.setState({ storeDistrict: value });
   };
 
-
+  // Store Name Actions
   handleStoreName = (value) => {
     this.setState({ storeName: value });
   };
 
-  handleStore = (value) => {
-    this.setState({ storeState: value });
-  };
-
-
+  // Applying Filter
   applyStoreFilter() {
     const searchStore = {
       "stateId": this.state.statecode,
@@ -230,19 +206,20 @@ export default class Stores extends Component {
     });
   }
 
-  modelCancel() {
-    this.setState({ modalVisible: false, flagFilterOpen: false });
-  }
-
-  // Filter Actions
+  // Filter Cancel Actions
   filterAction() {
     this.setState({ flagFilterOpen: true, modalVisible: true });
   }
-
   clearFilterAction() {
     this.setState({ filterActive: false });
     this.getStoresList();
   }
+  modelCancel() {
+    this.setState({ modalVisible: false, flagFilterOpen: false });
+  }
+
+
+
 
   render() {
     return (
@@ -252,23 +229,28 @@ export default class Stores extends Component {
             loading={this.state.loading} />
         }
         <FlatList
-          ListHeaderComponent={<View style={flatListHeaderContainer}>
-            <Text style={flatListTitle}>Stores</Text>
-            {!this.state.filterActive &&
-              <TouchableOpacity
-                style={filterBtn}
-                onPress={() => this.filterAction()} >
-                <Image style={{ alignSelf: 'center', top: 5 }} source={require('../assets/images/promofilter.png')} />
+          ListHeaderComponent={<View style={scss.headerContainer}>
+            <Text style={flatListTitle}>Stores - <Text style={{ color: '#ED1C24' }}>{this.state.storesList.length}</Text></Text>
+            <View style={scss.headerContainer}>
+              <TouchableOpacity style={[filterBtn, { marginRight: 10 }]} onPress={() => this.handleCreateStore()}>
+                <Image style={{ height: 20, width: 30, marginTop: 5 }} source={require('../../commonUtils/assets/Images/add_store.png')} />
               </TouchableOpacity>
+              {!this.state.filterActive &&
+                <TouchableOpacity
+                  style={filterBtn}
+                  onPress={() => this.filterAction()} >
+                  <Image style={{ alignSelf: 'center', top: 5 }} source={require('../assets/images/promofilter.png')} />
+                </TouchableOpacity>
 
-            }
-            {this.state.filterActive &&
-              <TouchableOpacity
-                style={filterBtn}
-                onPress={() => this.clearFilterAction()} >
-                <Image style={{ alignSelf: 'center', top: 5 }} source={require('../assets/images/clearFilterSearch.png')} />
-              </TouchableOpacity>
-            }
+              }
+              {this.state.filterActive &&
+                <TouchableOpacity
+                  style={filterBtn}
+                  onPress={() => this.clearFilterAction()} >
+                  <Image style={{ alignSelf: 'center', top: 5 }} source={require('../assets/images/clearFilterSearch.png')} />
+                </TouchableOpacity>
+              }
+            </View>
           </View>}
           data={this.state.filterActive ? this.state.filterStoresData : this.state.storesList}
           scrollEnabled={true}
@@ -276,32 +258,36 @@ export default class Stores extends Component {
           style={scss.flatListBody}
           ListEmptyComponent={<Text style={{ color: '#cc241d', textAlign: "center", fontFamily: "bold", fontSize: Device.isTablet ? 21 : 17, marginTop: deviceHeight / 3 }}>&#9888; Records Not Found</Text>}
           renderItem={({ item, index }) => (
-            <View style={scss.flatListContainer} >
-              <View style={scss.flatListSubContainer}>
-                <View style={scss.textContainer}>
-                  <Text style={scss.highText} >{I18n.t("STORE ID")}: {item.id} </Text>
-                </View>
-                <View style={scss.textContainer}>
-                  <Text style={scss.textStyleMedium}>{I18n.t("NAME")}: {item.name}</Text>
-                  <View style={scss.buttonContainer}>
-                    {item.isActive ?
-                      <Text style={[scss.textStyleMedium, { backgroundColor: '#009900', color: '#ffffff', marginTop: 5, padding: Device.isTablet ? 10 : 5, alignSelf: 'flex-start', borderRadius: Device.isTablet ? 10 : 5, fontFamily: 'medium' }]}>Active</Text>
-                      :
-                      <Text style={[scss.textStyleMedium, { backgroundColor: '#ee0000', color: '#ffffff', marginTop: 5, padding: Device.isTablet ? 10 : 5, alignSelf: 'flex-start', borderRadius: 5, fontFamily: 'medium' }]}>In-Active</Text>
-                    }
+            <View>
+              <ScrollView>
+                <View style={scss.flatListContainer} >
+                  <View style={scss.flatListSubContainer}>
+                    <View style={scss.textContainer}>
+                      <Text style={scss.highText} >{I18n.t("STORE ID")}: {item.id} </Text>
+                    </View>
+                    <View style={scss.textContainer}>
+                      <Text style={scss.textStyleMedium}>{I18n.t("NAME")}: {item.name}</Text>
+                      <View style={scss.buttonContainer}>
+                        {item.isActive ?
+                          <Text style={[scss.textStyleMedium, { backgroundColor: '#009900', color: '#ffffff', marginTop: 5, padding: Device.isTablet ? 10 : 5, alignSelf: 'flex-start', borderRadius: Device.isTablet ? 10 : 5, fontFamily: 'medium' }]}>Active</Text>
+                          :
+                          <Text style={[scss.textStyleMedium, { backgroundColor: '#ee0000', color: '#ffffff', marginTop: 5, padding: Device.isTablet ? 10 : 5, alignSelf: 'flex-start', borderRadius: 5, fontFamily: 'medium' }]}>In-Active</Text>
+                        }
+                      </View>
+                    </View>
+                    <View style={scss.textContainer}>
+                      <Text style={scss.textStyleLight}>{I18n.t("LOCATION")}: {item.cityId} </Text>
+                      <Text style={scss.textStyleLight}>{I18n.t("CREATED BY")}: {item.createdBy}</Text>
+                    </View>
+                    <View style={scss.flatListFooter}>
+                      <Text style={scss.footerText}>{I18n.t("DATE")}: {item.createdDate ? item.createdDate.toString().split(/T/)[0] : item.createdDate} </Text>
+                      <TouchableOpacity style={scss.footerSingleBtn} onPress={() => this.handleeditStore(item, index)}>
+                        <Image style={scss.footerBtnImg} source={require('../assets/images/edit.png')} />
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
-                <View style={scss.textContainer}>
-                  <Text style={scss.textStyleLight}>{I18n.t("LOCATION")}: {item.cityId} </Text>
-                  <Text style={scss.textStyleLight}>{I18n.t("CREATED BY")}: {item.createdBy}</Text>
-                </View>
-                <View style={scss.flatListFooter}>
-                  <Text style={scss.footerText}>{I18n.t("DATE")}: {item.createdDate ? item.createdDate.toString().split(/T/)[0] : item.createdDate} </Text>
-                  <TouchableOpacity style={scss.footerSingleBtn} onPress={() => this.handleeditStore(item, index)}>
-                    <Image style={scss.footerBtnImg} source={require('../assets/images/edit.png')} />
-                  </TouchableOpacity>
-                </View>
-              </View>
+              </ScrollView>
             </View>
           )}
         />

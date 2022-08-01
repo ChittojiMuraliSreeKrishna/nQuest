@@ -115,8 +115,8 @@ class InventoryService {
     return axios.post(BASE_URL + INVENTORY_PORTAL.getAllProductBundleList + params);
   }
 
-  addProductCombo() {
-    return BASE_URL + "/inventory/productBundle/add";
+  addProductCombo(obj) {
+    return axios.post(BASE_URL + INVENTORY_PORTAL.addProductBundle, obj);
   }
 
 }

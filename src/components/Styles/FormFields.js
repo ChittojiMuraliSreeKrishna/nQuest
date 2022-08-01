@@ -3,8 +3,8 @@ import Device from "react-native-device-detection";
 import { RH, RW, RF } from '../../Responsive';
 import { color } from "./colorStyles";
 
-var deviceheight = Dimensions.get("window").height
-var deviceWidth = Dimensions.get("window").width
+var deviceheight = Dimensions.get("window").height;
+var deviceWidth = Dimensions.get("window").width;
 
 export const inputField = {
   justifyContent: 'center',
@@ -12,7 +12,7 @@ export const inputField = {
   marginRight: RW(20),
   height: Device.isTablet ? RH(54) : RH(44),
   marginTop: RH(5),
-  marginBottom: RH(10),
+  marginBottom: RH(5),
   borderColor: color.border,
   borderRadius: 3,
   backgroundColor: color.light,
@@ -21,7 +21,7 @@ export const inputField = {
   paddingLeft: RW(15),
   width: deviceWidth - RW(40),
   fontSize: RF(14),
-}
+};
 
 export const inputFieldDisabled = {
   justifyContent: 'center',
@@ -39,7 +39,7 @@ export const inputFieldDisabled = {
   paddingLeft: RW(15),
   width: deviceWidth - RW(40),
   fontSize: RF(14),
-}
+};
 
 export const inputArea = {
   justifyContent: 'center',
@@ -55,7 +55,7 @@ export const inputArea = {
   fontFamily: 'regular',
   paddingLeft: RW(15),
   fontSize: RF(14),
-}
+};
 
 export const inputHeading = {
   fontSize: RF(13),
@@ -63,7 +63,7 @@ export const inputHeading = {
   marginLeft: RW(20),
   marginTop: RH(10),
   marginBottom: RH(10)
-}
+};
 
 export const rnPickerContainer = {
   justifyContent: 'center',
@@ -79,7 +79,7 @@ export const rnPickerContainer = {
   paddingLeft: RW(15),
   fontSize: RF(14),
   width: deviceWidth - RW(40)
-}
+};
 
 export const rnPicker = {
   placeholder: {
@@ -108,7 +108,7 @@ export const rnPicker = {
     backgroundColor: color.light,
     color: color.blue,
   },
-}
+};
 
 export const rnPickerError = {
   placeholder: {
@@ -137,7 +137,7 @@ export const rnPickerError = {
     backgroundColor: color.light,
     color: color.blue,
   },
-}
+};
 
 
 export const submitBtn = {
@@ -149,7 +149,7 @@ export const submitBtn = {
   borderRadius: 5,
   borderWidth: Device.isTablet ? 2 : 1,
   borderColor: color.accent,
-}
+};
 
 export const submitBtnText = {
   textAlign: 'center',
@@ -157,7 +157,7 @@ export const submitBtnText = {
   color: color.white,
   fontSize: RF(15),
   fontFamily: "regular"
-}
+};
 
 export const cancelBtn = {
   width: deviceWidth - RW(40),
@@ -168,7 +168,7 @@ export const cancelBtn = {
   borderRadius: 5,
   borderWidth: Device.isTablet ? 2 : 1,
   borderColor: color.border,
-}
+};
 
 export const cancelBtnText = {
   textAlign: 'center',
@@ -176,7 +176,7 @@ export const cancelBtnText = {
   color: color.black,
   fontSize: RF(15),
   fontFamily: "regular"
-}
+};
 
 export const dateSelector = {
   width: deviceWidth - RW(40),
@@ -190,7 +190,7 @@ export const dateSelector = {
   backgroundColor: color.light,
   borderRadius: 5,
   justifyContent: 'center'
-}
+};
 
 export const datePickerButton1 = {
   position: 'absolute',
@@ -199,7 +199,7 @@ export const datePickerButton1 = {
   height: Device.isTablet ? RH(50) : RH(30),
   backgroundColor: color.accent,
   borderRadius: 5,
-}
+};
 
 export const datePickerButton2 = {
   position: 'absolute',
@@ -208,7 +208,7 @@ export const datePickerButton2 = {
   height: Device.isTablet ? RH(50) : RH(30),
   backgroundColor: color.accent,
   borderRadius: 5,
-}
+};
 
 export const datePickerBtnText = {
   // textAlign: 'center',
@@ -216,19 +216,19 @@ export const datePickerBtnText = {
   color: color.light,
   fontSize: RF(14),
   fontFamily: "regular"
-}
+};
 
 export const datePickerContainer = {
   height: RH(280),
   width: deviceWidth,
   backgroundColor: color.light
-}
+};
 
 export const datePicker = {
   width: deviceWidth,
   height: RH(200),
   marginTop: RH(50),
-}
+};
 
 export const dateText = {
   marginLeft: RW(16),
@@ -236,4 +236,4 @@ export const dateText = {
   color: color.grey,
   fontSize: RF(15),
   fontFamily: "regular"
-}
+};

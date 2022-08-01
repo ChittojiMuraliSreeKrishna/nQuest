@@ -17,7 +17,7 @@ import DebitNotes from "./DebitNotes";
 import Domain from './Domain.js';
 import Stores from './Stores.js';
 import AccountingService from '../services/AccountingService';
-import scss from '../../assets/styles/HeaderStyles.scss';
+import scss from '../../commonUtils/assets/styles/HeaderStyles.scss';
 
 
 var deviceWidth = Dimensions.get("window").width;
@@ -168,89 +168,6 @@ export default class AccountManagement extends Component {
     this.props.navigation.openDrawer();
   }
 
-  navigateToAddCreditNotes() {
-    this.props.navigation.navigate('AddCreditNotes', {
-      isEdit: false,
-      onGoBack: () => this.child.getAllCreditNotes()
-    });
-  }
-
-  navigateToAdDebitNotes() {
-    this.props.navigation.navigate('AddDebitNotes');
-  }
-
-  navigateToAddHsnCode() {
-    this.props.navigation.navigate('AddHsnCode', {
-      onGoBack: () => this.child.getAllHsnCode()
-    });
-  }
-
-  navigateToAddTax() {
-    this.props.navigation.navigate('AddTaxMaster', {
-      onGoBack: () => this.child.getTaxMaster(),
-    });
-  }
-
-  navigateToAddDomain() {
-    this.props.navigation.navigate('AddDomain', {
-      onGoBack: () => this.child.getDomains(),
-    });
-  }
-
-  // Filter Functions
-
-  filterAction() {
-    if (this.state.flagCreditNotes === true) {
-      this.setState({ flagFilterCreditNotes: true });
-    } else {
-      this.setState({ flagFilterCreditNotes: false });
-    }
-    if (this.state.flagDebitNotes === true) {
-      this.setState({ flagFilterDebitNotes: true });
-    } else {
-      this.setState({ flagFilterDebitNotes: false });
-    }
-    if (this.state.flagStore === true) {
-      this.setState({ flagFilterStore: true });
-    } else {
-      this.setState({ flagFilterStore: false });
-    }
-    this.setState({ modalVisible: true });
-  }
-
-  filterStores = () => {
-    this.setState({ filterActive: true });
-  };
-
-  filterCredits = () => {
-    this.setState({ filterActive: true });
-    console.log("filters");
-  };
-
-  filterDebits = () => {
-    this.setState({ filterActive: true });
-  };
-
-  clearFilterAction() {
-    if (this.state.flagStore === true) {
-      this.setState({ filterActive: false });
-    }
-    if (this.state.flagCreditNotes === true) {
-      this.setState({ filterActive: false });
-
-    }
-    if (this.state.flagDebitNotes === true) {
-      this.setState({ filterActive: false });
-    }
-  }
-
-  modelCancel() {
-    this.setState({ modalVisible: false, flagFilterCreditNotes: false, flagFilterStore: false, flagFilterCreditNotes: false, flagFilterDebitNotes: false });
-  }
-
-  modelClose = () => {
-    this.modelCancel();
-  };
 
 
   render() {
@@ -263,35 +180,7 @@ export default class AccountManagement extends Component {
             loading={this.state.loading} />
         }
         <SafeAreaView style={styles.mainContainer}>
-          {/* <View style={headerTitleContainer} >
-            <View style={headerTitleSubContainer}>
-              <TouchableOpacity style={menuButton} onPress={() => this.handlemenuButtonClick()}>
-                <Image source={require('../assets/images/menu.png')} />
-              </TouchableOpacity>
-              <Text style={headerTitle}>
-                {I18n.t("Accounting Portal")}
-              </Text>
-            </View>
-            <View style={headerTitleSubContainer2}>
-              {this.state.flagCreditNotes && (
-                <TouchableOpacity style={headerNavigationBtn} onPress={() => this.navigateToAddCreditNotes()}>
-                  <Text style={headerNavigationBtnText}>Add Credit</Text>
-                </TouchableOpacity>
-              )}
 
-              {this.state.flagHSNCode && (
-                <TouchableOpacity style={headerNavigationBtn} onPress={() => this.navigateToAddHsnCode()}>
-                  <Text style={headerNavigationBtnText}>Add HSN</Text>
-                </TouchableOpacity>
-              )}
-              {this.state.flagTaxMaster && (
-                <TouchableOpacity style={headerNavigationBtn} onPress={() => this.navigateToAddTax()}>
-                  <Text style={headerNavigationBtnText}>Add Tax</Text>
-                </TouchableOpacity>
-              )}
-
-            </View>
-          </View> */}
           <ScrollView>
             <View style={styles.container}>
               <FlatList

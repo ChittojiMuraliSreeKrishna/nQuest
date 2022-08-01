@@ -20,10 +20,10 @@ import Barcode from './Barcode';
 import ProductCombo from './ProductCombo';
 import ReBarcode from './ReBarcode';
 import TopBar from '../../Navigation/TopBar';
-import style from '../../assets/styles/HeaderStyles.scss';
+import style from '../../commonUtils/assets/styles/HeaderStyles.scss';
 import ModalDropdown from 'react-native-modal-dropdown';
 
-import scss from '../../assets/styles/HeaderStyles.scss';
+import scss from '../../commonUtils/assets/styles/HeaderStyles.scss';
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -141,30 +141,6 @@ export default class Inventory extends Component {
       });
     }
   };
-
-  // Add Barcode
-  navigateToAddBarcode() {
-    this.props.navigation.navigate('AddBarcode', {
-      isEdit: false,
-      onGoBack: () => {
-        this.setState({ flagBarcode: true });
-        this.child.getAllBarcodes();
-      },
-    });
-  }
-
-  // Add Product Combo
-  navigateToAddProductCombo() {
-    this.props.navigation.navigate('AddProduct', {
-      isEdit: false,
-      onGoBack: () => null
-    });
-  }
-
-  handleOpenMenu() {
-    this.setState({ openModel: true });
-  }
-
 
   render() {
     const { privilages } = this.state;

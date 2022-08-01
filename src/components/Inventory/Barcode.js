@@ -14,7 +14,7 @@ import I18n from 'react-native-i18n';
 import { ActivityIndicator } from 'react-native-paper';
 import { RH, RF, RW } from '../../Responsive';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import scss from '../../assets/styles/style.scss';
+import scss from '../../commonUtils/assets/styles/style.scss';
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -97,10 +97,10 @@ export default class Barcode extends Component {
   }
 
   // Edit Barcodes Function
-  handleeditbarcode(item, index) {
+  handleeditbarcode(item, index, value) {
     this.props.navigation.navigate('EditBarcode'
       , {
-        item: item, isEdit: true,
+        item: item, isEdit: true, reBar: value,
         onGoBack: () => this.getAllBarcodes(),
       });
   }
@@ -246,9 +246,9 @@ export default class Barcode extends Component {
           <FlatList
             style={scss.flatListBody}
             ListHeaderComponent={<View style={scss.headerContainer}>
-              <Text style={flatListTitle}>Barcode List</Text>
+              <Text style={flatListTitle}>Barcode List - <Text style={{ color: '#ED1C24' }}>{this.state.barcodesList.length}</Text> </Text>
               <View style={scss.headerContainer}>
-                <TouchableOpacity style={filterBtn} onPress={() => this.handleAddBarcode()}><Text style={{ fontSize: 20 }}>+</Text></TouchableOpacity>
+                <TouchableOpacity style={filterBtn} onPress={() => this.handleAddBarcode()}><Image style={{ marginTop: 8 }} source={require('../../commonUtils/assets/Images/add_barcode.png')} /></TouchableOpacity>
                 {!this.state.filterActive &&
                   <TouchableOpacity
                     style={filterBtn}
@@ -279,7 +279,7 @@ export default class Barcode extends Component {
                         <Text style={scss.highText}>S.NO: {index + 1}</Text>
                       </View>
                       <View style={scss.textContainer}>
-                        <Text style={scss.textStyleMedium}>{I18n.t("STORE")}: {this.state.storeName}</Text>
+                        <Text style={scss.textStyleMedium}>{I18n.t("DOMAIN")}: {item.domainType}</Text>
                         <Text style={scss.textStyleLight}>{I18n.t("VALUE")}: ₹{item.value}</Text>
                       </View>
                       <View style={scss.textContainer}>
@@ -292,7 +292,10 @@ export default class Barcode extends Component {
                       <View style={scss.flatListFooter}>
                         <Text style={scss.footerText}>CreatedDate: {item.createdDate ? item.createdDate.toString().split(/T/)[0] : item.createdDate}</Text>
                         <View style={scss.buttonContainer}>
-                          <TouchableOpacity style={scss.footerButton1} onPress={() => this.handleeditbarcode(item, index)}>
+                          <TouchableOpacity style={scss.footerButton1} onPress={() => this.handleeditbarcode(item, index, true)}>
+                            <Image style={scss.footerBtnImg} source={require('../../commonUtils/assets/Images/barcode_list.png')} />
+                          </TouchableOpacity>
+                          <TouchableOpacity style={scss.footerButton1} onPress={() => this.handleeditbarcode(item, index, false)}>
                             <Image style={scss.footerBtnImg} source={require('../assets/images/edit.png')} />
                           </TouchableOpacity>
                           <TouchableOpacity style={scss.footerButton2} onPress={() => this.handlebarcodedeleteaction(item, index)}>

@@ -45,18 +45,22 @@ export default class CreateRole extends Component {
   }
 
   async componentDidMount() {
+    // Client Id
     const clientId = await AsyncStorage.getItem("custom:clientId1");
-    const userId = await AsyncStorage.getItem("userId")
+    // User Id
+    const userId = await AsyncStorage.getItem("userId");
+    console.log({ clientId, userId });
+    // check for Edit OR Create Roles
     this.setState({ isEdit: this.props.route.params.isEdit, userId: userId });
-    let editItems = this.props.route.params
-    console.log({ editItems })
     if (this.state.isEdit === true) {
+      let editItems = this.props.route.params;
+      console.log({ editItems });
       this.setState({
         description: this.props.route.params.item.description,
         role: this.props.route.params.item.roleName,
         roles: this.props.route.params.item.subPrivilege,
-        parentlist: this.props.route.params.item.parentPrivilege,
-        roleId: this.props.route.params.item.roleId
+        parentlist: this.props.route.params.item.parentPrivileges,
+        roleId: this.props.route.params.item.id
       });
       this.setState({ navtext: 'Edit Role' });
     }
@@ -64,104 +68,67 @@ export default class CreateRole extends Component {
       this.setState({ navtext: 'Add Role' });
     }
     this.setState({ clientId: clientId, userId: userId });
-    this.getDomainsList();
   }
 
 
-  async getDomainsList() {
-    this.setState({ domains: [] });
-    var domains = [];
-    axios.get(LoginService.getDomainsList() + this.state.clientId).then((res) => {
-      if (res.data["result"]) {
-        let len = res.data["result"].length;
-        if (len > 0) {
-          for (let i = 0; i < len; i++) {
-            let number = res.data.result[i];
-            this.state.domainsArray.push({ name: number.domaiName, id: number.id });
-            domains.push({
-              value: this.state.domainsArray[i].name,
-              label: this.state.domainsArray[i].name
-            });
-            this.setState({
-              domains: domains,
-            });
-
-            this.setState({ domainsArray: this.state.domainsArray });
-            if (this.state.isEdit === false) {
-              this.setState({ domain: this.state.domainsArray[0].name });
-              this.setState({ domainId: this.state.domainsArray[0].id });
-            }
-            else {
-              if (number.domaiName === this.props.route.params.item.clientDomainVo.domaiName) {
-                this.setState({ domain: this.state.domainsArray[i].name });
-                this.setState({ domainId: this.state.domainsArray[i].id });
-              }
-            }
-
-          }
-          console.log(this.state.domains);
-        }
-      }
-    }).catch(() => {
-      this.setState({ loading: false });
-      this.setState({ loading: false });
-      alert("There is an Error Getting Domain Id");
-    });
+  // Cancel Actions
+  cancel() {
+    global.privilages = [];
+    this.props.navigation.goBack(null);
   }
-
   handleBackButtonClick() {
     global.privilages = [];
     this.props.navigation.goBack(null);
     return true;
   }
 
+  // Reached End Flatlist
   onEndReached() {
     this.listRef.scrollToOffset({ offset: 0, animated: true });
   }
 
-  cancel() {
-    global.privilages = [];
-    this.props.navigation.goBack(null);
-  }
-
+  // RoleName Actions
+  handleRole = (value) => {
+    this.setState({ role: value });
+  };
   handleRoleValid = () => {
     if (this.state.role.length >= errorLength.name) {
-      this.setState({ roleValid: true })
+      this.setState({ roleValid: true });
     }
-  }
+  };
 
+  // Description Actions
   handleDescriptionValid = () => {
     if (this.state.description.length > 0) {
-      this.setState({ descriptionValid: true })
+      this.setState({ descriptionValid: true });
     }
-  }
+  };
 
+  // Validation Form
   validationForm() {
-    let errors = {}
-    let isFormValid = true
-
+    let errors = {};
+    let isFormValid = true;
     if (this.state.role.length < errorLength.name) {
-      isFormValid = false
-      errors["role"] = urmErrorMessages.roleName
-      this.setState({ roleValid: false })
+      isFormValid = false;
+      errors["role"] = urmErrorMessages.roleName;
+      this.setState({ roleValid: false });
     }
-
     if (this.state.description === "") {
-      isFormValid = false
-      errors["description"] = urmErrorMessages.description
-      this.setState({ descriptionValid: false })
+      isFormValid = false;
+      errors["description"] = urmErrorMessages.description;
+      this.setState({ descriptionValid: false });
     }
-
-    this.setState({ errors: errors })
-    return isFormValid
+    this.setState({ errors: errors });
+    return isFormValid;
   }
 
+  // Saving Role
   saveRole() {
     console.log(this.state.parentlist);
     console.log(this.state.childlist);
-    const isFormValid = this.validationForm()
+    const isFormValid = this.validationForm();
     if (isFormValid) {
-      if (this.state.isEdit === false) {
+      if (this.state.isEdit === false) { // Create Role
         const saveObj = {
           "roleName": this.state.role,
           "description": this.state.description,
@@ -174,51 +141,47 @@ export default class CreateRole extends Component {
         console.log({ saveObj });
         this.setState({ loading: true });
         UrmService.saveRole(saveObj).then(res => {
-          console.log({ res })
+          console.log({ res });
           if (res) {
-            let rolesMessage = res
-            console.log({ rolesMessage })
-            alert("Role Created Successfully")
+            let rolesMessage = res;
+            console.log({ rolesMessage });
+            alert("Role Created Successfully");
           }
-          this.props.navigation.goBack()
+          this.props.navigation.goBack();
         }).catch(err => {
-          console.log({ err })
-        })
+          console.log({ err });
+        });
       }
-      else {
-
+      else { // Edit Roles
         const saveObj = {
           "roleName": this.state.role,
           "description": this.state.description,
-          "clientDomianId": this.state.domainId,
+          "clientId": this.state.clientId,
           "createdBy": this.state.userId,
-          "parentPrivilages": this.state.parentlist,
-          "subPrivillages": this.state.roles,
+          "parentPrivileges": this.state.parentlist,
+          "subPrivileges": this.state.roles,
           "roleId": this.state.roleId,
         };
 
-        console.log('params are' + JSON.stringify(saveObj));
+        console.log({ saveObj });
         this.setState({ loading: true });
         UrmService.editRole(saveObj).then(res => {
           if (res) {
-            let rolesMessage = res.data.message
-            console.log({ rolesMessage })
-            alert(rolesMessage)
+            let rolesMessage = res.data.message;
+            console.log({ rolesMessage });
+            alert(rolesMessage ? rolesMessage : "Role Updated Successfully");
           }
-          this.props.navigation.goBack()
-          this.setState({ loading: false })
+          this.props.navigation.goBack();
+          this.setState({ loading: false });
         }).catch(err => {
-          console.log({ err })
-          this.setState({ loading: false })
-        })
+          console.log({ err });
+          this.setState({ loading: false });
+        });
       }
     }
   }
 
-  handleRole = (value) => {
-    this.setState({ role: value });
-  };
-
+  // Privileges Mapping Action
   privilageMapping() {
     global.privilages = [];
     this.props.navigation.navigate('Privilages', {
@@ -227,6 +190,7 @@ export default class CreateRole extends Component {
     });
   }
 
+  // Refresh Privileges
   refresh() {
     this.setState({ parentlist: [] });
     this.setState({ childlist: [] });
@@ -267,7 +231,7 @@ export default class CreateRole extends Component {
     }
     this.setState({ domain: value });
     if (this.state.domain !== "") {
-      this.setState({ domainValid: true })
+      this.setState({ domainValid: true });
     }
   };
 
@@ -276,9 +240,9 @@ export default class CreateRole extends Component {
   };
 
   render() {
-    const roleValid = this.state.roleValid
-    const descriptionValid = this.state.descriptionValid
-    const domainValid = this.state.domainValid
+    const roleValid = this.state.roleValid;
+    const descriptionValid = this.state.descriptionValid;
+    const domainValid = this.state.domainValid;
     return (
       <View style={styles.mainContainer}>
         {this.state.loading &&

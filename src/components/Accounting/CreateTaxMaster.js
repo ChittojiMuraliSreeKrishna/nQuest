@@ -59,8 +59,7 @@ export default class CreateTaxMaster extends Component {
     this.props.navigation.navigate('AddTaxMaster', {
       isEdit: false,
       onGoBack: () => {
-        this.child.getTaxMaster();
-        alert("hey");
+        this.getTaxMaster();
       },
     });
   }
@@ -79,7 +78,7 @@ export default class CreateTaxMaster extends Component {
             <TouchableOpacity onPress={() => this.navigateToAddTax()}><Text style={{ fontSize: 20 }}>+</Text></TouchableOpacity>
           </View>}
           data={this.state.taxList}
-          style={{ marginTop: 20 }}
+          style={{ marginTop: 10 }}
           scrollEnabled={true}
           renderItem={({ item, index }) => (
             <View style={flatListMainContainer} >

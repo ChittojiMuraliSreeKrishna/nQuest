@@ -48,10 +48,10 @@ export default class DebitNotes extends Component {
   }
 
   async componentDidMount() {
-    const storeId = await AsyncStorage.getItem("storeId")
-    const userId = await AsyncStorage.getItem('custom:userId')
-    this.setState({ storeId: storeId, userId: userId })
-    this.getDebitNotes()
+    const storeId = await AsyncStorage.getItem("storeId");
+    const userId = await AsyncStorage.getItem('custom:userId');
+    this.setState({ storeId: storeId, userId: userId });
+    this.getDebitNotes();
   }
 
 
@@ -102,14 +102,14 @@ export default class DebitNotes extends Component {
   }
 
   modelCancel() {
-    this.setState({ modalVisible: false })
+    this.setState({ modalVisible: false });
   }
 
 
   async getDebitNotes() {
-    this.setState({ lodaing: true })
+    this.setState({ lodaing: true });
     const accountType = 'DEBIT';
-    const { storeId } = this.state
+    const { storeId } = this.state;
     const reqOb = {
       fromDate: null,
       toDate: null,
@@ -117,17 +117,17 @@ export default class DebitNotes extends Component {
       mobileNumber: null,
       accountType: accountType,
       customerId: null
-    }
+    };
     AccountingService.getDebitNotes(reqOb).then(res => {
       if (res) {
-        console.log(res.data)
-        this.setState({ debitNotes: res.data.content })
+        console.log(res.data);
+        this.setState({ debitNotes: res.data.content });
       }
-      this.setState({ loading: false })
+      this.setState({ loading: false });
     }).catch(err => {
-      this.setState({ loading: false })
-      console.log(err)
-    })
+      this.setState({ loading: false });
+      console.log(err);
+    });
   }
 
   handleViewDebit(item, index) {
@@ -138,23 +138,23 @@ export default class DebitNotes extends Component {
       storeId: item.storeId,
       accountType: item.accountType,
       customerId: item.customerId,
-    }
+    };
     AccountingService.getAllLedgerLogs(reqObj).then(res => {
       if (res) {
         this.setState({
           isShowAllTransactions: true,
           modalVisible: true,
           transactionHistory: res.data.content
-        })
+        });
       }
-    })
+    });
   }
 
   applyDebitNotesFilter() {
-    this.setState({ loading: true })
-    const accountType = 'DEBIT'
-    const { storeId, startDate, endDate, mobileNumber } = this.state
-    console.log(storeId)
+    this.setState({ loading: true });
+    const accountType = 'DEBIT';
+    const { storeId, startDate, endDate, mobileNumber } = this.state;
+    console.log(storeId);
     const reqOb = {
       fromDate: startDate,
       toDate: endDate,
@@ -162,37 +162,37 @@ export default class DebitNotes extends Component {
       storeId: storeId,
       accountType: accountType,
       customerId: null
-    }
-    console.log(reqOb)
+    };
+    console.log(reqOb);
     AccountingService.getCreditNotes(reqOb).then(res => {
       if (res) {
-        console.log(res.data)
-        this.setState({ filterDebitData: res.data.content, filterActive: true })
+        console.log(res.data);
+        this.setState({ filterDebitData: res.data.content, filterActive: true });
       }
-      this.setState({ loading: false, modalVisible: false })
+      this.setState({ loading: false, modalVisible: false });
     }).catch(err => {
-      console.log(err)
-      this.setState({ loading: false, modalVisible: false, filterActive: false })
-    })
+      console.log(err);
+      this.setState({ loading: false, modalVisible: false, filterActive: false });
+    });
   }
 
   modalViewCancel() {
-    this.setState({ modalVisible: false })
+    this.setState({ modalVisible: false });
   }
 
   handleAddDebit(item, index) {
     this.props.navigation.navigate('AddDebitNotes', {
       item: item,
       onGoBack: () => this.getDebitNotes()
-    })
+    });
   }
 
   filterAction() {
-    this.setState({ flagFilterOpen: true, modalVisible: true })
+    this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
   clearFilterAction() {
-    this.setState({ filterActive: false })
+    this.setState({ filterActive: false });
   }
 
 
@@ -206,7 +206,7 @@ export default class DebitNotes extends Component {
         }
         <FlatList
           data={this.state.filterActive ? this.state.filterDebitData : this.state.debitNotes}
-          style={{ marginTop: 20 }}
+          style={{ marginTop: 10 }}
           scrollEnabled={true}
           ListHeaderComponent={<View style={flatListHeaderContainer}>
             <Text style={flatListTitle}>Debit Notes</Text>

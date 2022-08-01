@@ -321,6 +321,7 @@ class AddBarcode extends Component {
     });
   }
   handleStore = (value) => {
+    console.warn({ value });
     this.setState({ storeId: value, store: value });
   };
 
@@ -520,8 +521,9 @@ class AddBarcode extends Component {
         "itemMrp": this.state.listPrice,
         "domainId": 1,
         "qty": this.state.quantity,
-        "storeId": this.state.selectedstoreId,
+        "storeId": this.state.storeId,
         "uom": this.state.uomName,
+        "domainType": this.state.selectedDomain
       };
       this.setState({ loading: true });
       console.log({ params });
@@ -535,8 +537,8 @@ class AddBarcode extends Component {
           console.log({ response });
           this.props.route.params.onGoBack();
           this.props.navigation.goBack();
+          alert(response.message);
         }
-        alert(response.message);
         this.setState({ loading: false });
       }).catch((err) => {
         this.setState({ loading: false });
