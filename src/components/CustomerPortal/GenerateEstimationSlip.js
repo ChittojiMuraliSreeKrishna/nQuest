@@ -177,6 +177,8 @@ class GenerateEstimationSlip extends Component {
         "netValue": element.totalMrp,
         "barCode": element.barcode,
         "domainId": 1,
+        "manualDiscount":0,
+        "promoDiscount":(isNaN(element.itemDiscount) ? 0 : (parseInt(element.itemDiscount))),
         "storeId": parseInt(this.state.storeId),
         "section": element.section,
         "subSection": element.subSection,

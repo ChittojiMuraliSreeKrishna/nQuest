@@ -8,7 +8,6 @@ import EditRole from '../components/URM/EditRole';
 import Privilages from '../components/URM/Privilages';
 import AddStore from '../components/Accounting/AddStore';
 import TopBar from './TopBar';
-import BottomTabBar from './BottomTabBar';
 import BottomTabNav from './BottomTabNav';
 
 const Stack = createStackNavigator();

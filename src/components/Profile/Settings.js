@@ -511,6 +511,13 @@ class Settings extends Component {
 
                 </View>
                 <View>
+                    <TouchableOpacity
+                        onPress={() => {
+                            AsyncStorage.clear()
+                            this.props.navigation.navigate('Login');
+                        }}>
+                        <Text> {I18n.t("Sign Out")}</Text>
+                    </TouchableOpacity>
                   <Text style={Device.isTablet ? styles.inputHeader_tablet : styles.inputHeader_mobile}> {I18n.t("DESIGNATION")}: </Text>
 
                   <TextInput
