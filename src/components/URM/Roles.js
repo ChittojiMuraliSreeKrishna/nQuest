@@ -17,7 +17,7 @@ import EmptyList from '../Errors/EmptyList';
 import { buttonContainer, buttonStyle, buttonStyle1, filterBtn, flatListMainContainer, flatlistSubContainer, headerNavigationBtn, headerNavigationBtnText, headerTitle, headerTitleContainer, headerTitleSubContainer, headerTitleSubContainer2, highText, buttonImageStyle, menuButton, textContainer, textStyleLight, textStyleMedium, flatListHeaderContainer, flatListTitle, singleButtonStyle } from '../Styles/Styles';
 import { filterMainContainer, filterSubContainer, filterHeading, filterCloseImage, deleteText, deleteHeading, deleteHeader, deleteContainer, deleteCloseBtn } from '../Styles/PopupStyles';
 import { inputField, rnPickerContainer, rnPicker, submitBtn, submitBtnText, cancelBtn, cancelBtnText, datePicker, datePickerBtnText, datePickerButton1, datePickerButton2, datePickerContainer, dateSelector, dateText, } from '../Styles/FormFields';
-import scss from '../../assets/styles/style.scss';
+import scss from '../../commonUtils/assets/styles/style.scss';
 
 var deviceheight = Dimensions.get("window").height;
 var deviceWidth = Dimensions.get("window").width;
@@ -44,6 +44,7 @@ export default class Roles extends Component {
 
   // Getting Roles List
   getRolesList() {
+    this.setState({ rolesData: [] });
     const { clientId, pageNumber } = this.state;
     UrmService.getAllRoles(clientId, pageNumber).then(res => {
       if (res) {
@@ -59,7 +60,7 @@ export default class Roles extends Component {
     this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
-  // Page Navigation
+  // Create Role Navigation
   navigateToCreateRoles() {
     this.props.navigation.navigate('CreateRole', {
       isEdit: false,
@@ -67,23 +68,28 @@ export default class Roles extends Component {
     });
   }
 
+  // Filter Clear Action
   clearFilterAction() {
     this.setState({ filterActive: false });
     this.getRolesList();
   }
 
+  // Filter Cancel Action
   modelCancel() {
     this.setState({ modalVisible: false });
   }
 
+  // Created By Action
   handleCreatedBy = (value) => {
     this.setState({ createdBy: value });
   };
 
+  // Role Name Action
   handleRole = (value) => {
     this.setState({ role: value });
   };
 
+  // Created Date Action
   datepickerClicked() {
     this.setState({ datepickerOpen: true });
   }
@@ -108,7 +114,7 @@ export default class Roles extends Component {
     this.setState({ doneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
 
-
+  // Apply Filter Action
   applyRoleFilter() {
     const { role, createdBy, createdDate } = this.state;
     this.setState({ loading: true });
@@ -128,7 +134,7 @@ export default class Roles extends Component {
   }
 
 
-
+  // Edit Role Action
   handleeditrole(item, index) {
     this.props.navigation.navigate('CreateRole',
       {
@@ -145,7 +151,7 @@ export default class Roles extends Component {
         <FlatList
           style={scss.flatListBody}
           ListHeaderComponent={<View style={scss.headerContainer}>
-            <Text style={flatListTitle}>Roles</Text>
+            <Text style={flatListTitle}>Roles - <Text style={{ color: '#ED1C24' }}>{this.state.rolesData.length}</Text></Text>
             <View style={scss.headerContainer}>
               <TouchableOpacity style={filterBtn} onPress={() => this.navigateToCreateRoles()}><Text style={{ fontSize: 20 }}>+</Text></TouchableOpacity>
               {!this.state.filterActive &&

@@ -6,11 +6,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import UrmService from '../components/services/UrmService';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
 import I18n from 'react-native-i18n';
 import Modal from 'react-native-modal'
-import style from '../../src/assets/styles/topBar.scss';
-import BottomTabNav from './BottomTabNav';
 
 var data = [];
 var currentSelection = '';
@@ -67,7 +64,7 @@ export class TopBar extends Component {
           global.profileButtonClicked = false
           global.homeButtonClicked = false
           this.props.navigation.navigate(screenMapping[currentSelection], this.refresh());
-          this.setState({ modalVisibleData: false })
+          this.setState({ modalVisibleData: false });
         }}>
         <Image style={styles.icon} source={GetImageBasedOnPrevilageName(previlage.item)} />
         <Text style={styles.textItem}>{previlage.item}</Text>
@@ -180,7 +177,7 @@ export class TopBar extends Component {
                 data = Array.from(privilegesSet);
               }
 
-              this.getData()
+              this.getData();
 
             }
           });
@@ -206,7 +203,7 @@ export class TopBar extends Component {
 
 
   modalHandle() {
-    this.setState({ modalVisibleData: !this.state.modalVisibleData })
+    this.setState({ modalVisibleData: !this.state.modalVisibleData });
   }
 
 
@@ -217,7 +214,7 @@ export class TopBar extends Component {
   }
 
   render() {
-    var displayName = currentSelection === '' ? this.state.firstDisplayName : currentSelection
+    var displayName = currentSelection === '' ? this.state.firstDisplayName : currentSelection;
     console.log("placeholder data: " + this.state.firstDisplayName + ",current selection " + currentSelection);
     return (
       <>

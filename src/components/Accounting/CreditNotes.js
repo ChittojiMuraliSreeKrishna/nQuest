@@ -50,22 +50,22 @@ export default class CreditNotes extends Component {
   }
 
   modelCancel() {
-    this.setState({ modalVisible: false, flagFilterOpen: false, isShowAllTransactions: false })
+    this.setState({ modalVisible: false, flagFilterOpen: false, isShowAllTransactions: false });
   }
 
 
   async componentDidMount() {
-    const storeId = await AsyncStorage.getItem("storeId")
-    const userId = await AsyncStorage.getItem('custom:userId')
-    this.setState({ storeId: storeId, userId: userId })
-    this.getAllCreditNotes()
+    const storeId = await AsyncStorage.getItem("storeId");
+    const userId = await AsyncStorage.getItem('custom:userId');
+    this.setState({ storeId: storeId, userId: userId });
+    this.getAllCreditNotes();
   }
 
   async getAllCreditNotes() {
-    this.setState({ loading: true })
+    this.setState({ loading: true });
     const accountType = 'CREDIT';
-    const { storeId } = this.state
-    console.log(storeId)
+    const { storeId } = this.state;
+    console.log(storeId);
     const reqOb = {
       fromDate: null,
       mobileNumber: null,
@@ -73,21 +73,21 @@ export default class CreditNotes extends Component {
       toDate: null,
       accountType: accountType,
       customerId: null
-    }
+    };
     AccountingService.getCreditNotes(reqOb).then(res => {
       if (res) {
-        console.log(res.data.content)
-        this.setState({ creditNotes: res.data.content, })
+        console.log(res.data.content);
+        this.setState({ creditNotes: res.data.content, });
       }
-      this.setState({ loading: false })
-    })
+      this.setState({ loading: false });
+    });
   }
 
 
   applyCreditNotesFilter() {
-    this.setState({ loading: true })
+    this.setState({ loading: true });
     const accountType = 'CREDIT';
-    const { storeId, startDate, endDate, mobileNumber } = this.state
+    const { storeId, startDate, endDate, mobileNumber } = this.state;
     const reqOb = {
       fromDate: startDate,
       toDate: endDate,
@@ -95,18 +95,18 @@ export default class CreditNotes extends Component {
       storeId: storeId,
       accountType: accountType,
       customerId: null
-    }
-    console.log(reqOb)
+    };
+    console.log(reqOb);
     AccountingService.getCreditNotes(reqOb).then(res => {
       if (res) {
         // console.log(res.data)
-        this.setState({ filterCreditData: res.data.content, filterActive: true })
+        this.setState({ filterCreditData: res.data.content, filterActive: true });
       }
-      this.setState({ loading: false, modalVisible: false, flagFilterOpen: false })
+      this.setState({ loading: false, modalVisible: false, flagFilterOpen: false });
     }).catch(err => {
-      console.log(err)
-      this.setState({ loading: false, modalVisible: false, flagFilterOpen: false })
-    })
+      console.log(err);
+      this.setState({ loading: false, modalVisible: false, flagFilterOpen: false });
+    });
   }
 
   handleStoreName = (value) => {
@@ -180,18 +180,19 @@ export default class CreditNotes extends Component {
       toDate: null,
       accountType: item.accountType,
       customerId: item.customerId
-    }
+    };
     AccountingService.getAllLedgerLogs(reqOb).then(res => {
       if (res) {
         this.setState({
           isShowAllTransactions: true,
           modalVisible: true,
           transactionHistory: res.data.content
-        })
+        });
       }
-    })
+    });
   }
 
+  // Edit Navigation
   handleAddCredit(item, index) {
     this.props.navigation.navigate('AddCreditNotes', {
       item: item, isEdit: true,
@@ -201,12 +202,20 @@ export default class CreditNotes extends Component {
 
   // Filter Actions
   filterAction() {
-    this.setState({ flagFilterOpen: true, modalVisible: true })
+    this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
   clearFilterAction() {
-    this.setState({ filterActive: false, mobileNumber: "", startDate: "", endDate: "", date: new Date(), enddate: new Date() })
-    this.getAllCreditNotes()
+    this.setState({ filterActive: false, mobileNumber: "", startDate: "", endDate: "", date: new Date(), enddate: new Date() });
+    this.getAllCreditNotes();
+  }
+
+  // Add Credit
+  navigateToAddCreditNotes() {
+    this.props.navigation.navigate('AddCreditNotes', {
+      isEdit: false,
+      onGoBack: () => this.getAllCreditNotes()
+    });
   }
 
 
@@ -219,22 +228,29 @@ export default class CreditNotes extends Component {
         }
         <FlatList
           ListHeaderComponent={<View style={flatListHeaderContainer}>
-            <Text style={flatListTitle}>Credit Notes</Text>
-            {!this.state.filterActive &&
-              <TouchableOpacity
-                style={filterBtn}
-                onPress={() => this.filterAction()} >
-                <Image style={{ alignSelf: 'center', top: 5 }} source={require('../assets/images/promofilter.png')} />
+            <View>
+              <Text style={flatListTitle}>Credit Notes</Text>
+            </View>
+            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+              <TouchableOpacity style={{ height: 20, width: 20, marginRight: 20 }} onPress={() => this.navigateToAddCreditNotes()}>
+                <Image style={{ height: 20, width: 25 }} source={require('../../commonUtils/assets/Images/add_credit.png')} />
               </TouchableOpacity>
+              {!this.state.filterActive &&
+                <TouchableOpacity
+                  style={filterBtn}
+                  onPress={() => this.filterAction()} >
+                  <Image style={{ alignSelf: 'center', top: 5 }} source={require('../assets/images/promofilter.png')} />
+                </TouchableOpacity>
 
-            }
-            {this.state.filterActive &&
-              <TouchableOpacity
-                style={filterBtn}
-                onPress={() => this.clearFilterAction()} >
-                <Image style={{ alignSelf: 'center', top: 5 }} source={require('../assets/images/clearFilterSearch.png')} />
-              </TouchableOpacity>
-            }
+              }
+              {this.state.filterActive &&
+                <TouchableOpacity
+                  style={filterBtn}
+                  onPress={() => this.clearFilterAction()} >
+                  <Image style={{ alignSelf: 'center', top: 5 }} source={require('../assets/images/clearFilterSearch.png')} />
+                </TouchableOpacity>
+              }
+            </View>
           </View>}
           data={this.state.filterActive ? this.state.filterCreditData : this.state.creditNotes}
           style={{ marginTop: 10 }}

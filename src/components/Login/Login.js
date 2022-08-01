@@ -133,6 +133,12 @@ export default class Login extends Component {
               console.log({ finalToken });
               axios.defaults.headers.common = { 'Authorization': 'Bearer' + ' ' + finalToken };
             });
+            AsyncStorage.setItem("userId", jwt_decode(token)["custom:userId"]).then(() => {
+
+            }).catch(() => {
+              this.setState({ loading: false });
+              console.log("there is an error saving userId");
+            });
             AsyncStorage.setItem("rolename", jwt_decode(token)["custom:roleName"]).then(() => {
             }).catch(() => {
               this.setState({ loading: false });

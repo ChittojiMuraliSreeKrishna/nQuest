@@ -40,6 +40,7 @@ export const INVENTORY_PORTAL = {
   getAllHsnList: "/hsn-details/hsn-details/getHsnDetails",
   getStoreNamesByIds: '/user-management/store/storeList',
   updatTextileBarcodes: "/inventory/inventory-management/product",
+  addProductBundle: "/inventory/productBundle/add",
   addTextileBarcodes: "/inventory/inventory-management/product",
   updateBarcodesQuntity: "/inventory/inventory-management/product-qty",
   getTextileBarcodeDetails: "/inventory/inventory-management/barcode",

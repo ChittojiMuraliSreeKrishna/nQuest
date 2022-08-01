@@ -17,7 +17,7 @@ import EmptyList from '../Errors/EmptyList';
 import { buttonContainer, buttonStyle, buttonStyle1, filterBtn, flatListMainContainer, flatlistSubContainer, headerNavigationBtn, headerNavigationBtnText, headerTitle, headerTitleContainer, headerTitleSubContainer, headerTitleSubContainer2, highText, buttonImageStyle, menuButton, textContainer, textStyleLight, textStyleMedium, flatListHeaderContainer, flatListTitle, singleButtonStyle } from '../Styles/Styles';
 import { filterMainContainer, filterSubContainer, filterHeading, filterCloseImage, deleteText, deleteHeading, deleteHeader, deleteContainer, deleteCloseBtn } from '../Styles/PopupStyles';
 import { inputField, rnPickerContainer, rnPicker, submitBtn, submitBtnText, cancelBtn, cancelBtnText, datePicker, datePickerBtnText, datePickerButton1, datePickerButton2, datePickerContainer, dateSelector, dateText, } from '../Styles/FormFields';
-import scss from '../../assets/styles/style.scss';
+import scss from '../../commonUtils/assets/styles/style.scss';
 
 var deviceheight = Dimensions.get("window").height;
 var deviceWidth = Dimensions.get("window").width;
@@ -48,7 +48,9 @@ export default class Users extends Component {
     this.getAllUsers();
   }
 
+  // Get All Users
   getAllUsers() {
+    this.setState({ usersList: [] });
     const { clientId, pageNumber } = this.state;
     UrmService.getAllUsers(clientId, pageNumber).then(res => {
       let userResponse = res.data.content;
@@ -62,6 +64,7 @@ export default class Users extends Component {
   }
 
   // Filter Actions
+  // Applying Filter Action
   applyUserFilter() {
     const { userType, role, branch, clientId, pageNumber } = this.state;
     const searchUser = {
@@ -74,7 +77,6 @@ export default class Users extends Component {
       "storeName": branch ? branch.trim() : null,
       "clientId": clientId
     };
-
     UrmService.getUserDetails(searchUser, pageNumber).then(res => {
       if (res) {
         let filteredUserRes = res.data.result.content;
@@ -84,26 +86,30 @@ export default class Users extends Component {
     });
   }
 
+  // User Type Action
   handleUSerType = (value) => {
     this.setState({ userType: value });
   };
 
+  // Role Name Action
   handleRole = (value) => {
     this.setState({ role: value });
   };
 
+  // Branch Name Action
   handleBranch = (value) => {
     this.setState({ branch: value });
   };
 
-  filterAction() {
-    this.setState({ flagFilterOpen: true, modalVisible: true });
-  }
-
+  // Model Cancel
   modelCancel() {
     this.setState({ modalVisible: false });
   }
 
+  // Filter Button Actions
+  filterAction() {
+    this.setState({ flagFilterOpen: true, modalVisible: true });
+  }
   clearFilterAction() {
     this.setState({ filterActive: false });
   }
@@ -113,8 +119,16 @@ export default class Users extends Component {
     this.props.navigation.navigate('AddUser',
       {
         item: item, isEdit: true,
-        onGoBack: () => this.child.getAllUsers(),
+        onGoBack: () => this.getAllUsers(),
       });
+  }
+
+  // Add User Navigation
+  handleAddUser(item, index) {
+    this.props.navigation.navigate('AddUser', {
+      isEdit: false,
+      onGoBack: () => this.getAllUsers()
+    });
   }
 
   render() {
@@ -122,23 +136,27 @@ export default class Users extends Component {
       <View>
         <FlatList
           style={scss.flatListBody}
-          ListHeaderComponent={<View style={flatListHeaderContainer}>
-            <Text style={flatListTitle}>Users</Text>
-            {!this.state.filterActive &&
-              <TouchableOpacity
-                style={filterBtn}
-                onPress={() => this.filterAction()} >
-                <Image style={{ alignSelf: 'center', top: 5 }} source={require('../assets/images/promofilter.png')} />
+          ListHeaderComponent={<View style={scss.headerContainer}>
+            <Text style={flatListTitle}>Users - <Text style={{ color: '#ED1C24' }}>{this.state.usersList.length}</Text></Text>
+            <View style={scss.headerContainer}>
+              <TouchableOpacity onPress={() => this.handleAddUser()}>
+                <Image style={{ height: 20, width: 30, marginRight: 10 }} source={require('../../commonUtils/assets/Images/create_user_icon.png')} />
               </TouchableOpacity>
-
-            }
-            {this.state.filterActive &&
-              <TouchableOpacity
-                style={filterBtn}
-                onPress={() => this.clearFilterAction()} >
-                <Image style={{ alignSelf: 'center', top: 5 }} source={require('../assets/images/clearFilterSearch.png')} />
-              </TouchableOpacity>
-            }
+              {!this.state.filterActive &&
+                <TouchableOpacity
+                  style={filterBtn}
+                  onPress={() => this.filterAction()} >
+                  <Image style={{ alignSelf: 'center', top: 5 }} source={require('../assets/images/promofilter.png')} />
+                </TouchableOpacity>
+              }
+              {this.state.filterActive &&
+                <TouchableOpacity
+                  style={filterBtn}
+                  onPress={() => this.clearFilterAction()} >
+                  <Image style={{ alignSelf: 'center', top: 5 }} source={require('../assets/images/clearFilterSearch.png')} />
+                </TouchableOpacity>
+              }
+            </View>
           </View>}
           data={this.state.filterActive ? this.state.filterUserList : this.state.usersList}
           ListEmptyComponent={<EmptyList message={this.state.rolesError} />}
