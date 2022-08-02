@@ -110,7 +110,7 @@ class GenerateInvoiceSlip extends Component {
       },
       dlslips: [],
       finalList: [],
-      barCodeList: [1],
+      barCodeList: [],
       mobilenumber: "",
       customerName: "",
       gender: "",
@@ -290,11 +290,13 @@ class GenerateInvoiceSlip extends Component {
     let esNumber = this.state.dsNumber;
     let flag = true;
     const { storeId } = this.state;
+    console.log("data in getDeliverySlipDetails", esNumber, flag, storeId);
     CustomerService.getDsSlip(esNumber, flag, storeId).then((res) => {
-      console.log("getInvoiceSlip", { res });
+      var response = JSON.stringify(res)
+      console.log("getInvoiceSlip", JSON.stringify(res.data));
       if (res.data) {
         console.log(res.data);
-        this.state.dlslips.push(res.data.result);
+        this.state.dlslips.push(res.data);
         if (this.state.dlslips.length > 1) {
           const barList = this.state.dlslips.filter(
             (test, index, array) =>
@@ -477,7 +479,7 @@ class GenerateInvoiceSlip extends Component {
       onGoBack: () => this.invoiceUpdate(),
     };
     this.props.navigation.navigate('TextilePayment', obj);
-    console.log({ obj });
+    console.log("data in invoice slip", obj);
   }
 
   invoiceUpdate() {
@@ -644,7 +646,6 @@ class GenerateInvoiceSlip extends Component {
       this.setState({ barcodeId: '' });
       global.barcodeId = 'something';
     }
-    console.log('murali barcode', this.state.dsNumber);
   }
 
   navigateToScanCode() {
@@ -1020,6 +1021,7 @@ class GenerateInvoiceSlip extends Component {
                     maxLength={10}
                     value={this.state.mobileNumber}
                     onChangeText={(text) => this.handleMobileNumber(text)}
+
                   />
                   <TouchableOpacity
                     style={[Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile]}

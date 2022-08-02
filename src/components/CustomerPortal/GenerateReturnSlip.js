@@ -23,8 +23,8 @@ export default class GenerateReturnSlip extends Component {
       customerTagging: false,
       modelVisible: true,
       promotions: false,
-      returnInvoice: [1],
-      returnedItems: [1],
+      returnInvoice: [],
+      returnedItems: [],
       reason: "",
       invoiceNo: "",
       reasonDesc: "",
@@ -35,7 +35,7 @@ export default class GenerateReturnSlip extends Component {
       itemClicked: false,
       qty: 0,
       values: 0,
-      netValueList: [1],
+      netValueList: [],
       returnSlipTotal: 0,
       storeId: 0,
       customerNumber: "",
@@ -47,7 +47,7 @@ export default class GenerateReturnSlip extends Component {
   }
 
   async componentDidMount() {
-    const userId = await AsyncStorage.getItem("custom:userId");
+    const userId = await AsyncStorage.getItem("userId");
     this.setState({ userId: userId });
     console.log(userId, "userId");
     AsyncStorage.getItem("storeId").then((value) => {
@@ -99,8 +99,8 @@ export default class GenerateReturnSlip extends Component {
           costprice = costprice + element.netValue;
           quantity = quantity + element.quantity;
         });
-        console.log("Return Items", this.state.returnInvoice);
         this.setState({ netValue: costprice, quantity: quantity, isChecked: false, itemsReturn: true });
+        console.log("Return Items", this.state.returnInvoice, this.state.itemsReturn);
       });
     }).catch((err) => {
       this.setState({ loading: false });
@@ -155,10 +155,10 @@ export default class GenerateReturnSlip extends Component {
       comments: null
     };
     console.log(saveObj, "params");
-    this.setState({ loading: true });
+    // this.setState({ loading: true });
     axios.post(CustomerService.saveRetunSlip(), saveObj).then(res => {
       if (res) {
-        // alert(res.data.result);
+        console(res.data.result,"resultss");
         this.setState({ resultData: res.data.result, }, () => {
           this.setState({ resultModel: true, modelVisible: true });
         });
@@ -190,7 +190,7 @@ export default class GenerateReturnSlip extends Component {
   generateInvoice = () => {
     this.setState({ returnModel: true, modelVisible: true });
     console.log("hello");
-    console.log(this.state.netValueList);
+    console.log("generateInvoice",this.state.netValueList);
   };
 
   handleCutomerTagging = () => {
@@ -236,6 +236,7 @@ export default class GenerateReturnSlip extends Component {
 
 
   render() {
+    console.log("this.state.item", !this.state.itemsReturn);
     return (
       <View>
         <View style={{ flexDirection: 'row', width: Device.isTablet ? deviceWidth - 20 : deviceWidth - 10, justifyContent: 'space-between', marginTop: 20 }}>
@@ -359,7 +360,7 @@ export default class GenerateReturnSlip extends Component {
             </Modal>
           </View>
         )}
-        {!this.state.itemsReturn && (
+        {this.state.itemsReturn && (
           <View>
             <Text style={Device.isTablet ? styles.headerText_tablet : styles.hederText_mobile}>{I18n.t("List Of Items For Return")}</Text>
             <FlatList

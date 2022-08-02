@@ -108,12 +108,12 @@ class BottomTabNav extends Component {
     render() {
         return (
             <View style={styles.bottomContainer}>
-                <View style={styles.footer}>
+                {/* <View style={styles.footer}> */}
                     <TouchableOpacity style={styles.bottomButtons}
-                        onPress={() => { 
+                        onPress={() => {
                             console.log("in home click")
                             this.homeButtonActions()
-                             }}>
+                        }}>
                         <HomeIcon name="home" color={global.homeButtonClicked === true ? "red" : '#000'} size={20} />
                         <Text> {I18n.t("Home")}</Text>
                     </TouchableOpacity>
@@ -122,32 +122,36 @@ class BottomTabNav extends Component {
                         <ProfileIcon name="user" color={global.profileButtonClicked === true ? "red" : '#000'} size={20} />
                         <Text> {I18n.t("Profile")}</Text>
                     </TouchableOpacity>
-                </View>
+                {/* </View> */}
             </View >
         )
     }
 }
 
 const styles = StyleSheet.create({
-  bottomContainer: {
-    flexDirection: 'column',
-  },
-  footer: {
-    position: 'absolute',
-    flex: 0.1,
-    left: 0,
-    right: 0,
-    bottom: -10,
-    backgroundColor: '#fff',
-    flexDirection: 'row',
-    height: 80,
-    alignItems: 'center',
-  },
-  bottomButtons: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-  }
+    bottomContainer: {
+        flex: 0.1,
+        display:'flex',
+        backgroundColor: '#fff',
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    footer: {
+        // position: 'absolute',
+        // flex: 1,
+        // left: 0,
+        // right: 0,
+        // bottom: -10,
+        display:'flex',
+        backgroundColor: 'red',
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    bottomButtons: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+    }
 
 });
 export default BottomTabNav;
