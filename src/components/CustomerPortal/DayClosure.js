@@ -16,7 +16,7 @@ export default class DayClosure extends Component {
     super(props);
     this.state = {
       storeId: "",
-      dayClosureList: [1, 2],
+      dayClosureList: [],
       enableButton: false,
       loading: false
     };
@@ -33,7 +33,6 @@ export default class DayClosure extends Component {
     const param = "?storeId=" + this.state.storeId;
     axios.get(CustomerService.getAllDayClosure() + param).then(res => {
       if (res) {
-        console.log(res.data);
         this.setState({ dayClosureList: res.data.result });
         if (this.state.dayClosureList.length > 0) {
           this.setState({ enableButton: true });
@@ -120,21 +119,21 @@ const styles = StyleSheet.create({
   closeBtn: {
     width: RW(150),
     height: RH(40),
-    backgroundColor: '#24dd1d',
+    backgroundColor:'#ED1C24',
     borderRadius: Device.isTablet ? 10 : 5,
   },
   closeBtnText: {
-    color: '#00000090',
+    color: '#fff',
     fontSize: RF(14),
     textAlign: 'center',
     fontFamily: 'medium',
-    marginTop: 5,
+    marginTop: 5
   },
   emptyText: {
     fontSize: RF(14),
     fontFamily: 'medium',
     marginTop: deviceheight / 3,
     textAlign: 'center',
-    color: '#009d1d'
+    color: '#ED1C24'
   }
 });

@@ -445,7 +445,7 @@ class GenerateEstimationSlip extends Component {
       console.log('There is error getting token');
       //alert('There is error getting token');
     });
-
+    console.log("ES Number",this.state.resultDsNumber);
     return (
       <View style={{ flex: 1 }}>
         {this.state.flagone && (

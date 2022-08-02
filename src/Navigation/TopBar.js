@@ -28,13 +28,13 @@ export const screenMapping = {
 
 const GetImageBasedOnPrevilageName = (name) => {
   return (
-    name === "Dashboard" ? require('../components/assets/images/home.png') :
-      name === "Billing Portal" ? require('../components/assets/images/customerportal.png') :
-        name === "Inventory Portal" ? require('../components/assets/images/inventoryportal.png') :
-          name === "Promotions & Loyalty" ? require('../components/assets/images/promotions.png') :
-            name === "Accounting Portal" ? require('../components/assets/images/accounting.png') :
-              name === "Reports" ? require('../components/assets/images/reports.png') :
-                name === "URM Portal" ? require('../components/assets/images/urmportal.png') :
+    name === "Dashboard" ? require('../commonUtils/assets/Images/home.png') :
+      name === "Billing Portal" ? require('../commonUtils/assets/Images/billing_portal_header_icon.png') :
+        name === "Inventory Portal" ? require('../commonUtils/assets/Images/inventory_dropdown_icon.png') :
+          name === "Promotions & Loyalty" ? require('../commonUtils/assets/Images/promotions_dropdown_icon.png') :
+            name === "Accounting Portal" ? require('../commonUtils/assets/Images/accounting_dropdown_icon.png') :
+              name === "Reports" ? require('../commonUtils/assets/Images/reports_dropdown_icon.png') :
+                name === "URM Portal" ? require('../commonUtils/assets/Images/urm_dropdown_icon.png') :
                   <></>
   );
 };
@@ -223,7 +223,7 @@ export class TopBar extends Component {
           >
             <Image
               style={styles.logoimage}
-              source={require('../assets/Images/retail_logo_head.png')}
+              source={require('../commonUtils/assets/Images/retail_logo_head.png')}
             ></Image>
           </View>
 
@@ -309,8 +309,8 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 5,
-    width: 25,
-    height: 25,
+    width: 22,
+    height: 22,
   },
   item: {
     justifyContent: 'center',

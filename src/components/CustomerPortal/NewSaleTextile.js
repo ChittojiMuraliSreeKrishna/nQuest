@@ -14,6 +14,9 @@ import GenerateEstimationSlip from './GenerateEstimationSlip';
 import GenerateInvoiceSlip from './GenerateInvoiceSlip';
 import GenerateReturnSlip from './GenerateReturnSlip';
 import GiftVocher from './GiftVocher';
+import scss from '../../commonUtils/assets/styles/HeaderStyles.scss';
+
+
 var deviceWidth = Dimensions.get('window').width;
 var deviceWidth = Dimensions.get('window').width;
 const data = [true, false, false, false, false, false, false, false, false];
@@ -218,11 +221,11 @@ class NewSaleTextile extends Component {
               showsVerticalScrollIndicator={false}
               showsHorizontalScrollIndicator={false}
               renderItem={({ item, index }) => (
-                <TouchableOpacity style={[pageNavigationBtn, {
-                  backgroundColor: item.bool ? '#ED1C24' : '#FFFFFF',
-                  borderColor: item.bool ? '#ED1C24' : '#858585',
+                <TouchableOpacity style={[scss.pageNavigationBtn, {
+                  // backgroundColor: item.bool ? '#ED1C24' : '#d7d7d7',
+                  borderColor: item.bool ? '#ED1C24' : '#d7d7d7',
                 }]} onPress={() => this.topbarAction1(item, index)} >
-                  <Text style={[pageNavigationBtnText, { color: item.bool ? "#FFFFFF" : '#858585', }]}>
+                  <Text style={[scss.pageNavigationBtnText, { color: item.bool ? "#ED1C24" : '#00000073', }]}>
                     {item.name}
                   </Text>
                 </TouchableOpacity>

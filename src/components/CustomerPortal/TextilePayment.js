@@ -72,6 +72,7 @@ class TextilePayment extends Component {
             gvNumber: "",
             couponDiscount: 0,
             discountAmount: 0,
+            loading: false
         };
     }
 
@@ -86,7 +87,15 @@ class TextilePayment extends Component {
         }).catch(() => {
             this.setState({ loading: false });
             console.log('There is error getting domainDataId');
-           // alert('There is error getting domainDataId');
+            // alert('There is error getting domainDataId');
+        });
+
+        AsyncStorage.getItem("domainName").then((value) => {
+            global.domainName = value;
+        }).catch(() => {
+            this.setState({ loading: false });
+            console.log('There is error getting domainName');
+            //alert('There is error getting domainName');
         });
 
         AsyncStorage.getItem("storeId").then((value) => {
@@ -96,9 +105,9 @@ class TextilePayment extends Component {
         }).catch(() => {
             this.setState({ loading: false });
             console.log('There is error getting storeId');
-           // alert('There is error getting storeId');
+            // alert('There is error getting storeId');
         });
-        console.log('total amount is,',this.props.route.params.discountAmount);
+        console.log('total amount is,', this.props.route.params.discountAmount);
         this.setState({
             totalAmount: this.props.route.params.totalAmount,
             grossAmount: this.props.route.params.grossAmount,
@@ -457,284 +466,289 @@ class TextilePayment extends Component {
         if (this.state.flagOne === true && this.state.flagThree === false && this.state.recievedAmount === "") {
             alert('Please collect sufficient amount and then only pay');
         }
-        else if (this.state.flagOne === true && this.state.flagThree === false && parseFloat(this.state.recievedAmount) < (parseFloat(this.state.totalAmount ) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10))) {
+        else if (this.state.flagOne === true && this.state.flagThree === false && parseFloat(this.state.recievedAmount) < (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10))) {
             alert('Please collect sufficient amount and then only pay');
         }
         else if (this.state.flagThree === true && this.state.verifiedCash === "") {
             alert('Please collect some cash amount for ccpay');
         }
-        else if (global.domainName === "Textile") {
-            let obj;
-            if (this.state.flagTwo === true) {
-                obj = {
-                    "natureOfSale": "InStore",
-                    "domainId": 1,
-                    "storeId": this.state.storeId,
-                    "grossAmount": this.state.grossAmount,
-                    "totalPromoDisc": this.state.totalPromoDisc,
-                    "taxAmount": this.state.taxAmount,
-                    "totalManualDisc": parseInt(this.state.manualDisc),
-                    "discApprovedBy": this.state.approvedBy,
-                    "discType": this.state.reasonDiscount,
-                    "approvedBy": null,
-                    "netPayableAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)),
-                    "offlineNumber": null,
-                    "userId": this.state.userId,
-                    "sgst": this.state.CGST,
-                    "cgst": this.state.CGST,
-                    "dlSlip": this.state.dsNumberList,
-                    "lineItemsReVo": null,
-                    "paymentAmountType": []
-                };
+        // else if (global.domainName === "Textile") {
+        let obj;
+        if (this.state.flagTwo === true) {
+            obj = {
+                "natureOfSale": "InStore",
+                "domainId": 1,
+                "storeId": this.state.storeId,
+                "grossAmount": this.state.grossAmount,
+                "totalPromoDisc": this.state.totalPromoDisc,
+                "taxAmount": this.state.taxAmount,
+                "totalManualDisc": parseInt(this.state.manualDisc),
+                "discApprovedBy": this.state.approvedBy,
+                "discType": this.state.reasonDiscount,
+                "approvedBy": null,
+                "netPayableAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)),
+                "offlineNumber": null,
+                "userId": this.state.userId,
+                "sgst": this.state.CGST,
+                "cgst": this.state.CGST,
+                "dlSlip": this.state.dsNumberList,
+                "lineItemsReVo": null,
+                "paymentAmountType": [
+                    {
+                        "paymentType": "Card",
+                        "paymentAmount": this.state.ccCardCash
+                    }
+                ]
+            };
+        }
+        else if (this.state.flagOne === true) {
+            obj = {
+                "natureOfSale": "InStore",
+                "domainId": 1,
+                "storeId": this.state.storeId,
+                "grossAmount": this.state.grossAmount,
+                "totalPromoDisc": this.state.totalPromoDisc,
+                "taxAmount": this.state.taxAmount,
+                "totalManualDisc": parseInt(this.state.manualDisc),
+                "discApprovedBy": this.state.approvedBy,
+                "discType": this.state.reasonDiscount,
+                "approvedBy": null,
+                "netPayableAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString(),
+                "offlineNumber": null,
+                "userId": this.state.userId,
+                "sgst": this.state.CGST,
+                "cgst": this.state.CGST,
+                "dlSlip": this.state.dsNumberList,
+                "lineItemsReVo": null,
+                "recievedAmount": this.state.recievedAmount,
+                "returnAmount": this.state.returnAmount,
+                "paymentAmountType": [
+                    {
+                        "paymentType": "Cash",
+                        "paymentAmount": parseFloat(this.state.verifiedCash)
+                    }]
             }
-            else if (this.state.flagOne === true) {
-                obj = {
-                    "natureOfSale": "InStore",
-                    "domainId": 1,
-                    "storeId": this.state.storeId,
-                    "grossAmount": this.state.grossAmount,
-                    "totalPromoDisc": this.state.totalPromoDisc,
-                    "taxAmount": this.state.taxAmount,
-                    "totalManualDisc": parseInt(this.state.manualDisc),
-                    "discApprovedBy": this.state.approvedBy,
-                    "discType": this.state.reasonDiscount,
-                    "approvedBy": null,
-                    "netPayableAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString(),
-                    "offlineNumber": null,
-                    "userId": this.state.userId,
-                    "sgst": this.state.CGST,
-                    "cgst": this.state.CGST,
-                    "dlSlip": this.state.dsNumberList,
-                    "lineItemsReVo": null,
-                    "recievedAmount": this.state.recievedAmount,
-                    "returnAmount": this.state.returnAmount,
-                    "paymentAmountType": [
-                        {
-                            "paymentType": "Cash",
-                            "paymentAmount": parseFloat(this.state.verifiedCash)
-                        }]
+        }
+        else if (this.state.flagThree === true) {
+            obj = {
+                "natureOfSale": "InStore",
+                "domainId": 1,
+                "storeId": this.state.storeId,
+                "grossAmount": this.state.grossAmount,
+                "totalPromoDisc": this.state.totalPromoDisc,
+                "taxAmount": this.state.taxAmount,
+                "totalManualDisc": parseInt(this.state.manualDisc),
+                "discApprovedBy": this.state.approvedBy,
+                "discType": this.state.reasonDiscount,
+                "approvedBy": null,
+                "netPayableAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString(),
+                "offlineNumber": null,
+                "userId": this.state.userId,
+                "sgst": this.state.CGST,
+                "cgst": this.state.CGST,
+                "dlSlip": this.state.dsNumberList,
+                "lineItemsReVo": null,
+                "paymentAmountType": [
+                    {
+                        "paymentType": "Cash",
+                        "paymentAmount": parseFloat(this.state.verifiedCash)
+                    },
+                    {
+                        "paymentType": "Card",
+                        "paymentAmount": this.state.ccCardCash
+                    }]
+            };
+        }
+        console.log(" payment cash method data", obj);
+        axios.post(NewSaleService.createOrder(), obj).then((res) => {
+            console.log(res);
+            if (res.data && res.data["isSuccess"] === "true") {
+                // const cardAmount = this.state.flagTwo || this.state.flagThree ? JSON.stringify(Math.round(this.state.ccCardCash)) : JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString());
+                alert("Order created " + res.data["result"]);
+                if (this.state.flagOne === true && this.state.flagThree === false) {
+                    this.props.route.params.onGoBack();
+                    this.props.navigation.goBack();
                 }
-            }
-            else if (this.state.flagThree === true) {
-                obj = {
-                    "natureOfSale": "InStore",
-                    "domainId": 1,
-                    "storeId": this.state.storeId,
-                    "grossAmount": this.state.grossAmount,
-                    "totalPromoDisc": this.state.totalPromoDisc,
-                    "taxAmount": this.state.taxAmount,
-                    "totalManualDisc": parseInt(this.state.manualDisc),
-                    "discApprovedBy": this.state.approvedBy,
-                    "discType": this.state.reasonDiscount,
-                    "approvedBy": null,
-                    "netPayableAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString(),
-                    "offlineNumber": null,
-                    "userId": this.state.userId,
-                    "sgst": this.state.CGST,
-                    "cgst": this.state.CGST,
-                    "dlSlip": this.state.dsNumberList,
-                    "lineItemsReVo": null,
-                    "paymentAmountType": [
-                        {
-                            "paymentType": "Cash",
-                            "paymentAmount": parseFloat(this.state.verifiedCash)
+                let obj;
+                if (this.state.flagTwo === true) {
+                    obj = {
+                        "amount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)),
+                        "info": "order creations",
+                        "newsaleId": res.data["result"],
+                    };
+                } else if (this.state.flagThree === true) {
+                    obj = {
+                        "amount": this.state.ccCardCash,
+                        "info": "order creations",
+                        "newsaleId": res.data["result"],
+                    };
+
+                }
+                console.log('params aresdasd', obj);
+                axios.post(NewSaleService.payment(), obj).then((res) => {
+                    // this.setState({isPayment: false});
+                    const data = JSON.parse(res.data["result"]);
+                    //console.log()
+                    var options = {
+                        description: 'Transaction',
+                        image: 'https://i.imgur.com/3g7nmJC.png',
+                        currency: data.currency,
+                        order_id: data.id,
+                        key: 'rzp_test_z8jVsg0bBgLQer', // Your api key
+                        amount: data.amount,
+                        name: 'OTSI',
+                        prefill: {
+                            name: "Kadali",
+                            email: "kadali@gmail.com",
+                            contact: "9999999999",
                         },
-                        {
-                            "paymentType": "Card",
-                            "paymentAmount": this.state.ccCardCash
-                        }]
-                };
-            }
-            console.log(obj);
-            axios.post(NewSaleService.createOrder(), obj).then((res) => {
-                console.log(res);
-                if (res.data && res.data["isSuccess"] === "true") {
-                    // const cardAmount = this.state.flagTwo || this.state.flagThree ? JSON.stringify(Math.round(this.state.ccCardCash)) : JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString());
-                    alert("Order created " + res.data["result"]);
-                    if (this.state.flagOne === true && this.state.flagThree === false) {
+                        theme: { color: '#F37254' }
+                    };
+                    console.log("options data", options);
+                    RazorpayCheckout.open(options).then((data) => {
+                        // handle success
+                        this.setState({ tableData: [] });
+                        alert(`Success: ${data.razorpay_payment_id}`);
                         this.props.route.params.onGoBack();
                         this.props.navigation.goBack();
-                    }
-                    let obj;
-                    if (this.state.flagTwo === true) {
-                        obj = {
-                            "amount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)),
-                            "info": "order creations",
-                            "newsaleId": res.data["result"],
-                        };
-                    } else if (this.state.flagThree === true) {
-                        obj = {
-                            "amount": this.state.ccCardCash,
-                            "info": "order creations",
-                            "newsaleId": res.data["result"],
-                        };
-
-                    }
-                    console.log('params aresdasd', obj);
-                    axios.post(NewSaleService.payment(), obj).then((res) => {
-                        // this.setState({isPayment: false});
-                        const data = JSON.parse(res.data["result"]);
-                        //console.log()
-                        var options = {
-                            description: 'Transaction',
-                            image: 'https://i.imgur.com/3g7nmJC.png',
-                            currency: data.currency,
-                            order_id: data.id,
-                            key: 'rzp_test_z8jVsg0bBgLQer', // Your api key
-                            amount: data.amount,
-                            name: 'OTSI',
-                            prefill: {
-                                name: "Kadali",
-                                email: "kadali@gmail.com",
-                                contact: "9999999999",
-                            },
-                            theme: { color: '#F37254' }
-                        };
-                        console.log(options);
-                        RazorpayCheckout.open(options).then((data) => {
-                            // handle success
-                            this.setState({ tableData: [] });
-                            alert(`Success: ${data.razorpay_payment_id}`);
-                            this.props.route.params.onGoBack();
-                            this.props.navigation.goBack();
-                            //this.props.navigation.navigate('Orders', { total: this.state.totalAmount, payment: 'RazorPay' })
-                        }).catch((error) => {
-                            this.setState({ loading: false });
-                            console.log(error);
-                            // handle failure
-                            alert(`Error: ${JSON.stringify(error.code)} | ${JSON.stringify(error.description)}`);
-                        });
+                        //this.props.navigation.navigate('Orders', { total: this.state.totalAmount, payment: 'RazorPay' })
+                    }).catch((error) => {
+                        this.setState({ loading: false });
+                        console.log(error);
+                        // handle failure
+                        alert(`Error: ${JSON.stringify(error.code)} || ${JSON.stringify(error.description)}`);
                     });
-                    this.setState({ loading: false });
-                }
-                else {
-                    this.setState({ loading: false });
-                    alert("duplicate record already exists");
-                }
+                });
+                // this.setState({ loading: false });
             }
-            );
+            else {
+                // this.setState({ loading: false });
+                alert("duplicate record already exists");
+            }
         }
-        else if (global.domainName === "Retail") {
-            let lineItems = [];
-            this.state.retailBarCodeList.forEach((barCode, index) => {
-                const obj = {
-                    "barCode": barCode.barcodeId,
-                    "domainId": 2,
-                    "itemPrice": barCode.listPrice,
-                    "netValue": barCode.listPrice,
-                    "quantity": 1
-                };
-                lineItems.push(obj);
-            });
+        );
+        // }
+        // else if (global.domainName === "Retail") {
+        //     let lineItems = [];
+        //     this.state.retailBarCodeList.forEach((barCode, index) => {
+        //         const obj = {
+        //             "barCode": barCode.barcodeId,
+        //             "domainId": 2,
+        //             "itemPrice": barCode.listPrice,
+        //             "netValue": barCode.listPrice,
+        //             "quantity": 1
+        //         };
+        //         lineItems.push(obj);
+        //     });
 
-            axios.post(NewSaleService.saveLineItems(), lineItems).then((res) => {
-                if (res.data && res.data["isSuccess"] === "true") {
-                    let lineItemsList = [];
-                    let dataResult = JSON.parse(res.data.result);
-                    dataResult.forEach(element => {
-                        const obj = {
-                            "lineItemId": element
-                        };
-                        lineItemsList.push(obj);
-                    });
+        //     axios.post(NewSaleService.saveLineItems(), lineItems).then((res) => {
+        //         if (res.data && res.data["isSuccess"] === "true") {
+        //             let lineItemsList = [];
+        //             let dataResult = JSON.parse(res.data.result);
+        //             dataResult.forEach(element => {
+        //                 const obj = {
+        //                     "lineItemId": element
+        //                 };
+        //                 lineItemsList.push(obj);
+        //             });
 
-                    this.setState({ lineItemsList: lineItemsList }, () => {
-                        const params = {
-                            "natureOfSale": "InStore",
-                            "domainId": 2,
-                            "storeId": this.state.storeId,
-                            "grossAmount": this.state.grossAmount,
-                            "totalPromoDisc": this.state.totalPromoDisc,
-                            "taxAmount": this.state.taxAmount,
-                            "totalManualDisc": parseInt(this.state.manualDisc),
-                            "discApprovedBy": this.state.approvedBy,
-                            "discType": this.state.reasonDiscount,
-                            "approvedBy": null,
-                            "netPayableAmount": (parseFloat(this.state.totalAmount ) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString(),
-                            "offlineNumber": null,
-                            "userId": this.state.userId,
-                            "sgst": this.state.CGST,
-                            "cgst": this.state.CGST,
-                            "dlSlip": this.state.dsNumberList,
-                            "lineItemsReVo": this.state.lineItemsList,
-                            "paymentAmountType": [{
-                                "paymentType": "Cash",
-                                "paymentAmount": parseFloat(this.state.verifiedCash)
-                            }]
+        //             this.setState({ lineItemsList: lineItemsList }, () => {
+        //                 const params = {
+        //                     "natureOfSale": "InStore",
+        //                     "domainId": 2,
+        //                     "storeId": this.state.storeId,
+        //                     "grossAmount": this.state.grossAmount,
+        //                     "totalPromoDisc": this.state.totalPromoDisc,
+        //                     "taxAmount": this.state.taxAmount,
+        //                     "totalManualDisc": parseInt(this.state.manualDisc),
+        //                     "discApprovedBy": this.state.approvedBy,
+        //                     "discType": this.state.reasonDiscount,
+        //                     "approvedBy": null,
+        //                     "netPayableAmount": (parseFloat(this.state.totalAmount ) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString(),
+        //                     "offlineNumber": null,
+        //                     "userId": this.state.userId,
+        //                     "sgst": this.state.CGST,
+        //                     "cgst": this.state.CGST,
+        //                     "dlSlip": this.state.dsNumberList,
+        //                     "lineItemsReVo": this.state.lineItemsList,
+        //                     "paymentAmountType": [{
+        //                         "paymentType": "Cash",
+        //                         "paymentAmount": parseFloat(this.state.verifiedCash)
+        //                     }]
 
-                        };
+        //                 };
 
-                        console.log(params);
+        //                 console.log(params);
 
-                        axios.post(NewSaleService.createOrder(), params).then((res) => {
-                            if (res.data && res.data["isSuccess"] === "true") {
-                                //  alert("Order created " + res.data["result"]);
-                                this.setState({ loading: false });
-                                this.props.route.params.onGoBack();
-                                this.props.navigation.goBack();
-                            }
-                            else {
-                                this.setState({ loading: false });
-                                alert("duplicate record already exists");
-                            }
-                        }
-                        );
-                        console.log(params);
-                        axios.post(NewSaleService.createOrder(), params).then((res) => {
-                            if (res.data && res.data["isSuccess"] === "true") {
-                                alert("Order created " + res.data["result"]);
-                                const params = {
-                                    "amount": JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()),
-                                    "info": "order creations",
-                                    "newsaleId": res.data["result"],
-                                };
+        //                 axios.post(NewSaleService.createOrder(), params).then((res) => {
+        //                     if (res.data && res.data["isSuccess"] === "true") {
+        //                         //  alert("Order created " + res.data["result"]);
+        //                         this.setState({ loading: false });
+        //                         this.props.route.params.onGoBack();
+        //                         this.props.navigation.goBack();
+        //                     }
+        //                     else {
+        //                         this.setState({ loading: false });
+        //                         alert("duplicate record already exists");
+        //                     }
+        //                 }
+        //                 );
+        //                 console.log(params);
+        //                 axios.post(NewSaleService.createOrder(), params).then((res) => {
+        //                     if (res.data && res.data["isSuccess"] === "true") {
+        //                         alert("Order created " + res.data["result"]);
+        //                         const params = {
+        //                             "amount": JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()),
+        //                             "info": "order creations",
+        //                             "newsaleId": res.data["result"],
+        //                         };
 
-                                axios.post(NewSaleService.payment(), params).then((res) => {
-                                    // this.setState({isPayment: false});
-                                    const data = JSON.parse(res.data["result"]);
-                                    //console.log()
-                                    var options = {
-                                        description: 'Transaction',
-                                        image: 'https://i.imgur.com/3g7nmJC.png',
-                                        currency: data.currency,
-                                        order_id: data.id,
-                                        key: 'rzp_test_z8jVsg0bBgLQer', // Your api key
-                                        amount: data.amount,
-                                        name: 'OTSI',
-                                        prefill: {
-                                            name: "Kadali",
-                                            email: "kadali@gmail.com",
-                                            contact: "9999999999",
-                                        },
-                                        theme: { color: '#F37254' }
-                                    };
-                                    console.log(options);
-                                    RazorpayCheckout.open(options).then((data) => {
-                                        // handle success
-                                        this.setState({ tableData: [] });
-                                        alert(`Success: ${data.razorpay_payment_id}`);
-                                        this.props.route.params.onGoBack();
-                                        this.props.navigation.goBack();
-                                        //this.props.navigation.navigate('Orders', { total: this.state.totalAmount, payment: 'RazorPay' })
-                                    }).catch((error) => {
-                                        this.setState({ loading: false });
-                                        console.log(error);
-                                        // handle failure
-                                        alert(`Error: ${JSON.stringify(error.code)} | ${JSON.stringify(error.description)}`);
-                                    });
-                                });
-                                this.setState({ loading: false });
-                            }
-                            else {
-                                this.setState({ loading: false });
-                                alert("duplicate record already exists");
-                            }
-                        }
-                        );
-                    });
-                }
-            });
-        }
+        //                         axios.post(NewSaleService.payment(), params).then((res) => {
+        //                             // this.setState({isPayment: false});
+        //                             const data = JSON.parse(res.data["result"]);
+        //                             //console.log()
+        //                             var options = {
+        //                                 description: 'Transaction',
+        //                                 image: 'https://i.imgur.com/3g7nmJC.png',
+        //                                 currency: data.currency,
+        //                                 order_id: data.id,
+        //                                 key: 'rzp_test_z8jVsg0bBgLQer', // Your api key
+        //                                 amount: data.amount,
+        //                                 name: 'OTSI',
+        //                                 prefill: {
+        //                                     name: "Kadali",
+        //                                     email: "kadali@gmail.com",
+        //                                     contact: "9999999999",
+        //                                 },
+        //                                 theme: { color: '#F37254' }
+        //                             };
+        //                             console.log(options);
+        //                             RazorpayCheckout.open(options).then((data) => {
+        //                                 // handle success
+        //                                 this.setState({ tableData: [] });
+        //                                 alert(`Success: ${data.razorpay_payment_id}`);
+        //                                 this.props.route.params.onGoBack();
+        //                                 this.props.navigation.goBack();
+        //                                 //this.props.navigation.navigate('Orders', { total: this.state.totalAmount, payment: 'RazorPay' })
+        //                             }).catch((error) => {
+        //                                 this.setState({ loading: false });
+        //                                 console.log(error);
+        //                                 // handle failure
+        //                                 alert(`Error: ${JSON.stringify(error.code)} | ${JSON.stringify(error.description)}`);
+        //                             });
+        //                         });
+        //                         this.setState({ loading: false });
+        //                     }
+        //                     else {
+        //                         this.setState({ loading: false });
+        //                         alert("duplicate record already exists");
+        //                     }
+        //                 }
+        //                 );
+        //             });
+        //         }
+        //     });
+        // }
     };
 
 
