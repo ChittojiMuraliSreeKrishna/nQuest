@@ -61,13 +61,13 @@ export class TopBar extends Component {
       <TouchableOpacity style={styles.item}
         onPress={() => {
           currentSelection = previlage.item
-          global.profileButtonClicked = false
           global.homeButtonClicked = false
+          global.profileButtonClicked = false
           this.props.navigation.navigate(screenMapping[currentSelection], this.refresh());
           this.setState({ modalVisibleData: false });
         }}>
         <Image style={styles.icon} source={GetImageBasedOnPrevilageName(previlage.item)} />
-        <Text style={styles.textItem}>{previlage.item}</Text>
+        <Text style={styles.textItem}>{I18n.t(previlage.item)}</Text>
       </TouchableOpacity>
     );
   }
@@ -250,6 +250,7 @@ export class TopBar extends Component {
                         data={data}
                         renderItem={(item) => this._renderItem(item)}
                         keyExtractor={item => item}
+                       contentContainerStyle={{flexDirection:'column', justifyContent: 'center'}}
                       />
                     </View>
                   </View>
@@ -302,7 +303,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-
     padding: 1,
     backgroundColor: '#fff'
 
@@ -313,28 +313,31 @@ const styles = StyleSheet.create({
     height: 22,
   },
   item: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    //justifyContent: 'space-evenly',
+    //alignItems: 'center',
     flexDirection: 'row',
-    padding: 15
+    padding: 15,
+    // flexWrap: 'wrap',
+    // flexGrow: 1
   },
   textItem: {
-
     fontSize: RF(14),
     fontFamily: 'bold'
   },
   modalContainer: {
     backgroundColor: 'rgba(0,0,0,0.4)',
+    // opacity:0.5,
     // height:'100%',
     // width:'100%',
     // justifyContent:'center',
     // alignContent:'center',
     // alignItems:'center',
-    // flex:1
   },
   modalView: {
     backgroundColor: "white",
     justifyContent: 'center',
+    //flex:1,
+    //flexDirection:'row'
     // position: "relative",
     // width: "70%",
     // margin: "0 auto",

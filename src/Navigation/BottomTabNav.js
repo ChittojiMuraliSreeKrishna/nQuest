@@ -96,8 +96,8 @@ class BottomTabNav extends Component {
 
     homeButtonActions() {
         global.homeButtonClicked = true
-        this.props.navigation.navigate(this.state.firstDisplayName)
         global.profileButtonClicked = false
+        this.props.navigation.navigate(this.state.firstDisplayName)
     }
 
     profileButtonActions() {
@@ -109,19 +109,19 @@ class BottomTabNav extends Component {
         return (
             <View style={styles.bottomContainer}>
                 {/* <View style={styles.footer}> */}
-                    <TouchableOpacity style={styles.bottomButtons}
-                        onPress={() => {
-                            console.log("in home click")
-                            this.homeButtonActions()
-                        }}>
-                        <HomeIcon name="home" color={global.homeButtonClicked === true ? "red" : '#000'} size={20} />
-                        <Text> {I18n.t("Home")}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.bottomButtons}
-                        onPress={() => { this.profileButtonActions() }}>
-                        <ProfileIcon name="user" color={global.profileButtonClicked === true ? "red" : '#000'} size={20} />
-                        <Text> {I18n.t("Profile")}</Text>
-                    </TouchableOpacity>
+                <TouchableOpacity style={styles.bottomButtons}
+                    onPress={() => {
+                        console.log("in home click")
+                        this.homeButtonActions()
+                    }}>
+                    <HomeIcon name="home" color={global.homeButtonClicked === true ? "red" : '#000'} size={20} />
+                    <Text> {I18n.t("Home")}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.bottomButtons}
+                    onPress={() => { this.profileButtonActions() }}>
+                    <ProfileIcon name="user" color={global.profileButtonClicked === true ? "red" : '#000'} size={20} />
+                    <Text> {I18n.t("Profile")}</Text>
+                </TouchableOpacity>
                 {/* </View> */}
             </View >
         )
@@ -131,7 +131,7 @@ class BottomTabNav extends Component {
 const styles = StyleSheet.create({
     bottomContainer: {
         flex: 0.1,
-        display:'flex',
+        display: 'flex',
         backgroundColor: '#fff',
         flexDirection: 'row',
         alignItems: 'center'
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
         // left: 0,
         // right: 0,
         // bottom: -10,
-        display:'flex',
+        display: 'flex',
         backgroundColor: 'red',
         flexDirection: 'row',
         alignItems: 'center',
