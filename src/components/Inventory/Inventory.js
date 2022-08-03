@@ -21,7 +21,6 @@ import ProductCombo from './ProductCombo';
 import ReBarcode from './ReBarcode';
 import TopBar from '../../Navigation/TopBar';
 import style from '../../commonUtils/assets/styles/HeaderStyles.scss';
-import ModalDropdown from 'react-native-modal-dropdown';
 
 import scss from '../../commonUtils/assets/styles/HeaderStyles.scss';
 

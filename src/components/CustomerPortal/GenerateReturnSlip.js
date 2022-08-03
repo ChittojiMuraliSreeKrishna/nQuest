@@ -158,7 +158,7 @@ export default class GenerateReturnSlip extends Component {
     // this.setState({ loading: true });
     axios.post(CustomerService.saveRetunSlip(), saveObj).then(res => {
       if (res) {
-        console(res.data.result,"resultss");
+        
         this.setState({ resultData: res.data.result, }, () => {
           this.setState({ resultModel: true, modelVisible: true });
         });
