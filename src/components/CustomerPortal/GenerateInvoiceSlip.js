@@ -280,8 +280,9 @@ class GenerateInvoiceSlip extends Component {
   getDeliverySlipDetails() {
     this.setState({ barCodeList: [], finalList: [], rBarCodeList: [], dlslips: [] });
     let costPrice = 0;
-    let discount = 0;
     let total = 0;
+    let netTotal = 0;
+    let promoDiscValue = 0;
     this.setState({ discountAmount: 0, netPayableAmount: 0, totalAmount: 0, promoDiscount: 0 });
     this.state.barCodeList = [];
     this.state.finalList = [];
@@ -290,6 +291,10 @@ class GenerateInvoiceSlip extends Component {
     let esNumber = this.state.dsNumber;
     let flag = true;
     const { storeId } = this.state;
+    const obj = {
+      "dsNumber": this.state.dsNumber.trim(),
+    }    
+    this.state.dsNumberList.push(obj);
     console.log("data in getDeliverySlipDetails", esNumber, flag, storeId);
     CustomerService.getDsSlip(esNumber, flag, storeId).then((res) => {
       var response = JSON.stringify(res)
@@ -322,16 +327,17 @@ class GenerateInvoiceSlip extends Component {
         }
 
         this.state.barCodeList.forEach((barCode, index) => {
+          console.log("valueeee", barCode)
           costPrice = costPrice + barCode.itemPrice;
-          discount = discount + barCode.discount;
-          total = total + barCode.netValue;
+          promoDiscValue = promoDiscValue + barCode.promoDiscount;
+          total = total + barCode.grossValue;
+          netTotal = netTotal + barCode.grossValue;
         });
 
-        discount = discount + this.state.discountAmount;
 
         this.setState({
           netPayableAmount: total,
-          totalPromoDisc: discount,
+          totalPromoDisc: promoDiscValue,
           grossAmount: costPrice,
         });
 
@@ -583,8 +589,8 @@ class GenerateInvoiceSlip extends Component {
 
 
 
-  handleDiscountAmount(text) {
-    this.setState({ discountAmount: text.trim() });
+  handleDiscountAmount(value) {
+    this.setState({ discountAmount: value });
   }
 
   handleApprovedBy(text) {
@@ -605,15 +611,16 @@ class GenerateInvoiceSlip extends Component {
     }
     else {
       // this.state.netPayableAmount = 0;
+      console.log(this.state.totalPromoDisc, this.state.discountAmount);
       const totalDisc =
-        parseInt(this.state.totalPromoDisc) + parseInt(this.state.discountAmount);
+        this.state.totalPromoDisc + parseInt(this.state.discountAmount);
       if (totalDisc < this.state.grandNetAmount) {
         const netPayableAmount = this.state.grandNetAmount - totalDisc;
         this.state.netPayableAmount = netPayableAmount;
         this.setState({ netPayableAmount: netPayableAmount });
         // this.getTaxAmount();
       }
-      const promDisc = parseInt(this.state.discountAmount) + parseInt(this.state.totalPromoDisc);
+      const promDisc = parseInt(this.state.discountAmount) + this.state.totalPromoDisc;
       console.log('vinodfdsfdsffs' + promDisc);
       this.setState({ showDiscReason: true, promoDiscount: promDisc });
 
@@ -1072,7 +1079,10 @@ class GenerateInvoiceSlip extends Component {
                     textAlignVertical="center"
                     keyboardType={'numeric'}
                     autoCapitalize="none"
-                    onChangeText={(text) => this.handleDiscountAmount(text)}
+                    onChangeText={(text) =>
+                      // console.log(text)
+                      this.handleDiscountAmount(text)
+                    }
                   />
                   <TextInput
                     style={Device.isTablet ? styles.input_tablet : styles.input_mobile}

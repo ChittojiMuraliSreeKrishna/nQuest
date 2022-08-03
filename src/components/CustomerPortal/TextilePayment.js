@@ -39,8 +39,8 @@ class TextilePayment extends Component {
             recievedAmount: "",
             verifiedCash: "",
             ccCardCash: 0,
-            domainId: 1,
-            storeId: 1,
+            domainId: 0,
+            storeId: 0,
             customerName: '',
             customerPhoneNumber: '',
             customerGSTNumber: '',
@@ -72,13 +72,16 @@ class TextilePayment extends Component {
             gvNumber: "",
             couponDiscount: 0,
             discountAmount: 0,
-            loading: false
+            loading: false,
+            clientId: 0
         };
     }
 
     async componentDidMount() {
         var domainStringId = "";
         var storeStringId = "";
+        const clientId = await AsyncStorage.getItem("custom:clientId1");
+        this.setState({ clientId: clientId })
         AsyncStorage.getItem("domainDataId").then((value) => {
             domainStringId = value;
             this.setState({ domainId: parseInt(domainStringId) });
@@ -107,7 +110,7 @@ class TextilePayment extends Component {
             console.log('There is error getting storeId');
             // alert('There is error getting storeId');
         });
-        console.log('total amount is,', this.props.route.params.discountAmount);
+        console.log('total amount is,', this.props.route.params);
         this.setState({
             totalAmount: this.props.route.params.totalAmount,
             grossAmount: this.props.route.params.grossAmount,
@@ -393,7 +396,7 @@ class TextilePayment extends Component {
     };
 
     handleGVNumber = (text) => {
-        this.setState({ gvNumber: text });
+        this.setState({ gvNumber: text, giftvoucher: text });
     };
 
     verifycash() {
@@ -419,7 +422,7 @@ class TextilePayment extends Component {
         // this.setState({ promoDiscount: "100" });
         const clientId = await AsyncStorage.getItem("custom:clientId1");
         axios.get(NewSaleService.getCoupons() + '/' + clientId + '?gvNumber=' + this.state.promocode).then(res => {
-            console.log(res);
+            console.log("applyPromocode data", res);
             if (res.data.result !== "Record not found") {
                 let grandAmount = this.state.totalAmount;
                 if (grandAmount > res.data.result.value) {
@@ -561,7 +564,7 @@ class TextilePayment extends Component {
         }
         console.log(" payment cash method data", obj);
         axios.post(NewSaleService.createOrder(), obj).then((res) => {
-            console.log(res);
+            console.log("Invoice data",JSON.stringify(res.data));
             if (res.data && res.data["isSuccess"] === "true") {
                 // const cardAmount = this.state.flagTwo || this.state.flagThree ? JSON.stringify(Math.round(this.state.ccCardCash)) : JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString());
                 alert("Order created " + res.data["result"]);
@@ -804,6 +807,7 @@ class TextilePayment extends Component {
     }
 
     render() {
+        console.log("giftvoucher", this.state.giftvoucher);
         return (
             <View style={styles.container}>
                 {this.state.loading &&
@@ -1122,10 +1126,10 @@ class TextilePayment extends Component {
                             textAlignVertical="center"
                             keyboardType={'default'}
                             autoCapitalize="none"
-                            value={this.state.promocode}
+                            value={this.state.giftvoucher ? this.state.giftvoucher : this.state.promocode}
                             //  onEndEditing
                             onChangeText={(text) => this.handlePromocode(text)}
-                        // onEndEditing={() => this.endEditing()}
+                            onEndEditing={() => this.applyPromocode()}
                         />
                         {this.state.giftvoucher === "" && (
                             <TouchableOpacity
