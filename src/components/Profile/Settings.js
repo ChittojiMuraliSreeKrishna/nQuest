@@ -420,133 +420,131 @@ class Settings extends Component {
 
   render() {
     return (
+      <>
+        <View style={{ flex: 1 }}>
+          <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
+            <TouchableOpacity style={{ backgroundColor: '#ED1C24', width: 100, margin: 10, borderRadius: 5 }}
+              onPress={() => {
+                AsyncStorage.removeItem('phone_number')
+                AsyncStorage.removeItem('user')
+                AsyncStorage.removeItem('tokenkey')
+                this.props.navigation.navigate('Login')
+              }}>
+              <Text style={{ color: '#fff', alignSelf: 'center', fontWeight: '700' }}> {I18n.t("Sign Out")}</Text>
+            </TouchableOpacity>
+          </View>
+          <KeyboardAwareScrollView KeyboardAwareScrollView
+            enableOnAndroid={true}>
+            <View>
+              {this.state.loading &&
+                <Loader
+                  loading={this.state.loading} />
+              }
+              <View style={{
+                flex: 1, justifyContent: 'center', //Centered horizontally
+                alignItems: 'center', color: '#ffffff'
+              }}>
+                <View style={{ flexDirection: 'column', flex: 0, marginLeft: 0, marginTop: 10, marginRight: 0, backgroundColor: "#ffffff", borderRadius: 20, }}>
 
-      <View style={{ flex: 1 }}>
-        <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-          <TouchableOpacity style={{ backgroundColor: '#ED1C24', width: 100, margin: 10, borderRadius: 5 }}
-            onPress={() => { this.props.navigation.navigate('Login'); }}>
-            <Text style={{ color: '#fff', alignSelf: 'center', fontWeight: '700' }}> {I18n.t("Sign Out")}</Text>
-          </TouchableOpacity>
-        </View>
-        <KeyboardAwareScrollView KeyboardAwareScrollView
-          enableOnAndroid={true}>
-          <View>
-            {this.state.loading &&
-              <Loader
-                loading={this.state.loading} />
-            }
-            <View style={{
-              flex: 1, justifyContent: 'center', //Centered horizontally
-              alignItems: 'center', color: '#ffffff'
-            }}>
-              <View style={{ flexDirection: 'column', flex: 0, marginLeft: 0, marginTop: 10, marginRight: 0, backgroundColor: "#ffffff", borderRadius: 20, }}>
-
-                <Image
-                  style={{ width: 80, height: 80, resizeMode: "cover", marginTop: 20, borderRadius: 40, borderColor: '#F2F2F2', alignSelf: 'center', borderWidth: 2, }}
-                  source={this.state.image}
-                />
-                <TouchableOpacity style={{ width: 30, height: 30, borderRadius: 10, alignSelf: 'center', top: -20, left: 15 }}>
                   <Image
-                    style={{ width: 30, height: 30, borderRadius: 10, }}
-                    source={require('../assets/images/cameraclick.png')} />
-                </TouchableOpacity>
+                    style={{ width: 80, height: 80, resizeMode: "cover", marginTop: 20, borderRadius: 40, borderColor: '#F2F2F2', alignSelf: 'center', borderWidth: 2, }}
+                    source={this.state.image}
+                  />
+                  <TouchableOpacity style={{ width: 30, height: 30, borderRadius: 10, alignSelf: 'center', top: -20, left: 15 }}>
+                    <Image
+                      style={{ width: 30, height: 30, borderRadius: 10, }}
+                      source={require('../assets/images/cameraclick.png')} />
+                  </TouchableOpacity>
 
-                {this.state.flagqtyModelOpen && (
-                  <View>
-                    <Modal isVisible={this.state.modalVisible}>
-                      <View style={{
-                        flex: 1, justifyContent: 'center', //Centered horizontally
-                        alignItems: 'center',
-                      }}>
+                  {this.state.flagqtyModelOpen && (
+                    <View>
+                      <Modal isVisible={this.state.modalVisible}>
                         <View style={{
-                          position: 'absolute',
-                          right: 20,
-                          left: 20,
+                          flex: 1, justifyContent: 'center', //Centered horizontally
                           alignItems: 'center',
-                          justifyContent: 'flex-start',
-                          backgroundColor: "#ffffff", borderRadius: 20,
                         }}>
-                          <TouchableOpacity
-                            style={{ backgroundColor: '#ED1C24', borderRadius: 5, width: 200, marginTop: 20, height: 32, alignSelf: 'center' }}
-                            onPress={() => this.pickSingleWithCameraForProductsAdd(true)} >
-                            <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ffffff', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('Select Product Image With Camera')} </Text>
-                          </TouchableOpacity>
+                          <View style={{
+                            position: 'absolute',
+                            right: 20,
+                            left: 20,
+                            alignItems: 'center',
+                            justifyContent: 'flex-start',
+                            backgroundColor: "#ffffff", borderRadius: 20,
+                          }}>
+                            <TouchableOpacity
+                              style={{ backgroundColor: '#ED1C24', borderRadius: 5, width: 200, marginTop: 20, height: 32, alignSelf: 'center' }}
+                              onPress={() => this.pickSingleWithCameraForProductsAdd(true)} >
+                              <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ffffff', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('Select Product Image With Camera')} </Text>
+                            </TouchableOpacity>
 
-                          <TouchableOpacity
-                            style={{ backgroundColor: '#ED1C24', borderRadius: 5, width: 200, marginTop: 20, height: 32, alignSelf: 'center' }}
-                            onPress={() => this.pickSingleForProductsAdd(true)} >
-                            <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ffffff', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('Select Product Image With Gallery')} </Text>
-                          </TouchableOpacity>
+                            <TouchableOpacity
+                              style={{ backgroundColor: '#ED1C24', borderRadius: 5, width: 200, marginTop: 20, height: 32, alignSelf: 'center' }}
+                              onPress={() => this.pickSingleForProductsAdd(true)} >
+                              <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ffffff', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('Select Product Image With Gallery')} </Text>
+                            </TouchableOpacity>
 
-                          <TouchableOpacity
-                            style={{ backgroundColor: '#ED1C24', borderRadius: 5, width: 200, marginTop: 20, height: 32, alignSelf: 'center', marginBottom: 20, }}
-                            onPress={() => this.cancel()} >
-                            <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ffffff', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('Cancel')} </Text>
-                          </TouchableOpacity>
+                            <TouchableOpacity
+                              style={{ backgroundColor: '#ED1C24', borderRadius: 5, width: 200, marginTop: 20, height: 32, alignSelf: 'center', marginBottom: 20, }}
+                              onPress={() => this.cancel()} >
+                              <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ffffff', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('Cancel')} </Text>
+                            </TouchableOpacity>
 
+                          </View>
                         </View>
-                      </View>
-                    </Modal>
-                  </View>)}
+                      </Modal>
+                    </View>)}
 
 
-                <Text></Text>
+                  <Text></Text>
 
-                <View style={{ marginTop: 0, width: deviceWidth }}>
+                  <View style={{ marginTop: 0, width: deviceWidth }}>
 
-                  <Text style={Device.isTablet ? styles.inputHeader_tablet : styles.inputHeader_mobile}> {I18n.t("NAME")}: </Text>
+                    <Text style={Device.isTablet ? styles.inputHeader_tablet : styles.inputHeader_mobile}> {I18n.t("NAME")}: </Text>
 
-                  <TextInput
-                    style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                    underlineColorAndroid="transparent"
-                    placeholder={I18n.t("NAME")}
-                    editable={false} selectTextOnFocus={false}
-                    placeholderTextColor="#353C4050"
-                    textAlignVertical="center"
-                    autoCapitalize="none"
-                    value={this.state.userName}
-                    onChangeText={this.handleUserName}
-                  />
+                    <TextInput
+                      style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
+                      underlineColorAndroid="transparent"
+                      placeholder={I18n.t("NAME")}
+                      editable={false} selectTextOnFocus={false}
+                      placeholderTextColor="#353C4050"
+                      textAlignVertical="center"
+                      autoCapitalize="none"
+                      value={this.state.userName}
+                      onChangeText={this.handleUserName}
+                    />
 
 
-                </View>
-                <View>
-                    <TouchableOpacity
-                        onPress={() => {
-                            AsyncStorage.clear()
-                            this.props.navigation.navigate('Login');
-                        }}>
-                        <Text> {I18n.t("Sign Out")}</Text>
-                    </TouchableOpacity>
-                  <Text style={Device.isTablet ? styles.inputHeader_tablet : styles.inputHeader_mobile}> {I18n.t("DESIGNATION")}: </Text>
+                  </View>
+                  <View>
+                    <Text style={Device.isTablet ? styles.inputHeader_tablet : styles.inputHeader_mobile}> {I18n.t("DESIGNATION")}: </Text>
 
-                  <TextInput
-                    style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                    editable={false} selectTextOnFocus={false}
-                    underlineColorAndroid="transparent"
-                    placeholder={I18n.t("DESIGNATION")}
-                    placeholderTextColor="#353C4050"
-                    textAlignVertical="center"
-                    autoCapitalize="none"
-                    value={this.state.role}
-                    onChangeText={this.handleRole}
-                  />
-                </View>
-                <View>
-                  <Text style={Device.isTablet ? styles.inputHeader_tablet : styles.inputHeader_mobile}> {I18n.t("EMAIL")}: </Text>
+                    <TextInput
+                      style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
+                      editable={false} selectTextOnFocus={false}
+                      underlineColorAndroid="transparent"
+                      placeholder={I18n.t("DESIGNATION")}
+                      placeholderTextColor="#353C4050"
+                      textAlignVertical="center"
+                      autoCapitalize="none"
+                      value={this.state.role}
+                      onChangeText={this.handleRole}
+                    />
+                  </View>
+                  <View>
+                    <Text style={Device.isTablet ? styles.inputHeader_tablet : styles.inputHeader_mobile}> {I18n.t("EMAIL")}: </Text>
 
-                  <TextInput
-                    style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                    underlineColorAndroid="transparent"
-                    placeholder={I18n.t("EMAIL")}
-                    placeholderTextColor="#353C4050"
-                    textAlignVertical="center"
-                    autoCapitalize="none"
-                    value={this.state.email}
-                    onChangeText={this.handleEmail}
-                  />
+                    <TextInput
+                      style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
+                      underlineColorAndroid="transparent"
+                      placeholder={I18n.t("EMAIL")}
+                      placeholderTextColor="#353C4050"
+                      textAlignVertical="center"
+                      autoCapitalize="none"
+                      value={this.state.email}
+                      onChangeText={this.handleEmail}
+                    />
 
-                  {/* <TouchableOpacity style={{
+                    {/* <TouchableOpacity style={{
                         position: 'absolute',
                         right: 28,
                         top: 20,
@@ -554,49 +552,49 @@ class Settings extends Component {
 
                         <Text style={{ color: '#353C4050', fontFamily: 'regular', fontSize: 14, position: 'absolute', right: 0, }}> {'Select Unit >'} </Text>
                       </TouchableOpacity> */}
-                </View>
+                  </View>
 
-                <View>
-                  <Text style={Device.isTablet ? styles.inputHeader_tablet : styles.inputHeader_mobile}> {I18n.t("MOBILE NUMBER")}: </Text>
+                  <View>
+                    <Text style={Device.isTablet ? styles.inputHeader_tablet : styles.inputHeader_mobile}> {I18n.t("MOBILE NUMBER")}: </Text>
 
-                  <TextInput
-                    style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                    underlineColorAndroid="transparent"
-                    placeholder={I18n.t("MOBILE NUMBER")}
-                    placeholderTextColor="#353C4050"
-                    textAlignVertical="center"
-                    autoCapitalize="none"
-                    value={this.state.mobileNumber}
-                    onChangeText={this.handleMobileNumber}
-                  />
-                </View>
-                <View>
-                  <Text style={Device.isTablet ? styles.inputHeader_tablet : styles.inputHeader_mobile}> {I18n.t("GENDER")}: </Text>
-
-                  <View style={Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile} >
-                    <RNPickerSelect
-                      placeholder={{
-                        label: 'SELECT GENDER',
-                        value: " ",
-                      }}
-                      Icon={() => {
-                        return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-                      }}
-                      items={[
-                        { label: 'MALE', value: 'MALE' },
-                        { label: 'FEMALE', value: 'FEMALE' },
-                        { label: 'PREFER NOT TO SAY', value: 'PREFER NOT TO SAY' },
-                      ]}
-                      onValueChange={this.handleGender}
-                      style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
-                      value={this.state.selectedGender}
-                      useNativeAndroidPickerStyle={false}
-
+                    <TextInput
+                      style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
+                      underlineColorAndroid="transparent"
+                      placeholder={I18n.t("MOBILE NUMBER")}
+                      placeholderTextColor="#353C4050"
+                      textAlignVertical="center"
+                      autoCapitalize="none"
+                      value={this.state.mobileNumber}
+                      onChangeText={this.handleMobileNumber}
                     />
                   </View>
-                </View>
+                  <View>
+                    <Text style={Device.isTablet ? styles.inputHeader_tablet : styles.inputHeader_mobile}> {I18n.t("GENDER")}: </Text>
 
-                {/* <View>
+                    <View style={Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile} >
+                      <RNPickerSelect
+                        placeholder={{
+                          label: 'SELECT GENDER',
+                          value: " ",
+                        }}
+                        Icon={() => {
+                          return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
+                        }}
+                        items={[
+                          { label: 'MALE', value: 'MALE' },
+                          { label: 'FEMALE', value: 'FEMALE' },
+                          { label: 'PREFER NOT TO SAY', value: 'PREFER NOT TO SAY' },
+                        ]}
+                        onValueChange={this.handleGender}
+                        style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
+                        value={this.state.selectedGender}
+                        useNativeAndroidPickerStyle={false}
+
+                      />
+                    </View>
+                  </View>
+
+                  {/* <View>
                                     <Text style={Device.isTablet ? styles.inputHeader_tablet : styles.inputHeader_mobile}> DOMAIN: </Text>
                                     <View style={Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile} >
                                         <RNPickerSelect style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
@@ -617,55 +615,55 @@ class Settings extends Component {
                                 </View> */}
 
 
-                <View>
-                  <Text style={Device.isTablet ? styles.inputHeader_tablet : styles.inputHeader_mobile}> {I18n.t("DATE OF BIRTH")}: </Text>
+                  <View>
+                    <Text style={Device.isTablet ? styles.inputHeader_tablet : styles.inputHeader_mobile}> {I18n.t("DATE OF BIRTH")}: </Text>
 
-                  <TouchableOpacity
-                    style={{
-                      justifyContent: 'center',
-                      margin: 20,
-                      height: Device.isTablet ? 54 : 44,
-                      marginTop: Device.isTable ? 25 : 15,
-                      marginBottom: Device.isTablet ? 25 : 15,
-                      borderColor: '#8F9EB717',
-                      borderRadius: 3,
-                      backgroundColor: '#FBFBFB',
-                      borderWidth: 1,
-                      fontFamily: 'regular',
-                      paddingLeft: 15,
-                      fontSize: Device.isTablet ? 20 : 14,
-                    }} testID="openModal"
+                    <TouchableOpacity
+                      style={{
+                        justifyContent: 'center',
+                        margin: 20,
+                        height: Device.isTablet ? 54 : 44,
+                        marginTop: Device.isTable ? 25 : 15,
+                        marginBottom: Device.isTablet ? 25 : 15,
+                        borderColor: '#8F9EB717',
+                        borderRadius: 3,
+                        backgroundColor: '#FBFBFB',
+                        borderWidth: 1,
+                        fontFamily: 'regular',
+                        paddingLeft: 15,
+                        fontSize: Device.isTablet ? 20 : 14,
+                      }} testID="openModal"
 
-                    onPress={() => this.datepickerClicked()}
-                  >
-                    <Text style={{
-                      marginLeft: 0, marginTop: 0, color: "#6F6F6F", fontSize: Device.isTablet ? 20 : 14,
-                      fontFamily: "regular"
-                    }}  > {this.state.dateOfBirth} </Text>
-                    <Image style={{ position: 'absolute', top: 5, right: 0, }} source={require('../assets/images/calender.png')} />
-                  </TouchableOpacity>
+                      onPress={() => this.datepickerClicked()}
+                    >
+                      <Text style={{
+                        marginLeft: 0, marginTop: 0, color: "#6F6F6F", fontSize: Device.isTablet ? 20 : 14,
+                        fontFamily: "regular"
+                      }}  > {this.state.dateOfBirth} </Text>
+                      <Image style={{ position: 'absolute', top: 5, right: 0, }} source={require('../assets/images/calender.png')} />
+                    </TouchableOpacity>
 
-                </View>
-                <View>
-                  <Text style={Device.isTablet ? styles.inputHeader_tablet : styles.inputHeader_mobile}> {I18n.t("ADDRESS")}: </Text>
-
-
-                  <TextInput
-                    style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                    underlineColorAndroid="transparent"
-                    placeholder={I18n.t("ADDRESS")}
-                    placeholderTextColor="#353C4050"
-                    textAlignVertical="center"
-                    autoCapitalize="none"
-                    value={this.state.address}
-                    onChangeText={this.handleAddress}
-                  />
-                </View>
-
-                <View>
+                  </View>
+                  <View>
+                    <Text style={Device.isTablet ? styles.inputHeader_tablet : styles.inputHeader_mobile}> {I18n.t("ADDRESS")}: </Text>
 
 
-                  {/* <TouchableOpacity style={{
+                    <TextInput
+                      style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
+                      underlineColorAndroid="transparent"
+                      placeholder={I18n.t("ADDRESS")}
+                      placeholderTextColor="#353C4050"
+                      textAlignVertical="center"
+                      autoCapitalize="none"
+                      value={this.state.address}
+                      onChangeText={this.handleAddress}
+                    />
+                  </View>
+
+                  <View>
+
+
+                    {/* <TouchableOpacity style={{
                         position: 'absolute',
                         right: 28,
                         top: 20,
@@ -675,61 +673,62 @@ class Settings extends Component {
                         <Text style={{ color: '#353C4050', fontFamily: 'regular', fontSize: 14, position: 'absolute', right: 0, }}> {'%'} </Text>
                       </TouchableOpacity> */}
 
+                  </View>
+
+
+
+                  <TouchableOpacity
+                    style={Device.isTablet ? styles.saveButton_tablet : styles.saveButton_mobile}
+                    onPress={() => this.profileUpdate()}
+                  >
+                    <Text style={Device.isTablet ? styles.saveButtonText_tablet : styles.saveButtonText_mobile}> {I18n.t("SAVE")} </Text>
+                  </TouchableOpacity>
                 </View>
 
-
-
-                <TouchableOpacity
-                  style={Device.isTablet ? styles.saveButton_tablet : styles.saveButton_mobile}
-                  onPress={() => this.profileUpdate()}
-                >
-                  <Text style={Device.isTablet ? styles.saveButtonText_tablet : styles.saveButtonText_mobile}> {I18n.t("SAVE")} </Text>
-                </TouchableOpacity>
               </View>
-
             </View>
-          </View>
-        </KeyboardAwareScrollView>
+          </KeyboardAwareScrollView>
 
-        {this.state.datepickerOpen && (
-          <View style={{ height: 280, width: deviceWidth, backgroundColor: 'ffffff' }}>
-            <TouchableOpacity
-              style={{
-                position: 'absolute',
-                left: 20,
-                top: 10,
-                height: 30, backgroundColor: "#ED1C24", borderRadius: 5,
-              }} onPress={() => this.datepickerCancelClicked()}
-            >
-              <Text style={{
-                textAlign: 'center', marginTop: 5, color: "#ffffff", fontSize: 15,
-                fontFamily: "regular"
-              }}  > Cancel </Text>
+          {this.state.datepickerOpen && (
+            <View style={{ height: 280, width: deviceWidth, backgroundColor: 'ffffff' }}>
+              <TouchableOpacity
+                style={{
+                  position: 'absolute',
+                  left: 20,
+                  top: 10,
+                  height: 30, backgroundColor: "#ED1C24", borderRadius: 5,
+                }} onPress={() => this.datepickerCancelClicked()}
+              >
+                <Text style={{
+                  textAlign: 'center', marginTop: 5, color: "#ffffff", fontSize: 15,
+                  fontFamily: "regular"
+                }}  > Cancel </Text>
 
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                position: 'absolute',
-                right: 20,
-                top: 10,
-                height: 30, backgroundColor: "#ED1C24", borderRadius: 5,
-              }} onPress={() => this.datepickerDoneClicked()}
-            >
-              <Text style={{
-                textAlign: 'center', marginTop: 5, color: "#ffffff", fontSize: 15,
-                fontFamily: "regular"
-              }}  > Done </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  position: 'absolute',
+                  right: 20,
+                  top: 10,
+                  height: 30, backgroundColor: "#ED1C24", borderRadius: 5,
+                }} onPress={() => this.datepickerDoneClicked()}
+              >
+                <Text style={{
+                  textAlign: 'center', marginTop: 5, color: "#ffffff", fontSize: 15,
+                  fontFamily: "regular"
+                }}  > Done </Text>
 
-            </TouchableOpacity>
-            <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
-              date={this.state.date}
-              mode={'date'}
-              onDateChange={(date) => this.setState({ date })}
-            />
-          </View>
-        )}
+              </TouchableOpacity>
+              <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
+                date={this.state.date}
+                mode={'date'}
+                onDateChange={(date) => this.setState({ date })}
+              />
+            </View>
+          )}
+        </View>
         <BottomTabNav {...this.props} />
-      </View>
+      </>
     );
   }
 }

@@ -398,8 +398,9 @@ class Home extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
-        {/* <View style={headerTitleContainer}>
+      <>
+        <View style={styles.container}>
+          {/* <View style={headerTitleContainer}>
           <View style={headerTitleSubContainer}>
             <TouchableOpacity style={menuButton} onPress={() => this.handleMenuButtonClick()}>
               <Image source={require('../assets/images/menu.png')} />
@@ -407,132 +408,187 @@ class Home extends Component {
             <Text style={headerTitle}> {I18n.t("Home")} </Text>
           </View>
         </View> */}
-        {/* <TopBar {...this.props}/> */}
-        <ScrollView>
-          <View style={styles.container}>
-            {/* <Image
+          {/* <TopBar {...this.props}/> */}
+          <ScrollView>
+            <View style={styles.container}>
+              {/* <Image
                             style={styles.image}
                             source={require('../assets/images/profilepic.png')}
                             resizeMode={"cover"} // <- needs to be "cover" for borderRadius to take effect on Android
                         />
                         <Text style={{ fontSize: 26, fontFamily: 'regular', color: '#353C40', marginLeft: 10, marginTop: 20 }}> {('Welcome,')} </Text>
                         <Text style={{ fontSize: 26, fontFamily: 'bold', color: '#353C40', marginLeft: 10, marginTop: 0 }}> {('Vinod Magham')} </Text> */}
-            <FlatList
-              style={styles.flatList}
-              horizontal
-              data={data}
-              showsVerticalScrollIndicator={false}
-              showsHorizontalScrollIndicator={false}
-              renderItem={({ item, index }) => {
-                if (item.key === 1) {
-                  return <View style={{
-                    height: Device.isTablet ? 150 : 120,
-                    width: Device.isTablet ? 300 : 250,
-                    borderWidth: Device.isTablet ? 2 : 1,
-                    backgroundColor: "#33D087",
-                    borderColor: '#ffffff',
-                    borderRadius: 10,
-                    marginLeft: 10,
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
-                    <Image source={require('../assets/images/todaysales.png')} style={{
-                      marginTop: Device.isTablet ? -10 : -5
-                    }} />
-                    <View style={{ marginLeft: Device.isTablet ? 10 : 5 }}>
-                      <Text style={{ fontSize: Device.isTablet ? 21 : 16, alignItems: 'center', alignSelf: 'center', color: "#ffffff", fontFamily: 'medium' }}>
-                        {I18n.t("Today's Sales")}
-                      </Text>
-                      <Text style={{ fontSize: Device.isTablet ? 40 : 30, marginTop: 0, color: "#ffffff", fontFamily: 'bold' }}>
-                        ₹ {this.state.toadysSale}
-                      </Text>
-                    </View>
-                  </View>;
-                }
-                if (item.key === 2) {
-                  return <View style={{
-                    height: Device.isTablet ? 150 : 120,
-                    width: Device.isTablet ? 300 : 250,
-                    borderWidth: Device.isTablet ? 2 : 1,
-                    backgroundColor: "#37CBE4",
-                    borderColor: '#ffffff',
-                    borderRadius: 10,
-                    marginLeft: 10,
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
-                    <Image source={require('../assets/images/monthlysales.png')} style={{
-                      marginTop: Device.isTablet ? -10 : -5,
-                    }} />
-                    <View style={{ marginLeft: Device.isTablet ? 10 : 5 }}>
-                      <Text style={{ fontSize: Device.isTablet ? 21 : 16, alignItems: 'center', alignSelf: 'center', color: "#ffffff", fontFamily: 'regular' }}>
-                        {I18n.t("Monthly's Sales")}
-                      </Text>
-                      <Text style={{ fontSize: Device.isTablet ? 40 : 30, marginTop: 0, color: "#ffffff", fontFamily: 'bold' }}>
-                        ₹ {this.state.monthlySale}
-                      </Text>
-                    </View>
-                  </View>;
-                }
-                if (item.key === 3) {
-                  return <View style={{
-                    height: Device.isTablet ? 150 : 120,
-                    width: Device.isTablet ? 300 : 250,
-                    borderWidth: Device.isTablet ? 2 : 1,
-                    backgroundColor: "#fc9834",
-                    borderColor: '#ffffff',
-                    borderRadius: 10,
-                    marginLeft: 10,
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
-                    <Image source={require('../assets/images/monthlysales.png')} style={{
-                      marginTop: Device.isTablet ? -10 : -5,
-                    }} />
-                    <View style={{ marginLeft: Device.isTablet ? 10 : 5, maxWidth: Device.isTablet ? 200 : 180 }}>
-                      <Text style={{ fontSize: Device.isTablet ? 21 : 16, alignItems: 'center', alignSelf: 'center', color: "#ffffff", fontFamily: 'regular', }}>
-                        {I18n.t(`This month sales v/s Last month`)}
-                      </Text>
-                      <Text style={{ fontSize: Device.isTablet ? 40 : 30, marginTop: 0, color: "#ffffff", fontFamily: 'bold' }}>
-                        {this.state.thisVsLastMonthSale} %
-                      </Text>
-                    </View>
-                  </View>;
+              <FlatList
+                style={styles.flatList}
+                horizontal
+                data={data}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
+                renderItem={({ item, index }) => {
+                  if (item.key === 1) {
+                    return <View style={{
+                      height: Device.isTablet ? 150 : 120,
+                      width: Device.isTablet ? 300 : 250,
+                      borderWidth: Device.isTablet ? 2 : 1,
+                      backgroundColor: "#33D087",
+                      borderColor: '#ffffff',
+                      borderRadius: 10,
+                      marginLeft: 10,
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                      <Image source={require('../assets/images/todaysales.png')} style={{
+                        marginTop: Device.isTablet ? -10 : -5
+                      }} />
+                      <View style={{ marginLeft: Device.isTablet ? 10 : 5 }}>
+                        <Text style={{ fontSize: Device.isTablet ? 21 : 16, alignItems: 'center', alignSelf: 'center', color: "#ffffff", fontFamily: 'medium' }}>
+                          {I18n.t("Today's Sales")}
+                        </Text>
+                        <Text style={{ fontSize: Device.isTablet ? 40 : 30, marginTop: 0, color: "#ffffff", fontFamily: 'bold' }}>
+                          ₹ {this.state.toadysSale}
+                        </Text>
+                      </View>
+                    </View>;
+                  }
+                  if (item.key === 2) {
+                    return <View style={{
+                      height: Device.isTablet ? 150 : 120,
+                      width: Device.isTablet ? 300 : 250,
+                      borderWidth: Device.isTablet ? 2 : 1,
+                      backgroundColor: "#37CBE4",
+                      borderColor: '#ffffff',
+                      borderRadius: 10,
+                      marginLeft: 10,
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                      <Image source={require('../assets/images/monthlysales.png')} style={{
+                        marginTop: Device.isTablet ? -10 : -5,
+                      }} />
+                      <View style={{ marginLeft: Device.isTablet ? 10 : 5 }}>
+                        <Text style={{ fontSize: Device.isTablet ? 21 : 16, alignItems: 'center', alignSelf: 'center', color: "#ffffff", fontFamily: 'regular' }}>
+                          {I18n.t("Monthly's Sales")}
+                        </Text>
+                        <Text style={{ fontSize: Device.isTablet ? 40 : 30, marginTop: 0, color: "#ffffff", fontFamily: 'bold' }}>
+                          ₹ {this.state.monthlySale}
+                        </Text>
+                      </View>
+                    </View>;
+                  }
+                  if (item.key === 3) {
+                    return <View style={{
+                      height: Device.isTablet ? 150 : 120,
+                      width: Device.isTablet ? 300 : 250,
+                      borderWidth: Device.isTablet ? 2 : 1,
+                      backgroundColor: "#fc9834",
+                      borderColor: '#ffffff',
+                      borderRadius: 10,
+                      marginLeft: 10,
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                      <Image source={require('../assets/images/monthlysales.png')} style={{
+                        marginTop: Device.isTablet ? -10 : -5,
+                      }} />
+                      <View style={{ marginLeft: Device.isTablet ? 10 : 5, maxWidth: Device.isTablet ? 200 : 180 }}>
+                        <Text style={{ fontSize: Device.isTablet ? 21 : 16, alignItems: 'center', alignSelf: 'center', color: "#ffffff", fontFamily: 'regular', }}>
+                          {I18n.t(`This month sales v/s Last month`)}
+                        </Text>
+                        <Text style={{ fontSize: Device.isTablet ? 40 : 30, marginTop: 0, color: "#ffffff", fontFamily: 'bold' }}>
+                          {this.state.thisVsLastMonthSale} %
+                        </Text>
+                      </View>
+                    </View>;
 
-                }
-                // if (item.key === 4) {
-                //     return <View style={{
-                //         height: 120,
-                //         width: 250,
-                //         borderWidth: 1,
-                //         backgroundColor: "#00C656",
-                //         borderColor: '#ffffff',
-                //         borderRadius: 10,
-                //         marginLeft: 10,
-                //     }}>
-                //         <Image source={require('../assets/images/monthlysales.png')} style={{
-                //             marginLeft: 20, marginTop: 40,
-                //         }} />
-                //         <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: -50, marginLeft: 20, fontSize: 16, color: "#ffffff", fontFamily: 'regular' }}>
-                //             Today total Orders
-                //         </Text>
-                //         <Text style={{ fontSize: 15, marginTop: 0, alignItems: 'center', alignSelf: 'center', fontSize: 30, color: "#ffffff", fontFamily: 'bold' }}>
-                //             55
-                //         </Text>
-                //     </View>;
-                // }
-              }}
-              ListFooterComponent={<View style={{ width: 15 }}></View>}
-            />
-            <View>
-              <View style={styles.chartMaincontainer}>
-                <Text style={Device.isTablet ? styles.chartTitle_tablet : styles.chartTitle_mobile}>{I18n.t("Sales % by category")}</Text>
+                  }
+                  // if (item.key === 4) {
+                  //     return <View style={{
+                  //         height: 120,
+                  //         width: 250,
+                  //         borderWidth: 1,
+                  //         backgroundColor: "#00C656",
+                  //         borderColor: '#ffffff',
+                  //         borderRadius: 10,
+                  //         marginLeft: 10,
+                  //     }}>
+                  //         <Image source={require('../assets/images/monthlysales.png')} style={{
+                  //             marginLeft: 20, marginTop: 40,
+                  //         }} />
+                  //         <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: -50, marginLeft: 20, fontSize: 16, color: "#ffffff", fontFamily: 'regular' }}>
+                  //             Today total Orders
+                  //         </Text>
+                  //         <Text style={{ fontSize: 15, marginTop: 0, alignItems: 'center', alignSelf: 'center', fontSize: 30, color: "#ffffff", fontFamily: 'bold' }}>
+                  //             55
+                  //         </Text>
+                  //     </View>;
+                  // }
+                }}
+                ListFooterComponent={<View style={{ width: 15 }}></View>}
+              />
+              <View>
+                <View style={styles.chartMaincontainer}>
+                  <Text style={Device.isTablet ? styles.chartTitle_tablet : styles.chartTitle_mobile}>{I18n.t("Sales % by category")}</Text>
+                  <View style={[Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile, { width: deviceWidth - 60, borderColor: '#000000', borderWidth: Device.isTablet ? 2 : 1, marginTop: Device.isTablet ? 20 : 0 }]}>
+                    <RNPickerSelect
+                      placeholder={{
+                        label: "Today",
+                        value: "Today",
+                      }}
+                      Icon={() => {
+                        return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
+                      }}
+                      items={[
+                        { label: 'Last One Month', value: 'LastOneMonth' },
+                        { label: 'Last 6 Months', value: 'Last6months' },
+                        { label: 'Last Year', value: 'LastYear' },
+                      ]}
+                      onValueChange={this.handleCategoryName}
+                      style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
+                      value={this.state.categoryName}
+                      useNativeAndroidPickerStyle={false}
+                    />
+                  </View>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: Device.isTablet ? deviceWidth - 260 : deviceWidth - 160 }}>
+                    <PieChart
+                      data={this.state.salesCategoryChart}
+                      style={{ paddingTop: 20, paddingLeft: 20 }}
+                      width={Device.isTablet ? deviceWidth - 60 : deviceWidth - 20}
+                      height={Device.isTablet ? 300 : 220}
+                      chartConfig={chartConfig}
+                      accessor="count"
+                      hasLegend={false}
+                      backgroundColor={"transparent"}
+                      paddingLeft={"15"}
+                      center={[0, 0]}
+                      absolute
+                    />
+                    <View style={{ marginTop: Device.isTablet ? 40 : 20 }}>
+                      <FlatList
+                        style={{ paddingRight: 20 }}
+                        data={this.state.salesCategoryChart}
+                        showsVerticalScrollIndicator={false}
+                        showsHorizontalScrollIndicator={false}
+                        renderItem={({ item, index }) => (
+                          <View style={{ flexDirection: 'column' }}>
+                            <View style={{ flexDirection: 'column' }}>
+                              <Text style={{ fontSize: Device.isTablet ? 20 : 15, fontFamily: 'medium', marginRight: 10, color: item.color }}>{item.name} : {item.count}</Text>
+                            </View>
+                          </View>
+                        )}
+                      />
+                    </View>
+                  </View>
+                </View>
+              </View>
+              <View style={[styles.chartMaincontainer, { height: Device.isTablet ? 600 : 700 }]}>
+                <Text style={Device.isTablet ? styles.chartTitle_tablet : styles.chartTitle_mobile}>{I18n.t("Top 5 Sales by representative")}</Text>
+
                 <View style={[Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile, { width: deviceWidth - 60, borderColor: '#000000', borderWidth: Device.isTablet ? 2 : 1, marginTop: Device.isTablet ? 20 : 0 }]}>
                   <RNPickerSelect
                     placeholder={{
@@ -547,85 +603,31 @@ class Home extends Component {
                       { label: 'Last 6 Months', value: 'Last6months' },
                       { label: 'Last Year', value: 'LastYear' },
                     ]}
-                    onValueChange={this.handleCategoryName}
+                    onValueChange={this.handleSalesName}
                     style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
-                    value={this.state.categoryName}
+                    value={this.state.salesName}
                     useNativeAndroidPickerStyle={false}
                   />
                 </View>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: Device.isTablet ? deviceWidth - 260 : deviceWidth - 160 }}>
-                  <PieChart
-                    data={this.state.salesCategoryChart}
-                    style={{ paddingTop: 20, paddingLeft: 20 }}
-                    width={Device.isTablet ? deviceWidth - 60 : deviceWidth - 20}
-                    height={Device.isTablet ? 300 : 220}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: Device.isTablet ? deviceWidth - 260 : deviceWidth - 160, marginTop: Device.isTablet ? 10 : 20 }}>
+                  <BarChart
+                    style={{ paddingTop: 20 }}
+                    data={this.state.topSalesChart}
+                    width={Device.isTablet ? deviceWidth - 120 : deviceWidth - 60}
+                    height={Device.isTablet ? 400 : 500}
+                    yLabelsOffset={Device.isTablet ? 0 : 20}
+                    yAxisLabel="₹"
+                    fromZero
                     chartConfig={chartConfig}
-                    accessor="count"
-                    hasLegend={false}
-                    backgroundColor={"transparent"}
-                    paddingLeft={"15"}
-                    center={[0, 0]}
-                    absolute
+                    verticalLabelRotation={Device.isTablet ? 0 : 90}
                   />
-                  <View style={{ marginTop: Device.isTablet ? 40 : 20 }}>
-                    <FlatList
-                      style={{ paddingRight: 20 }}
-                      data={this.state.salesCategoryChart}
-                      showsVerticalScrollIndicator={false}
-                      showsHorizontalScrollIndicator={false}
-                      renderItem={({ item, index }) => (
-                        <View style={{ flexDirection: 'column' }}>
-                          <View style={{ flexDirection: 'column' }}>
-                            <Text style={{ fontSize: Device.isTablet ? 20 : 15, fontFamily: 'medium', marginRight: 10, color: item.color }}>{item.name} : {item.count}</Text>
-                          </View>
-                        </View>
-                      )}
-                    />
-                  </View>
                 </View>
               </View>
             </View>
-            <View style={[styles.chartMaincontainer, { height: Device.isTablet ? 600 : 700 }]}>
-              <Text style={Device.isTablet ? styles.chartTitle_tablet : styles.chartTitle_mobile}>{I18n.t("Top 5 Sales by representative")}</Text>
-
-              <View style={[Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile, { width: deviceWidth - 60, borderColor: '#000000', borderWidth: Device.isTablet ? 2 : 1, marginTop: Device.isTablet ? 20 : 0 }]}>
-                <RNPickerSelect
-                  placeholder={{
-                    label: "Today",
-                    value: "Today",
-                  }}
-                  Icon={() => {
-                    return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-                  }}
-                  items={[
-                    { label: 'Last One Month', value: 'LastOneMonth' },
-                    { label: 'Last 6 Months', value: 'Last6months' },
-                    { label: 'Last Year', value: 'LastYear' },
-                  ]}
-                  onValueChange={this.handleSalesName}
-                  style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
-                  value={this.state.salesName}
-                  useNativeAndroidPickerStyle={false}
-                />
-              </View>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: Device.isTablet ? deviceWidth - 260 : deviceWidth - 160, marginTop: Device.isTablet ? 10 : 20 }}>
-                <BarChart
-                  style={{ paddingTop: 20 }}
-                  data={this.state.topSalesChart}
-                  width={Device.isTablet ? deviceWidth - 120 : deviceWidth - 60}
-                  height={Device.isTablet ? 400 : 500}
-                  yLabelsOffset={Device.isTablet ? 0 : 20}
-                  yAxisLabel="₹"
-                  fromZero
-                  chartConfig={chartConfig}
-                  verticalLabelRotation={Device.isTablet ? 0 : 90}
-                />
-              </View>
-            </View>
-          </View>
-        </ScrollView>
-        <BottomTabNav {...this.props}/>
-      </View>
+          </ScrollView>
+        </View>
+        <BottomTabNav {...this.props} />
+      </>
     );
   }
 }

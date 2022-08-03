@@ -12,6 +12,7 @@ import { cancelBtn, cancelBtnText, datePicker, datePickerBtnText, datePickerButt
 import { RH, RF, RW } from '../../Responsive';
 import { filterBtn, flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleLight, textStyleMedium } from '../Styles/Styles';
 import Modal from 'react-native-modal'
+import AddGiftVoucher from './AddGiftVoucher'
 
 var deviceheight = Dimensions.get('window').height;
 var deviceheight = Dimensions.get('window').height;
@@ -63,14 +64,6 @@ class GiftVocher extends Component {
   handleMobile = (value) => {
     this.setState({ mobile: value });
   };
-
-  datepickerClicked() {
-    this.setState({ datepickerOpen: true });
-  }
-
-  enddatepickerClicked() {
-    this.setState({ datepickerendOpen: true });
-  }
 
   datepickerDoneClicked() {
     // if (parseInt(this.state.date.getDate()) < 10) {
@@ -300,11 +293,121 @@ class GiftVocher extends Component {
             </Modal>
           </View>
         }
+        <View>
+          <Text style={flats.titleStyle}>{I18n.t('Generate Gift Voucher')}</Text>
+          <View>
+            <TextInput
+              style={inputField}
+              placeholder={('GV NUMBER *')}
+              placeholderTextColor="#6f6f6f60"
+              textAlignVertical="center"
+              keyboardType={'default'}
+              autoCapitalize='none'
+              value={this.state.gvNumber}
+              onChangeText={(text) => this.handleGvNumber(text)}
+            />
+            <TextInput
+              style={inputField}
+              placeholder={I18n.t('DESCRIPTION')}
+              placeholderTextColor="#6f6f6f60"
+              textAlignVertical="center"
+              keyboardType={'default'}
+              autoCapitalize='none'
+              value={this.state.description}
+              onChangeText={(text) => this.handleDescription(text)}
+            />
+            <TouchableOpacity
+              style={dateSelector}
+              testID="openModal"
+              onPress={() => this.datepickerClicked()}
+            >
+              <Text
+                style={dateText}
+              >{this.state.startDate === "" ? 'Start Date' : this.state.startDate}</Text>
+              <Image style={styles.calenderpng} source={require('../assets/images/calender.png')} />
+            </TouchableOpacity>
+            {this.state.datepickerOpen && (
+              <View style={styles.dateTopView}>
+                <View style={styles.dateTop2}>
+                  <TouchableOpacity
+                    style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
+                  >
+                    <Text style={datePickerBtnText}  > Cancel </Text>
+                  </TouchableOpacity>
 
+                  <TouchableOpacity
+                    style={datePickerButton2} onPress={() => this.datepickerDoneClicked()}
+                  >
+                    <Text style={datePickerBtnText}  > Done </Text>
+                  </TouchableOpacity>
+                </View>
+                <DatePicker style={datePicker}
+                  date={this.state.date}
+                  mode={'date'}
+                  onDateChange={(date) => this.setState({ date })}
+                />
+              </View>
+            )}
+            <TouchableOpacity
+              style={dateSelector}
+              testID="openModal"
+              onPress={() => this.enddatepickerClicked()}
+            >
+              <Text
+                style={dateText}
+              >{this.state.endDate === '' ? 'End Date' : this.state.endDate}</Text>
+              <Image style={styles.calenderpng} source={require('../assets/images/calender.png')} />
+            </TouchableOpacity>
+
+            {this.state.datepickerendOpen && (
+              <View style={styles.dateTopView}>
+                <View style={styles.dateTop2}>
+                  <View>
+                    <TouchableOpacity
+                      style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
+                    >
+                      <Text style={datePickerBtnText}  > Cancel </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View>
+                    <TouchableOpacity
+                      style={datePickerButton2} onPress={() => this.datepickerendDoneClicked()}
+                    >
+                      <Text style={datePickerBtnText}  > Done </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                <DatePicker style={datePicker}
+                  date={this.state.enddate}
+                  mode={'date'}
+                  onDateChange={(enddate) => this.setState({ enddate })}
+                />
+              </View>
+            )}
+            <View >
+              <TextInput
+                style={inputField}
+                placeholder={I18n.t('GIFT VALUE *')}
+                placeholderTextColor="#6f6f6f60"
+                textAlignVertical="center"
+                keyboardType={'default'}
+                autoCapitalize='none'
+                value={this.state.giftValue}
+                onChangeText={(text) => this.handleValue(text)}
+              />
+              <TouchableOpacity
+                style={submitBtn}
+                onPress={() => this.addGiftVocher()}
+              >
+                <Text style={submitBtnText}>{I18n.t("Add Gift Voucher")}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
 
         <FlatList
           ListHeaderComponent={<View style={flatListHeaderContainer}>
-            <Text style={flatListTitle}>Gift Vouchers</Text>
+            <Text style={flatListTitle}>{I18n.t('Gift Vouchers')}</Text>
             <View>
               {!this.state.filterActive &&
                 <TouchableOpacity
@@ -368,6 +471,12 @@ const flats = StyleSheet.create({
     justifyContent: 'space-around',
   },
 
+  titleStyle: {
+    fontSize: RF(15),
+    fontFamily: 'medium',
+    color: '#00000090',
+    margin: 10
+  },
 
 
   // flats for Mobile
