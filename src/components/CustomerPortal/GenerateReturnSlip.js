@@ -43,6 +43,7 @@ export default class GenerateReturnSlip extends Component {
       resultData: "",
       userId: 0,
       itemsReturn: false,
+      createdBy: 0
     };
   }
 
@@ -143,6 +144,7 @@ export default class GenerateReturnSlip extends Component {
 
   generateNewSlip() {
     console.log(this.state.storeId);
+    console.log("returnSlipList", this.state.netValueList);
     const saveObj = {
       barcodes: this.state.netValueList,
       mobileNumber: this.state.mobileNumber ? this.state.mobileNumber : null,
@@ -151,19 +153,18 @@ export default class GenerateReturnSlip extends Component {
       customerId: parseInt(this.state.userId),
       storeId: parseInt(this.state.storeId),
       totalAmount: parseInt(this.state.returnSlipTotal),
-      createdBy: 0,
-      comments: null
+      createdBy: this.state.createdBy,
+      comments: this.state.reasonDesc
     };
     console.log(saveObj, "params");
     // this.setState({ loading: true });
-    axios.post(CustomerService.saveRetunSlip(), saveObj).then(res => {
+    axios.post(CustomerService.saveRetunSlip(), saveObj).then((res) => {
+      console.log("return slip data,res", JSON.stringify(res.data))
       if (res) {
-        
-        this.setState({ resultData: res.data.result, }, () => {
-          this.setState({ resultModel: true, modelVisible: true });
-        });
+        alert(res.data.message)
         this.setState({
-          modelVisible: false,
+          resultData: res.data.message,
+          resultModel: true, modelVisible: true,
           netValueList: [],
           returnSlipTotal: 0,
           returnInvoice: [],
@@ -173,14 +174,25 @@ export default class GenerateReturnSlip extends Component {
           quantity: 0,
           reason: "",
           customerNumber: "",
+          createdBy: null
         });
+
       }
       this.setState({ returnModel: false, modelVisible: false, loading: false });
     }).catch((err) => {
-      this.setState({ loading: false });
-      console.log(err);
-      alert("Unable to Save the Return Slip");
-      this.setState({ returnModel: false, modelVisible: false, loading: false });
+      this.setState({
+        returnModel: false, modelVisible: false, loading: false,
+        netValueList: [],
+        returnSlipTotal: 0,
+        returnInvoice: [],
+        mobileNumber: '',
+        invoiceNumber: "",
+        netValue: 0,
+        quantity: 0,
+        reason: "",
+        customerNumber: "",
+        createdBy: null
+      });
     });
 
   }
@@ -190,7 +202,7 @@ export default class GenerateReturnSlip extends Component {
   generateInvoice = () => {
     this.setState({ returnModel: true, modelVisible: true });
     console.log("hello");
-    console.log("generateInvoice",this.state.netValueList);
+    console.log("generateInvoice", this.state.netValueList);
   };
 
   handleCutomerTagging = () => {
@@ -249,6 +261,7 @@ export default class GenerateReturnSlip extends Component {
             autoCapitalize="none"
             value={this.state.invoiceNumber}
             onChangeText={(text) => this.handleInvoiceNumber(text)}
+            onEndEditing={() => this.searchInvoice()}
           />
           <TouchableOpacity
             style={{ backgroundColor: "#ED1C24", width: Device.isTablet ? 120 : 80, height: Device.isTablet ? 55 : 45, borderRadius: 10, marginTop: 5 }}
@@ -269,7 +282,7 @@ export default class GenerateReturnSlip extends Component {
           keyboardType={'numeric'}
           value={this.state.mobileNumber}
           onChangeText={(text) => this.handleMobileNumber(text)}
-        // onEndEditing={() => this.endEditing()}
+          onEndEditing={() => this.searchInvoice()}
         />
         <View
           style={{

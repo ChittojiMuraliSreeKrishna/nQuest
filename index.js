@@ -40,7 +40,9 @@ axios.interceptors.response.use((response) => response, (error) => {
 
       alert('Please login to access this resource');
    }
-
+   if(error.response.status === 400){
+      alert(error.response.data.message)
+   }
 
 });
 AppRegistry.registerComponent('main', () => App);
