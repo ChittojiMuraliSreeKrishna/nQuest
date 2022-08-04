@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 import React, { Component } from 'react';
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import DatePicker from 'react-native-date-picker';
@@ -8,13 +7,12 @@ import I18n from 'react-native-i18n';
 import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
 import Loader from '../../commonUtils/loader';
+import { RF, RH, RW } from '../../Responsive';
 import { accountingErrorMessages, errorLength, inventoryErrorMessages } from '../Errors/errors';
-import InventoryService from '../services/InventoryService';
-import LoginService from '../services/LoginService';
 import Message from '../Errors/Message';
-import { RH, RW, RF } from '../../Responsive';
-import { backButton, backButtonImage, headerTitle, headerTitleContainer, headerTitleSubContainer, headerTitleSubContainer2, menuButton } from '../Styles/Styles';
-import { inputField, rnPickerContainer, rnPicker, inputHeading, submitBtn, submitBtnText, cancelBtn, rnPickerError, cancelBtnText, datePicker, datePickerBtnText, datePickerButton1, datePickerButton2, datePickerContainer, dateSelector, dateText, } from '../Styles/FormFields';
+import InventoryService from '../services/InventoryService';
+import { cancelBtn, cancelBtnText, datePicker, datePickerBtnText, datePickerButton1, datePickerButton2, dateSelector, dateText, inputField, inputHeading, rnPicker, rnPickerContainer, rnPickerError, submitBtn, submitBtnText } from '../Styles/FormFields';
+import { backButton, backButtonImage, headerTitle, headerTitleContainer, headerTitleSubContainer } from '../Styles/Styles';
 
 var deviceWidth = Dimensions.get('window').width;
 var deviceHeight = Dimensions.get('window').height;
@@ -210,12 +208,7 @@ class AddBarcode extends Component {
     });
   }
   handleSubSection = (value) => {
-    for (let i = 0; i < this.state.subSectionsList.length; i++) {
-      if (this.state.subSectionsList[i].name === value) {
-        this.setState({ subsectionId: this.state.subSectionsList[i].id });
-      }
-    }
-    this.setState({ subSection: value });
+    this.setState({ subSectionId: value, subSection: value });
     if (this.state.subsectionId !== null) {
       this.setState({ subSectionValid: true });
     }

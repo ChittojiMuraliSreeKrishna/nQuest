@@ -3,50 +3,45 @@ import { INVENTORY_PORTAL, USER_MANAGEMENT_URL } from "../../commonUtils/ApiCons
 import { BASE_URL } from "../../commonUtils/Base";
 
 class InventoryService {
-  //Retail
-  createProduct() {
-    return BASE_URL + '/inventory/inventoryRetail/createBarcode';
+
+  // Getting all barcode -> Barcode.js
+  getTextileBarcodes(list, pageNumber = 0) {
+    const barcodeParam = '?page=' + pageNumber + '&size=10';
+    console.log({ barcodeParam });
+    return axios.post(BASE_URL + INVENTORY_PORTAL.getTextileBarcodes + barcodeParam, list);
   }
 
-  deleteBarcode() {
-    return BASE_URL + '/inventory/inventoryTextile/deleteBarcode_Textile';
+  // Get all Productcombo -> ProductCombo.js
+  getProductCombo(params) {
+    return axios.post(BASE_URL + INVENTORY_PORTAL.getAllProductBundleList + params);
   }
 
-  updateBarcode() {
-    return BASE_URL + '/inventory/inventoryRetail/updateBarcode';
-  }
-
-  getAllBarcodes() {
-    return BASE_URL + '/inventory/inventoryRetail/getAllBarcodes';
-  }
-  saveUOM() {
-    return BASE_URL + '/uom/saveUom';
-  }
+  // Get all divisions for -> AddBarcodes.js, EditBarcodes.js
   getUOM() {
     return axios.get(BASE_URL + INVENTORY_PORTAL.getAllUOMs);
   }
 
+  // Get all divisions for -> AddBarcodes.js, EditBarcodes.js
   getAllDivisions(domainType) {
     const divisionParam = '?domainType=' + domainType;
     console.log({ divisionParam });
     return axios.get(BASE_URL + INVENTORY_PORTAL.getAllDivisions + divisionParam);
   }
 
+  // Get all sections, subSections for -> addbarcode, EditBarcodes.js
   getAllSections(id, domainType) {
     const sectionParam = '?id=' + id + '&domainType=' + domainType;
     console.log({ sectionParam });
     return axios.get(BASE_URL + INVENTORY_PORTAL.getAllSections + sectionParam);
   }
 
-  getAllSubSections() {
-    return BASE_URL + '/inventory/catalog/getcategoriesByid';
-  }
+  // Get all Categories for -> AddBarcode.js, EditBarcode.js
   getAllCategories(domainType) {
     const categoriesParam = '?domainType=' + domainType;
     console.log({ categoriesParam });
     return axios.get(BASE_URL + INVENTORY_PORTAL.getAllCategories + categoriesParam);
   }
-
+  // Get all stores for -> AddBarcodes.js, AddProductCombo.js, EditBarcodes.js
   getAllStores(clientId) {
     const storesParam = '?clientId=' + clientId + '&isActive=true';
     console.log({ storesParam });
@@ -57,6 +52,7 @@ class InventoryService {
     return axios.get(BASE_URL + INVENTORY_PORTAL.getAllHsnList);
   }
 
+  // Save Barcode -> AddBarcode.js
   saveBarCode(list, domain, isEdit, value) {
     console.log({ list, domain, isEdit, value });
     if (domain && domain.label === "Retail") {
@@ -78,15 +74,8 @@ class InventoryService {
       }
     }
   }
-  updatTextileBarcodes() {
-    return BASE_URL + "/inventory/inventoryTextile/updateBarcode_Textile";
-  }
 
-  getTextileBarcodes() {
-    return BASE_URL + "/inventory/inventory-management/barcodes/filter";
-  }
-
-  // Getting Barcode Details
+  // Getting Barcode Details -> AddProductCombo.js
   getBarcodesDetails(storesId, domain, barcodeId) {
     if (domain && domain.label === "Retail") {
       const RetailDetails = '?barcode=' + barcodeId + '&storeId=' + storesId;
@@ -97,6 +86,18 @@ class InventoryService {
       console.log({ TextileDetails });
       return axios.get(BASE_URL + INVENTORY_PORTAL.getTextileBarcodeDetails + TextileDetails);
     }
+  }
+
+  // Saving Product Combo -> AddProductCombo.js
+  addProductCombo(obj) {
+    return axios.post(BASE_URL + INVENTORY_PORTAL.addProductBundle, obj);
+  }
+
+
+  /* --- UNUSED CALLS --- */
+
+  updatTextileBarcodes() {
+    return BASE_URL + "/inventory/inventoryTextile/updateBarcode_Textile";
   }
 
   deleteTextileBarcode() {
@@ -111,12 +112,23 @@ class InventoryService {
     return BASE_URL + "/user-management/store/storeList";
   }
 
-  getProductCombo(params) {
-    return axios.post(BASE_URL + INVENTORY_PORTAL.getAllProductBundleList + params);
+  createProduct() {
+    return BASE_URL + '/inventory/inventoryRetail/createBarcode';
   }
 
-  addProductCombo(obj) {
-    return axios.post(BASE_URL + INVENTORY_PORTAL.addProductBundle, obj);
+  deleteBarcode() {
+    return BASE_URL + '/inventory/inventoryTextile/deleteBarcode_Textile';
+  }
+
+  updateBarcode() {
+    return BASE_URL + '/inventory/inventoryRetail/updateBarcode';
+  }
+
+  getAllBarcodes() {
+    return BASE_URL + '/inventory/inventoryRetail/getAllBarcodes';
+  }
+  saveUOM() {
+    return BASE_URL + '/uom/saveUom';
   }
 
 }

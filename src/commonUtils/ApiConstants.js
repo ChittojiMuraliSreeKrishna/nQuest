@@ -32,6 +32,7 @@ export const INVENTORY_PORTAL = {
 
   // Textile
   getAllBarcodes: "/inventory/inventoryTextile/getAllBarcodeTextiles",
+  getTextileBarcodes: "/inventory/inventory-management/barcodes/filter",
   getAllProductBundleList: "/inventory/productBundle/all",
   getAllDivisions: "/inventory/catalog/divisions",
   getAllUOMs: "/inventory/uom/list",

@@ -7,17 +7,15 @@ import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Loader from '../../commonUtils/loader';
-import LoginService from '../services/LoginService';
-import ProfileService from '../services/ProfileService';
+import { RF, RH, RW } from '../../Responsive';
 import { errorLength, errorLengthMax, urmErrorMessages } from '../Errors/errors';
-import UrmService from '../services/UrmService';
 import Message from '../Errors/Message';
-import { RH, RW, RF } from '../../Responsive';
+import LoginService from '../services/LoginService';
+import { inputField, submitBtn, submitBtnText } from '../Styles/FormFields';
 
 var deviceheight = Dimensions.get('window').height;
 var deviceheight = Dimensions.get('window').height;
 var deviceWidth = Dimensions.get("window").width;
-import { cancelBtn, cancelBtnText, inputField, inputHeading, rnPicker, rnPickerContainer, rnPickerError, submitBtn, submitBtnText } from '../Styles/FormFields';
 export default class Login extends Component {
   constructor(props) {
     super(props);
@@ -256,7 +254,7 @@ export default class Login extends Component {
       console.log({ storeId });
       AsyncStorage.setItem("storeId", storeId);
       global.storeName = storeName;
-      console.log("IN login",this.props.navigation)
+      console.log("IN login", this.props.navigation);
       AsyncStorage.setItem("storeName", storeName).then(() => {
         this.props.navigation.navigate('TopBarNavigation');
       });
@@ -270,7 +268,7 @@ export default class Login extends Component {
   }
 
   async componentDidMount() {
-    AsyncStorage.removeItem('phone_number');
+    // AsyncStorage.removeItem('phone_number');
   }
 
 
