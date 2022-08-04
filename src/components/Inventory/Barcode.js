@@ -1,20 +1,18 @@
-import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, ClipboardStatic } from 'react-native';
-import React, { Component } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+import React, { Component } from 'react';
+import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import Device from 'react-native-device-detection';
-import Modal from 'react-native-modal';
-import Loader from '../../commonUtils/loader';
-import InventoryService from '../services/InventoryService';
-import { listEmptyMessage, pageNavigationBtn, pageNavigationBtnText, filterBtn, menuButton, headerNavigationBtn, headerNavigationBtnText, headerTitle, headerTitleContainer, headerTitleSubContainer, headerTitleSubContainer2, buttonContainer, buttonStyle, buttonStyle1, flatListMainContainer, flatlistSubContainer, buttonImageStyle, textContainer, textStyleLight, textStyleMedium, highText, loadMoreBtn, loadmoreBtnText, flatListHeaderContainer, flatListTitle } from '../Styles/Styles';
-import { filterMainContainer, filterSubContainer, filterHeading, filterCloseImage, deleteText, deleteHeading, deleteHeader, deleteContainer, deleteCloseBtn } from '../Styles/PopupStyles';
-import { inputField, rnPickerContainer, rnPicker, submitBtn, submitBtnText, cancelBtn, cancelBtnText, datePicker, datePickerBtnText, datePickerButton1, datePickerButton2, datePickerContainer, dateSelector, dateText, } from '../Styles/FormFields';
 import I18n from 'react-native-i18n';
-import { ActivityIndicator } from 'react-native-paper';
-import { RH, RF, RW } from '../../Responsive';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import Modal from 'react-native-modal';
 import scss from '../../commonUtils/assets/styles/style.scss';
+import Loader from '../../commonUtils/loader';
+import { RH, RW } from '../../Responsive';
+import InventoryService from '../services/InventoryService';
+import { cancelBtn, cancelBtnText, datePicker, datePickerBtnText, datePickerButton1, datePickerButton2, dateSelector, dateText, inputField, submitBtn, submitBtnText } from '../Styles/FormFields';
+import { deleteCloseBtn, deleteContainer, deleteHeader, deleteHeading, deleteText, filterCloseImage, filterHeading, filterMainContainer, filterSubContainer } from '../Styles/PopupStyles';
+import { filterBtn, flatListTitle, listEmptyMessage, loadMoreBtn, loadmoreBtnText } from '../Styles/Styles';
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -57,7 +55,7 @@ export default class Barcode extends Component {
     console.log({ newstoreId });
     console.log({ storeId });
     this.setState({ storeId: storeId });
-    this.getAllBarcodes();
+    this.getAllBarcodes(0);
     console.log({ scss });
   }
 
@@ -72,7 +70,7 @@ export default class Barcode extends Component {
   }
 
   // Getting Barcodes Functions
-  getAllBarcodes() {
+  getAllBarcodes(pageNumber) {
     this.setState({ loading: true, loadMoreActive: false });
     const params = {
       "fromDate": "",
@@ -81,7 +79,7 @@ export default class Barcode extends Component {
       "storeId": parseInt(this.state.storeId)
     };
     console.log("getBarcodes", params);
-    axios.post(InventoryService.getTextileBarcodes() + '?page=' + parseInt(this.state.pageNo) + '&size=10', params).then((res) => {
+    InventoryService.getTextileBarcodes(params, pageNumber).then((res) => {
       if (res.data) {
         let response = res.data.content;
         console.log({ response });
@@ -135,6 +133,7 @@ export default class Barcode extends Component {
   enddatepickerClicked() {
     this.setState({ datepickerendOpen: true });
   }
+
   datepickerDoneClicked() {
     if (parseInt(this.state.date.getDate()) < 10 && (parseInt(this.state.date.getMonth()) < 10)) {
       this.setState({ startDate: this.state.date.getFullYear() + "-0" + (this.state.date.getMonth() + 1) + "-" + "0" + this.state.date.getDate() });
@@ -176,7 +175,7 @@ export default class Barcode extends Component {
     this.setState({ barCodeId: value.trim() });
   };
 
-  applyBarcodeFilter() {
+  applyBarcodeFilter(pageNumber) {
     console.log(this.state.filterActive, this.state.filterPageNo);
     this.setState({ loading: true, loadMoreActive: false });
     let list = {};
@@ -187,15 +186,16 @@ export default class Barcode extends Component {
       storeId: parseInt(this.state.storeId)
     };
     console.log(list);
-    axios.post(InventoryService.getTextileBarcodes() + '?page=' + parseInt(this.state.filterPageNo) + '&size=10', list).then(res => {
+    InventoryService.getTextileBarcodes(list, pageNumber).then(res => {
       console.log(res);
       if (res) {
         if (res.data) {
-          this.setState({ loading: false, filterBarcodesList: this.state.filterBarcodesList.concat(res.data.content), error: "", filterActive: true, loading: false, totalPages: res.data.result.totalPages });
-          console.log("filtered Data", res.data.content);
-          this.setState({ fromDate: "", toDate: "", barCodeId: "" });
+          let filResponse = res.data.content;
+          console.log({ filResponse });
+          this.setState({ loading: false, filterBarcodesList: this.state.filterBarcodesList.concat(filResponse), error: "", filterActive: true, loading: false, totalPages: res.data.totalPages });
           this.continuePagination();
         }
+        this.setState({ fromDate: "", toDate: "", barCodeId: "" });
       }
       this.setState({ loading: false, filterActive: true });
     }).catch((err) => {
@@ -406,7 +406,7 @@ export default class Barcode extends Component {
                     onChangeText={this.handlebarCodeId}
                   />
                   <TouchableOpacity style={submitBtn}
-                    onPress={() => this.applyBarcodeFilter()}>
+                    onPress={() => this.applyBarcodeFilter(0)}>
                     <Text style={submitBtnText} >{I18n.t("APPLY")}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={cancelBtn}

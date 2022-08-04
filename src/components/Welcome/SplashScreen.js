@@ -2,8 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import Device from 'react-native-device-detection';
-import I18n, { getLanguages } from 'react-native-i18n';
-import { RH, RW, RF } from '../../Responsive';
+import I18n from 'react-native-i18n';
+import { RF, RH, RW } from '../../Responsive';
 // Enable fallbacks if you want `en-US`
 // and `en-GB` to fallback to `en`
 I18n.fallbacks = true;
@@ -26,12 +26,13 @@ export default class SplashScreen extends React.Component {
 
   componentDidMount() {
     if (I18n.locale == "english" || I18n.locale == "en" || I18n.locale == "en-US") {
-      I18n.locale = "english"
-      this.setState({ selectedItem: 0 })
+      I18n.locale = "english";
+      this.setState({ selectedItem: 0 });
     }
     var phonenumber = "";
     AsyncStorage.getItem("phone_number").then((value) => {
       phonenumber = value;
+      console.log({ phonenumber });
     }).catch(() => {
       this.setState({ loading: false });
       console.log('There is error getting phone numner');
@@ -39,8 +40,8 @@ export default class SplashScreen extends React.Component {
     });
     var roleType = "";
     AsyncStorage.getItem("rolename").then(value => {
-      roleType = value
-    })
+      roleType = value;
+    });
     console.log('phone number is' + phonenumber);
     setTimeout(() => {
       if (phonenumber === null) {
