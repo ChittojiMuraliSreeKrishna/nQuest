@@ -25,7 +25,7 @@ export default class AccountingNaviagtion extends Component {
                 <Stack.Screen name='AddCreditNotes' options={{ headerShown: false }} component={AddCreditNotes} />
                 <Stack.Screen name='AddDebitNotes' options={{ headerShown: false }} component={AddDebitNotes} />
             </Stack.Navigator>
-            <BottomTabNav {...this.props}/>
+            {/* <BottomTabNav {...this.props}/> */}
             </>
         );
     }

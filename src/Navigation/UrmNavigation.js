@@ -25,7 +25,7 @@ export default class UrmNavigation extends Component {
         <Stack.Screen name='EditRole' options={{ headerShown: false }} component={EditRole} />
         <Stack.Screen name='Privilages' options={{ headerShown: false }} component={Privilages} />
       </Stack.Navigator>
-      <BottomTabNav {...this.props}/>
+      {/* <BottomTabNav {...this.props}/> */}
       </>
     )
   }

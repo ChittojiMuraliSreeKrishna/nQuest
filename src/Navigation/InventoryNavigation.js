@@ -20,7 +20,7 @@ export default class InventoryNavigation extends Component {
                 <Stack.Screen name="ViewReBarcode" options={{ headerShown: false }} component={ViewReBarcode} />
                 <Stack.Screen name="AddProduct" options={{ headerShown: false }} component={AddProductCombo} />
             </Stack.Navigator>
-            <BottomTabNav {...this.props}/>
+            {/* <BottomTabNav {...this.props}/> */}
             </>
         )
     }

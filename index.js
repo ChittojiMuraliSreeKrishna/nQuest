@@ -16,7 +16,7 @@ axios.interceptors.request.use(
       }).catch((err) => {
          this.setState({ loading: false });
          // alert('There is error getting token');
-          alert(err);
+         alert(err);
 
          console.log('There is error getting token');
       });
@@ -40,8 +40,8 @@ axios.interceptors.response.use((response) => response, (error) => {
 
       alert('Please login to access this resource');
    }
-   if(error.response.status === 400){
-      alert(error.response.data.message)
+   if (error.response.status === 400) {
+      error.response.data && error.response.data.message && alert(error.response.data.message)
    }
 
 });

@@ -27,7 +27,7 @@ export default class ProductsNavigation extends React.Component {
                 <Stack.Screen name="AddPromo" options={{ headerShown: false }} component={AddPromo} />
                 <Stack.Screen name="AddLoyalty" options={{ headerShown: false }} component={AddLoyalty} />
             </Stack.Navigator>
-            <BottomTabNav {...this.props}/>
+            {/* <BottomTabNav {...this.props}/> */}
             </>
         );
     }

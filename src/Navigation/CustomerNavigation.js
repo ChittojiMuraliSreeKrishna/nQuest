@@ -20,7 +20,7 @@ export default class CustomerNavigation extends Component {
                     <Stack.Screen name="ScanBarCode" options={{ headerShown: false }} component={ScanBarCode} />
                     <Stack.Screen name='AddGiftVoucher' options={{ headerShow: false }} component={AddGiftVoucher} />
                 </Stack.Navigator>
-                <BottomTabNav {...this.props} />
+                {/* <BottomTabNav {...this.props} /> */}
             </>
         );
     }

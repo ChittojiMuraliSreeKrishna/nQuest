@@ -13,7 +13,7 @@ export default class ReportsNavigation extends Component {
                 <Stack.Navigator initialRouteName='Reports' >
                     <Stack.Screen name='Reports' options={{ headerShown: false }} component={Reports} />
                 </Stack.Navigator>
-                <BottomTabNav {...this.props} />
+                {/* <BottomTabNav {...this.props} /> */}
             </>
         )
     }

@@ -426,9 +426,12 @@ class Settings extends Component {
           <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
             <TouchableOpacity style={{ backgroundColor: '#ED1C24', width: 100, margin: 10, borderRadius: 5 }}
               onPress={() => {
+                AsyncStorage.clear()
                 AsyncStorage.removeItem('phone_number')
                 AsyncStorage.removeItem('user')
                 AsyncStorage.removeItem('tokenkey')
+                global.homeButtonClicked = false;
+                global.profileButtonClicked = false;
                 this.props.navigation.navigate('Login')
               }}>
               <Text style={{ color: '#fff', alignSelf: 'center', fontWeight: '700' }}> {I18n.t("Sign Out")}</Text>
@@ -728,7 +731,7 @@ class Settings extends Component {
             </View>
           )}
         </View>
-        <BottomTabNav {...this.props} />
+        {/* <BottomTabNav {...this.props} /> */}
       </>
     );
   }

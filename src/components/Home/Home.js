@@ -626,7 +626,7 @@ class Home extends Component {
             </View>
           </ScrollView>
         </View>
-        <BottomTabNav {...this.props} />
+        {/* <BottomTabNav {...this.props} /> */}
       </>
     );
   }
