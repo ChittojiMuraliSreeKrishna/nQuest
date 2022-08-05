@@ -38,9 +38,9 @@ export default class SelectStore extends React.Component {
     if (userType[0] === "super_admin") {
       this.getstores();
     } else {
-      let storesList = await AsyncStorage.getItem("storesList")
-      console.log("hero", storesList)
-      this.setState({ storesData: this.props.route.params.items }, () => console.log("stores Data", this.state.storesData))
+      let storesParams = this.props.route.params.items
+      console.log({storesParams})
+      this.setState({ storesData: storesParams }, () => console.log("stores Data", this.state.storesData))
     }
   }
 
@@ -55,7 +55,7 @@ export default class SelectStore extends React.Component {
     if (this.state.selectedItem === null) {
       alert("Select Atleast one Store")
     } else {
-      this.props.navigation.navigate('HomeNavigation');
+      this.props.navigation.navigate('TopBarNavigation');
     }
   }
 

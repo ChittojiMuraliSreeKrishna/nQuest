@@ -83,6 +83,7 @@ export class TopBar extends Component {
   async componentWillMount() {
     var storeStringId = "";
     var domainStringId = "";
+    // this.props.navigation.navigate('Login')
 
     AsyncStorage.getItem("storeId").then((value) => {
       storeStringId = value;
@@ -120,6 +121,7 @@ export class TopBar extends Component {
   async getPrivileges() {
     await AsyncStorage.getItem("roleType").then((value) => {
       if (value === "config_user") {
+        let privilegesSet = new Set()
         global.previlage1 = '';
         global.previlage2 = '';
         global.previlage3 = '';
@@ -127,6 +129,10 @@ export class TopBar extends Component {
         global.previlage5 = '';
         global.previlage6 = '';
         global.previlage7 = 'URM Portal';
+        privilegesSet.add('URM Portal')
+        data = Array.from(privilegesSet)
+        this.setState({ firstDisplayName: 'URM Portal' })
+        this.getData()
       }
       else if (value === "super_admin") {
         global.previlage1 = 'Dashboard';
@@ -145,6 +151,7 @@ export class TopBar extends Component {
               if (len > 0) {
                 this.setState({ firstDisplayName: res.data.parentPrivileges[0].name });
                 const firstDisplayName = this.state.firstDisplayName;
+                console.log({firstDisplayName})
                 firstDisplayRoute = res.data.parentPrivileges[0].name
                 var privilegesSet = new Set();
                 // this.props.navigation.navigate(firstDisplayName);
@@ -238,7 +245,9 @@ export class TopBar extends Component {
             {this.state.modalVisibleData &&
               <View>
                 <Modal
+                  style={{ margin: 0, backgroundColor: 'rgba(0,0,0,0.7)' }}
                   transparent={true}
+                  animationType="fade"
                   visible={this.state.modalVisibleData}
                   onRequestClose={() => { this.modalHandle() }}
                   onBackButtonPress={() => this.modalHandle()}

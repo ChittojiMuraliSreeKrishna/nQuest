@@ -23,8 +23,8 @@ export default class Login extends Component {
       rememberMe: false,
       redirect: false,
       isAuth: false,
-      userName: '',
-      password: '',
+      userName: 'sideuser3',
+      password: 'Otsi@123',
       dropValue: '',
       store: 0,
       user: {
@@ -165,7 +165,8 @@ export default class Login extends Component {
                 if (value === "super_admin") {
                   this.getAdminStores();
                 } else if (value === "config_user") {
-                  this.props.navigation.navigate('UrmNaviagtion');
+                  // this.props.navigation.navigate('UrmNaviagtion');
+                  this.props.navigation.navigate('TopBarNavigation');
                   global.previlage1 = '';
                   global.previlage2 = '';
                   global.previlage3 = '';

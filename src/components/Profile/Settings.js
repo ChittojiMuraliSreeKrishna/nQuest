@@ -277,6 +277,7 @@ class Settings extends Component {
         }
         this.setState({ address: res.data["result"].address, mobileNumber: phonenumber });
       }
+      this.setState({loading: false})
     }).catch(() => {
       this.setState({ loading: false });
       this.setState({ loading: false });

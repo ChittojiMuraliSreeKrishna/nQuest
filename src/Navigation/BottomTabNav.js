@@ -67,6 +67,7 @@ class BottomTabNav extends Component {
                 global.previlage5 = '';
                 global.previlage6 = '';
                 global.previlage7 = 'URM Portal';
+                this.setState({firstDisplayName: screenMapping['URM Portal']})
             }
             else if (value === "super_admin") {
                 global.previlage1 = 'Dashboard';
