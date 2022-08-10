@@ -202,17 +202,6 @@ export default class AddUser extends Component {
     return true;
   }
 
-  handleDomain = (value) => {
-    for (let i = 0; i < this.state.domainsArray.length; i++) {
-      if (this.state.domainsArray[i].name === value) {
-        this.setState({ domainId: this.state.domainsArray[i].id, stores: [], storesArray: [] });
-      }
-    }
-    this.setState({ domain: value });
-    this.getStores();
-    this.getRoles();
-
-  };
 
   handleStore = (value) => {
     this.setState({ store: value });

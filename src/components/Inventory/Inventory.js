@@ -66,6 +66,7 @@ export default class Inventory extends Component {
                 for (let i = 0; i < sublen; i++) {
                   if (privilegeId === subPrivileges[i].parentPrivilegeId) {
                     let routes = subPrivileges[i].name;
+                    
                     this.state.headerNames.push({ name: routes });
                     console.log("Header Names", this.state.headerNames);
                   }
