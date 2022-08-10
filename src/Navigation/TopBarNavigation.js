@@ -37,7 +37,7 @@ export default class TopBarNavigation extends Component {
         <Stack.Screen name="InventoryRetailNavigation" options={{ headerShown: false }} component={InventoryRetailNavigation} />
         <Stack.Screen name="Settings" options={{ headerShown: false }} component={Settings} />
       </Stack.Navigator>
-      {/* <BottomTabNav {...this.props}/> */}
+      <BottomTabNav {...this.props}/>
       </>
     );
   }

@@ -1,0 +1,16 @@
+@import "./Colors.scss";
+
+.mainContainer {
+	height: 100%;
+	background: $white;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	align-items: center;
+}
+
+.logoImg {
+	height: 100px;
+	width: 250px;
+	// mar
+}
