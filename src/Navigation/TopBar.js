@@ -151,7 +151,7 @@ export class TopBar extends Component {
               if (len > 0) {
                 this.setState({ firstDisplayName: res.data.parentPrivileges[0].name });
                 const firstDisplayName = this.state.firstDisplayName;
-                console.log({firstDisplayName})
+                console.log({ firstDisplayName })
                 firstDisplayRoute = res.data.parentPrivileges[0].name
                 var privilegesSet = new Set();
                 // this.props.navigation.navigate(firstDisplayName);
@@ -229,7 +229,7 @@ export class TopBar extends Component {
           <View
           >
             <Image
-              style={styles.logoimage}
+              style={styles.logoImage}
               source={require('../commonUtils/assets/Images/retail_logo_head.png')}
             ></Image>
           </View>
@@ -259,7 +259,7 @@ export class TopBar extends Component {
                         data={data}
                         renderItem={(item) => this._renderItem(item)}
                         keyExtractor={item => item}
-                       contentContainerStyle={{flexDirection:'column', justifyContent: 'center'}}
+                        contentContainerStyle={{ flexDirection: 'column', justifyContent: 'center' }}
                       />
                     </View>
                   </View>
@@ -308,6 +308,10 @@ export class TopBar extends Component {
 
 
 const styles = StyleSheet.create({
+  logoImage: {
+    width: RW(170),
+    height:RH(60)
+},
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -356,11 +360,6 @@ const styles = StyleSheet.create({
     // backgroundColor: "#fff",
     // borderRadius: 4,
     // padding: 5
-  },
-  test: {
-    height: "1%",
-
-
   }
 });
 export default TopBar;

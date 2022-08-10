@@ -12,9 +12,12 @@ import Modal from "react-native-modal";
 import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
 import { openDatabase } from 'react-native-sqlite-storage';
+import { RF } from '../../Responsive';
 import CustomerService from '../services/CustomerService';
+import { color } from '../Styles/colorStyles';
+import { checkPromoDiscountBtn, submitBtn, submitBtnText, textStyle } from '../Styles/FormFields';
 import { deleteCloseBtn, sucessBtn, sucessBtnText, sucessContainer, sucessHeader, sucessHeading, sucessMainText, sucessText } from '../Styles/PopupStyles';
-import { pageNavigationBtn, pageNavigationBtnText } from '../Styles/Styles';
+import { buttonContainer, buttonImageStyle, buttonStyle, buttonStyle1, flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleMediumColor, textStyleMedium } from '../Styles/Styles';
 
 var deviceWidth = Dimensions.get('window').width;
 var deviceHeight = Dimensions.get('window').height;
@@ -76,7 +79,7 @@ class GenerateEstimationSlip extends Component {
       domainId: 1,
       tableHead: ['S.No', 'Barcode', 'Product', 'Price Per Qty', 'Qty', 'Sales Rate'],
       // tableData: [],
-      privilages: [{ bool: true, name: "Check Promo Discount" }],
+      privilages: [{ bool: true, name: "Check Promo Disc" }],
       inventoryDelete: false,
       lineItemDelete: false,
       uom: '',
@@ -103,6 +106,7 @@ class GenerateEstimationSlip extends Component {
 
   async componentDidMount() {
     const storeId = await AsyncStorage.getItem("storeId");
+    console.log("stroeiddd", storeId);
     this.setState({ storeId: storeId });
   }
 
@@ -177,8 +181,8 @@ class GenerateEstimationSlip extends Component {
         "netValue": element.totalMrp,
         "barCode": element.barcode,
         "domainId": 1,
-        "manualDiscount":0,
-        "promoDiscount":(isNaN(element.itemDiscount) ? 0 : (parseInt(element.itemDiscount))),
+        "manualDiscount": 0,
+        "promoDiscount": (isNaN(element.itemDiscount) ? 0 : (parseInt(element.itemDiscount))),
         "storeId": parseInt(this.state.storeId),
         "section": element.section,
         "subSection": element.subSection,
@@ -241,7 +245,7 @@ class GenerateEstimationSlip extends Component {
 
   getLineItems() {
     const { barcodeId, storeId, smnumber } = this.state;
-    console.log({ barcodeId, storeId, smnumber });
+    console.log("datataa", barcodeId, storeId, smnumber);
     let lineItem = [];
     CustomerService.getDeliverySlip(barcodeId.trim(), storeId, smnumber).then(res => {
       console.log({ res });
@@ -445,9 +449,9 @@ class GenerateEstimationSlip extends Component {
       console.log('There is error getting token');
       //alert('There is error getting token');
     });
-    console.log("ES Number",this.state.resultDsNumber);
+    console.log("ES Number", this.state.resultDsNumber);
     return (
-      <View style={{ flex: 1 }}>
+      <View style={styles.container}>
         {this.state.flagone && (
           <ScrollView>
             < View
@@ -462,7 +466,7 @@ class GenerateEstimationSlip extends Component {
                   <RNPickerSelect
                     // style={Device.isTablet ? styles.rnSelectContainer_tablet_newsale : styles.rnSelectContainer_mobile_newsale}
                     placeholder={{
-                      label: 'SELECT UOM',
+                      label: 'SELECT TYPE',
                       value: "",
                     }}
                     Icon={() => {
@@ -481,29 +485,38 @@ class GenerateEstimationSlip extends Component {
                   />
                 </View>
 
-                <TextInput style={Device.isTablet ? styles.input_tablet_normal : styles.input_mobile_normal}
-                  underlineColorAndroid="transparent"
-                  placeholder={I18n.t("ENTER BARCODE")}
-                  placeholderTextColor="#6F6F6F60"
-                  textAlignVertical="center"
-                  autoCapitalize="none"
-                  value={this.state.barcodeId}
-                  onChangeText={this.handleBarCode}
-                  // onEndEditing
-                  onEndEditing={() => this.endEditing()}
-                />
-
-                <TextInput style={[Device.isTablet ? styles.input_tablet_normal_start : styles.input_mobile_normal_start, { width: Device.isTablet ? 150 : 100 }]}
+                <TextInput style={[Device.isTablet ? styles.input_tablet_normal : styles.input_mobile_normal, { width: Device.isTablet ? 150 : 100 }]}
                   underlineColorAndroid="transparent"
                   placeholder={I18n.t("SM Number")}
                   placeholderTextColor="#6F6F6F60"
                   textAlignVertical="center"
-                  keyboardType={'default'}
-                  maxLength={4}
                   autoCapitalize="none"
+                  maxLength={4}
+                  keyboardType={'default'}
                   value={this.state.smnumber}
                   onChangeText={(text) => this.handleSmCode(text)}
                 />
+                <View style={{ flexDirection: 'row' }}>
+                  <TextInput style={Device.isTablet ? styles.input_tablet_normal_start : styles.input_mobile_normal_start}
+                    underlineColorAndroid="transparent"
+                    placeholder={I18n.t("BARCODE")}
+                    placeholderTextColor="#6F6F6F60"
+                    textAlignVertical="center"
+                    value={this.state.barcodeId}
+                    onChangeText={this.handleBarCode}
+                    onEndEditing={() => this.endEditing()}
+                  />
+                  <TouchableOpacity style={{ marginTop: RF(1) }}
+                    // style={
+                    //   Device.isTablet ? styles.input_tabletbutton_normal : styles.input_mobilebutton_normal
+                    // }
+                    onPress={() => this.navigateToScanCode()} >
+                    <Image
+                      source={require('../../commonUtils/assets/Images/scan_icon.png')}
+                    />
+                    {/* <Text style={[Device.isTablet ? styles.navButtonText_tablet : styles.navButtonText_mobile, { marginTop: Device.isTablet ? 0 : 0, marginLeft: Device.isTablet ? -20 : -10 }]}> {I18n.t('SCAN')} </Text> */}
+                  </TouchableOpacity>
+                </View>
 
                 {this.state.uom === "Pieces" && (
                   <TextInput style={[Device.isTablet ? styles.input_tablet_notedit : styles.input_mobile_notedit, { marginLeft: Device.isTablet ? deviceWidth / 2.4 : deviceWidth / 2.15, width: Device.isTablet ? 160 : 80 }]}
@@ -529,17 +542,9 @@ class GenerateEstimationSlip extends Component {
                     onChangeText={this.handleQty}
                   />
                 )}
-
-
-                <TouchableOpacity
-                  style={
-                    Device.isTablet ? styles.input_tabletbutton_normal : styles.input_mobilebutton_normal
-                  }
-                  onPress={() => this.navigateToScanCode()} >
-                  <Text style={[Device.isTablet ? styles.navButtonText_tablet : styles.navButtonText_mobile, { marginTop: Device.isTablet ? 0 : 0, marginLeft: Device.isTablet ? -20 : -10 }]}> {I18n.t('SCAN')} </Text>
-                </TouchableOpacity>
-
               </View>
+
+
               {this.state.itemsList.length !== 0 && (
                 <FlatList
                   style={styles.flatList}
@@ -548,19 +553,32 @@ class GenerateEstimationSlip extends Component {
                   showsVerticalScrollIndicator={false}
                   showsHorizontalScrollIndicator={false}
                   renderItem={({ item, index }) => (
-                    <TouchableOpacity style={[pageNavigationBtn, {
-                      backgroundColor: item.bool ? '#ED1C24' : '#FFFFFF',
-                      borderColor: item.bool ? '#ED1C24' : '#858585',
-                    }]} onPress={() => this.topbarAction1(item, index)} >
-
-                      <Text style={[pageNavigationBtnText, { color: item.bool ? "#FFFFFF" : '#858585', fontFamily: 'regular' }]}>
-                        {item.name}
-                      </Text>
+                    <TouchableOpacity style={[checkPromoDiscountBtn, {
+                      backgroundColor: color.white, borderColor: color.lightBlack,
+                    }]}>
+                      <Image source={require('../../commonUtils/assets/Images/check_promo_disc.png')} />
+                      <Text style={{ color: color.dark, padding: RF(1) }}>{item.name}</Text>
                     </TouchableOpacity>
+
+                    // <TouchableOpacity style={[pageNavigationBtn, {
+                    //   backgroundColor: item.bool ? '#ED1C24' : '#FFFFFF',
+                    //   borderColor: item.bool ? '#ED1C24' : '#858585',
+                    // }]} onPress={() => this.topbarAction1(item, index)} >
+
+                    //   <Text style={[pageNavigationBtnText, { color: item.bool ? "#FFFFFF" : '#858585', fontFamily: 'regular' }]}>
+                    //     {item.name}
+                    //   </Text>
+                    // </TouchableOpacity>
                   )}
                   ListFooterComponent={<View style={{ width: 15 }}></View>}
                 />
               )}
+
+              {this.state.itemsList.length !== 0 && (
+              <View style={{ flex: 1, flexDirection: 'row', marginLeft: RF(10) }}>
+                <Text style={textStyle}>Total Scanned Items - </Text>
+                <Text style={[textStyle, { color: color.accent }]}>{this.state.totalQuantity} </Text>
+              </View>)}
 
               <FlatList style={{ marginTop: 20, marginBottom: 20 }}
                 data={this.state.barList}
@@ -570,138 +588,161 @@ class GenerateEstimationSlip extends Component {
                 scrollEnabled={
                   false
                 }
-                ref={(ref) => { this.listRef = ref; }}
                 renderItem={({ item, index }) => (
-                  <View style={{
-                    height: Device.isTablet ? 240 : 190,
-                    backgroundColor: '#FFFFFF',
-                    borderBottomWidth: 5,
-                    borderBottomColor: '#FBFBFB',
-                    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
-                  }}>
-                    <View style={{ flexDirection: 'row', width: deviceWidth, justifyContent: 'space-around', alignItems: 'center', height: Device.isTablet ? 220 : 170, }}>
-                      <View>
-                        <Image source={require('../assets/images/default.jpeg')}
-                          //source={{ uri: item.image }}
-                          style={{
-                            width: Device.isTablet ? 140 : 90, height: Device.isTablet ? 140 : 90,
-                          }} />
+                  <View style={flatListMainContainer}>
+                    <View style={flatlistSubContainer}>
+                      <View style={textContainer}>
+                        <Text style={textStyleMediumColor}>{I18n.t("Item")}</Text>
+                        <Text style={textStyleMediumColor}>{I18n.t("MRP")}</Text>
+                        <Text style={textStyleMediumColor}>{I18n.t("QTY")}</Text>
                       </View>
-                      <View style={{ flexDirection: 'column', justifyContent: 'space-around' }}>
-                        <Text style={{ fontSize: Device.isTablet ? 21 : 16, marginTop: 10, fontFamily: 'medium', color: '#353C40' }}>
-                          {item.itemdesc}
-                        </Text>
-                        <Text style={{ fontSize: Device.isTablet ? 17 : 12, marginTop: -20, fontFamily: 'regular', color: '#808080' }}>
-                          {I18n.t("BARCODE")}: <Text style={{ color: '#000000' }}>{item.barcode}</Text>
-                        </Text>
-                        <Text style={{ fontSize: Device.isTablet ? 17 : 12, marginTop: 6, fontFamily: 'regular', color: '#808080' }}>
-                          {I18n.t("QUANTITY")}: <Text style={{ color: '#000000' }}>{item.quantity}</Text>
-                        </Text>
-                        <Text style={{ fontSize: Device.isTablet ? 17 : 12, marginTop: 6, fontFamily: 'regular', color: '#808080' }}>
-                          {I18n.t("SM")}: <Text style={{ color: '#000000' }}>{this.state.smnumber}</Text>
-                        </Text>
-                        <Text style={{ fontSize: Device.isTablet ? 17 : 12, marginTop: 6, fontFamily: 'regular', color: '#808080' }}>
-                          {I18n.t("DISCOUNT TYPE")}:
-                        </Text>
-                        <Text style={{ fontSize: Device.isTablet ? 17 : 12, marginTop: 6, fontFamily: 'regular', color: '#808080' }}>
-                          {I18n.t("MRP")}: <Text style={{ color: '#ED1C24' }}>₹ {item.itemMrp}</Text>
-                        </Text>
-                        <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080' }}>
-                          {I18n.t("DISCOUNT")}: ₹ 0
-                        </Text>
-                        <Text style={{ fontSize: Device.isTablet ? 17 : 12, marginTop: 6, fontFamily: 'regular', color: '#808080' }}>
-                          {I18n.t("TOTAL")}: <Text style={{ color: '#ED1C24' }}>₹ {item.totalMrp}</Text>
-                        </Text>
+                      <View style={textContainer}>
+                        <Text style={textStyleMedium}>{item.barcode}</Text>
+                        <Text style={textStyleMedium}>₹ {item.itemMrp}</Text>
+                        <Text style={textStyleMedium}>{item.quantity}</Text>
                       </View>
-                      <View>
-                        <View style={{
-                          flexDirection: 'row',
-                          justifyContent: 'space-around',
-                          alignItems: 'center',
-                          height: Device.isTablet ? 60 : 30,
-                          marginLeft: -40,
-                          marginRight: Device.isTablet ? 40 : 20,
-                          width: Device.isTablet ? 150 : 90,
-                        }}>
-                          <TouchableOpacity style={{
-                            borderColor: '#ED1C24',
-                            height: Device.isTablet ? 50 : 30,
-                            width: Device.isTablet ? 50 : 30, borderBottomLeftRadius: 3,
-                            borderTopLeftRadius: 3,
-                            borderBottomWidth: 1,
-                            borderTopWidth: 1,
-                            borderLeftWidth: 1, paddingLeft: 10, marginLeft: 20,
-                          }}
-                            onPress={() => this.decreamentForTable(item, index)}>
-                            <Text style={{
-                              alignSelf: 'center',
-                              marginTop: 2,
-                              marginLeft: -10,
-                              fontSize: Device.isTablet ? 22 : 12,
-                              color: '#ED1C24'
-                            }}
-                            >-</Text>
-                          </TouchableOpacity>
-                          {/* <Text> {item.qty}</Text> */}
-                          <TextInput
-                            style={{
-                              justifyContent: 'center',
-                              margin: 20,
-                              height: Device.isTablet ? 50 : 30,
-                              width: Device.isTablet ? 50 : 30,
-                              marginTop: 10,
-                              marginBottom: 10,
-                              borderColor: '#ED1C24',
-                              backgroundColor: 'white',
-                              color: '#353C40',
-                              borderWidth: 1,
-                              fontFamily: 'regular',
-                              fontSize: Device.isTablet ? 22 : 12,
-                              paddingLeft: Device.isTablet ? 15 : 9,
-                            }}
-                            underlineColorAndroid="transparent"
-                            placeholder="1"
-                            placeholderTextColor="#8F9EB7"
-                            value={item.quantity}
-                            onChangeText={(text) => this.updateQty(text, index, item)}
-                          />
-                          <TouchableOpacity style={{
-                            borderColor: '#ED1C24',
-                            height: Device.isTablet ? 50 : 30,
-                            width: Device.isTablet ? 50 : 30, borderBottomRightRadius: 3,
-                            borderTopRightRadius: 3,
-                            borderBottomWidth: 1,
-                            borderTopWidth: 1,
-                            borderRightWidth: 1
-                          }}
-                            onPress={() => this.incrementForTable(item, index)}>
-                            <Text style={{
-                              alignSelf: 'center',
-                              marginTop: 2,
-                              fontSize: Device.isTablet ? 22 : 12,
-                              color: '#ED1C24'
-                            }}
-                            >+</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity style={{
-                            position: 'absolute',
-                            right: Device.isTablet ? 40 : 20,
-                            top: Device.isTablet ? -55 : -35,
-                            width: Device.isTablet ? 50 : 30,
-                            height: Device.isTablet ? 50 : 30,
-                            borderRadius: 5,
-                            // borderTopRightRadius: 5,
-                            borderWidth: 1,
-                            borderColor: "lightgray",
-                          }} onPress={() => this.handlenewsaledeleteaction(item, index)}>
-                            <Image style={{ alignSelf: 'center', top: 5, height: Device.isTablet ? 30 : 20, width: Device.isTablet ? 30 : 20 }} source={require('../assets/images/delete.png')} />
-                          </TouchableOpacity>
-                        </View>
+
+                      <View style={textContainer}>
+                        <Text style={textStyleMediumColor}>{I18n.t("SM Number")}:{"\n"} {this.state.smnumber}</Text>
+                        <Text style={textStyleMediumColor}>{I18n.t("Discount Type")}:{"\n"} </Text>
+                        <Text style={textStyleMediumColor}>{I18n.t("Discont")}:{"\n"} </Text>
 
                       </View>
                     </View>
-
                   </View>
+
+
+                  // <View style={{
+                  //   height: Device.isTablet ? 240 : 190,
+                  //   backgroundColor: '#FFFFFF',
+                  //   borderBottomWidth: 5,
+                  //   borderBottomColor: '#FBFBFB',
+                  //   borderColor:color.light,
+                  //   flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
+                  // }}>
+                  //   <View style={{ flexDirection: 'row', width: deviceWidth, justifyContent: 'space-around', alignItems: 'center', height: Device.isTablet ? 220 : 170, }}>
+                  //     <View>
+                  //       <Image source={require('../assets/images/default.jpeg')}
+                  //         style={{
+                  //           width: Device.isTablet ? 140 : 90, height: Device.isTablet ? 140 : 90,
+                  //         }} />
+                  //     </View>
+                  //     <View style={{ flexDirection: 'column', justifyContent: 'space-around' }}>
+                  //       <Text style={{ fontSize: Device.isTablet ? 21 : 16, marginTop: 10, fontFamily: 'medium', color: '#353C40' }}>
+                  //         {item.itemdesc}
+                  //       </Text>
+                  //       <Text style={{ fontSize: Device.isTablet ? 17 : 12, marginTop: -20, fontFamily: 'regular', color: '#808080' }}>
+                  //         {I18n.t("BARCODE")}: <Text style={{ color: '#000000' }}>{item.barcode}</Text>
+                  //       </Text>
+                  //       <Text style={{ fontSize: Device.isTablet ? 17 : 12, marginTop: 6, fontFamily: 'regular', color: '#808080' }}>
+                  //         {I18n.t("QUANTITY")}: <Text style={{ color: '#000000' }}>{item.quantity}</Text>
+                  //       </Text>
+                  //       <Text style={{ fontSize: Device.isTablet ? 17 : 12, marginTop: 6, fontFamily: 'regular', color: '#808080' }}>
+                  //         {I18n.t("SM")}: <Text style={{ color: '#000000' }}>{this.state.smnumber}</Text>
+                  //       </Text>
+                  //       <Text style={{ fontSize: Device.isTablet ? 17 : 12, marginTop: 6, fontFamily: 'regular', color: '#808080' }}>
+                  //         {I18n.t("DISCOUNT TYPE")}:
+                  //       </Text>
+                  //       <Text style={{ fontSize: Device.isTablet ? 17 : 12, marginTop: 6, fontFamily: 'regular', color: '#808080' }}>
+                  //         {I18n.t("MRP")}: <Text style={{ color: '#ED1C24' }}>₹ {item.itemMrp}</Text>
+                  //       </Text>
+                  //       <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080' }}>
+                  //         {I18n.t("DISCOUNT")}: ₹ 0
+                  //       </Text>
+                  //       <Text style={{ fontSize: Device.isTablet ? 17 : 12, marginTop: 6, fontFamily: 'regular', color: '#808080' }}>
+                  //         {I18n.t("TOTAL")}: <Text style={{ color: '#ED1C24' }}>₹ {item.totalMrp}</Text>
+                  //       </Text>
+                  //     </View>
+                  //     <View>
+                  //       <View style={{
+                  //         flexDirection: 'row',
+                  //         justifyContent: 'space-around',
+                  //         alignItems: 'center',
+                  //         height: Device.isTablet ? 60 : 30,
+                  //         marginLeft: -40,
+                  //         marginRight: Device.isTablet ? 40 : 20,
+                  //         width: Device.isTablet ? 150 : 90,
+                  //       }}>
+                  //         <TouchableOpacity style={{
+                  //           borderColor: '#ED1C24',
+                  //           height: Device.isTablet ? 50 : 30,
+                  //           width: Device.isTablet ? 50 : 30, borderBottomLeftRadius: 3,
+                  //           borderTopLeftRadius: 3,
+                  //           borderBottomWidth: 1,
+                  //           borderTopWidth: 1,
+                  //           borderLeftWidth: 1, paddingLeft: 10, marginLeft: 20,
+                  //         }}
+                  //           onPress={() => this.decreamentForTable(item, index)}>
+                  //           <Text style={{
+                  //             alignSelf: 'center',
+                  //             marginTop: 2,
+                  //             marginLeft: -10,
+                  //             fontSize: Device.isTablet ? 22 : 12,
+                  //             color: '#ED1C24'
+                  //           }}
+                  //           >-</Text>
+                  //         </TouchableOpacity>
+                  //         {/* <Text> {item.qty}</Text> */}
+                  //         <TextInput
+                  //           style={{
+                  //             justifyContent: 'center',
+                  //             margin: 20,
+                  //             height: Device.isTablet ? 50 : 30,
+                  //             width: Device.isTablet ? 50 : 30,
+                  //             marginTop: 10,
+                  //             marginBottom: 10,
+                  //             borderColor: '#ED1C24',
+                  //             backgroundColor: 'white',
+                  //             color: '#353C40',
+                  //             borderWidth: 1,
+                  //             fontFamily: 'regular',
+                  //             fontSize: Device.isTablet ? 22 : 12,
+                  //             paddingLeft: Device.isTablet ? 15 : 9,
+                  //           }}
+                  //           underlineColorAndroid="transparent"
+                  //           placeholder="1"
+                  //           placeholderTextColor="#8F9EB7"
+                  //           value={item.quantity}
+                  //           onChangeText={(text) => this.updateQty(text, index, item)}
+                  //         />
+                  //         <TouchableOpacity style={{
+                  //           borderColor: '#ED1C24',
+                  //           height: Device.isTablet ? 50 : 30,
+                  //           width: Device.isTablet ? 50 : 30, borderBottomRightRadius: 3,
+                  //           borderTopRightRadius: 3,
+                  //           borderBottomWidth: 1,
+                  //           borderTopWidth: 1,
+                  //           borderRightWidth: 1
+                  //         }}
+                  //           onPress={() => this.incrementForTable(item, index)}>
+                  //           <Text style={{
+                  //             alignSelf: 'center',
+                  //             marginTop: 2,
+                  //             fontSize: Device.isTablet ? 22 : 12,
+                  //             color: '#ED1C24'
+                  //           }}
+                  //           >+</Text>
+                  //         </TouchableOpacity>
+                  //         <TouchableOpacity style={{
+                  //           position: 'absolute',
+                  //           right: Device.isTablet ? 40 : 20,
+                  //           top: Device.isTablet ? -55 : -35,
+                  //           width: Device.isTablet ? 50 : 30,
+                  //           height: Device.isTablet ? 50 : 30,
+                  //           borderRadius: 5,
+                  //           // borderTopRightRadius: 5,
+                  //           borderWidth: 1,
+                  //           borderColor: "lightgray",
+                  //         }} onPress={() => this.handlenewsaledeleteaction(item, index)}>
+                  //           <Image style={{ alignSelf: 'center', top: 5, height: Device.isTablet ? 30 : 20, width: Device.isTablet ? 30 : 20 }} source={require('../assets/images/delete.png')} />
+                  //         </TouchableOpacity>
+                  //       </View>
+
+                  //     </View>
+                  //   </View>
+
+                  // </View>
+
                 )}
               />
 
@@ -796,10 +837,10 @@ export default GenerateEstimationSlip;
 
 
 const styles = StyleSheet.create({
-  safeArea: {
+  container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#FAFAFF'
+    backgroundColor: '#FFFFFF'
   },
   viewswidth: {
     backgroundColor: '#FFFFFF',
@@ -986,11 +1027,6 @@ const styles = StyleSheet.create({
     paddingTop: 30,
     backgroundColor: '#FFFFFF',
     borderRadius: 10,
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: '#FAFAFF'
   },
   head: {
     height: 45,
@@ -1311,9 +1347,9 @@ const styles = StyleSheet.create({
   input_mobile_normal_start: {
     justifyContent: 'center',
     marginLeft: 20,
-    width: deviceWidth / 3,
+    width: deviceWidth / 2,
     height: 44,
-    marginTop: 0,
+    marginTop: 5,
     marginBottom: 10,
     borderColor: '#8F9EB717',
     borderRadius: 3,
