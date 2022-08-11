@@ -13,7 +13,6 @@ export default class UrmNavigation extends Component {
 	render() {
 		return (
 			<>
-				{/* <TopBar {...this.props}/> */}
 				<Stack.Navigator initialRouteName="UserManagement">
 					<Stack.Screen
 						name="UserManagement"

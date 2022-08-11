@@ -431,7 +431,6 @@ class Home extends Component {
             <Text style={headerTitle}> {I18n.t("Home")} </Text>
           </View>
         </View> */}
-					{/* <TopBar {...this.props}/> */}
 					<ScrollView>
 						<View style={styles.container}>
 							{/* <Image

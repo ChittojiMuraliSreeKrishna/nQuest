@@ -13,7 +13,6 @@ export default class ProductsNavigation extends React.Component {
 	render() {
 		return (
 			<>
-				{/* <TopBar {...this.props}/> */}
 				<Stack.Navigator>
 					<Stack.Screen
 						name="Pramotions"

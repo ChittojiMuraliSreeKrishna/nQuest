@@ -13,7 +13,6 @@ export default class AccountingNaviagtion extends Component {
 	render() {
 		return (
 			<>
-				{/* <TopBar {...this.props}/> */}
 				<Stack.Navigator initialRouteName="AccountManagement">
 					<Stack.Screen
 						name="AccountManagement"

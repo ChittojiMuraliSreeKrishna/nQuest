@@ -10,7 +10,6 @@ export default class CustomerNavigation extends Component {
 	render() {
 		return (
 			<>
-				{/* <TopBar {...this.props} /> */}
 				<Stack.Navigator initialRouteName="NewSaleTextile">
 					<Stack.Screen
 						name="NewSaleTextile"

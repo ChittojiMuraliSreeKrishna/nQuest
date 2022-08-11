@@ -204,85 +204,6 @@ class Settings extends Component {
 	}
 
 	async componentDidMount() {
-		var isSuperAdmin = "";
-		AsyncStorage.getItem("custom:isSuperAdmin")
-			.then((value) => {
-				if (value === "true") {
-					var clientId = "";
-					var domainNames = [];
-					AsyncStorage.getItem("custom:clientId1")
-						.then((value) => {
-							clientId = value;
-							console.log(clientId);
-							axios.get(UrmService.getDomains() + clientId).then((res) => {
-								if (res.data && res.data["isSuccess"] === "true") {
-									for (var i = 0; i < res.data["result"].length; i++) {
-										let number = res.data.result[i];
-										console.log(number);
-										this.state.domainNamesArray.push({
-											name: number.domaiName,
-											id: number.clientDomainaId,
-										});
-										console.log(this.state.domainNamesArray);
-										domainNames.push({
-											value: this.state.domainNamesArray[i].name,
-											label: this.state.domainNamesArray[i].name,
-										});
-										this.setState({
-											domainNames: domainNames,
-										});
-										this.setState({
-											domainNamesArray: this.state.domainNamesArray,
-										});
-									}
-								}
-							});
-						})
-						.catch(() => {
-							this.setState({ loading: false });
-							console.log("There is error getting phone numner");
-							//  alert('There is error getting phone numner');
-						});
-				} else {
-					AsyncStorage.getItem("domainDataId")
-						.then((value) => {
-							console.log("sdasfsafsafsfaasf" + value);
-							var domainNames = [];
-							axios.get(UrmService.getDomainName() + value).then((res) => {
-								if (res.data && res.data["isSuccess"] === "true") {
-									let number = res.data.result;
-									console.log(res.data.result);
-									this.state.domainNamesArray.push({
-										name: number.domaiName,
-										id: number.clientDomainaId,
-									});
-									console.log(this.state.domainNamesArray[0].name);
-									domainNames.push({
-										value: this.state.domainNamesArray[0].name,
-										label: this.state.domainNamesArray[0].name,
-									});
-									this.setState({
-										domainNames: domainNames,
-									});
-									this.setState({
-										domainNamesArray: this.state.domainNamesArray,
-									});
-								}
-							});
-						})
-						.catch(() => {
-							this.setState({ loading: false });
-							console.log("There is error saving token");
-							// alert('There is error saving token');
-						});
-				}
-			})
-			.catch(() => {
-				this.setState({ loading: false });
-				console.log("There is error getting storeId");
-				// alert('There is error getting storeId');
-			});
-
 		var phonenumber = "";
 		AsyncStorage.getItem("phone_number")
 			.then((value) => {
@@ -291,10 +212,8 @@ class Settings extends Component {
 			.catch(() => {
 				this.setState({ loading: false });
 				console.log("There is error getting phone numner");
-				// alert('There is error getting phone numner');
 			});
 		const username = await AsyncStorage.getItem("username");
-		//console.log(ProfileService.getUser() + "+919895695626")
 		this.setState({ loading: true });
 		axios
 			.get(ProfileService.getUser() + username)

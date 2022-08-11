@@ -238,6 +238,25 @@ export default class ProductCombo extends Component {
 		});
 	}
 
+	applyBarcodeFilter() {
+		const { startDate, endDate, storeId } = this.state;
+		InventoryService.getProductCombo(startDate, endDate, storeId).then(
+			(res) => {
+				console.log({ res });
+				if (res?.data && res.data.status === 200) {
+					this.setState({
+						filteredProductsList: res.data.result,
+						filterActive: true,
+						modalVisible: false,
+					});
+				} else {
+					this.setState({ modalVisible: false });
+					alert(res.data.message);
+				}
+			},
+		);
+	}
+
 	render() {
 		return (
 			<View>
@@ -287,7 +306,11 @@ export default class ProductCombo extends Component {
 							</View>
 						</View>
 					}
-					data={this.state.productComboList}
+					data={
+						this.state.filterActive
+							? this.state.filteredProductsList
+							: this.state.productComboList
+					}
 					scrollEnabled={true}
 					keyExtractor={(item, i) => i.toString()}
 					ListEmptyComponent={

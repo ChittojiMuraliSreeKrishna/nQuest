@@ -2,14 +2,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import React, { Component } from "react";
 import {
-	Dimensions,
-	Image,
-	ScrollView,
-	StyleSheet,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	View,
+  Dimensions,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from "react-native";
 import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
@@ -18,30 +18,30 @@ import { Chevron } from "react-native-shapes";
 import Loader from "../../commonUtils/loader";
 import { RF } from "../../Responsive";
 import {
-	accountingErrorMessages,
-	errorLength,
-	urmErrorMessages,
+  accountingErrorMessages,
+  errorLength,
+  urmErrorMessages
 } from "../Errors/errors";
 import Message from "../Errors/Message";
 import LoginService from "../services/LoginService";
 import UrmService from "../services/UrmService";
 import {
-	cancelBtn,
-	cancelBtnText,
-	inputField,
-	inputHeading,
-	rnPicker,
-	rnPickerContainer,
-	rnPickerError,
-	submitBtn,
-	submitBtnText,
+  cancelBtn,
+  cancelBtnText,
+  inputField,
+  inputHeading,
+  rnPicker,
+  rnPickerContainer,
+  rnPickerError,
+  submitBtn,
+  submitBtnText
 } from "../Styles/FormFields";
 import {
-	backButton,
-	backButtonImage,
-	headerTitle,
-	headerTitleContainer,
-	headerTitleSubContainer,
+  backButton,
+  backButtonImage,
+  headerTitle,
+  headerTitleContainer,
+  headerTitleSubContainer
 } from "../Styles/Styles";
 
 var deviceHeight = Dimensions.get("window").height;
@@ -201,17 +201,12 @@ export default class AddStore extends Component {
 		this.setState({ states: [] });
 		this.setState({ loading: false });
 		var states = [];
-		axios.get(UrmService.getStates()).then((res) => {
+		UrmService.getStates().then((res) => {
 			if (res.data["result"]) {
 				for (var i = 0; i < res.data["result"].length; i++) {
-					this.state.statesArray.push({
-						name: res.data["result"][i].stateName,
-						id: res.data["result"][i].stateId,
-						code: res.data["result"][i].stateCode,
-					});
 					states.push({
-						value: this.state.statesArray[i].name,
-						label: this.state.statesArray[i].name,
+						value: res.data.result[i].stateCode,
+						label: res.data.result[i].stateName,
 					});
 
 					if (res.data["result"][i].stateId === this.state.stateId) {
@@ -228,27 +223,24 @@ export default class AddStore extends Component {
 			}
 		});
 	}
+	handleStoreState = (value) => {
+		this.setState({ storeState: value, statecode: value }, () => {
+			console.log(this.state.statecode, "yktld");
+			this.getMasterDistrictsList(this.state.statecode);
+		});
+	};
 
+	// Store Districts
 	getMasterDistrictsList() {
 		this.setState({ loading: false, dictricts: [], dictrictArray: [] });
-		const params = {
-			stateCode: this.state.statecode,
-		};
-		console.log(params);
-		axios.get(UrmService.getDistricts(), { params }).then((res) => {
+		UrmService.getDistricts(this.state.statecode).then((res) => {
 			if (res.data["result"]) {
 				this.setState({ loading: false });
 				let dictricts = [];
-				// this.setState({  });
-				// this.setState({ dictrictArray: [] });
 				for (var i = 0; i < res.data["result"].length; i++) {
-					this.state.dictrictArray.push({
-						name: res.data["result"][i].districtName,
-						id: res.data["result"][i].districtId,
-					});
 					dictricts.push({
-						value: this.state.dictrictArray[i].name,
-						label: this.state.dictrictArray[i].name,
+						value: res.data.result[i].districtId,
+						label: res.data.result[i].districtName,
 					});
 					this.setState({
 						dictricts: dictricts,
@@ -262,6 +254,9 @@ export default class AddStore extends Component {
 			}
 		});
 	}
+	handleDistrict = (value) => {
+		this.setState({ storeDistrict: value, districtId: value });
+	};
 
 	handleDistrict = (value) => {
 		for (let i = 0; i < this.state.dictrictArray.length; i++) {

@@ -103,15 +103,21 @@ export default class Users extends Component {
 			storeName: branch ? branch.trim() : null,
 			clientId: clientId,
 		};
-		UrmService.getUserDetails(searchUser, pageNumber).then((res) => {
+		UrmService.getUserBySearch(searchUser, pageNumber).then((res) => {
 			if (res) {
-				let filteredUserRes = res.data.result.content;
-				console.log({ filteredUserRes });
-				this.setState({
-					modalVisible: false,
-					filterActive: true,
-					filterUserList: filteredUserRes,
-				});
+				console.log({ res });
+				if (res?.data && res.data.status === 200) {
+					let filteredUserRes = res.data.result.content;
+					console.log({ filteredUserRes });
+					this.setState({
+						modalVisible: false,
+						filterActive: true,
+						filterUserList: filteredUserRes,
+					});
+				} else {
+					this.setState({ modalVisible: false });
+					alert(res.data.message);
+				}
 			}
 		});
 	}
@@ -252,14 +258,11 @@ export default class Users extends Component {
 												})}
 											</Text>
 											<View style={scss.buttonContainer}>
-												<Text style={(scss.textStyleLight, scss.text_right)}>
-													Status {"\n"}
-													{item.isActive ? (
-														<Text style={[scss.active_txt]}>Active</Text>
-													) : (
-														<Text style={[scss.inactive_txt]}>In-Active</Text>
-													)}
-												</Text>
+												{item.isActive ? (
+													<Text style={[scss.active_txt]}>Active</Text>
+												) : (
+													<Text style={[scss.inactive_txt]}>In-Active</Text>
+												)}
 											</View>
 										</View>
 										<View style={scss.textContainer}></View>

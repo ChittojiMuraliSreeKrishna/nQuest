@@ -10,7 +10,6 @@ export default class InventoryNavigation extends Component {
 	render() {
 		return (
 			<>
-				{/* <TopBar {...this.props}/> */}
 				<Stack.Navigator>
 					<Stack.Screen
 						name="Inventory"

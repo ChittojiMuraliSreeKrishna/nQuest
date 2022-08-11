@@ -1,5 +1,4 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
 import React, { Component } from "react";
 import {
 	Dimensions,
@@ -137,17 +136,12 @@ export default class Stores extends Component {
 		this.setState({ states: [] });
 		this.setState({ loading: false });
 		var states = [];
-		axios.get(UrmService.getStates()).then((res) => {
+		UrmService.getStates().then((res) => {
 			if (res.data["result"]) {
 				for (var i = 0; i < res.data["result"].length; i++) {
-					this.state.statesArray.push({
-						name: res.data["result"][i].stateName,
-						id: res.data["result"][i].stateId,
-						code: res.data["result"][i].stateCode,
-					});
 					states.push({
-						value: this.state.statesArray[i].name,
-						label: this.state.statesArray[i].name,
+						value: res.data.result[i].stateCode,
+						label: res.data.result[i].stateName,
 					});
 
 					if (res.data["result"][i].stateId === this.state.stateId) {
@@ -165,36 +159,23 @@ export default class Stores extends Component {
 		});
 	}
 	handleStoreState = (value) => {
-		for (let i = 0; i < this.state.statesArray.length; i++) {
-			if (this.state.statesArray[i].name === value) {
-				this.setState({ stateId: this.state.statesArray[i].id });
-				this.setState({ statecode: this.state.statesArray[i].code });
-			}
-		}
-		this.setState({ storeState: value }, () => {
-			this.getMasterDistrictsList();
+		this.setState({ storeState: value, statecode: value }, () => {
+			console.log(this.state.statecode, "yktld");
+			this.getMasterDistrictsList(this.state.statecode);
 		});
 	};
 
 	// Store Districts
 	getMasterDistrictsList() {
 		this.setState({ loading: false, dictricts: [], dictrictArray: [] });
-		const params = {
-			stateCode: this.state.statecode,
-		};
-		console.log(params);
-		axios.get(UrmService.getDistricts(), { params }).then((res) => {
+		UrmService.getDistricts(this.state.statecode).then((res) => {
 			if (res.data["result"]) {
 				this.setState({ loading: false });
 				let dictricts = [];
 				for (var i = 0; i < res.data["result"].length; i++) {
-					this.state.dictrictArray.push({
-						name: res.data["result"][i].districtName,
-						id: res.data["result"][i].districtId,
-					});
 					dictricts.push({
-						value: this.state.dictrictArray[i].name,
-						label: this.state.dictrictArray[i].name,
+						value: res.data.result[i].districtId,
+						label: res.data.result[i].districtName,
 					});
 					this.setState({
 						dictricts: dictricts,
@@ -209,12 +190,7 @@ export default class Stores extends Component {
 		});
 	}
 	handleDistrict = (value) => {
-		for (let i = 0; i < this.state.dictrictArray.length; i++) {
-			if (this.state.dictrictArray[i].name === value) {
-				this.setState({ districtId: this.state.dictrictArray[i].id });
-			}
-		}
-		this.setState({ storeDistrict: value });
+		this.setState({ storeDistrict: value, districtId: value });
 	};
 
 	// Store Name Actions
@@ -231,8 +207,7 @@ export default class Stores extends Component {
 			storeName: this.state.storeName ? this.state.storeName : null,
 		};
 		console.log("store search", searchStore);
-		axios
-			.post(UrmService.getStoresBySearch(), searchStore)
+		UrmService.getStoresBySearch(searchStore)
 			.then((res) => {
 				if (res) {
 					if (res.data.isSuccess === "true") {
@@ -277,7 +252,7 @@ export default class Stores extends Component {
 									{this.state.storesList.length}
 								</Text>
 							</Text>
-            <View style={scss.subHeader}>
+							<View style={scss.subHeader}>
 								<TouchableOpacity
 									style={[filterBtn]}
 									onPress={() => this.handleCreateStore()}
@@ -468,7 +443,7 @@ export default class Stores extends Component {
 												);
 											}}
 											items={this.state.states}
-											onValueChange={this.handleStoreState}
+											onValueChange={(value) => this.handleStoreState(value)}
 											style={rnPicker}
 											value={this.state.storeState}
 											useNativeAndroidPickerStyle={false}
@@ -489,7 +464,7 @@ export default class Stores extends Component {
 												);
 											}}
 											items={this.state.dictricts}
-											onValueChange={this.handleDistrict}
+											onValueChange={(value) => this.handleDistrict(value)}
 											style={rnPicker}
 											value={this.state.storeDistrict}
 											useNativeAndroidPickerStyle={false}
