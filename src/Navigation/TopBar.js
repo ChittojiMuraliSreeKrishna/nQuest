@@ -1,5 +1,4 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
 import React, { Component } from "react";
 import {
 	FlatList,
@@ -162,53 +161,51 @@ export class TopBar extends Component {
 				AsyncStorage.getItem("rolename")
 					.then((value) => {
 						global.userrole = value;
-						axios
-							.get(UrmService.getPrivillagesByRoleName() + value)
-							.then((res) => {
-								console.log({ res });
-								if (res.data) {
-									let len = res.data.parentPrivileges.length;
-									if (len > 0) {
-										this.setState({
-											firstDisplayName: res.data.parentPrivileges[0].name,
-										});
-										const firstDisplayName = this.state.firstDisplayName;
-										console.log({ firstDisplayName });
-										firstDisplayRoute = res.data.parentPrivileges[0].name;
-										var privilegesSet = new Set();
-										// this.props.navigation.navigate(firstDisplayName);
-										for (let i = 0; i < len; i++) {
-											let previlage = res.data.parentPrivileges[i];
-											if (previlage.name === "Dashboard") {
-												global.previlage1 = "Dashboard";
-											}
-											if (previlage.name === "Billing Portal") {
-												global.previlage2 = "Billing Portal";
-											}
-											if (previlage.name === "Inventory Portal") {
-												global.previlage3 = "Inventory Portal";
-											}
-											if (previlage.name === "Promotions & Loyalty") {
-												global.previlage4 = "Promotions & Loyalty";
-											}
-											if (previlage.name === "Accounting Portal") {
-												global.previlage5 = "Accounting Portal";
-											}
-											if (previlage.name === "Reports") {
-												global.previlage6 = "Reports";
-											}
-											if (previlage.name === "URM Portal") {
-												global.previlage7 = "URM Portal";
-											}
-											privilegesSet.add(previlage.name);
-											// data.push(previlage.name);
+						UrmService.getPrivillagesByRoleName(value).then((res) => {
+							console.log({ res });
+							if (res.data) {
+								let len = res.data.parentPrivileges.length;
+								if (len > 0) {
+									this.setState({
+										firstDisplayName: res.data.parentPrivileges[0].name,
+									});
+									const firstDisplayName = this.state.firstDisplayName;
+									console.log({ firstDisplayName });
+									firstDisplayRoute = res.data.parentPrivileges[0].name;
+									var privilegesSet = new Set();
+									// this.props.navigation.navigate(firstDisplayName);
+									for (let i = 0; i < len; i++) {
+										let previlage = res.data.parentPrivileges[i];
+										if (previlage.name === "Dashboard") {
+											global.previlage1 = "Dashboard";
 										}
-										data = Array.from(privilegesSet);
+										if (previlage.name === "Billing Portal") {
+											global.previlage2 = "Billing Portal";
+										}
+										if (previlage.name === "Inventory Portal") {
+											global.previlage3 = "Inventory Portal";
+										}
+										if (previlage.name === "Promotions & Loyalty") {
+											global.previlage4 = "Promotions & Loyalty";
+										}
+										if (previlage.name === "Accounting Portal") {
+											global.previlage5 = "Accounting Portal";
+										}
+										if (previlage.name === "Reports") {
+											global.previlage6 = "Reports";
+										}
+										if (previlage.name === "URM Portal") {
+											global.previlage7 = "URM Portal";
+										}
+										privilegesSet.add(previlage.name);
+										// data.push(previlage.name);
 									}
-
-									this.getData();
+									data = Array.from(privilegesSet);
 								}
-							});
+
+								this.getData();
+							}
+						});
 					})
 					.catch((err) => {
 						console.log(err);

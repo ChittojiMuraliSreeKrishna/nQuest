@@ -15,6 +15,7 @@ import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
 import RNPickerSelect from "react-native-picker-select";
 import { Chevron } from "react-native-shapes";
+import forms from "../../commonUtils/assets/styles/formFields.scss";
 import Loader from "../../commonUtils/loader";
 import { RF, RH, RW } from "../../Responsive";
 import {
@@ -25,7 +26,6 @@ import {
 import Message from "../Errors/Message";
 import InventoryService from "../services/InventoryService";
 import {
-	cancelBtn,
 	cancelBtnText,
 	datePicker,
 	datePickerBtnText,
@@ -33,12 +33,9 @@ import {
 	datePickerButton2,
 	dateSelector,
 	dateText,
-	inputField,
 	inputHeading,
 	rnPicker,
-	rnPickerContainer,
 	rnPickerError,
-	submitBtn,
 	submitBtnText,
 } from "../Styles/FormFields";
 import {
@@ -652,7 +649,7 @@ class AddBarcode extends Component {
 					</Text>
 					<View
 						style={[
-							rnPickerContainer,
+							forms.rnp_container,
 							{ borderColor: divisionValid ? "#8F9EB718" : "#dd0000" },
 						]}
 					>
@@ -686,7 +683,7 @@ class AddBarcode extends Component {
 							</Text>
 							<View
 								style={[
-									rnPickerContainer,
+									forms.rnp_container,
 									{ borderColor: divisionValid ? "#8F9EB718" : "#dd0000" },
 								]}
 							>
@@ -718,7 +715,7 @@ class AddBarcode extends Component {
 							</Text>
 							<View
 								style={[
-									rnPickerContainer,
+									forms.rnp_container,
 									{ borderColor: sectionValid ? "#8F9EB718" : "#dd0000" },
 								]}
 							>
@@ -751,7 +748,7 @@ class AddBarcode extends Component {
 							</Text>
 							<View
 								style={[
-									rnPickerContainer,
+									forms.rnp_container,
 									{ borderColor: subSectionValid ? "#8F9EB718" : "#dd0000" },
 								]}
 							>
@@ -783,7 +780,7 @@ class AddBarcode extends Component {
 							</Text>
 							<View
 								style={[
-									rnPickerContainer,
+									forms.rnp_container,
 									{ borderColor: categoryValid ? "#8F9EB718" : "#dd0000" },
 								]}
 							>
@@ -819,7 +816,7 @@ class AddBarcode extends Component {
 							</Text>
 							<View
 								style={[
-									rnPickerContainer,
+									forms.rnp_container,
 									{ borderColor: divisionValid ? "#8F9EB718" : "#dd0000" },
 								]}
 							>
@@ -889,17 +886,17 @@ class AddBarcode extends Component {
 						</View>
 					)}
 					<Text style={inputHeading}>
-						{" "}
 						{I18n.t("Colour")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
 					</Text>
 					<TextInput
 						style={[
-							inputField,
+							forms.input_fld,
+							forms.active_fld,
 							{ borderColor: colorValid ? "#8F9EB718" : "#dd0000" },
 						]}
 						underlineColorAndroid="transparent"
 						placeholder={I18n.t("Colour")}
-						placeholderTextColor={colorValid ? "#6F6F6F17" : "#dd0000"}
+						placeholderTextColor={colorValid ? "#6F6F6F67" : "#dd0000"}
 						textAlignVertical="center"
 						maxLength={12}
 						autoCapitalize="none"
@@ -911,17 +908,17 @@ class AddBarcode extends Component {
 						<Message imp={true} message={this.state.errors["color"]} />
 					)}
 					<Text style={inputHeading}>
-						{" "}
 						{I18n.t("Name")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
 					</Text>
 					<TextInput
 						style={[
-							inputField,
+							forms.input_fld,
+							forms.active_fld,
 							{ borderColor: nameValid ? "#8F9EB718" : "#dd0000" },
 						]}
 						underlineColorAndroid="transparent"
 						placeholder={I18n.t("Name")}
-						placeholderTextColor={nameValid ? "#6F6F6F17" : "#dd0000"}
+						placeholderTextColor={nameValid ? "#6F6F6F67" : "#dd0000"}
 						maxLength={25}
 						textAlignVertical="center"
 						autoCapitalize="none"
@@ -937,12 +934,13 @@ class AddBarcode extends Component {
 					</Text>
 					<TextInput
 						style={[
-							inputField,
+							forms.input_fld,
+							forms.active_fld,
 							{ borderColor: batchNoValid ? "#8F9EB718" : "#dd0000" },
 						]}
 						underlineColorAndroid="transparent"
 						placeholder={I18n.t("Batch No")}
-						placeholderTextColor={batchNoValid ? "#6F6F6F17" : "#dd0000"}
+						placeholderTextColor={batchNoValid ? "#6F6F6F67" : "#dd0000"}
 						textAlignVertical="center"
 						maxLength={12}
 						autoCapitalize="none"
@@ -958,14 +956,15 @@ class AddBarcode extends Component {
 					</Text>
 					<TextInput
 						style={[
-							inputField,
+							forms.input_fld,
+							forms.active_fld,
 							{ borderColor: costPriceValid ? "#8F9EB718" : "#dd0000" },
 						]}
 						underlineColorAndroid="transparent"
 						placeholder={I18n.t("Cost Price")}
 						keyboardType={"numeric"}
 						textContentType="telephoneNumber"
-						placeholderTextColor={costPriceValid ? "#6F6F6F17" : "#dd0000"}
+						placeholderTextColor={costPriceValid ? "#6F6F6F67" : "#dd0000"}
 						textAlignVertical="center"
 						autoCapitalize="none"
 						maxLength={10}
@@ -981,14 +980,15 @@ class AddBarcode extends Component {
 					</Text>
 					<TextInput
 						style={[
-							inputField,
+							forms.input_fld,
+							forms.active_fld,
 							{ borderColor: listPriceValid ? "#8F9EB718" : "#dd0000" },
 						]}
 						underlineColorAndroid="transparent"
 						placeholder={I18n.t("List Price")}
 						keyboardType={"numeric"}
 						textContentType="telephoneNumber"
-						placeholderTextColor={listPriceValid ? "#6F6F6F17" : "#dd0000"}
+						placeholderTextColor={listPriceValid ? "#6F6F6F67" : "#dd0000"}
 						textAlignVertical="center"
 						autoCapitalize="none"
 						maxLength={10}
@@ -1004,7 +1004,7 @@ class AddBarcode extends Component {
 					</Text>
 					<View
 						style={[
-							rnPickerContainer,
+							forms.rnp_container,
 							{ borderColor: uomValid ? "#8F9EB718" : "#dd0000" },
 						]}
 					>
@@ -1036,7 +1036,7 @@ class AddBarcode extends Component {
 					</Text>
 					<View
 						style={[
-							rnPickerContainer,
+							forms.rnp_container,
 							{ borderColor: hsnValid ? "#8F9EB718" : "#dd0000" },
 						]}
 					>
@@ -1068,12 +1068,13 @@ class AddBarcode extends Component {
 					</Text>
 					<TextInput
 						style={[
-							inputField,
+							forms.input_fld,
+							forms.active_fld,
 							{ borderColor: empValid ? "#8F9EB718" : "#dd0000" },
 						]}
 						underlineColorAndroid="transparent"
 						placeholder="EMP ID"
-						placeholderTextColor={empValid ? "#6F6F6F17" : "#dd0000"}
+						placeholderTextColor={empValid ? "#6F6F6F67" : "#dd0000"}
 						textAlignVertical="center"
 						maxLength={10}
 						autoCapitalize="none"
@@ -1089,7 +1090,7 @@ class AddBarcode extends Component {
 					</Text>
 					<View
 						style={[
-							rnPickerContainer,
+							forms.rnp_container,
 							{ borderColor: storeValid ? "#8F9EB718" : "#dd0000" },
 						]}
 					>
@@ -1121,12 +1122,13 @@ class AddBarcode extends Component {
 					</Text>
 					<TextInput
 						style={[
-							inputField,
+							forms.input_fld,
+							forms.active_fld,
 							{ borderColor: storeValid ? "#8F9EB718" : "#dd0000" },
 						]}
 						underlineColorAndroid="transparent"
 						placeholder="QTY"
-						placeholderTextColor={storeValid ? "#6F6F6F17" : "#dd0000"}
+						placeholderTextColor={storeValid ? "#6F6F6F67" : "#dd0000"}
 						textAlignVertical="center"
 						maxLength={12}
 						autoCapitalize="none"
@@ -1137,15 +1139,20 @@ class AddBarcode extends Component {
 					{!qtyValid && (
 						<Message imp={true} message={this.state.errors["qty"]} />
 					)}
-					<TouchableOpacity
-						style={submitBtn}
-						onPress={() => this.saveBarcode()}
-					>
-						<Text style={submitBtnText}>{I18n.t("SAVE")}</Text>
-					</TouchableOpacity>
-					<TouchableOpacity style={cancelBtn} onPress={() => this.cancel()}>
-						<Text style={cancelBtnText}>{I18n.t("CANCEL")}</Text>
-					</TouchableOpacity>
+					<View style={forms.form_btn_container}>
+						<TouchableOpacity
+							style={forms.cancel_btn}
+							onPress={() => this.cancel()}
+						>
+							<Text style={cancelBtnText}>{I18n.t("CANCEL")}</Text>
+						</TouchableOpacity>
+						<TouchableOpacity
+							style={forms.submit_btn}
+							onPress={() => this.saveBarcode()}
+						>
+							<Text style={submitBtnText}>{I18n.t("SAVE")}</Text>
+						</TouchableOpacity>
+					</View>
 					<View style={styles.bottomContainer}></View>
 				</ScrollView>
 			</View>

@@ -15,13 +15,10 @@ import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
 import RNPickerSelect from "react-native-picker-select";
 import { Chevron } from "react-native-shapes";
+import forms from "../../commonUtils/assets/styles/formFields.scss";
 import Loader from "../../commonUtils/loader";
 import { RF, RH, RW } from "../../Responsive";
-import {
-	accountingErrorMessages,
-	errorLength,
-	inventoryErrorMessages,
-} from "../Errors/errors";
+import { errorLength, inventoryErrorMessages } from "../Errors/errors";
 import Message from "../Errors/Message";
 import InventoryService from "../services/InventoryService";
 import {
@@ -33,7 +30,6 @@ import {
 	datePickerButton2,
 	dateSelector,
 	dateText,
-	inputField,
 	inputHeading,
 	rnPicker,
 	rnPickerContainer,
@@ -130,6 +126,7 @@ class EditBarcode extends Component {
 			doneButtonClicked: false,
 			reBar: false,
 			navText: "",
+			barcodeId: null,
 		};
 	}
 
@@ -144,7 +141,11 @@ class EditBarcode extends Component {
 		} else {
 			this.setState({ navText: "Edit Barcode" });
 		}
-		this.setState({ isEdit: editBcode.isEdit, reBar: editBcode.reBar });
+		this.setState({
+			isEdit: editBcode.isEdit,
+			reBar: editBcode.reBar,
+			loading: true,
+		});
 		console.log({ editBcode });
 		this.setState(
 			{
@@ -161,10 +162,10 @@ class EditBarcode extends Component {
 				batchNo: editBcode.item.batchNo,
 				costPrice: String(editBcode.item.costPrice),
 				listPrice: String(editBcode.item.itemMrp),
-				uomName: editBcode.item.uom,
-				uomId: editBcode.item.uom,
-				hsnCode: editBcode.item.hsnCode,
-				hsnId: editBcode.item.hsnCode,
+				uomName: parseInt(editBcode.item.uom),
+				uomId: parseInt(editBcode.item.uom),
+				hsnCode: parseInt(editBcode.item.hsnCode),
+				hsnId: parseInt(editBcode.item.hsnCode),
 				empId: editBcode.item.empId,
 				storeId: editBcode.item.storeId,
 				store: editBcode.item.storeId,
@@ -174,6 +175,7 @@ class EditBarcode extends Component {
 				name: editBcode.item.name,
 				reBar: editBcode.reBar,
 				empId: String(editBcode.item.empId),
+				barcodeId: parseInt(editBcode.item.id),
 			},
 			() => {
 				const { selectedDomain } = this.state;
@@ -186,6 +188,7 @@ class EditBarcode extends Component {
 				this.getAllstores(selectedDomain);
 				this.getAllHSNCodes();
 				this.getAllUOM();
+				this.setState({ loading: false });
 			},
 		);
 		// alert(this.state.storeId);
@@ -194,6 +197,7 @@ class EditBarcode extends Component {
 	// Go Back Actions
 	handleBackButtonClick() {
 		this.props.navigation.goBack(null);
+		this.props.route.params.onGoBack(null);
 		return true;
 	}
 	// Domain Actions
@@ -325,7 +329,7 @@ class EditBarcode extends Component {
 				console.log("UOMS", res.data);
 				for (let i = 0; i < res.data.length; i++) {
 					uomList.push({
-						value: res.data[i].uomName,
+						value: res.data[i].id,
 						label: res.data[i].uomName,
 					});
 				}
@@ -526,70 +530,22 @@ class EditBarcode extends Component {
 	validationForm() {
 		let isFormValid = true;
 		let errors = {};
-		if (this.state.name.length < errorLength.name) {
-			isFormValid = false;
-			errors["name"] = inventoryErrorMessages.name;
-			this.setState({ nameValid: false });
-		}
-		if (this.state.divisionId === null) {
-			isFormValid = false;
-			errors["divison"] = inventoryErrorMessages.divisionId;
-			this.setState({ divisionValid: false });
-		}
-		if (this.state.sectionId === null) {
-			isFormValid = false;
-			errors["section"] = inventoryErrorMessages.sectionId;
-			this.setState({ sectionValid: false });
-		}
-		if (this.state.subsectionId === null) {
-			isFormValid = false;
-			errors["subSection"] = inventoryErrorMessages.subSectionId;
-			this.setState({ subSectionValid: false });
-		}
-		if (this.state.catogirieId === null) {
-			isFormValid = false;
-			errors["category"] = inventoryErrorMessages.category;
-			this.setState({ categoryValid: false });
-		}
-		if (String(this.state.colour).length < errorLength.colour) {
-			isFormValid = false;
-			errors["color"] = inventoryErrorMessages.colour;
-			this.setState({ colorValid: false });
-		}
-		if (String(this.state.batchNo).length === 0) {
-			isFormValid = false;
-			errors["batchNo"] = inventoryErrorMessages.batchNo;
-			this.setState({ batchNoValid: false });
-		}
-		if (this.state.costPrice === null) {
-			isFormValid = false;
-			errors["costPrice"] = inventoryErrorMessages.costPrice;
-			this.setState({ costPriceValid: false });
-		}
-		if (this.state.listPrice === null) {
-			isFormValid = false;
-			errors["listPrice"] = inventoryErrorMessages.listPrice;
-			this.setState({ listPriceValid: false });
-		}
-		if (this.state.uomId === null) {
-			isFormValid = false;
-			errors["uom"] = inventoryErrorMessages.uom;
-			this.setState({ uomValid: false });
+		if (this.state.reBar === true) {
+			if (this.state.costPrice === null) {
+				isFormValid = false;
+				errors["costPrice"] = inventoryErrorMessages.costPrice;
+				this.setState({ costPriceValid: false });
+			}
+			if (this.state.listPrice === null) {
+				isFormValid = false;
+				errors["listPrice"] = inventoryErrorMessages.listPrice;
+				this.setState({ listPriceValid: false });
+			}
 		}
 		if (this.state.hsnId === null) {
 			isFormValid = false;
 			errors["hsn"] = inventoryErrorMessages.hsnCode;
 			this.setState({ hsnValid: false });
-		}
-		if (String(this.state.empId).length < errorLength.empId) {
-			isFormValid = false;
-			errors["emp"] = inventoryErrorMessages.empId;
-			this.setState({ empValid: false });
-		}
-		if (this.state.store === undefined) {
-			isFormValid = false;
-			errors["store"] = accountingErrorMessages.store;
-			this.setState({ storeValid: false });
 		}
 		if (String(this.state.quantity).length === 0) {
 			isFormValid = false;
@@ -629,6 +585,7 @@ class EditBarcode extends Component {
 				storeId: this.state.storeId,
 				uom: this.state.uomName,
 				domainType: this.state.selectedDomain,
+				id: this.state.barcodeId,
 			};
 			this.setState({ loading: true });
 			console.log({ params });
@@ -638,15 +595,17 @@ class EditBarcode extends Component {
 			} else {
 				value = "Edit";
 			}
-			alert(selectedDomain);
 			InventoryService.saveBarCode(params, selectedDomain, isEdit, value)
 				.then((res) => {
-					if (res?.data) {
+					console.log({ res });
+					if (res?.data && res.request.status === 200) {
 						let response = res.data;
 						console.log({ response });
 						this.props.route.params.onGoBack();
 						this.props.navigation.goBack();
-						alert(response.message);
+						alert("barcode updated successfully");
+					} else {
+						alert(res.data.message);
 					}
 					this.setState({ loading: false });
 				})
@@ -951,7 +910,8 @@ class EditBarcode extends Component {
 					</Text>
 					<TextInput
 						style={[
-							inputField,
+							forms.input_fld,
+							forms.inactive_fld,
 							{ borderColor: colorValid ? "#8F9EB718" : "#dd0000" },
 						]}
 						underlineColorAndroid="transparent"
@@ -974,7 +934,8 @@ class EditBarcode extends Component {
 					</Text>
 					<TextInput
 						style={[
-							inputField,
+							forms.input_fld,
+							forms.inactive_fld,
 							{ borderColor: nameValid ? "#8F9EB718" : "#dd0000" },
 						]}
 						underlineColorAndroid="transparent"
@@ -996,7 +957,8 @@ class EditBarcode extends Component {
 					</Text>
 					<TextInput
 						style={[
-							inputField,
+							forms.input_fld,
+							forms.inactive_fld,
 							{ borderColor: batchNoValid ? "#8F9EB718" : "#dd0000" },
 						]}
 						underlineColorAndroid="transparent"
@@ -1018,7 +980,8 @@ class EditBarcode extends Component {
 					</Text>
 					<TextInput
 						style={[
-							inputField,
+							forms.input_fld,
+							forms.inactive_fld,
 							{ borderColor: costPriceValid ? "#8F9EB718" : "#dd0000" },
 						]}
 						underlineColorAndroid="transparent"
@@ -1042,7 +1005,8 @@ class EditBarcode extends Component {
 					</Text>
 					<TextInput
 						style={[
-							inputField,
+							forms.input_fld,
+							this.state.reBar ? forms.active_fld : forms.inactive_fld,
 							{ borderColor: listPriceValid ? "#8F9EB718" : "#dd0000" },
 						]}
 						underlineColorAndroid="transparent"
@@ -1131,7 +1095,8 @@ class EditBarcode extends Component {
 					</Text>
 					<TextInput
 						style={[
-							inputField,
+							forms.input_fld,
+							forms.active_fld,
 							{ borderColor: empValid ? "#8F9EB718" : "#dd0000" },
 						]}
 						underlineColorAndroid="transparent"
@@ -1186,7 +1151,8 @@ class EditBarcode extends Component {
 					</Text>
 					<TextInput
 						style={[
-							inputField,
+							forms.input_fld,
+							forms.active_fld,
 							{ borderColor: storeValid ? "#8F9EB718" : "#dd0000" },
 						]}
 						underlineColorAndroid="transparent"

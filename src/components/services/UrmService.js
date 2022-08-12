@@ -48,10 +48,11 @@ class UrmService {
 	}
 
 	// Get Privileges By RoleName
-	getPrivillagesByRoleName() {
+	getPrivillagesByRoleName(value) {
 		let assignedRoles = BASE_URL + USER_MANAGEMENT_URL.getPrivilegesByRoleName;
+		let param = "/" + value;
 		console.log({ assignedRoles });
-		return assignedRoles;
+		return axios.get(assignedRoles + param);
 	}
 
 	// Getting Roles

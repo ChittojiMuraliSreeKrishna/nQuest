@@ -59,34 +59,44 @@ class InventoryService {
 		return axios.get(BASE_URL + USER_MANAGEMENT_URL.getAllStores + storesParam);
 	}
 
+  // Get all hsns 
 	getAllHsnList() {
 		return axios.get(BASE_URL + INVENTORY_PORTAL.getAllHsnList);
 	}
 
-	// Save Barcode -> AddBarcode.js
+	// Save Barocodes
 	saveBarCode(list, domain, isEdit, value) {
 		console.log({ list, domain, isEdit, value });
 		if (domain && domain.label === "Retail") {
+			// Edit Barcode -RETAIL- -> EditBarcode.js
 			if (isEdit) {
 				return axios.put(BASE_URL + INVENTORY_PORTAL.updateBarcodes, list);
-			} else {
+			}
+			// Add Barcode -> AddBarcode.js
+			else {
 				return axios.post(BASE_URL + INVENTORY_PORTAL.addBarcodes, list);
 			}
 		} else {
 			if (isEdit) {
+				// Re Barcode -TEXTILE- -> EditBarcode.js
 				if (value === "REBAR") {
-					const reBarcode = INVENTORY_PORTAL.updatTextileBarcodes;
-					console.log({ BASE_URL, reBarcode, list });
-					return axios.put(BASE_URL + reBarcode, list);
-				} else {
-					const updateBarcode = INVENTORY_PORTAL.updateBarcodesQuntity;
-					console.log({ BASE_URL, updateBarcode, list });
-					return axios.put(BASE_URL + updateBarcode, list);
+					const reBarcode = BASE_URL + INVENTORY_PORTAL.updatTextileBarcodes;
+					console.log({ reBarcode, list });
+					return axios.put(reBarcode, list);
 				}
-			} else {
-				const addBarcode = INVENTORY_PORTAL.addTextileBarcodes;
-				console.log({ BASE_URL, addBarcode, list });
-				return axios.post(BASE_URL + addBarcode, list);
+				// Edit Barcode -> EditBarcide.js
+				else {
+					const updateBarcode =
+						BASE_URL + INVENTORY_PORTAL.updateBarcodesQuntity;
+					console.log({ updateBarcode, list });
+					return axios.put(updateBarcode, list);
+				}
+			}
+			// Add Barcode -> AddBarcode.js
+			else {
+				const addBarcode = BASE_URL + INVENTORY_PORTAL.addTextileBarcodes;
+				console.log({ addBarcode, list });
+				return axios.post(addBarcode, list);
 			}
 		}
 	}

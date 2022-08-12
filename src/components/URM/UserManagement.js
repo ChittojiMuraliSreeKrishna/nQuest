@@ -92,16 +92,20 @@ export default class UserManagement extends Component {
 					}
 				}
 			} else {
-				axios.get(UrmService.getPrivillagesByRoleName() + value).then((res) => {
+				UrmService.getPrivillagesByRoleName(value).then((res) => {
+					let resp = res.data.parentPrivileges;
+					console.log({ resp });
 					if (res) {
 						if (res.data) {
 							let len = res.data.parentPrivileges.length;
 							for (let i = 0; i < len; i++) {
 								let privilege = res.data.parentPrivileges[i];
+								console.log({ privilege });
 								if (privilege.name === "URM Portal") {
 									let privilegeId = privilege.id;
-									let sublen = res.data.subPrivileges.length;
-									let subPrivileges = res.data.subPrivileges;
+									let sublen = privilege.subPrivileges.length;
+									let subPrivileges = privilege.subPrivileges;
+									console.log({ subPrivileges });
 									for (let i = 0; i < sublen; i++) {
 										if (privilegeId === subPrivileges[i].parentPrivilegeId) {
 											let routes = subPrivileges[i].name;
