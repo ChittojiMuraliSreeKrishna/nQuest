@@ -71,3 +71,7 @@ export const errorLengthMax = {
   empId: 10,
   organisation: 25
 };
+
+export const customerErrorMessages = {
+  discountAmount : "/Discount amount not more than net payable amount."
+}

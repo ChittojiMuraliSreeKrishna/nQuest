@@ -19,12 +19,12 @@ var currentSelection = "";
 var dataCleared = true;
 var firstDisplayRoute = "";
 export const screenMapping = {
-	Dashboard: "Home",
+	"Dashboard": "Home",
 	"Billing Portal": "CustomerNavigation",
 	"Inventory Portal": "InventoryNavigation",
 	"Promotions & Loyalty": "PromoNavigation",
 	"Accounting Portal": "AccountingNaviagtion",
-	Reports: "ReportsNavigation",
+	"Reports": "ReportsNavigation",
 	"URM Portal": "UrmNavigation",
 };
 
