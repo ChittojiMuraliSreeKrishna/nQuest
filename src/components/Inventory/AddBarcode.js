@@ -662,7 +662,7 @@ class AddBarcode extends Component {
 									<Chevron
 										style={styles.imagealign}
 										size={1.5}
-										color={divisionValid ? "gray" : "#dd0000"}
+										color={divisionValid ? "gray" : "#dd0000ff"}
 									/>
 								);
 							}}
