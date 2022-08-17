@@ -1,30 +1,45 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 import jwt_decode from "jwt-decode";
-import React, { Component } from 'react';
-import { Dimensions, Image, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import Device from 'react-native-device-detection';
-import I18n from 'react-native-i18n';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import Loader from '../../commonUtils/loader';
-import { RF, RH, RW } from '../../Responsive';
-import { errorLength, errorLengthMax, urmErrorMessages } from '../Errors/errors';
-import Message from '../Errors/Message';
-import LoginService from '../services/LoginService';
-import { inputField, submitBtn, submitBtnText } from '../Styles/FormFields';
+import React, { Component } from "react";
+import {
+	Dimensions,
+	Image,
+	SafeAreaView,
+	StyleSheet,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	View,
+} from "react-native";
+import Device from "react-native-device-detection";
+import I18n from "react-native-i18n";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import scss from "../../commonUtils/assets/styles/Registation.scss";
+import Loader from "../../commonUtils/loader";
+import { RF, RH, RW } from "../../Responsive";
+import {
+	errorLength,
+	errorLengthMax,
+	urmErrorMessages,
+} from "../Errors/errors";
+import Message from "../Errors/Message";
+import LoginService from "../services/LoginService";
+import { inputField, submitBtn, submitBtnText } from "../Styles/FormFields";
 
-var deviceheight = Dimensions.get('window').height;
-var deviceheight = Dimensions.get('window').height;
+var deviceheight = Dimensions.get("window").height;
+var deviceheight = Dimensions.get("window").height;
 var deviceWidth = Dimensions.get("window").width;
 export default class Login extends Component {
+
   constructor(props) {
     super(props);
     this.state = {
       rememberMe: false,
       redirect: false,
       isAuth: false,
-      userName: 'sideuser3',
-      password: 'Otsi@123',
+      userName: '',
+      password: '',
       dropValue: '',
       store: 0,
       user: {
@@ -374,181 +389,182 @@ export default class Login extends Component {
       </KeyboardAwareScrollView>
     );
   }
+
 }
 
 const styles = StyleSheet.create({
-  logoImage: {
-    alignSelf: 'center',
-    width: RW(500),
-    height: RH(300),
-  },
-  errorRecords: {
-    color: '#dd0000',
-    fontSize: Device.isTablet ? 17 : 12,
-    marginLeft: RW(30),
-  },
-  containerForActivity: {
-    flex: 1,
-    backgroundColor: '#623FA0',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    color: 'white',
-    fontSize: RF(20),
-    margin: RH(20)
-  },
-  imagealign: {
-    marginTop: RH(40),
-    marginRight: RF(10),
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    height: deviceheight + RH(40),
-    backgroundColor: '#FFFFFF'
-  },
-  ytdImageValue: {
-    alignSelf: 'center',
-  },
-  loading: {
-    flex: 1,
-    justifyContent: 'center'
-    // alignItems: 'center',
-  },
-  mainLogo: {
-    color: '#ED1C24',
-    fontSize: Device.isTablet ? RF(40) : RF(30),
-    fontFamily: "bold",
-  },
-  subLogo: {
-    fontSize: RF(25),
-    fontFamily: 'medium',
-  },
+	logoImage: {
+		alignSelf: "center",
+		width: RW(500),
+		height: RH(300),
+	},
+	errorRecords: {
+		color: "#dd0000",
+		fontSize: Device.isTablet ? 17 : 12,
+		marginLeft: RW(30),
+	},
+	containerForActivity: {
+		flex: 1,
+		backgroundColor: "#623FA0",
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	title: {
+		color: "white",
+		fontSize: RF(20),
+		margin: RH(20),
+	},
+	imagealign: {
+		marginTop: RH(40),
+		marginRight: RF(10),
+	},
+	container: {
+		flex: 1,
+		justifyContent: "center",
+		height: deviceheight + RH(40),
+		backgroundColor: "#FFFFFF",
+	},
+	ytdImageValue: {
+		alignSelf: "center",
+	},
+	loading: {
+		flex: 1,
+		justifyContent: "center",
+		// alignItems: 'center',
+	},
+	mainLogo: {
+		color: "#ED1C24",
+		fontSize: Device.isTablet ? RF(40) : RF(30),
+		fontFamily: "bold",
+	},
+	subLogo: {
+		fontSize: RF(25),
+		fontFamily: "medium",
+	},
 
-  // Mobile Styles
-  hederText_mobile: {
-    color: "#353C40",
-    fontFamily: "bold",
-    marginLeft: RW(20),
-    marginTop: RH(20),
-    flexDirection: 'column',
-    justifyContent: 'center',
-    fontSize: RF(25),
-  },
-  headerText2_mobile: {
-    color: "#353C40",
-    fontSize: RF(20),
-    fontFamily: "bold",
-    marginLeft: RW(10),
-    marginTop: 0,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    height: RH(45),
-    fontSize: RF(28),
-  },
-  bottomImage_mobile: {
-    position: 'absolute',
-    right: 0,
-    bottom: RH(40),
-    width: RW(162),
-    height: RH(170)
-  },
-  navigationText_mobile: {
-    fontSize: RF(16),
-    color: '#858585',
-    fontFamily: "regular",
-  },
-  navigationButtonText_mobile: {
-    color: '#353C40',
-    fontSize: RF(16),
-    fontFamily: "bold",
-    textDecorationLine: 'underline'
-  },
+	// Mobile Styles
+	hederText_mobile: {
+		color: "#353C40",
+		fontFamily: "bold",
+		marginLeft: RW(20),
+		marginTop: RH(20),
+		flexDirection: "column",
+		justifyContent: "center",
+		fontSize: RF(25),
+	},
+	headerText2_mobile: {
+		color: "#353C40",
+		fontSize: RF(20),
+		fontFamily: "bold",
+		marginLeft: RW(10),
+		marginTop: 0,
+		flexDirection: "column",
+		justifyContent: "center",
+		height: RH(45),
+		fontSize: RF(28),
+	},
+	bottomImage_mobile: {
+		position: "absolute",
+		right: 0,
+		bottom: RH(40),
+		width: RW(162),
+		height: RH(170),
+	},
+	navigationText_mobile: {
+		fontSize: RF(16),
+		color: "#858585",
+		fontFamily: "regular",
+	},
+	navigationButtonText_mobile: {
+		color: "#353C40",
+		fontSize: RF(16),
+		fontFamily: "bold",
+		textDecorationLine: "underline",
+	},
 
-  // Tablet Styles
-  headerText_tablet: {
-    color: "#353C40",
-    fontSize: RF(40),
-    fontFamily: "bold",
-    marginLeft: RW(20),
-    marginTop: RH(50),
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-  headerText2_tablet: {
-    color: "#353C40",
-    fontSize: RF(40),
-    fontFamily: "bold",
-    marginLeft: RW(10),
-    marginTop: 0,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    height: RH(55),
-  },
-  bottomImage_tablet: {
-    position: 'absolute',
-    right: 0,
-    bottom: RH(40),
-    width: RW(202),
-    height: RH(230)
-  },
-  navigationText_tablet: {
-    fontSize: 22,
-    color: '#858585',
-    fontFamily: "regular",
-  },
-  navigationButtonText_tablet: {
-    color: '#353C40',
-    fontSize: RF(22),
-    fontFamily: "bold",
-    textDecorationLine: 'underline'
-  },
-  hexagon: {
-    width: Device.isTablet ? 120 : RW(70),
-    height: Device.isTablet ? 55 : RH(25),
-    position: 'relative',
-  },
-  logoDesign: {
-    position: 'absolute',
-    top: Device.isTablet ? -5 : -RH(10),
-    bottom: 0,
-    left: Device.isTablet ? 35 : RW(15),
-    color: "#FFF",
-    fontSize: Device.isTablet ? 50 : RF(30),
-    fontFamily: "bold"
-  },
-  hexagonInner: {
-    width: Device.isTablet ? 100 : RW(50),
-    height: Device.isTablet ? 55 : RH(25.2),
-    backgroundColor: "red",
-  },
-  hexagonAfter: {
-    position: "absolute",
-    bottom: Device.isTablet ? -25 : -RH(15),
-    left: 0,
-    width: 0,
-    height: 0,
-    borderStyle: "solid",
-    borderLeftWidth: Device.isTablet ? 50 : 25,
-    borderLeftColor: "transparent",
-    borderRightWidth: Device.isTablet ? 50 : 25,
-    borderRightColor: "transparent",
-    borderTopWidth: Device.isTablet ? 25 : 15,
-    borderTopColor: "red",
-  },
-  hexagonBefore: {
-    position: "absolute",
-    top: Device.isTablet ? -25 : -RH(15),
-    left: 0,
-    width: 0,
-    height: 0,
-    borderStyle: "solid",
-    borderLeftWidth: Device.isTablet ? 50 : 25,
-    borderLeftColor: "transparent",
-    borderRightWidth: Device.isTablet ? 50 : 25,
-    borderRightColor: "transparent",
-    borderBottomWidth: Device.isTablet ? 25 : 15,
-    borderBottomColor: "red",
-  },
+	// Tablet Styles
+	headerText_tablet: {
+		color: "#353C40",
+		fontSize: RF(40),
+		fontFamily: "bold",
+		marginLeft: RW(20),
+		marginTop: RH(50),
+		flexDirection: "column",
+		justifyContent: "center",
+	},
+	headerText2_tablet: {
+		color: "#353C40",
+		fontSize: RF(40),
+		fontFamily: "bold",
+		marginLeft: RW(10),
+		marginTop: 0,
+		flexDirection: "column",
+		justifyContent: "center",
+		height: RH(55),
+	},
+	bottomImage_tablet: {
+		position: "absolute",
+		right: 0,
+		bottom: RH(40),
+		width: RW(202),
+		height: RH(230),
+	},
+	navigationText_tablet: {
+		fontSize: 22,
+		color: "#858585",
+		fontFamily: "regular",
+	},
+	navigationButtonText_tablet: {
+		color: "#353C40",
+		fontSize: RF(22),
+		fontFamily: "bold",
+		textDecorationLine: "underline",
+	},
+	hexagon: {
+		width: Device.isTablet ? 120 : RW(70),
+		height: Device.isTablet ? 55 : RH(25),
+		position: "relative",
+	},
+	logoDesign: {
+		position: "absolute",
+		top: Device.isTablet ? -5 : -RH(10),
+		bottom: 0,
+		left: Device.isTablet ? 35 : RW(15),
+		color: "#FFF",
+		fontSize: Device.isTablet ? 50 : RF(30),
+		fontFamily: "bold",
+	},
+	hexagonInner: {
+		width: Device.isTablet ? 100 : RW(50),
+		height: Device.isTablet ? 55 : RH(25.2),
+		backgroundColor: "red",
+	},
+	hexagonAfter: {
+		position: "absolute",
+		bottom: Device.isTablet ? -25 : -RH(15),
+		left: 0,
+		width: 0,
+		height: 0,
+		borderStyle: "solid",
+		borderLeftWidth: Device.isTablet ? 50 : 25,
+		borderLeftColor: "transparent",
+		borderRightWidth: Device.isTablet ? 50 : 25,
+		borderRightColor: "transparent",
+		borderTopWidth: Device.isTablet ? 25 : 15,
+		borderTopColor: "red",
+	},
+	hexagonBefore: {
+		position: "absolute",
+		top: Device.isTablet ? -25 : -RH(15),
+		left: 0,
+		width: 0,
+		height: 0,
+		borderStyle: "solid",
+		borderLeftWidth: Device.isTablet ? 50 : 25,
+		borderLeftColor: "transparent",
+		borderRightWidth: Device.isTablet ? 50 : 25,
+		borderRightColor: "transparent",
+		borderBottomWidth: Device.isTablet ? 25 : 15,
+		borderBottomColor: "red",
+	},
 });

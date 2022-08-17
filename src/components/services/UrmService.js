@@ -3,124 +3,164 @@ import { LOGIN_URL, USER_MANAGEMENT_URL } from "../../commonUtils/ApiConstants";
 import { BASE_URL } from "../../commonUtils/Base";
 
 class UrmService {
-  registerUser(obj) {
-    return axios.post(BASE_URL + LOGIN_URL.registerUser, obj);
-  }
+	// User Services
+	// Register Client
+	registerUser(obj) {
+		let registerUser = BASE_URL + LOGIN_URL.registerUser;
+		console.log({ registerUser, obj });
+		return axios.post(registerUser, obj);
+	}
 
-  saveUser(saveObj) {
-    return axios.post(BASE_URL + USER_MANAGEMENT_URL.saveUser, saveObj);
-  }
+	// Edit User
+	editUser() {
+		let editUser = BASE_URL + USER_MANAGEMENT_URL.editUser;
+		console.log({ editUser });
+		return editUser;
+	}
 
-  changePassword(obj) {
-    return axios.post(BASE_URL + LOGIN_URL.changePassword, obj);
-  }
+	// Save User
+	saveUser(saveObj) {
+		let saveUser = BASE_URL + USER_MANAGEMENT_URL.saveUser;
+		console.log({ saveUser, saveObj });
+		return axios.post(saveUser, saveObj);
+	}
 
-  getAllPrivillages() {
-    return axios.get(BASE_URL + USER_MANAGEMENT_URL.getAllPrivileges);
-  }
+	// Change Password
+	changePassword(obj) {
+		let changePass = BASE_URL + LOGIN_URL.changePassword;
+		console.log({ changePass, obj });
+		return axios.post(changePass, obj);
+	}
 
-  getPrivillagesByRoleName() {
-    return BASE_URL + '/user-management/roles/privilagesByName/';
-  }
+	// Get all Privileges
+	getAllPrivillages() {
+		const getPrivileges = BASE_URL + USER_MANAGEMENT_URL.getAllPrivileges;
+		console.log({ getPrivileges });
+		return axios.get(getPrivileges);
+	}
 
-  getDomainName() {
-    return BASE_URL + '/user-management/client/domian/';
-  }
+	// Getting User Details
+	getUserDetails(user, pageNumber = 0) {
+		const param = "?page=" + pageNumber + "&size=10";
+		let userDetails = BASE_URL + USER_MANAGEMENT_URL.getUserBySearch;
+		console.log({ userDetails, param });
+		return axios.post(userDetails + param, user);
+	}
 
-  getDomains() {
-    return BASE_URL + '/user-management/client/getDomiansForClient/';
-  }
+	// Get Privileges By RoleName
+	getPrivillagesByRoleName(value) {
+		let assignedRoles = BASE_URL + USER_MANAGEMENT_URL.getPrivilegesByRoleName;
+		let param = "/" + value;
+		console.log({ assignedRoles });
+		return axios.get(assignedRoles + param);
+	}
 
-  getPrivilegesByName() {
-    return BASE_URL + "/user-management/roles/privilagesByName/";
-  }
+	// Getting Roles
+	getRolesByDomainId(clientId) {
+		const param = "/" + clientId;
+		let getDomainRoles = BASE_URL + USER_MANAGEMENT_URL.getAllRoles;
+		console.log({ getDomainRoles, param });
+		return axios.get(getDomainRoles + param);
+	}
 
-  getMasterDomains() {
-    return BASE_URL + "/user-management/client/getMasterDomains";
-  }
+	// Get All Users
+	getAllUsers(clientId, pageNumber) {
+		const param = "/" + parseInt(clientId);
+		const pages = "?page=" + pageNumber + "&size=10";
+		let getUsers = BASE_URL + USER_MANAGEMENT_URL.getAllUsers;
+		console.log({ getUsers, param, pages });
+		return axios.get(getUsers + param + pages);
+	}
 
+	// Filter Users
+	getUserBySearch(list, page) {
+		let userSearch = BASE_URL + USER_MANAGEMENT_URL.getUserBySearch;
+		const param2 = "?page=" + page;
+		console.log({ userSearch, list, param2 });
+		return axios.post(userSearch + param2, list);
+	}
 
-  saveDomain() {
-    return BASE_URL + "/user-management/client/assignDomianToClient";
-  }
+	// Store Services
+	// Save Store
+	saveStore() {
+		let saveStore = BASE_URL + USER_MANAGEMENT_URL.saveStore;
+		console.log({ saveStore });
+		return saveStore;
+	}
 
-  saveStore() {
-    return BASE_URL + "/user-management/store/create-store";
-  }
+	// Edit Store
+	editStore() {
+		let editStore = BASE_URL + USER_MANAGEMENT_URL.editStore;
+		console.log({ editStore });
+		return editStore;
+	}
 
-  editStore() {
-    return BASE_URL + "/user-management/store/store";
-  }
+	// Get All Stores
+	getAllStores(clientId, pageNumber, isActive) {
+		const param = "?clientId=" + clientId + "&isActive=" + isActive;
+		// let storesPath = BASE_URL + USER_MANAGEMENT_URL.getAllStores;
+		let storesPath = BASE_URL + "/user-management/store/getAllStores";
+		console.log({ storesPath, param });
+		return axios.get(storesPath);
+	}
 
-  getAllStores(clientId, pageNumber, isActive) {
-    const param = '?clientId=' + clientId + '&isActive=' + isActive;
-    console.log({ param });
-    const pages = '?page=' + pageNumber + '&size=10';
-    return axios.get(BASE_URL + USER_MANAGEMENT_URL.getAllStores + param);
-  }
+	// Get States
+	getStates() {
+		let getStates = BASE_URL + USER_MANAGEMENT_URL.getStates;
+		console.log({ getStates });
+		return axios.get(getStates);
+	}
 
-  deleteStore() {
-    return BASE_URL + '/user-management/store/deleteStore';
-  }
+	// Get Disctricts
+	getDistricts(value) {
+		const params = "?stateCode=" + value;
+		let getDistricts = BASE_URL + USER_MANAGEMENT_URL.getDistricts;
+		console.log({ getDistricts, params });
+		return axios.get(getDistricts + params);
+	}
 
-  getStates() {
-    return BASE_URL + "/user-management/store/allStates";
-  }
+	// Filter Stores
+	getStoresBySearch(list) {
+		let filterStores = BASE_URL + USER_MANAGEMENT_URL.getStoresBySearch;
+		console.log({ filterStores, list });
+		return axios.post(filterStores, list);
+	}
 
-  getDistricts() {
-    return BASE_URL + "/user-management/store/getDistrict";
-  }
+	// Get Gst Number for store edit
+	getGSTNumber() {
+		let gstNumber = BASE_URL + USER_MANAGEMENT_URL.getGstNumber;
+		console.log({ gstNumber });
+		return gstNumber;
+	}
 
-  getStoresBySearch() {
-    return BASE_URL + "/user-management/store/getStoresWithFilter";
-  }
+	// Roles Services
+	// Get All Roles
+	getAllRoles(clientId, pageNumber) {
+		const params = "/" + clientId;
+		const pages = "?page=" + pageNumber + "&size=10";
+		let getRoles = BASE_URL + USER_MANAGEMENT_URL.getAllRoles;
+		console.log({ getRoles, params, pages });
+		return axios.get(getRoles + params + pages);
+	}
 
-  getRolesByDomainId(clientId) {
-    const param = '/' + clientId;
-    return axios.get(BASE_URL + USER_MANAGEMENT_URL.getAllRoles + param);
-  }
+	getRolesBySearch(searchRole) {
+		let filterRoles = BASE_URL + USER_MANAGEMENT_URL.getRolesBySearch;
+		console.log({ filterRoles, searchRole });
+		return axios.post(filterRoles, searchRole);
+	}
 
-  getAllRoles(clientId, pageNumber) {
-    const param = '/' + clientId;
-    const pages = '?page=' + pageNumber + '&size=10';
-    return axios.get(BASE_URL + USER_MANAGEMENT_URL.getAllRoles + param + pages);
-  }
+	// Save Role
+	saveRole(saveObj) {
+		let saveRole = BASE_URL + USER_MANAGEMENT_URL.saveRole;
+		console.log({ saveRole, saveObj });
+		return axios.post(saveRole, saveObj);
+	}
 
-  getAllUsers(clientId, pageNumber) {
-    const param = '/' + parseInt(clientId);
-    const pages = '?page=' + pageNumber + '&size=10';
-    return axios.get(BASE_URL + USER_MANAGEMENT_URL.getAllUsers + param + pages);
-  }
-
-  getUserBySearch() {
-    return BASE_URL + "/user-management/user/getUser";
-  }
-
-  getRolesBySearch(searchRole) {
-    console.log({ searchRole });
-    return axios.post(BASE_URL + USER_MANAGEMENT_URL.getRolesBySearch, searchRole);
-  }
-
-  saveRole(saveObj) {
-    return axios.post(BASE_URL + USER_MANAGEMENT_URL.saveRole, saveObj);
-  }
-
-  editRole(saveObj) {
-    return axios.put(BASE_URL + USER_MANAGEMENT_URL.editRole, saveObj);
-  }
-
-
-  editUser() {
-    return BASE_URL + "/user-management/user/updateUser";
-  }
-
-  getGSTNumber() {
-    return BASE_URL + "/user-management/store/getgstDetails";
-  }
-
-  getUserDetails(user, pageNumber = 0) {
-    const param = '?page=' + pageNumber + '&size=10';
-    return axios.post(BASE_URL + USER_MANAGEMENT_URL.getUserBySearch + param, user);
-  }
+	// Edit Role
+	editRole(saveObj) {
+		let editRole = BASE_URL + USER_MANAGEMENT_URL.editRole;
+		console.log({ editRole, saveObj });
+		return axios.put(editRole, saveObj);
+	}
 }
 export default new UrmService();

@@ -1,21 +1,19 @@
-import { createStackNavigator } from '@react-navigation/stack'
-import React, { Component } from 'react'
-import Promo from '../components/Promotions/Promo';
-import AddPool from '../components/Promotions/AddPool';
-import EditPool from '../components/Promotions/EditPool';
-import AddPromo from '../components/Promotions/AddPromo';
-import AddLoyalty from '../components/Promotions/AddLoyalty';
-import Pramotions from '../components/Promotions/promotions';
-import ListOfPromo from '../components/Promotions/listOfPromotions';
-import ManagePromo from '../components/Promotions/managePromo'
-import TopBar from './TopBar';
-import BottomTabNav from './BottomTabNav';
+import { createStackNavigator } from "@react-navigation/stack";
+import React from "react";
+import AddLoyalty from "../components/Promotions/AddLoyalty";
+import AddPool from "../components/Promotions/AddPool";
+import AddPromo from "../components/Promotions/AddPromo";
+import EditPool from "../components/Promotions/EditPool";
+import ListOfPromo from "../components/Promotions/listOfPromotions";
+import ManagePromo from "../components/Promotions/managePromo";
+import Promo from "../components/Promotions/Promo";
+import Pramotions from "../components/Promotions/promotions";
 const Stack = createStackNavigator();
 export default class ProductsNavigation extends React.Component {
+
     render() {
         return (
             <>
-            {/* <TopBar {...this.props}/> */}
             <Stack.Navigator>
                 <Stack.Screen name="Pramotions" options={{ headerShown: false }} component={Pramotions} />
                 <Stack.Screen name="ListOfPromo" options={{ headerShown: false }} component={ListOfPromo} />
@@ -27,10 +25,7 @@ export default class ProductsNavigation extends React.Component {
                 <Stack.Screen name="AddPromo" options={{ headerShown: false }} component={AddPromo} />
                 <Stack.Screen name="AddLoyalty" options={{ headerShown: false }} component={AddLoyalty} />
             </Stack.Navigator>
-            <BottomTabNav {...this.props}/>
             </>
         );
     }
-
 }
-

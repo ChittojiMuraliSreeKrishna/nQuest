@@ -1,47 +1,55 @@
-import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity } from 'react-native';
-import React, { Component } from 'react';
-import { Dropdown } from 'react-native-element-dropdown';
-import { RW, RF, RH } from '../Responsive';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
-import UrmService from '../components/services/UrmService';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import I18n from 'react-native-i18n';
-import Modal from 'react-native-modal'
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { Component } from "react";
+import {
+	FlatList,
+	Image,
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+	View,
+} from "react-native";
+import I18n from "react-native-i18n";
+import Modal from "react-native-modal";
+import scss from "../commonUtils/assets/styles/Bars.scss";
+import UrmService from "../components/services/UrmService";
+import { RF } from "../Responsive";
 
 var data = [];
-var currentSelection = '';
+var currentSelection = "";
 var dataCleared = true;
-var firstDisplayRoute = ''
+var firstDisplayRoute = "";
 export const screenMapping = {
-
-  "Dashboard": "Home",
-  "Billing Portal": "CustomerNavigation",
-  "Inventory Portal": "InventoryNavigation",
-  "Promotions & Loyalty": "PromoNavigation",
-  "Accounting Portal": "AccountingNaviagtion",
-  "Reports": "ReportsNavigation",
-  "URM Portal": "UrmNavigation"
-
+	"Dashboard": "Home",
+	"Billing Portal": "CustomerNavigation",
+	"Inventory Portal": "InventoryNavigation",
+	"Promotions & Loyalty": "PromoNavigation",
+	"Accounting Portal": "AccountingNaviagtion",
+	"Reports": "ReportsNavigation",
+	"URM Portal": "UrmNavigation",
 };
-
 
 const GetImageBasedOnPrevilageName = (name) => {
-  return (
-    name === "Dashboard" ? require('../commonUtils/assets/Images/home.png') :
-      name === "Billing Portal" ? require('../commonUtils/assets/Images/billing_portal_header_icon.png') :
-        name === "Inventory Portal" ? require('../commonUtils/assets/Images/inventory_dropdown_icon.png') :
-          name === "Promotions & Loyalty" ? require('../commonUtils/assets/Images/promotions_dropdown_icon.png') :
-            name === "Accounting Portal" ? require('../commonUtils/assets/Images/accounting_dropdown_icon.png') :
-              name === "Reports" ? require('../commonUtils/assets/Images/reports_dropdown_icon.png') :
-                name === "URM Portal" ? require('../commonUtils/assets/Images/urm_dropdown_icon.png') :
-                  <></>
-  );
+	return name === "Dashboard" ? (
+		require("../commonUtils/assets/Images/home.png")
+	) : name === "Billing Portal" ? (
+		require("../commonUtils/assets/Images/billing_portal_header_icon.png")
+	) : name === "Inventory Portal" ? (
+		require("../commonUtils/assets/Images/inventory_dropdown_icon.png")
+	) : name === "Promotions & Loyalty" ? (
+		require("../commonUtils/assets/Images/promotions_dropdown_icon.png")
+	) : name === "Accounting Portal" ? (
+		require("../commonUtils/assets/Images/accounting_dropdown_icon.png")
+	) : name === "Reports" ? (
+		require("../commonUtils/assets/Images/reports_dropdown_icon.png")
+	) : name === "URM Portal" ? (
+		require("../commonUtils/assets/Images/urm_dropdown_icon.png")
+	) : (
+		<></>
+	);
 };
 
-
-
 export class TopBar extends Component {
+
   constructor(props) {
     super(props);
     this.state = {
@@ -304,10 +312,11 @@ export class TopBar extends Component {
       </>
     );
   }
+
 }
 
-
 const styles = StyleSheet.create({
+
   logoImage: {
     width: RW(170),
     height:RH(60)
@@ -361,5 +370,6 @@ const styles = StyleSheet.create({
     // borderRadius: 4,
     // padding: 5
   }
+
 });
 export default TopBar;

@@ -1,24 +1,23 @@
-import React, { Component } from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
-import TopBar from './TopBar';
-import Settings from '../components/Profile/Settings';
-import NewSaleNavigation from './NewSaleNavigation';
-import Home from '../components/Home/Home';
-import AccountingNaviagtion from './AccountingNavigation';
-import ReportsNavigation from './ReportsNavigation';
-import CustomerNavigation from './CustomerNavigation';
-import InventoryRetailNavigation from './InventoryRetailNavigation';
-import CustomerRetailNavigation from './CustomerRetailNavigation';
-import PromoNavigation from './PromoNavigation';
-import InventoryNavigation from './InventoryNavigation';
-import UrmNavigation from './UrmNavigation';
-import BottomTabNav from './BottomTabNav';
-
+import { createStackNavigator } from "@react-navigation/stack";
+import React, { Component } from "react";
+import Home from "../components/Home/Home";
+import Settings from "../components/Profile/Settings";
+import AccountingNaviagtion from "./AccountingNavigation";
+import BottomTabNav from "./BottomTabNav";
+import CustomerNavigation from "./CustomerNavigation";
+import CustomerRetailNavigation from "./CustomerRetailNavigation";
+import InventoryNavigation from "./InventoryNavigation";
+import InventoryRetailNavigation from "./InventoryRetailNavigation";
+import NewSaleNavigation from "./NewSaleNavigation";
+import PromoNavigation from "./PromoNavigation";
+import ReportsNavigation from "./ReportsNavigation";
+import TopBar from "./TopBar";
+import UrmNavigation from "./UrmNavigation";
 
 const Stack = createStackNavigator();
 
-
 export default class TopBarNavigation extends Component {
+
   render() {
     return (
       <>
@@ -37,7 +36,7 @@ export default class TopBarNavigation extends Component {
         <Stack.Screen name="InventoryRetailNavigation" options={{ headerShown: false }} component={InventoryRetailNavigation} />
         <Stack.Screen name="Settings" options={{ headerShown: false }} component={Settings} />
       </Stack.Navigator>
-      {/* <BottomTabNav {...this.props}/> */}
+      <BottomTabNav {...this.props}/>
       </>
     );
   }
