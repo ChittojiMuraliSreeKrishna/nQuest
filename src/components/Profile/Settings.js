@@ -41,640 +41,523 @@ global.previlage8 = "";
 global.domainName = "";
 
 class Settings extends Component {
-	constructor(props) {
-		super(props);
-		this.camera = null;
-		this.barcodeCodes = [];
-		this.state = {
-			barcodeId: "",
-			selectedGender: "",
-			date: new Date(),
-			datepickerOpen: false,
-			userName: "",
-			role: "",
-			email: "",
-			mobileNumber: "",
-			dateOfBirth: "",
-			address: "",
-			userId: 0,
-			domainNamesArray: [],
-			domainNames: [],
-			selectedDomain: "",
-		};
-	}
 
-	handleGender = (value) => {
-		this.setState({ selectedGender: value });
-	};
+  constructor(props) {
+    super(props);
+    this.camera = null;
+    this.barcodeCodes = [];
+    this.state = {
+      barcodeId: "",
+      selectedGender: '',
+      date: new Date(),
+      datepickerOpen: false,
+      userName: "",
+      role: "",
+      email: "",
+      mobileNumber: "",
+      dateOfBirth: "",
+      address: "",
+      userId: 0,
+      domainNamesArray: [],
+      domainNames: [],
+      selectedDomain: "",
 
-	handleUserName = (value) => {
-		this.setState({ userName: value });
-	};
+    };
+  }
 
-	handleRole = (value) => {
-		this.setState({ role: value });
-	};
+  handleGender = (value) => {
+    this.setState({ selectedGender: value });
+  };
 
-	handleMobileNumber = (value) => {
-		this.setState({ mobileNumber: value });
-	};
+  handleUserName = (value) => {
+    this.setState({ userName: value });
+  };
 
-	handleEmail = (value) => {
-		this.setState({ email: value });
-	};
+  handleRole = (value) => {
+    this.setState({ role: value });
+  };
 
-	handleAddress = (value) => {
-		this.setState({ address: value });
-	};
+  handleMobileNumber = (value) => {
+    this.setState({ mobileNumber: value });
+  };
 
-	handleDomain = (value) => {
-		for (let i = 0; i < this.state.domainNamesArray.length; i++) {
-			if (this.state.domainNamesArray[i].name === value) {
-				AsyncStorage.setItem(
-					"domainDataId",
-					this.state.domainNamesArray[i].id.toString(),
-				)
-					.then(() => {
-						// console.log
-					})
-					.catch(() => {
-						this.setState({ loading: false });
-						console.log("There is error saving token");
-						// alert('There is error saving token');
-					});
-				global.domainName = this.state.domainNamesArray[i].name;
-				AsyncStorage.setItem("domainName", this.state.domainNamesArray[i].name)
-					.then(() => {
-						// console.log
-					})
-					.catch(() => {
-						this.setState({ loading: false });
-						console.log("There is error saving token");
-					});
-			}
-		}
-		console.log("store id is" + this.state.domainNamesArray[0].name);
+  handleEmail = (value) => {
+    this.setState({ email: value });
+  };
 
-		this.setState({ selectedDomain: value });
-	};
+  handleAddress = (value) => {
+    this.setState({ address: value });
+  };
 
-	datepickerCancelClicked() {
-		this.setState({ date: new Date() });
-		this.setState({ datepickerOpen: false });
-	}
+  handleDomain = (value) => {
+    for (let i = 0; i < this.state.domainNamesArray.length; i++) {
+      if (this.state.domainNamesArray[i].name === value) {
+        AsyncStorage.setItem("domainDataId", (this.state.domainNamesArray[i].id).toString()).then(() => {
+          // console.log
 
-	datepickerDoneClicked() {
-		if (parseInt(this.state.date.getDate()) < 10) {
-			this.setState({
-				dateOfBirth:
-					this.state.date.getFullYear() +
-					"-" +
-					(this.state.date.getMonth() + 1) +
-					"-0" +
-					this.state.date.getDate(),
-			});
-		} else {
-			this.setState({
-				dateOfBirth:
-					this.state.date.getFullYear() +
-					"-" +
-					(this.state.date.getMonth() + 1) +
-					"-" +
-					this.state.date.getDate(),
-			});
-		}
-		this.setState({ datepickerOpen: false });
-	}
+        }).catch(() => {
+          this.setState({ loading: false });
+          console.log('There is error saving token');
+          // alert('There is error saving token');
+        });
+        global.domainName = this.state.domainNamesArray[i].name;
+        AsyncStorage.setItem("domainName", this.state.domainNamesArray[i].name).then(() => {
+          // console.log
 
-	datepickerClicked() {
-		this.setState({ datepickerOpen: true });
-	}
+        }).catch(() => {
+          this.setState({ loading: false });
+          console.log('There is error saving token');
+        });
 
-	profileUpdate() {
-		if (this.state.dateOfBirth === "Date Of Birth") {
-			this.state.dateOfBirth = null;
-		}
+      }
+    }
+    console.log('store id is' + this.state.domainNamesArray[0].name);
 
-		const params = {
-			userId: this.state.userId,
-			email: this.state.email,
-			phoneNumber: this.state.mobileNumber,
-			birthDate: this.state.dateOfBirth,
-			gender: this.state.selectedGender,
-			name: this.state.userName,
-			username: this.state.userName,
-			// "parentId": "1",
-			// "domianId": "1",
-			address: this.state.address,
-			clientId: "123",
-			// "role": {
-			//     "roleName": "config_user"
-			// }
-			// "stores": [
-			//     {
-			//         "name":"Vizag"
-			//     },
-			//     {
-			//         "name":"kakinada"
-			//     }
-			// ],
-			// "clientId": "801",
-			// "isConfigUser": "true",
-			// "clientDomain": [1,2]
-		};
+    this.setState({ selectedDomain: value });
+  };
 
-		console.log("params are" + JSON.stringify(params));
-		this.setState({ loading: true });
-		axios
-			.put(ProfileService.updateUser(), params)
-			.then((res) => {
-				if (res.data && res.data["isSuccess"] === "true") {
-					this.setState({ loading: false });
-				} else {
-					this.setState({ loading: false });
-					// this.setState({ loading: false })
-					alert("user Update issue");
-				}
-			})
-			.catch(() => {
-				this.setState({ loading: false });
-				this.setState({ loading: false });
-				alert("Update Api error");
-			});
-	}
+  datepickerCancelClicked() {
+    this.setState({ date: new Date() });
+    this.setState({ datepickerOpen: false });
+  }
 
-	async componentDidMount() {
-		var phonenumber = "";
-		AsyncStorage.getItem("phone_number")
-			.then((value) => {
-				phonenumber = value;
-			})
-			.catch(() => {
-				this.setState({ loading: false });
-				console.log("There is error getting phone numner");
-			});
-		const username = await AsyncStorage.getItem("username");
-		this.setState({ loading: true });
-		axios
-			.get(ProfileService.getUser() + username)
-			.then((res) => {
-				if (res.data && res.data["isSuccess"] === "true") {
-					this.setState({
-						loading: false,
-						userId: res.data["result"].userId,
-						userName: res.data["result"].userName,
-						role: res.data["result"].roleName,
-						email: res.data["result"].email,
-						selectedGender: res.data["result"].gender,
-					});
-					if (res.data["result"].dob === null) {
-						this.setState({ dateOfBirth: "Date Of Birth" });
-					} else {
-						this.setState({ dateOfBirth: res.data["result"].dob });
-					}
-					this.setState({
-						address: res.data["result"].address,
-						mobileNumber: phonenumber,
-					});
-				}
-				this.setState({ loading: false });
-			})
-			.catch(() => {
-				this.setState({ loading: false });
-				this.setState({ loading: false });
-				alert("No user details get");
-			});
-		this.domainChange();
-	}
+  datepickerDoneClicked() {
+    if (parseInt(this.state.date.getDate()) < 10) {
+      this.setState({ dateOfBirth: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-0" + this.state.date.getDate() });
+    }
+    else {
+      this.setState({ dateOfBirth: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-" + this.state.date.getDate() });
+    }
+    this.setState({ datepickerOpen: false });
+  }
 
-	async domainChange() {
-		AsyncStorage.getItem("domainName")
-			.then((value) => {
-				global.domainName = value;
-			})
-			.catch(() => {
-				this.setState({ loading: false });
-				console.log("There is error getting storeId");
-				// alert('There is error getting storeId');
-			});
+  datepickerClicked() {
+    this.setState({ datepickerOpen: true });
+  }
 
-		AsyncStorage.getItem("custom:isConfigUser")
-			.then((value) => {
-				if (value === "true") {
-					global.previlage7 = "URM Portal";
-					global.previlage5 = "Accounting Portal";
-					alert("No user details get");
-				} else {
-					AsyncStorage.getItem("custom:isSuperAdmin")
-						.then((value) => {
-							if (value === "true") {
-								var domainId = "1";
-								if (global.domainName === "Textile") {
-									domainId = "1";
-								} else if (global.domainName === "Retail") {
-									domainId = "2";
-								} else if (global.domainName === "Electrical & Electronics") {
-									domainId = "3";
-								}
+  profileUpdate() {
+    if (this.state.dateOfBirth === "Date Of Birth") {
+      this.state.dateOfBirth = null;
+    }
 
-								axios
-									.get(UrmService.getPrivillagesForDomain() + domainId)
-									.then((res) => {
-										if (res.data && res.data["isSuccess"] === "true") {
-											console.log(res.data);
-											let len = res.data["result"].length;
-											console.log(len);
-											if (len > 0) {
-												for (let i = 0; i < len; i++) {
-													let previlage = res.data["result"][i];
-													if (previlage.name === "Dashboard") {
-														global.previlage1 = "Dashboard";
-													}
-													if (previlage.name === "Billing Portal") {
-														global.previlage2 = "Billing Portal";
-													}
-													if (previlage.name === "Inventory Portal") {
-														global.previlage3 = "Inventory Portal";
-													}
-													if (previlage.name === "Promotions & Loyalty") {
-														global.previlage4 = "Promotions & Loyalty";
-													}
-													if (previlage.name === "Accounting Portal") {
-														global.previlage5 = "Accounting Portal";
-													}
-													if (previlage.name === "Reports") {
-														global.previlage6 = "Reports";
-													}
-													if (previlage.name === "URM Portal") {
-														global.previlage7 = "URM Portal";
-													}
-												}
-											}
-										}
-									});
-							} else {
-								console.log("vinod-------> privlage by name");
-								AsyncStorage.getItem("rolename")
-									.then((value) => {
-										axios
-											.get(UrmService.getPrivillagesByRoleName() + value)
-											.then((res) => {
-												if (res.data && res.data["isSuccess"] === "true") {
-													console.log(res.data);
-													let len = res.data["result"].parentPrivilages.length;
-													// console.log(.name)
-													if (len > 0) {
-														for (let i = 0; i < len; i++) {
-															let previlage =
-																res.data["result"].parentPrivilages[i];
+    const params = {
+      "userId": this.state.userId,
+      "email": this.state.email,
+      "phoneNumber": this.state.mobileNumber,
+      "birthDate": this.state.dateOfBirth,
+      "gender": this.state.selectedGender,
+      "name": this.state.userName,
+      "username": this.state.userName,
+      // "parentId": "1",
+      // "domianId": "1",
+      "address": this.state.address,
+      "clientId": "123"
+      // "role": {
+      //     "roleName": "config_user"
+      // }
+      // "stores": [
+      //     {
+      //         "name":"Vizag"
+      //     },
+      //     {
+      //         "name":"kakinada"
+      //     }
+      // ],
+      // "clientId": "801",
+      // "isConfigUser": "true",
+      // "clientDomain": [1,2]
+    };
 
-															if (previlage.name === "Dashboard") {
-																global.previlage1 = "Dashboard";
-															}
-															if (previlage.name === "Billing Portal") {
-																global.previlage2 = "Billing Portal";
-															}
-															if (previlage.name === "Inventory Portal") {
-																global.previlage3 = "Inventory Portal";
-															}
-															if (previlage.name === "Promotions & Loyalty") {
-																global.previlage4 = "Promotions & Loyalty";
-															}
-															if (previlage.name === "Accounting Portal") {
-																global.previlage5 = "Accounting Portal";
-															}
-															if (previlage.name === "Reports") {
-																global.previlage6 = "Reports";
-															}
-															if (previlage.name === "URM Portal") {
-																global.previlage7 = "URM Portal";
-															}
-														}
-													}
-												}
-											});
-									})
-									.catch(() => {
-										this.setState({ loading: false });
-										console.log("There is error saving domainDataId");
-										// alert('There is error saving domainDataId');
-									});
-							}
-						})
-						.catch(() => {
-							this.setState({ loading: false });
-							console.log("There is error getting storeId");
-							// alert('There is error getting storeId');
-						});
-				}
-			})
-			.catch(() => {
-				this.setState({ loading: false });
-				console.log("There is error getting storeId");
-				// alert('There is error getting storeId');
-			});
-	}
+    console.log('params are' + JSON.stringify(params));
+    this.setState({ loading: true });
+    axios.put(ProfileService.updateUser(), params).then((res) => {
+      if (res.data && res.data["isSuccess"] === "true") {
+        this.setState({ loading: false });
+      }
+      else {
+        this.setState({ loading: false });
+        // this.setState({ loading: false })
+        alert("user Update issue");
+      }
+    }
+    ).catch(() => {
+      this.setState({ loading: false });
+      this.setState({ loading: false });
+      alert('Update Api error');
+    });
+  }
 
-	signOut() {
-		AsyncStorage.removeItem("phone_number");
-		AsyncStorage.clear();
-		global.homeButtonClicked = false;
-		global.profileButtonClicked = false;
-		this.props.navigation.push("Login");
-	}
+  async componentDidMount() {
+    var isSuperAdmin = "";
+    AsyncStorage.getItem("custom:isSuperAdmin").then((value) => {
+      if (value === "true") {
+        var clientId = "";
+        var domainNames = [];
+        AsyncStorage.getItem("custom:clientId1").then((value) => {
+          clientId = value;
+          console.log(clientId);
+          axios.get(UrmService.getDomains() + clientId).then((res) => {
+            if (res.data && res.data["isSuccess"] === "true") {
+              for (var i = 0; i < res.data["result"].length; i++) {
+                let number = res.data.result[i];
+                console.log(number);
+                this.state.domainNamesArray.push({ name: number.domaiName, id: number.clientDomainaId });
+                console.log(this.state.domainNamesArray);
+                domainNames.push({
+                  value: this.state.domainNamesArray[i].name,
+                  label: this.state.domainNamesArray[i].name
+                });
+                this.setState({
+                  domainNames: domainNames,
+                });
+                this.setState({ domainNamesArray: this.state.domainNamesArray });
+              }
+            }
 
-	handleMenuButtonClick() {
-		this.props.navigation.openDrawer();
-	}
+          });
+        }).catch(() => {
+          this.setState({ loading: false });
+          console.log('There is error getting phone numner');
+          //  alert('There is error getting phone numner');
+        });
+      }
+      else {
+        AsyncStorage.getItem("domainDataId").then((value) => {
+          console.log('sdasfsafsafsfaasf' + value);
+          var domainNames = [];
+          axios.get(UrmService.getDomainName() + value).then((res) => {
+            if (res.data && res.data["isSuccess"] === "true") {
 
-	render() {
-		return (
-			<>
-				<View style={{ flex: 1 }}>
-					<View
-						style={{
-							display: "flex",
-							justifyContent: "center",
-							alignItems: "flex-end",
-						}}
-					>
-						<TouchableOpacity
-							style={{
-								backgroundColor: "#ED1C24",
-								width: 100,
-								margin: 10,
-								borderRadius: 5,
-							}}
-							onPress={() => {
-								AsyncStorage.removeItem("phone_number");
-								AsyncStorage.removeItem("user");
-								AsyncStorage.removeItem("tokenkey");
-								this.props.navigation.navigate("Login");
-							}}
-						>
-							<Text
-								style={{
-									color: "#fff",
-									alignSelf: "center",
-									fontWeight: "700",
-								}}
-							>
-								{" "}
-								{I18n.t("Sign Out")}
-							</Text>
-						</TouchableOpacity>
-					</View>
-					<KeyboardAwareScrollView
-						KeyboardAwareScrollView
-						enableOnAndroid={true}
-					>
-						<View>
-							{this.state.loading && <Loader loading={this.state.loading} />}
-							<View
-								style={{
-									flex: 1,
-									justifyContent: "center", //Centered horizontally
-									alignItems: "center",
-									color: "#ffffff",
-								}}
-							>
-								<View
-									style={{
-										flexDirection: "column",
-										flex: 0,
-										marginLeft: 0,
-										marginTop: 10,
-										marginRight: 0,
-										backgroundColor: "#ffffff",
-										borderRadius: 20,
-									}}
-								>
-									<Image
-										style={{
-											width: 80,
-											height: 80,
-											resizeMode: "cover",
-											marginTop: 20,
-											borderRadius: 40,
-											borderColor: "#F2F2F2",
-											alignSelf: "center",
-											borderWidth: 2,
-										}}
-										source={this.state.image}
-									/>
-									<TouchableOpacity
-										style={{
-											width: 30,
-											height: 30,
-											borderRadius: 10,
-											alignSelf: "center",
-											top: -20,
-											left: 15,
-										}}
-									>
-										<Image
-											style={{ width: 30, height: 30, borderRadius: 10 }}
-											source={require("../assets/images/cameraclick.png")}
-										/>
-									</TouchableOpacity>
+              let number = res.data.result;
+              console.log(res.data.result);
+              this.state.domainNamesArray.push({ name: number.domaiName, id: number.clientDomainaId });
+              console.log(this.state.domainNamesArray[0].name);
+              domainNames.push({
+                value: this.state.domainNamesArray[0].name,
+                label: this.state.domainNamesArray[0].name
+              });
+              this.setState({
+                domainNames: domainNames,
+              });
+              this.setState({ domainNamesArray: this.state.domainNamesArray });
+            }
 
-									{this.state.flagqtyModelOpen && (
-										<View>
-											<Modal isVisible={this.state.modalVisible}>
-												<View
-													style={{
-														flex: 1,
-														justifyContent: "center", //Centered horizontally
-														alignItems: "center",
-													}}
-												>
-													<View
-														style={{
-															position: "absolute",
-															right: 20,
-															left: 20,
-															alignItems: "center",
-															justifyContent: "flex-start",
-															backgroundColor: "#ffffff",
-															borderRadius: 20,
-														}}
-													>
-														<TouchableOpacity
-															style={{
-																backgroundColor: "#ED1C24",
-																borderRadius: 5,
-																width: 200,
-																marginTop: 20,
-																height: 32,
-																alignSelf: "center",
-															}}
-															onPress={() =>
-																this.pickSingleWithCameraForProductsAdd(true)
-															}
-														>
-															<Text
-																style={{
-																	fontSize: 12,
-																	fontFamily: "regular",
-																	color: "#ffffff",
-																	marginLeft: 10,
-																	marginTop: 8,
-																	alignSelf: "center",
-																}}
-															>
-																{" "}
-																{"Select Product Image With Camera"}{" "}
-															</Text>
-														</TouchableOpacity>
+          });
 
-														<TouchableOpacity
-															style={{
-																backgroundColor: "#ED1C24",
-																borderRadius: 5,
-																width: 200,
-																marginTop: 20,
-																height: 32,
-																alignSelf: "center",
-															}}
-															onPress={() =>
-																this.pickSingleForProductsAdd(true)
-															}
-														>
-															<Text
-																style={{
-																	fontSize: 12,
-																	fontFamily: "regular",
-																	color: "#ffffff",
-																	marginLeft: 10,
-																	marginTop: 8,
-																	alignSelf: "center",
-																}}
-															>
-																{" "}
-																{"Select Product Image With Gallery"}{" "}
-															</Text>
-														</TouchableOpacity>
+        }).catch(() => {
+          this.setState({ loading: false });
+          console.log('There is error saving token');
+          // alert('There is error saving token');
+        });
+      }
 
-														<TouchableOpacity
-															style={{
-																backgroundColor: "#ED1C24",
-																borderRadius: 5,
-																width: 200,
-																marginTop: 20,
-																height: 32,
-																alignSelf: "center",
-																marginBottom: 20,
-															}}
-															onPress={() => this.cancel()}
-														>
-															<Text
-																style={{
-																	fontSize: 12,
-																	fontFamily: "regular",
-																	color: "#ffffff",
-																	marginLeft: 10,
-																	marginTop: 8,
-																	alignSelf: "center",
-																}}
-															>
-																{" "}
-																{"Cancel"}{" "}
-															</Text>
-														</TouchableOpacity>
-													</View>
-												</View>
-											</Modal>
-										</View>
-									)}
+    }).catch(() => {
+      this.setState({ loading: false });
+      console.log('There is error getting storeId');
+      // alert('There is error getting storeId');
+    });
 
-									<Text></Text>
+    var phonenumber = "";
+    AsyncStorage.getItem("phone_number").then((value) => {
+      phonenumber = value;
+    }).catch(() => {
+      this.setState({ loading: false });
+      console.log('There is error getting phone numner');
+      // alert('There is error getting phone numner');
+    });
+    const username = await AsyncStorage.getItem("username");
+    //console.log(ProfileService.getUser() + "+919895695626")
+    this.setState({ loading: true });
+    axios.get(ProfileService.getUser() + username).then((res) => {
+      if (res.data && res.data["isSuccess"] === "true") {
+        this.setState({
+          loading: false,
+          userId: res.data["result"].userId,
+          userName: res.data["result"].userName,
+          role: res.data["result"].roleName,
+          email: res.data["result"].email,
+          selectedGender: res.data["result"].gender
+        });
+        if (res.data["result"].dob === null) {
+          this.setState({ dateOfBirth: 'Date Of Birth' });
+        }
+        else {
+          this.setState({ dateOfBirth: res.data["result"].dob });
+        }
+        this.setState({ address: res.data["result"].address, mobileNumber: phonenumber });
+      }
+      this.setState({loading: false})
+    }).catch(() => {
+      this.setState({ loading: false });
+      this.setState({ loading: false });
+      alert('No user details get');
+    });
+    this.domainChange();
+  }
 
-									<View style={{ marginTop: 0, width: deviceWidth }}>
-										<Text
-											style={
-												Device.isTablet
-													? styles.inputHeader_tablet
-													: styles.inputHeader_mobile
-											}
-										>
-											{" "}
-											{I18n.t("NAME")}:{" "}
-										</Text>
+  async domainChange() {
+    AsyncStorage.getItem("domainName").then((value) => {
+      global.domainName = value;
+    }).catch(() => {
+      this.setState({ loading: false });
+      console.log('There is error getting storeId');
+      // alert('There is error getting storeId');
+    });
 
-										<TextInput
-											style={
-												Device.isTablet
-													? styles.input_tablet
-													: styles.input_mobile
-											}
-											underlineColorAndroid="transparent"
-											placeholder={I18n.t("NAME")}
-											editable={false}
-											selectTextOnFocus={false}
-											placeholderTextColor="#353C4050"
-											textAlignVertical="center"
-											autoCapitalize="none"
-											value={this.state.userName}
-											onChangeText={this.handleUserName}
-										/>
-									</View>
-									<View>
-										<Text
-											style={
-												Device.isTablet
-													? styles.inputHeader_tablet
-													: styles.inputHeader_mobile
-											}
-										>
-											{" "}
-											{I18n.t("DESIGNATION")}:{" "}
-										</Text>
+    AsyncStorage.getItem("custom:isConfigUser").then((value) => {
+      if (value === "true") {
+        global.previlage7 = 'URM Portal';
+        global.previlage5 = 'Accounting Portal';
+        alert('No user details get');
+      }
+      else {
+        AsyncStorage.getItem("custom:isSuperAdmin").then((value) => {
+          if (value === "true") {
+            var domainId = "1";
+            if (global.domainName === "Textile") {
+              domainId = "1";
+            }
+            else if (global.domainName === "Retail") {
+              domainId = "2";
+            }
+            else if (global.domainName === "Electrical & Electronics") {
+              domainId = "3";
+            }
 
-										<TextInput
-											style={
-												Device.isTablet
-													? styles.input_tablet
-													: styles.input_mobile
-											}
-											editable={false}
-											selectTextOnFocus={false}
-											underlineColorAndroid="transparent"
-											placeholder={I18n.t("DESIGNATION")}
-											placeholderTextColor="#353C4050"
-											textAlignVertical="center"
-											autoCapitalize="none"
-											value={this.state.role}
-											onChangeText={this.handleRole}
-										/>
-									</View>
-									<View>
-										<Text
-											style={
-												Device.isTablet
-													? styles.inputHeader_tablet
-													: styles.inputHeader_mobile
-											}
-										>
-											{" "}
-											{I18n.t("EMAIL")}:{" "}
-										</Text>
+            axios.get(UrmService.getPrivillagesForDomain() + domainId).then((res) => {
+              if (res.data && res.data["isSuccess"] === "true") {
+                console.log(res.data);
+                let len = res.data["result"].length;
+                console.log(len);
+                if (len > 0) {
+                  for (let i = 0; i < len; i++) {
+                    let previlage = res.data["result"][i];
+                    if (previlage.name === "Dashboard") {
+                      global.previlage1 = 'Dashboard';
+                    }
+                    if (previlage.name === "Billing Portal") {
+                      global.previlage2 = 'Billing Portal';
+                    }
+                    if (previlage.name === "Inventory Portal") {
+                      global.previlage3 = 'Inventory Portal';
+                    }
+                    if (previlage.name === "Promotions & Loyalty") {
+                      global.previlage4 = 'Promotions & Loyalty';
+                    }
+                    if (previlage.name === "Accounting Portal") {
+                      global.previlage5 = 'Accounting Portal';
+                    }
+                    if (previlage.name === "Reports") {
+                      global.previlage6 = 'Reports';
+                    }
+                    if (previlage.name === "URM Portal") {
+                      global.previlage7 = 'URM Portal';
+                    }
+                  }
+                }
+              }
+            });
+          }
+          else {
+            console.log('vinod-------> privlage by name');
+            AsyncStorage.getItem("rolename").then((value) => {
+              axios.get(UrmService.getPrivillagesByRoleName() + value).then((res) => {
+                if (res.data && res.data["isSuccess"] === "true") {
+                  console.log(res.data);
+                  let len = res.data["result"].parentPrivilages.length;
+                  // console.log(.name)
+                  if (len > 0) {
+                    for (let i = 0; i < len; i++) {
+                      let previlage = res.data["result"].parentPrivilages[i];
 
-										<TextInput
-											style={
-												Device.isTablet
-													? styles.input_tablet
-													: styles.input_mobile
-											}
-											underlineColorAndroid="transparent"
-											placeholder={I18n.t("EMAIL")}
-											placeholderTextColor="#353C4050"
-											textAlignVertical="center"
-											autoCapitalize="none"
-											value={this.state.email}
-											onChangeText={this.handleEmail}
-										/>
+                      if (previlage.name === "Dashboard") {
+                        global.previlage1 = 'Dashboard';
+                      }
+                      if (previlage.name === "Billing Portal") {
+                        global.previlage2 = 'Billing Portal';
+                      }
+                      if (previlage.name === "Inventory Portal") {
+                        global.previlage3 = 'Inventory Portal';
+                      }
+                      if (previlage.name === "Promotions & Loyalty") {
+                        global.previlage4 = 'Promotions & Loyalty';
+                      }
+                      if (previlage.name === "Accounting Portal") {
+                        global.previlage5 = 'Accounting Portal';
+                      }
+                      if (previlage.name === "Reports") {
+                        global.previlage6 = 'Reports';
+                      }
+                      if (previlage.name === "URM Portal") {
+                        global.previlage7 = 'URM Portal';
+                      }
+                    }
+                  }
+                }
+              });
+            }).catch(() => {
+              this.setState({ loading: false });
+              console.log('There is error saving domainDataId');
+              // alert('There is error saving domainDataId');
+            });
 
-										{/* <TouchableOpacity style={{
+          }
+        }).catch(() => {
+          this.setState({ loading: false });
+          console.log('There is error getting storeId');
+          // alert('There is error getting storeId');
+        });
+      }
+    }).catch(() => {
+      this.setState({ loading: false });
+      console.log('There is error getting storeId');
+      // alert('There is error getting storeId');
+    });
+  }
+
+
+
+
+  signOut() {
+    AsyncStorage.removeItem('phone_number');
+    this.props.navigation.push('Login');
+  }
+
+  handleMenuButtonClick() {
+    this.props.navigation.openDrawer();
+  }
+
+
+  render() {
+    return (
+      <>
+        <View style={{ flex: 1 }}>
+          <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
+            <TouchableOpacity style={{ backgroundColor: '#ED1C24', width: 100, margin: 10, borderRadius: 5 }}
+              onPress={() => {
+                AsyncStorage.clear()
+                AsyncStorage.removeItem('phone_number')
+                AsyncStorage.removeItem('user')
+                AsyncStorage.removeItem('tokenkey')
+                global.homeButtonClicked = false;
+                global.profileButtonClicked = false;
+                this.props.navigation.navigate('Login')
+              }}>
+              <Text style={{ color: '#fff', alignSelf: 'center', fontWeight: '700' }}> {I18n.t("Sign Out")}</Text>
+            </TouchableOpacity>
+          </View>
+          <KeyboardAwareScrollView KeyboardAwareScrollView
+            enableOnAndroid={true}>
+            <View>
+              {this.state.loading &&
+                <Loader
+                  loading={this.state.loading} />
+              }
+              <View style={{
+                flex: 1, justifyContent: 'center', //Centered horizontally
+                alignItems: 'center', color: '#ffffff'
+              }}>
+                <View style={{ flexDirection: 'column', flex: 0, marginLeft: 0, marginTop: 10, marginRight: 0, backgroundColor: "#ffffff", borderRadius: 20, }}>
+
+                  <Image
+                    style={{ width: 80, height: 80, resizeMode: "cover", marginTop: 20, borderRadius: 40, borderColor: '#F2F2F2', alignSelf: 'center', borderWidth: 2, }}
+                    source={this.state.image}
+                  />
+                  <TouchableOpacity style={{ width: 30, height: 30, borderRadius: 10, alignSelf: 'center', top: -20, left: 15 }}>
+                    <Image
+                      style={{ width: 30, height: 30, borderRadius: 10, }}
+                      source={require('../assets/images/cameraclick.png')} />
+                  </TouchableOpacity>
+
+                  {this.state.flagqtyModelOpen && (
+                    <View>
+                      <Modal isVisible={this.state.modalVisible}>
+                        <View style={{
+                          flex: 1, justifyContent: 'center', //Centered horizontally
+                          alignItems: 'center',
+                        }}>
+                          <View style={{
+                            position: 'absolute',
+                            right: 20,
+                            left: 20,
+                            alignItems: 'center',
+                            justifyContent: 'flex-start',
+                            backgroundColor: "#ffffff", borderRadius: 20,
+                          }}>
+                            <TouchableOpacity
+                              style={{ backgroundColor: '#ED1C24', borderRadius: 5, width: 200, marginTop: 20, height: 32, alignSelf: 'center' }}
+                              onPress={() => this.pickSingleWithCameraForProductsAdd(true)} >
+                              <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ffffff', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('Select Product Image With Camera')} </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                              style={{ backgroundColor: '#ED1C24', borderRadius: 5, width: 200, marginTop: 20, height: 32, alignSelf: 'center' }}
+                              onPress={() => this.pickSingleForProductsAdd(true)} >
+                              <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ffffff', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('Select Product Image With Gallery')} </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                              style={{ backgroundColor: '#ED1C24', borderRadius: 5, width: 200, marginTop: 20, height: 32, alignSelf: 'center', marginBottom: 20, }}
+                              onPress={() => this.cancel()} >
+                              <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ffffff', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('Cancel')} </Text>
+                            </TouchableOpacity>
+
+                          </View>
+                        </View>
+                      </Modal>
+                    </View>)}
+
+
+                  <Text></Text>
+
+                  <View style={{ marginTop: 0, width: deviceWidth }}>
+
+                    <Text style={Device.isTablet ? styles.inputHeader_tablet : styles.inputHeader_mobile}> {I18n.t("NAME")}: </Text>
+
+                    <TextInput
+                      style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
+                      underlineColorAndroid="transparent"
+                      placeholder={I18n.t("NAME")}
+                      editable={false} selectTextOnFocus={false}
+                      placeholderTextColor="#353C4050"
+                      textAlignVertical="center"
+                      autoCapitalize="none"
+                      value={this.state.userName}
+                      onChangeText={this.handleUserName}
+                    />
+
+
+                  </View>
+                  <View>
+                    <Text style={Device.isTablet ? styles.inputHeader_tablet : styles.inputHeader_mobile}> {I18n.t("DESIGNATION")}: </Text>
+
+                    <TextInput
+                      style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
+                      editable={false} selectTextOnFocus={false}
+                      underlineColorAndroid="transparent"
+                      placeholder={I18n.t("DESIGNATION")}
+                      placeholderTextColor="#353C4050"
+                      textAlignVertical="center"
+                      autoCapitalize="none"
+                      value={this.state.role}
+                      onChangeText={this.handleRole}
+                    />
+                  </View>
+                  <View>
+                    <Text style={Device.isTablet ? styles.inputHeader_tablet : styles.inputHeader_mobile}> {I18n.t("EMAIL")}: </Text>
+
+                    <TextInput
+                      style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
+                      underlineColorAndroid="transparent"
+                      placeholder={I18n.t("EMAIL")}
+                      placeholderTextColor="#353C4050"
+                      textAlignVertical="center"
+                      autoCapitalize="none"
+                      value={this.state.email}
+                      onChangeText={this.handleEmail}
+                    />
+
+                    {/* <TouchableOpacity style={{
                         position: 'absolute',
                         right: 28,
                         top: 20,
@@ -870,100 +753,67 @@ class Settings extends Component {
                       >
                         <Text style={{ color: '#353C4050', fontFamily: 'regular', fontSize: 14, position: 'absolute', right: 0, }}> {'%'} </Text>
                       </TouchableOpacity> */}
-									</View>
 
-									<TouchableOpacity
-										style={
-											Device.isTablet
-												? styles.saveButton_tablet
-												: styles.saveButton_mobile
-										}
-										onPress={() => this.profileUpdate()}
-									>
-										<Text
-											style={
-												Device.isTablet
-													? styles.saveButtonText_tablet
-													: styles.saveButtonText_mobile
-											}
-										>
-											{" "}
-											{I18n.t("SAVE")}{" "}
-										</Text>
-									</TouchableOpacity>
-								</View>
-							</View>
-						</View>
-					</KeyboardAwareScrollView>
 
-					{this.state.datepickerOpen && (
-						<View
-							style={{
-								height: 280,
-								width: deviceWidth,
-								backgroundColor: "ffffff",
-							}}
-						>
-							<TouchableOpacity
-								style={{
-									position: "absolute",
-									left: 20,
-									top: 10,
-									height: 30,
-									backgroundColor: "#ED1C24",
-									borderRadius: 5,
-								}}
-								onPress={() => this.datepickerCancelClicked()}
-							>
-								<Text
-									style={{
-										textAlign: "center",
-										marginTop: 5,
-										color: "#ffffff",
-										fontSize: 15,
-										fontFamily: "regular",
-									}}
-								>
-									{" "}
-									Cancel{" "}
-								</Text>
-							</TouchableOpacity>
-							<TouchableOpacity
-								style={{
-									position: "absolute",
-									right: 20,
-									top: 10,
-									height: 30,
-									backgroundColor: "#ED1C24",
-									borderRadius: 5,
-								}}
-								onPress={() => this.datepickerDoneClicked()}
-							>
-								<Text
-									style={{
-										textAlign: "center",
-										marginTop: 5,
-										color: "#ffffff",
-										fontSize: 15,
-										fontFamily: "regular",
-									}}
-								>
-									{" "}
-									Done{" "}
-								</Text>
-							</TouchableOpacity>
-							<DatePicker
-								style={{ width: deviceWidth, height: 200, marginTop: 50 }}
-								date={this.state.date}
-								mode={"date"}
-								onDateChange={(date) => this.setState({ date })}
-							/>
-						</View>
-					)}
-				</View>
-			</>
-		);
-	}
+                  </View>
+
+
+
+                  <TouchableOpacity
+                    style={Device.isTablet ? styles.saveButton_tablet : styles.saveButton_mobile}
+                    onPress={() => this.profileUpdate()}
+                  >
+                    <Text style={Device.isTablet ? styles.saveButtonText_tablet : styles.saveButtonText_mobile}> {I18n.t("SAVE")} </Text>
+                  </TouchableOpacity>
+                </View>
+
+              </View>
+            </View>
+          </KeyboardAwareScrollView>
+
+          {this.state.datepickerOpen && (
+            <View style={{ height: 280, width: deviceWidth, backgroundColor: 'ffffff' }}>
+              <TouchableOpacity
+                style={{
+                  position: 'absolute',
+                  left: 20,
+                  top: 10,
+                  height: 30, backgroundColor: "#ED1C24", borderRadius: 5,
+                }} onPress={() => this.datepickerCancelClicked()}
+              >
+                <Text style={{
+                  textAlign: 'center', marginTop: 5, color: "#ffffff", fontSize: 15,
+                  fontFamily: "regular"
+                }}  > Cancel </Text>
+
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  position: 'absolute',
+                  right: 20,
+                  top: 10,
+                  height: 30, backgroundColor: "#ED1C24", borderRadius: 5,
+                }} onPress={() => this.datepickerDoneClicked()}
+              >
+                <Text style={{
+                  textAlign: 'center', marginTop: 5, color: "#ffffff", fontSize: 15,
+                  fontFamily: "regular"
+                }}  > Done </Text>
+
+              </TouchableOpacity>
+              <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
+                date={this.state.date}
+                mode={'date'}
+                onDateChange={(date) => this.setState({ date })}
+              />
+            </View>
+          )}
+        </View>
+        {/* <BottomTabNav {...this.props} /> */}
+      </>
+    );
+  }
+
 }
 export default Settings;
 

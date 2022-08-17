@@ -16,7 +16,7 @@ axios.interceptors.request.use(
       }).catch((err) => {
          this.setState({ loading: false });
          // alert('There is error getting token');
-          alert(err);
+         alert(err);
 
          console.log('There is error getting token');
       });

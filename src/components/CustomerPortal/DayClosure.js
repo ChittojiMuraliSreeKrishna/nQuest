@@ -65,7 +65,7 @@ export default class DayClosure extends Component {
         <FlatList
           ListHeaderComponent={<View style={flatListHeaderContainer}>
             <Text style={flatListTitle}>List of Pending Dl slips</Text>
-            {this.state.enableButton && (
+            {!this.state.enableButton && (
               <TouchableOpacity style={styles.closeBtn} onPress={() => this.closeDay()}>
                 <Text style={styles.closeBtnText}>Day Closure</Text>
               </TouchableOpacity>
