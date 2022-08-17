@@ -743,48 +743,79 @@ class Home extends Component {
 									{I18n.t("Top 5 Sales by representative")}
 								</Text>
 
-                <View style={[Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile, { width: deviceWidth - 60, borderColor: '#000000', borderWidth: Device.isTablet ? 2 : 1, marginTop: Device.isTablet ? 20 : 0 }]}>
-                  <RNPickerSelect
-                    placeholder={{
-                      label: "Today",
-                      value: "Today",
-                    }}
-                    Icon={() => {
-                      return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-                    }}
-                    items={[
-                      { label: 'Last One Month', value: 'LastOneMonth' },
-                      { label: 'Last 6 Months', value: 'Last6months' },
-                      { label: 'Last Year', value: 'LastYear' },
-                    ]}
-                    onValueChange={this.handleSalesName}
-                    style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
-                    value={this.state.salesName}
-                    useNativeAndroidPickerStyle={false}
-                  />
-                </View>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: Device.isTablet ? deviceWidth - 260 : deviceWidth - 160, marginTop: Device.isTablet ? 10 : 20 }}>
-                  <BarChart
-                    style={{ paddingTop: 20 }}
-                    data={this.state.topSalesChart}
-                    width={Device.isTablet ? deviceWidth - 120 : deviceWidth - 60}
-                    height={Device.isTablet ? 400 : 500}
-                    yLabelsOffset={Device.isTablet ? 0 : 20}
-                    yAxisLabel="₹"
-                    fromZero
-                    chartConfig={chartConfig}
-                    verticalLabelRotation={Device.isTablet ? 0 : 90}
-                  />
-                </View>
-              </View>
-            </View>
-          </ScrollView>
-        </View>
-        {/* <BottomTabNav {...this.props} /> */}
-      </>
-    );
-  }
-
+								<View
+									style={[
+										Device.isTablet
+											? styles.rnSelectContainer_tablet
+											: styles.rnSelectContainer_mobile,
+										{
+											width: deviceWidth - 60,
+											borderColor: "#000000",
+											borderWidth: Device.isTablet ? 2 : 1,
+											marginTop: Device.isTablet ? 20 : 0,
+										},
+									]}
+								>
+									<RNPickerSelect
+										placeholder={{
+											label: "Today",
+											value: "Today",
+										}}
+										Icon={() => {
+											return (
+												<Chevron
+													style={styles.imagealign}
+													size={1.5}
+													color="gray"
+												/>
+											);
+										}}
+										items={[
+											{ label: "Last One Month", value: "LastOneMonth" },
+											{ label: "Last 6 Months", value: "Last6months" },
+											{ label: "Last Year", value: "LastYear" },
+										]}
+										onValueChange={this.handleSalesName}
+										style={
+											Device.isTablet
+												? pickerSelectStyles_tablet
+												: pickerSelectStyles_mobile
+										}
+										value={this.state.salesName}
+										useNativeAndroidPickerStyle={false}
+									/>
+								</View>
+								<View
+									style={{
+										flexDirection: "row",
+										justifyContent: "space-around",
+										width: Device.isTablet
+											? deviceWidth - 260
+											: deviceWidth - 160,
+										marginTop: Device.isTablet ? 10 : 20,
+									}}
+								>
+									<BarChart
+										style={{ paddingTop: 20 }}
+										data={this.state.topSalesChart}
+										width={
+											Device.isTablet ? deviceWidth - 120 : deviceWidth - 60
+										}
+										height={Device.isTablet ? 400 : 500}
+										yLabelsOffset={Device.isTablet ? 0 : 20}
+										yAxisLabel="₹"
+										fromZero
+										chartConfig={chartConfig}
+										verticalLabelRotation={Device.isTablet ? 0 : 90}
+									/>
+								</View>
+							</View>
+						</View>
+					</ScrollView>
+				</View>
+			</>
+		);
+	}
 }
 export default Home;
 

@@ -10,20 +10,47 @@ import AddTaxMaster from "../components/Accounting/AddTaxMaster";
 
 const Stack = createStackNavigator();
 export default class AccountingNaviagtion extends Component {
-
-    render() {
-        return (
-            <>
-            <Stack.Navigator initialRouteName='AccountManagement' >
-                <Stack.Screen name='AccountManagement' options={{ headerShown: false }} component={AccountManagement} />
-                <Stack.Screen name='AddStore' options={{ headerShown: false }} component={AddStore} />
-                <Stack.Screen name='AddDomain' options={{ headerShown: false }} component={AddDomain} />
-                <Stack.Screen name='AddTaxMaster' options={{ headerShown: false }} component={AddTaxMaster} />
-                <Stack.Screen name='AddHsnCode' options={{ headerShown: false }} component={AddHsnCode} />
-                <Stack.Screen name='AddCreditNotes' options={{ headerShown: false }} component={AddCreditNotes} />
-                <Stack.Screen name='AddDebitNotes' options={{ headerShown: false }} component={AddDebitNotes} />
-            </Stack.Navigator>
-            </>
-        );
-    }
-};
+	render() {
+		return (
+			<>
+				<Stack.Navigator initialRouteName="AccountManagement">
+					<Stack.Screen
+						name="AccountManagement"
+						options={{ headerShown: false }}
+						component={AccountManagement}
+					/>
+					<Stack.Screen
+						name="AddStore"
+						options={{ headerShown: false }}
+						component={AddStore}
+					/>
+					<Stack.Screen
+						name="AddDomain"
+						options={{ headerShown: false }}
+						component={AddDomain}
+					/>
+					<Stack.Screen
+						name="AddTaxMaster"
+						options={{ headerShown: false }}
+						component={AddTaxMaster}
+					/>
+					<Stack.Screen
+						name="AddHsnCode"
+						options={{ headerShown: false }}
+						component={AddHsnCode}
+					/>
+					<Stack.Screen
+						name="AddCreditNotes"
+						options={{ headerShown: false }}
+						component={AddCreditNotes}
+					/>
+					<Stack.Screen
+						name="AddDebitNotes"
+						options={{ headerShown: false }}
+						component={AddDebitNotes}
+					/>
+				</Stack.Navigator>
+			</>
+		);
+	}
+}
