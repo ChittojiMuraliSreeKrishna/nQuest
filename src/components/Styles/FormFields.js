@@ -236,23 +236,3 @@ export const dateText = {
 	fontSize: RF(15),
 	fontFamily: "regular",
 };
-
-export const checkPromoDiscountBtn = {
-  width: deviceWidth - RW(40),
-  marginHorizontal: RW(20),
-  marginVertical: RH(10),
-  height: Device.isTablet ? RH(60) : RH(50),
-  borderRadius: 5,
-  borderWidth: Device.isTablet ? 2 : 1,
-  display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'center'
-};
-
-export const textStyle = {
-  color: "#353C40",
-  fontFamily: "medium",
-  alignItems: 'center',
-  justifyContent: 'center',
-  textAlign: 'center',
-  marginTop: RF(10),
-  fontSize: Device.isTablet ? 19 : 14,
-}

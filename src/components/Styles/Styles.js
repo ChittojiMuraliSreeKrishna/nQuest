@@ -259,9 +259,3 @@ export const loadmoreBtnText = {
 	color: color.lightBlack,
 	fontFamily: "bold",
 };
-
-export const textStyleMediumColor = {
-  fontSize: RF(10),
-  fontFamily: 'medium',
-  color: color.mediumDark
-}
