@@ -94,6 +94,9 @@ export default class Barcode extends Component {
 		this.setState({ storeId: storeId });
 		this.getAllBarcodes(0);
 		console.log({ scss });
+		window.setTimeout(() => {
+			this.setState({ loading: false });
+		}, 11000);
 	}
 
 	// Filter Action

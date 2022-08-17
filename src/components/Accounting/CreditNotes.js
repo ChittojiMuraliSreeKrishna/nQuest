@@ -113,7 +113,7 @@ export default class CreditNotes extends Component {
 		this.setState({ loading: true });
 		const accountType = "CREDIT";
 		const { storeId } = this.state;
-		console.log(storeId);
+		console.log({ storeId });
 		const reqOb = {
 			fromDate: null,
 			mobileNumber: null,
@@ -124,7 +124,7 @@ export default class CreditNotes extends Component {
 		};
 		AccountingService.getCreditNotes(reqOb).then((res) => {
 			if (res) {
-				console.log(res.data.content);
+				console.log({ res });
 				this.setState({ creditNotes: res.data.content });
 			}
 			this.setState({ loading: false });
