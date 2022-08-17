@@ -1,0 +1,60 @@
+@import "./Colors.scss";
+
+.input_fld {
+	justify-content: center;
+	margin: 0 20px;
+	height: 50px;
+	width: 92%;
+	border-color: $grey-lighter;
+	border-width: 2px;
+	border-radius: 5px;
+	font-weight: normal;
+	padding-left: 10px;
+	font-size: 20px;
+}
+
+.active_fld {
+	background-color: $white;
+	color: $black;
+}
+
+.inactive_fld {
+	background-color: $shadow;
+	color: $grey-dark;
+}
+
+.cancel_btn {
+	height: 55px;
+	width: 45%;
+	background-color: $white;
+	border: 1px solid $border;
+	border-radius: 5px;
+	text-align: center;
+}
+
+.submit_btn {
+	height: 55px;
+	width: 45%;
+	background-color: $primary-color;
+	border: 1px solid $border;
+	border-radius: 5px;
+	text-align: center;
+}
+
+.form_btn_container {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	align-items: center;
+	margin: 10px 0;
+}
+
+.rnp_container {
+	justify-content: center;
+	margin: 0 20px;
+	width: 93%;
+	height: 50px;
+	border-color: $border;
+	border-radius: 5px;
+	border-width: 2px;
+}
