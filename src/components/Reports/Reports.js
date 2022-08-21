@@ -2,15 +2,16 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DrawerActions } from "@react-navigation/native";
 import React, { Component } from "react";
 import {
-	Dimensions,
-	FlatList,
-	ScrollView,
-	StyleSheet,
-	Text,
-	TouchableOpacity,
-	View,
+  Dimensions,
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 import Device from "react-native-device-detection";
+import scss from "../../commonUtils/assets/styles/HeaderStyles.scss";
 import { RF, RH, RW } from "../../Responsive";
 import UrmService from "../services/UrmService";
 import { GoodsReturn } from "./GoodsReturn";
@@ -20,9 +21,11 @@ import { ListOfPromotions } from "./ListOfPromotions";
 import NewSaleReport from "./NewSaleReport";
 import ReportsDashboard from "./ReportsDashboard";
 import { SalesSumary } from "./SalesSumary";
+
 var deviceWidth = Dimensions.get("window").width;
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
+
 
 const data = [true, false, false, false, false, false, false, false, false];
 
@@ -159,7 +162,7 @@ class Reports extends Component {
 				} else {
 					this.setState({ flagSalesSummary: false });
 				}
-				if (this.state.privilages[0].name === "List Of Barcodes") {
+				if (this.state.privilages[0].name === "List of Barcodes") {
 					this.setState({
 						listBarcodes: [],
 						flagListBarcodes: true,
@@ -423,7 +426,7 @@ class Reports extends Component {
 				<ScrollView>
 					<View style={styles.container}>
 						<FlatList
-							style={styles.flatList}
+							style={scss.pageNavigationContainer}
 							horizontal
 							data={this.state.privilages}
 							showsVerticalScrollIndicator={false}
@@ -444,26 +447,19 @@ class Reports extends Component {
 							}
 							renderItem={({ item, index }) => (
 								<TouchableOpacity
-									style={{
-										height: Device.isTablet ? 46 : 36,
-										width: Device.isTablet ? 250 : 200,
-										borderWidth: Device.isTablet ? 2 : 1,
-										backgroundColor: item.bool ? "#ED1C24" : "#FFFFFF",
-										borderColor: item.bool ? "#ED1C24" : "#858585",
-										borderRadius: Device.isTablet ? 10 : 5,
-										marginLeft: RW(10),
-									}}
+									style={[
+											scss.pageNavigationBtn,
+											{
+												borderColor: item.bool ? "#ED1C24" : "#d7d7d7",
+											},
+										]}
 									onPress={() => this.topbarAction1(item, index)}
 								>
 									<Text
-										style={{
-											fontSize: Device.isTablet ? 21 : 16,
-											alignItems: "center",
-											alignSelf: "center",
-											marginTop: RH(5),
-											color: item.bool ? "#FFFFFF" : "#858585",
-											fontFamily: "regular",
-										}}
+										style={[
+												scss.pageNavigationBtnText,
+												{ color: item.bool ? "#ED1C24" : "#00000073" },
+											]}
 									>
 										{item.name}
 									</Text>

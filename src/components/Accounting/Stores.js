@@ -109,6 +109,7 @@ export default class Stores extends Component {
 		const isActive = false;
 		UrmService.getAllStores(clientId, pageNumber, isActive)
 			.then((res) => {
+				console.log({ res });
 				if (res) {
 					if (res.data) {
 						let response = res.data;
