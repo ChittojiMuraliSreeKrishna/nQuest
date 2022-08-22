@@ -63,6 +63,7 @@ class BottomTabNav extends Component {
 	async getPrivileges() {
 		await AsyncStorage.getItem("roleType").then((value) => {
 			if (value === "config_user") {
+				let privilegesSet = new Set();
 				global.previlage1 = "";
 				global.previlage2 = "";
 				global.previlage3 = "";
@@ -70,7 +71,9 @@ class BottomTabNav extends Component {
 				global.previlage5 = "";
 				global.previlage6 = "";
 				global.previlage7 = "URM Portal";
-				this.setState({ firstDisplayName: screenMapping["URM Portal"] });
+				privilegesSet.add("URM Portal");
+				data = Array.from(privilegesSet);
+				this.setState({ firstDisplayName: "URM Portal" });
 			} else if (value === "super_admin") {
 				global.previlage1 = "Dashboard";
 				global.previlage2 = "Billing Portal";
@@ -83,18 +86,17 @@ class BottomTabNav extends Component {
 				AsyncStorage.getItem("rolename")
 					.then((value) => {
 						global.userrole = value;
-						axios
-							.get(UrmService.getPrivillagesByRoleName() + value)
-							.then((res) => {
-								if (res.data) {
-									let len = res.data.parentPrivileges.length;
-									if (len > 0)
-										this.setState({
-											firstDisplayName:
-												screenMapping[res.data.parentPrivileges[0].name],
-										});
+						UrmService.getPrivillagesByRoleName(value).then((res) => {
+							console.log({ res });
+							if (res.data) {
+								let len = res.data.parentPrivileges.length;
+								if (len > 0) {
+									this.setState({
+										firstDisplayName: screenMapping[res.data.parentPrivileges[0].name],
+									});
 								}
-							});
+							}
+						});
 					})
 					.catch((err) => {
 						console.log(err);
