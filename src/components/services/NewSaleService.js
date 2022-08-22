@@ -7,6 +7,10 @@ class NewSaleService {
     return BASE_URL + '/paymentgateway/paymentgateway/create_order'
   }
 
+  upiPayment(){
+    return BASE_URL + '/paymentgateway/razorpay/create-payment-link'
+  }
+  
   getAllBarcodes() {
     return BASE_URL + '/new-sale/newsale/getAllBarcodes'
   }

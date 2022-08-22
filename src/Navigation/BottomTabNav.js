@@ -59,48 +59,52 @@ class BottomTabNav extends Component {
     this.getPrivileges();
   }
 
-  async getPrivileges() {
-    await AsyncStorage.getItem("roleType").then((value) => {
-      if (value === "config_user") {
-        global.previlage1 = "";
-        global.previlage2 = "";
-        global.previlage3 = "";
-        global.previlage4 = "";
-        global.previlage5 = "";
-        global.previlage6 = "";
-        global.previlage7 = "URM Portal";
-        this.setState({ firstDisplayName: screenMapping["URM Portal"] });
-      } else if (value === "super_admin") {
-        global.previlage1 = "Dashboard";
-        global.previlage2 = "Billing Portal";
-        global.previlage3 = "Inventory Portal";
-        global.previlage4 = "Promotions & Loyalty";
-        global.previlage5 = "Accounting Portal";
-        global.previlage6 = "Reports";
-        global.previlage7 = "URM Portal";
-      } else {
-        AsyncStorage.getItem("rolename")
-          .then((value) => {
-            global.userrole = value;
-            UrmService.getPrivillagesByRoleName(value).then((res) => {
-              if (res.data) {
-                let len = res.data.parentPrivileges.length;
-                let parentPriv = res.data.parentPrivileges
-                console.log({ parentPriv })
-                if (len > 0)
-                  this.setState({
-                    firstDisplayName:
-                      screenMapping[parentPriv[0].name],
-                  });
-              }
-            });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      }
-    });
-  }
+
+	async getPrivileges() {
+		await AsyncStorage.getItem("roleType").then((value) => {
+			if (value === "config_user") {
+				let privilegesSet = new Set();
+				global.previlage1 = "";
+				global.previlage2 = "";
+				global.previlage3 = "";
+				global.previlage4 = "";
+				global.previlage5 = "";
+				global.previlage6 = "";
+				global.previlage7 = "URM Portal";
+				privilegesSet.add("URM Portal");
+				data = Array.from(privilegesSet);
+				this.setState({ firstDisplayName: "URM Portal" });
+			} else if (value === "super_admin") {
+				global.previlage1 = "Dashboard";
+				global.previlage2 = "Billing Portal";
+				global.previlage3 = "Inventory Portal";
+				global.previlage4 = "Promotions & Loyalty";
+				global.previlage5 = "Accounting Portal";
+				global.previlage6 = "Reports";
+				global.previlage7 = "URM Portal";
+			} else {
+				AsyncStorage.getItem("rolename")
+					.then((value) => {
+						global.userrole = value;
+						UrmService.getPrivillagesByRoleName(value).then((res) => {
+							console.log({ res });
+							if (res.data) {
+								let len = res.data.parentPrivileges.length;
+								if (len > 0) {
+									this.setState({
+										firstDisplayName: screenMapping[res.data.parentPrivileges[0].name],
+									});
+								}
+							}
+						});
+					})
+					.catch((err) => {
+						console.log(err);
+					});
+			}
+		});
+	}
+
 
   homeButtonActions() {
     global.homeButtonClicked = true;

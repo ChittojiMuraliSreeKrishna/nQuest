@@ -195,75 +195,57 @@ class NewSaleTextile extends Component {
 
 	render() {
 		return (
-			<View style={styles.container}>
-				{/* <View style={headerTitleContainer}>
-          <View style={headerTitleSubContainer}>
-            <TouchableOpacity style={menuButton} onPress={() => this.handleMenuButtonClick()}>
-              <Image source={require('../assets/images/menu.png')} />
-            </TouchableOpacity>
-            <Text style={headerTitle}> {I18n.t("Billing Portal")} </Text>
-          </View>
-          <View style={headerTitleSubContainer2}>
-            {this.state.flagGiftVoucher && (
-              <TouchableOpacity style={headerNavigationBtn} onPress={() => this.navigateToAddBarcode()}>
-                <Text style={headerNavigationBtnText}>Add Voucher</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View> */}
-
-				<ScrollView>
-					<View style={styles.container}>
-						<FlatList
-							style={pageNavigationBtnContainer}
-							horizontal
-							data={this.state.privilages}
-							showsVerticalScrollIndicator={false}
-							showsHorizontalScrollIndicator={false}
-							renderItem={({ item, index }) => (
-								<TouchableOpacity
+			< ScrollView >
+				<View style={styles.container}>
+					<FlatList
+						style={pageNavigationBtnContainer}
+						horizontal
+						data={this.state.privilages}
+						showsVerticalScrollIndicator={false}
+						showsHorizontalScrollIndicator={false}
+						renderItem={({ item, index }) => (
+							<TouchableOpacity
+								style={[
+									scss.pageNavigationBtn,
+									{
+										// backgroundColor: item.bool ? '#ED1C24' : '#d7d7d7',
+										borderColor: item.bool ? "#ED1C24" : "#d7d7d7",
+									},
+								]}
+								onPress={() => this.topbarAction1(item, index)}
+							>
+								<Text
 									style={[
-										scss.pageNavigationBtn,
-										{
-											// backgroundColor: item.bool ? '#ED1C24' : '#d7d7d7',
-											borderColor: item.bool ? "#ED1C24" : "#d7d7d7",
-										},
+										scss.pageNavigationBtnText,
+										{ color: item.bool ? "#ED1C24" : "#00000073" },
 									]}
-									onPress={() => this.topbarAction1(item, index)}
 								>
-									<Text
-										style={[
-											scss.pageNavigationBtnText,
-											{ color: item.bool ? "#ED1C24" : "#00000073" },
-										]}
-									>
-										{item.name}
-									</Text>
-								</TouchableOpacity>
-							)}
-							ListFooterComponent={<View style={{ width: 15 }}></View>}
-						/>
-
-						{this.state.flagGenerateEstimationSlip && (
-							<GenerateEstimationSlip navigation={this.props.navigation} />
+									{item.name}
+								</Text>
+							</TouchableOpacity>
 						)}
+						ListFooterComponent={<View style={{ }}></View>}
+					/>
 
-						{this.state.flagGenerateInvoice && (
-							<GenerateInvoiceSlip navigation={this.props.navigation} />
-						)}
+					{this.state.flagGenerateEstimationSlip && (
+						<GenerateEstimationSlip navigation={this.props.navigation} />
+					)}
 
-						{this.state.flagGenerateReturnSlip && (
-							<GenerateReturnSlip navigation={this.props.navigation} />
-						)}
+					{this.state.flagGenerateInvoice && (
+						<GenerateInvoiceSlip navigation={this.props.navigation} />
+					)}
 
-						{this.state.falgAddCustomer && <AddCustomer />}
+					{this.state.flagGenerateReturnSlip && (
+						<GenerateReturnSlip navigation={this.props.navigation} />
+					)}
 
-						{this.state.flagGiftVoucher && <GiftVocher />}
+					{this.state.falgAddCustomer && <AddCustomer />}
 
-						{this.state.flagDayClosure && <DayClosure />}
-					</View>
-				</ScrollView>
-			</View>
+					{this.state.flagGiftVoucher && <GiftVocher />}
+
+					{this.state.flagDayClosure && <DayClosure />}
+				</View>
+			</ScrollView >
 		);
 	}
 }
