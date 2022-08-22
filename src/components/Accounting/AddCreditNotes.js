@@ -1,16 +1,17 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 import React, { Component } from 'react';
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import DatePicker from 'react-native-date-picker';
 import Device from 'react-native-device-detection';
 import RNPickerSelect from 'react-native-picker-select';
+import RazorpayCheckout from 'react-native-razorpay';
 import { Chevron } from 'react-native-shapes';
+import { ACCOUNTING_PORTAL } from '../../commonUtils/ApiConstants';
+import { BASE_URL } from '../../commonUtils/Base';
 import AccountingService from '../services/AccountingService';
 import NewSaleService from '../services/NewSaleService';
-import { cancelBtn, cancelBtnText, inputFieldDisabled, inputArea, inputField, inputHeading, rnPicker, rnPickerContainer, submitBtn, submitBtnText } from '../Styles/FormFields';
+import { cancelBtn, cancelBtnText, inputArea, inputField, inputFieldDisabled, inputHeading, rnPicker, rnPickerContainer, submitBtn, submitBtnText } from '../Styles/FormFields';
 import { backButton, backButtonImage, headerTitle, headerTitleContainer, headerTitleSubContainer } from '../Styles/Styles';
-import RazorpayCheckout from 'react-native-razorpay';
-
 var deviceWidth = Dimensions.get('window').width;
 
 export default class AddCreditNotes extends Component {
@@ -126,7 +127,9 @@ export default class AddCreditNotes extends Component {
       console.log({ res });
       if (res) {
         if (transanctionMode === "Card") {
+          console.log('\n')
           this.savePayment(res.data.amount, res.data.referenceNumber);
+          console.log('\n')
         } else {
           this.props.route.params.onGoBack();
           this.props.navigation.goBack();
@@ -147,6 +150,7 @@ export default class AddCreditNotes extends Component {
   }
 
   savePayment = (cardAmount, referenceNumber) => {
+      let self = this;
     const reqObj = {
       amount: cardAmount,
       type: "C",
@@ -163,10 +167,12 @@ export default class AddCreditNotes extends Component {
         image: 'https://i.imgur.com/3g7nmJC.png',
         order_id: res.data.result.razorPayId,
         handler: function (response) {
-          toast.success("Payment Done Successfully");
+          alert("Payment Done Successfully");
+          console.log('++++++++++Rayanna+++++++', self);
           let status = true;
           const param = '?razorPayId=' + response.razorpay_order_id + '&payStatus=' + status;
-          const result = axios.post(BASE_URL + NEW_SALE_URL.saveSale + param, {});
+          const result = axios.post(BASE_URL + ACCOUNTING_PORTAL.saveSale + param, {});
+          console.log('++++++++++Rayanna+++++++', result);
         },
         prefill: {
           name: "Kadali",
@@ -174,14 +180,16 @@ export default class AddCreditNotes extends Component {
           contact: "9999999999",
         },
       };
-      RazorpayCheckout.open(options).then((data) => {
-        this.setState({ tableData: [] });
-        alert(`Success: ${data.razorpay_payment_id}`);
-        this.props.navigation.goBack();
-      }).catch(err => {
-        console.log(err);
-        alert(`Error: ${JSON.stringify(err.code)} | ${JSON.stringify(err.description)}`);
-      });
+      const paymentObject = new RazorpayCheckout.open(options)
+      paymentObject.open()
+      //   .then((data) => {
+      //   this.setState({ tableData: [] });
+      //   alert(`Success: ${data.razorpay_payment_id}`);
+      //   this.props.navigation.goBack();
+      // }).catch(err => {
+      //   console.log(err);
+      //   alert(`Error: ${JSON.stringify(err.code)} | ${JSON.stringify(err.description)}`);
+      // });
     });
   };
 

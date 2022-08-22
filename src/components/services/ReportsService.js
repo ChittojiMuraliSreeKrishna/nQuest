@@ -1,31 +1,33 @@
+import axios from 'axios'
+import { REPORTS_URL } from '../../commonUtils/ApiConstants'
 import { BASE_URL } from "../../commonUtils/Base"
 class ReportsService {
 
-    estimationSlips() {
-        return BASE_URL + "/new-sale/newsale/getlistofdeliveryslips"
-    }
+  estimationSlips(data, pageNumber = 0) {
+    const param = '?page=' + pageNumber
+    return axios.post(BASE_URL + REPORTS_URL.estimationslipsList + param, data)
+  }
 
-    newSaleReports() {
-        return BASE_URL + "/new-sale/newsale/getlistofsalebills"
-    }
+  newSaleReports(data, pageNumber = 0) {
+    const param = '?page=' + pageNumber
+    return axios.post(BASE_URL + REPORTS_URL.listOfSaleBills + param, data)
+  }
 
-    returnSlips(){
-        return BASE_URL + "/customer/customer/getListOfReturnSlips"
-    }
-
-    saleReports() {
-        return BASE_URL + "/new-sale/newsale/getsalereport";
-    }
-
+  returnSlips(data, pageNumber = 0) {
+    const param = '?page=' + pageNumber
+    return axios.post(BASE_URL + REPORTS_URL.returnslipsList + param, data)
+  }
 
 
-    getListOfBarcodes() {
-        return BASE_URL + "/inventory/inventoryTextile/getAllBarcodeTextiles"
-    }
+  getListOfBarcodes(data, pageNumber) {
+    const param = '?page=' + pageNumber
+    return axios.post(BASE_URL + REPORTS_URL.listOfBarcodes + param, data)
+  }
 
-    promotionsList() {
-        return BASE_URL + "/connection-pool/promo/listOfPromotionsBySearch";
-    }
+  promotionsList(data, pageNumber = 0) {
+    const param = '?page=' + pageNumber
+    return axios.post(BASE_URL + REPORTS_URL.promotionsList + param, data)
+  }
 
 }
 

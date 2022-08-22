@@ -2,12 +2,9 @@
 
 .input_fld {
 	justify-content: center;
-	margin: 0 20px;
+	margin: 5px 20px;
 	height: 50px;
 	width: 92%;
-	border-color: $grey-lighter;
-	border-width: 2px;
-	border-radius: 5px;
 	font-weight: normal;
 	padding-left: 10px;
 	font-size: 20px;
@@ -15,12 +12,10 @@
 
 .active_fld {
 	background-color: $white;
-	color: $black;
 }
 
 .inactive_fld {
 	background-color: $shadow;
-	color: $grey-dark;
 }
 
 .cancel_btn {

@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 import React, { Component } from 'react';
 import { Dimensions, FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import DatePicker from 'react-native-date-picker';
@@ -7,8 +6,8 @@ import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
+import { RF, RH, RW } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
-import { RH, RW, RF } from '../../Responsive';
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -39,7 +38,7 @@ export class ListOfBarcodes extends Component {
       barcode: "",
       mrp: "",
       qty: "",
-      listBarcodes: [1, 3, 4]
+      listBarcodes: []
     };
   }
 
@@ -164,7 +163,8 @@ export class ListOfBarcodes extends Component {
       itemMrpGreaterThan: this.state.toPrice,
     };
     console.log('params are' + JSON.stringify(obj));
-    axios.post(ReportsService.getListOfBarcodes(), obj).then((res) => {
+    let pageNumber = 0
+    ReportsService.getListOfBarcodes(obj, pageNumber).then((res) => {
       console.log(res.data);
       if (res.data && res.data["isSuccess"] === "true") {
         if (res.data.result.length !== 0) {
