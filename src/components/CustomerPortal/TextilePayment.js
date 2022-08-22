@@ -790,25 +790,17 @@ class TextilePayment extends Component {
         // else if (global.domainName === "Textile") {
         if (this.state.isCard === true) {
             const obj = {
-                "paymentAmountType": [
-                    {
-                        "paymentType": "Card",
-                        "paymentAmount": this.state.ccCardCash
-                    }
-                ]
+                "paymentType": "Card",
+                "paymentAmount": this.state.ccCardCash
             }
             this.state.paymentType.push(obj);
         }
         else if (this.state.isCash === true) {
             const obj = {
-                "paymentAmountType": [
-                    {
-                        "paymentType": "Cash",
-                        "paymentAmount": parseFloat(this.state.verifiedCash)
-                    }]
+                "paymentType": "Cash",
+                "paymentAmount": parseFloat(this.state.verifiedCash)
             }
             this.state.paymentType.push(obj);
-
         }
         else if (this.state.isCardOrCash === true) {
             const obj = {
@@ -829,6 +821,7 @@ class TextilePayment extends Component {
             "domainId": 1,
             "storeId": this.state.storeId,
             "grossAmount": this.state.grossAmount,
+            "createdBy": this.state.clientId,
             "totalPromoDisc": this.state.totalPromoDisc,
             "taxAmount": this.state.taxAmount,
             "totalManualDisc": parseInt(this.state.manualDisc),
@@ -842,10 +835,12 @@ class TextilePayment extends Component {
             "cgst": this.state.CGST,
             "dlSlip": this.state.dsNumberList,
             "lineItemsReVo": null,
+            "mobileNumber": this.state.customerPhoneNumber,
             "recievedAmount": this.state.recievedAmount,
             "returnAmount": this.state.returnAmount,
             "lineItemsReVo": null,
             "paymentAmountType": this.state.paymentType,
+            "returnSlipNumber": this.state.rtNumber
         }
         console.log(" payment cash method data", obj);
         axios.post(NewSaleService.createOrder(), obj).then((res) => {
