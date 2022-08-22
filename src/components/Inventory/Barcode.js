@@ -51,6 +51,8 @@ import {
   loadMoreBtn,
   loadmoreBtnText
 } from "../Styles/Styles";
+import Icon from 'react-native-vector-icons/FontAwesome5';
+
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;

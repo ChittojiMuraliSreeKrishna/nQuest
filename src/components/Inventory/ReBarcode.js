@@ -63,6 +63,8 @@ export default class ReBarcode extends Component {
     this.state = {
       reBarcodesData: [],
       filterRebarcodesData: [],
+      viewBarcode: [],
+      viewModel: false,
       pageNo: 0,
       filterPageNo: 0,
       storeId: 0,
@@ -301,27 +303,26 @@ export default class ReBarcode extends Component {
       barcode: item.currentBarcodeId,
       storeId: this.state.storeId,
     };
-    console.log("storeId" + this.state.storeId);
-    console.error("params", params);
-    // axios.get(InventoryService.getTextileBarcodesDetails(), { params }).then((res) => {
-    //   if (res) {
-    //     console.log("response edit", res);
-    //     if (res.data && res.data["isSuccess"] === "true") {
-    //       if (res.data["result"]) {
-    //         this.state.barcodesData.push(res.data["result"]);
-    //         this.props.navigation.navigate('ViewReBarcode'
-    //           , {
-    //             item: res.data["result"], isEdit: true,
-    //             onGoBack: () => this.child.getAllBarcodes(),
-    //           });
-    //       }
-    //       console.log(res.data)
-    //       this.setState({ barcodesData: this.state.barcodesData });
-    //     }
-    //   }
-    // }).catch(err => {
-    //   console.log(err);
-    // });
+    console.log({ params });
+    let domainDetails = {}
+    InventoryService.getBarcodesDetails(this.state.storeId, domainDetails, item.currentBarcodeId).then(res => {
+      if (res?.data) {
+        console.log({ res })
+        let viewBarcode = res.data
+        console.log({ viewBarcode })
+        if (res.status === 200) {
+          this.props.navigation.navigate('ViewReBarcode', {
+            item: viewBarcode, isEdit: true,
+            onGoBack: () => {
+              this.setState({ reBarcodesData: [] })
+              this.getAllReBarcodes()
+            }
+          })
+        }
+      }
+    }).catch((err) => {
+      console.log({ err })
+    })
   };
 
   isLoadMoreList = () => {
@@ -424,6 +425,7 @@ export default class ReBarcode extends Component {
             </View>
           )}
         />
+
         {this.state.flagFilterOpen && (
           <View>
             <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>

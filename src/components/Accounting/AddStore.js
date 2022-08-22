@@ -23,7 +23,6 @@ import {
   urmErrorMessages
 } from "../Errors/errors";
 import Message from "../Errors/Message";
-import LoginService from "../services/LoginService";
 import UrmService from "../services/UrmService";
 import {
   cancelBtn,
@@ -97,88 +96,39 @@ export default class AddStore extends Component {
     if (this.state.isEdit === true) {
       const storeItem = this.props.route.params.item;
       console.log({ storeItem });
+      console.log(storeItem.stateCode, "codeState")
       this.setState({
-        stateId: this.props.route.params.item.stateId,
-        statecode: this.props.route.params.item.stateCode,
-        districtId: this.props.route.params.item.districtId,
-        city: this.props.route.params.item.cityId,
-        area: this.props.route.params.item.area,
-        mobile: this.props.route.params.item.phoneNumber,
-        address: this.props.route.params.item.address,
-        domainId: this.props.route.params.item.id.domaiName,
-        storeName: this.props.route.params.item.name,
-        storeId: this.props.route.params.item.id,
-        gstNumber: this.props.route.params.item.gstNumber,
-        storeStatus: this.props.route.params.item.isActive,
+        stateId: storeItem.stateId,
+        statecode: storeItem.stateCode,
+        storeState: storeItem.stateCode,
+        districtId: storeItem.districtId,
+        storeDistrict: storeItem.districtId,
+        city: storeItem.cityId,
+        area: storeItem.area,
+        mobile: storeItem.phoneNumber,
+        address: storeItem.address,
+        domainId: storeItem.id.domaiName,
+        storeName: storeItem.name,
+        storeId: storeItem.id,
+        gstNumber: storeItem.gstNumber,
+        storeStatus: storeItem.isActive,
+      }, () => {
+        this.getMasterStatesList();
+        this.getMasterDistrictsList(this.state.storeState)
       });
-      console.log(this.props.route.params.item);
       this.setState({ navtext: "Edit Store" });
     } else {
       this.setState({ navtext: "Add Store" });
+      this.getMasterStatesList()
     }
-    this.getDomainsList();
-    this.getMasterStatesList();
+    console.log("storeStaet", this.state.storeState, this.state.districtId)
+    // this.getDomainsList();
   }
 
-  getDomainsList() {
-    this.setState({ domains: [] });
-    var domains = [];
-    axios
-      .get(LoginService.getDomainsList() + this.state.clientId)
-      .then((res) => {
-        if (res.data["result"]) {
-          console.log("domain", res.data.result);
-          let len = res.data["result"].length;
-          if (len > 0) {
-            for (let i = 0; i < len; i++) {
-              let number = res.data.result[i];
-              this.state.domainsArray.push({
-                name: number.domaiName,
-                id: number.id,
-              });
-              domains.push({
-                value: this.state.domainsArray[i].name,
-                label: this.state.domainsArray[i].name,
-              });
-
-              if (number.clientDomainaId === this.state.domainId) {
-                this.setState({ domain: this.state.domainsArray[i].name });
-              }
-            }
-            this.setState({
-              domains: domains,
-            });
-
-            this.setState({ domainsArray: this.state.domainsArray });
-            console.log(this.state.domains);
-          }
-        }
-      })
-      .catch(() => {
-        this.setState({ loading: false });
-        this.setState({ loading: false });
-        alert("There Is An Error Getting Domains List");
-      });
-  }
-
-  handleDomain = (value) => {
-    console.log(value);
-    for (let i = 0; i < this.state.domainsArray.length; i++) {
-      if (this.state.domainsArray[i].name === value) {
-        this.setState({ domainId: this.state.domainsArray[i].id });
-        console.log(this.state.domainsArray[i].id);
-      }
-    }
-    this.setState({ domain: value });
-
-    if (this.state.domain !== "" && this.state.domain !== undefined) {
-      this.setState({ domianValid: true });
-    }
-  };
 
   getGSTNumber() {
     const { clientId, statecode } = this.state
-    console.log("hey.............")
+    console.log({ clientId, statecode })
     UrmService.getGSTNumber(clientId, statecode).then((res) => {
       if (res) {
         let gstResult = res.data
@@ -197,38 +147,37 @@ export default class AddStore extends Component {
     this.setState({ loading: false });
     var states = [];
     UrmService.getStates().then((res) => {
+      console.log(res.data)
       if (res.data["result"]) {
         for (var i = 0; i < res.data["result"].length; i++) {
           states.push({
             value: res.data.result[i].stateCode,
             label: res.data.result[i].stateName,
           });
-
-          if (res.data["result"][i].stateId === this.state.stateId) {
-            console.log("stateId is" + this.state.statesArray[i].name);
-            this.setState({ storeState: this.state.statesArray[i].name });
-            this.getMasterDistrictsList();
-          }
+          this.setState({
+            states: states,
+          });
         }
-        this.setState({
-          states: states,
-        });
         this.setState({ statesArray: this.state.statesArray });
       }
+      console.log(this.state.states, "states")
     });
   }
   handleStoreState = (value) => {
-    this.setState({ storeState: value, statecode: value }, () => {
-      console.log(this.state.statecode, "yktld");
-      this.getGSTNumber()
-      this.getMasterDistrictsList(this.state.statecode);
-    });
+    if (!this.state.isEdit) {
+      this.setState({ storeState: value, statecode: value }, () => {
+        console.log({ value })
+        console.log(this.state.statecode, "yktld", this.state.storeState);
+        this.getGSTNumber()
+        this.getMasterDistrictsList(this.state.statecode);
+      });
+    }
   };
 
   // Store Districts
-  getMasterDistrictsList() {
+  getMasterDistrictsList(id) {
     this.setState({ loading: false, dictricts: [], dictrictArray: [] });
-    UrmService.getDistricts(this.state.statecode).then((res) => {
+    UrmService.getDistricts(id).then((res) => {
       if (res.data["result"]) {
         this.setState({ loading: false });
         let dictricts = [];
@@ -237,36 +186,18 @@ export default class AddStore extends Component {
             value: res.data.result[i].districtId,
             label: res.data.result[i].districtName,
           });
+          console.log({ dictricts })
           this.setState({
             dictricts: dictricts,
           });
           this.setState({ dictrictArray: this.state.dictrictArray });
-          if (this.state.dictrictArray[i].id === this.state.districtId) {
-            console.log("district name  is" + this.state.dictrictArray[i].name);
-            this.setState({ storeDistrict: this.state.dictrictArray[i].name });
-          }
         }
       }
     });
   }
   handleDistrict = (value) => {
-    this.setState({ storeDistrict: value, districtId: value });
-  };
-
-  handleDistrict = (value) => {
-    for (let i = 0; i < this.state.dictrictArray.length; i++) {
-      if (this.state.dictrictArray[i].name === value) {
-        console.log("district name  is" + this.state.dictrictArray[i].id);
-        this.setState({ districtId: this.state.dictrictArray[i].id });
-      }
-    }
-    this.setState({ storeDistrict: value });
-
-    if (
-      this.state.storeDistrict !== "" &&
-      this.state.storeDistrict !== undefined
-    ) {
-      this.setState({ districtValid: true });
+    if (!this.state.isEdit) {
+      this.setState({ storeDistrict: value, districtId: value });
     }
   };
 
@@ -349,7 +280,7 @@ export default class AddStore extends Component {
     }
 
     if (this.state.storeStatus === "") {
-      erros["status"] = urmErrorMessages.status;
+      errors["status"] = urmErrorMessages.status;
     }
 
     this.setState({ errors: errors });
