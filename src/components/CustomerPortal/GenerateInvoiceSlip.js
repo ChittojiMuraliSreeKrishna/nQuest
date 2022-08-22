@@ -75,7 +75,7 @@ class GenerateInvoiceSlip extends Component {
       domainId: 1,
       tableHead: ['S.No', 'Barcode', 'Product', 'Price Per Qty', 'Qty', 'Sales Rate'],
       tableData: [],
-      privilages: [{ bool: true, name: "Tag Customer" }, { bool: false, name: "Bill Level Discount" }],
+      privilages: [{ bool: false, name: "Tag Customer" }, { bool: false, name: "Bill Level Discount" }],
       inventoryDelete: false,
       lineItemDelete: false,
       uom: [],
@@ -492,7 +492,8 @@ pay() {
     discountAmount: this.state.discountAmount,
     userId: this.state.userId,
     dsNumberList: this.state.dsNumberList,
-    customerName: this.state.customerName, customerPhoneNumber: this.state.customerPhoneNumber,
+    customerName: this.state.customerName,
+    customerPhoneNumber: this.state.customerMobilenumber,
     customerGSTNumber: this.state.customerGSTNumber, customerAddress: this.state.customerAddress,
     customerGender: this.state.customerGender,
     totalQty: this.state.totalQty.toString(),
@@ -973,7 +974,7 @@ render() {
                   color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 150, fontSize: 20, justifyContent: 'center', textAlign: 'center', marginTop: 10,
                   fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
                 }}>
-                  Customer {I18n.t("MOBILE NUMBER")} </Text>
+                   {I18n.t("CUSTOMER MOBILE NUMBER")} </Text>
                 <Text style={{
                   color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 150, fontSize: 20, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
                   fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
