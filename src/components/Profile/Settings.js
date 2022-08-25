@@ -406,10 +406,7 @@ class Settings extends Component {
 								borderRadius: 5,
 							}}
 							onPress={() => {
-								AsyncStorage.removeItem("phone_number");
-								AsyncStorage.removeItem("user");
-								AsyncStorage.removeItem("tokenkey");
-								this.props.navigation.navigate("Login");
+								this.signOut()
 							}}
 						>
 							<Text
