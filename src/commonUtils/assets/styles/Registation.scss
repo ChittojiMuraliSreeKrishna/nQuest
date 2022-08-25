@@ -5,12 +5,23 @@
 	background: $white;
 	display: flex;
 	flex-direction: column;
-	justify-content: space-around;
+	justify-content: flex-start;
 	align-items: center;
+  margin-top: 15%;
 }
 
 .logoImg {
 	height: 100px;
 	width: 250px;
 	// mar
+}
+
+.headerText {
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.subHeaderText {
+  font-size: 15px;
+  font-weight: lighter;
 }

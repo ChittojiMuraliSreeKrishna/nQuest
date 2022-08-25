@@ -1,0 +1,35 @@
+@import './Colors.scss';
+
+.container{ 
+  background-color: $white;
+  height: 100%;
+ }
+
+ .subContainer{
+  background-color: $white;
+  padding: 25px 0;
+ }
+
+.inputField {
+  width: 90%;
+  margin: 2% 5%;
+}
+
+.header {
+  background-color: $white;
+  border-bottom-color: $secondary-color;
+  border-bottom-width: 2px;
+}
+
+.submitBtn {
+  border-radius: 5px;
+  width: 90%;
+  margin: 1% 5%;
+  background-color: $primary-color;
+}
+
+.changeBtn {
+  border-radius: 5px;
+  width: 90%;
+  margin: 1% 5%;
+}

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { LOGIN_URL, USER_MANAGEMENT_URL } from "../../commonUtils/ApiConstants";
-import { BASE_URL } from "../../commonUtils/Base"
+import { BASE_URL } from "../../commonUtils/Base";
 
 class LoginService {
   getStores() {
@@ -9,7 +9,13 @@ class LoginService {
 
   getUserStores(clientId) {
     const param = '?clientId=' + clientId
-    return axios.get(BASE_URL + USER_MANAGEMENT_URL.getAllStores() + param);
+    return axios.get(BASE_URL + USER_MANAGEMENT_URL.getAllStores + param);
+  }
+
+  getAllClient(userId) {
+    const param = '?userId=' + userId
+    console.log({ param })
+    return axios.get(BASE_URL + USER_MANAGEMENT_URL.getAllClients + param)
   }
 
   getStoreIdWithStoreName() {

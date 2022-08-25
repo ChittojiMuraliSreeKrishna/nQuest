@@ -58,7 +58,7 @@ export default class Roles extends Component {
 	}
 
 	async componentDidMount() {
-		const clientId = await AsyncStorage.getItem("custom:clientId1");
+    const clientId = await AsyncStorage.getItem("custom:clientId1");
 		this.setState({ clientId: clientId });
 		this.getRolesList();
 	}

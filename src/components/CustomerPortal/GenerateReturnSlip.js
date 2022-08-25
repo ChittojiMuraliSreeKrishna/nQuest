@@ -420,12 +420,10 @@ export default class GenerateReturnSlip extends Component {
       <View style={{ backgroundColor: color.white }}>
         <View style={{ flexDirection: 'row', width: Device.isTablet ? deviceWidth - 20 : deviceWidth - 10, justifyContent: 'space-between', marginTop: 20 }}>
           <TextInput style={[Device.isTablet ? styles.input_tablet : inputField, { width: Device.isTablet ? deviceWidth / 1.3 : deviceWidth / 1.25, borderColor: '#8F9EB717', marginRight: RW(0) }]}
-            underlineColorAndroid="transparent"
-            placeholder={I18n.t("Scan Invoice Number")}
-            placeholderTextColor="#6F6F6F"
-            textAlignVertical="center"
-            keyboardType={'default'}
-            autoCapitalize="none"
+            mode="flat"
+            activeUnderlineColor='#000'
+            underlineColor={'#6f6f6f'}
+            label={I18n.t("Scan Invoice Number")}
             value={this.state.invoiceNumber}
             onChangeText={(text) => this.handleInvoiceNumber(text)}
             onEndEditing={() => this.endEditing()}
@@ -512,14 +510,12 @@ export default class GenerateReturnSlip extends Component {
                   }}> {I18n.t("Please provide customer phone number")}  </Text>
                   <TextInput
                     style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                    underlineColorAndroid="transparent"
-                    placeholder={I18n.t("MOBILE NUMBER")}
-                    placeholderTextColor="#6F6F6F"
-                    textAlignVertical="center"
-                    // keyboardType={'default'}
+                    mode="flat"
+                    activeUnderlineColor='#000'
+                    underlineColor={'#6f6f6f'}
+                    label={I18n.t("MOBILE NUMBER")}
                     maxLength={10}
-                    keyboardType={'numeric'}
-                    autoCapitalize="none"
+                    keyboardType='phone-pad'
                     value={this.state.customerNumber}
                     onChangeText={(text) => this.handleCustomerNumber(text)}
                   />
@@ -561,9 +557,9 @@ export default class GenerateReturnSlip extends Component {
                       <TouchableOpacity onPress={(e) => this.itemSelected(e, index, item)} style={{ width: 20, height: 20 }}>
                         <Image style={{}} source={
                           //require('../assets/images/chargeunselect.png')}
-                          item.isSelected ? 
-                          require('../../commonUtils/assets/Images/checkbox_checked.png') :
-                           require('../../commonUtils/assets/Images/checkbox_uncheck.png')} />
+                          item.isSelected ?
+                            require('../../commonUtils/assets/Images/checkbox_checked.png') :
+                            require('../../commonUtils/assets/Images/checkbox_uncheck.png')} />
                       </TouchableOpacity>
                       <View style={flatlistSubContainer}>
                         <View style={textContainer}>
@@ -664,13 +660,12 @@ export default class GenerateReturnSlip extends Component {
               <Text style={styles.headings}>{I18n.t("Comments")}</Text>
               <TextInput
                 style={styles.textarea}
-                placeholder={I18n.t('Write comments')}
+                label={I18n.t('Write comments')}
                 multiline
                 numberOfLines={5}
-                placeholderTextColor="#6f6f6f60"
-                textAlignVertical="center"
-                keyboardType={'default'}
-                autoCapitalize='none'
+                mode="flat"
+                activeUnderlineColor='#000'
+                underlineColor={'#6f6f6f'}
                 value={this.state.reasonDesc}
                 onChangeText={(text) => this.handleReasonDesc(text)}
               />

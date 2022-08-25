@@ -755,13 +755,11 @@ class GenerateInvoiceSlip extends Component {
               }}>
               <View>
                 <View style={{ flexDirection: 'row', width: Device.isTablet ? deviceWidth - 20 : deviceWidth - 10 }}>
-                  <TextInput style={[inputField, { width: Device.isTablet ? deviceWidth / 1.45 : deviceWidth / 1.4, borderColor: '#8F9EB717', marginLeft: RW(0) }]}
-                    underlineColorAndroid="transparent"
-                    placeholder={I18n.t("Enter ES Number")}
-                    placeholderTextColor="#6F6F6F60"
-                    textAlignVertical="center"
-                    keyboardType={'default'}
-                    autoCapitalize="none"
+                  <TextInput style={[inputField, { width: Device.isTablet ? deviceWidth / 1.45 : deviceWidth / 1.4, borderColor: '#8F9EB717', marginLeft: RW(10) ,marginRight:RW(0)}]}
+                    mode="flat"
+                    activeUnderlineColor='#000'
+                    underlineColor={'#6f6f6f'}
+                    label={I18n.t("Enter ES Number")}
                     value={this.state.dsNumber}
                     onChangeText={(text) => this.handleDsNumber(text)}
                     onEndEditing={() => this.endEditing()}
@@ -1109,12 +1107,11 @@ class GenerateInvoiceSlip extends Component {
                   }}> {I18n.t("Please provide customer phone number")}  </Text>
                   <TextInput
                     style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                    underlineColorAndroid="transparent"
-                    placeholder={I18n.t("MOBILE NUMBER")}
-                    placeholderTextColor="#6F6F6F"
-                    textAlignVertical="center"
-                    keyboardType={'default'}
-                    autoCapitalize="none"
+                    mode="flat"
+                    activeUnderlineColor='#000'
+                    underlineColor={'#6f6f6f'}
+                    label={I18n.t("MOBILE NUMBER")}
+                    keyboardType='phone-pad'
                     maxLength={10}
                     value={this.state.mobileNumber}
                     onChangeText={(text) => this.handleMobileNumber(text)}
@@ -1163,10 +1160,10 @@ class GenerateInvoiceSlip extends Component {
                 <View>
                   <TextInput
                     style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                    underlineColorAndroid="transparent"
-                    placeholder={I18n.t("AMOUNT *")}
-                    placeholderTextColor="#6F6F6F"
-                    textAlignVertical="center"
+                    mode="flat"
+                    activeUnderlineColor='#000'
+                    underlineColor={'#6f6f6f'}
+                    label={I18n.t("AMOUNT *")}
                     keyboardType={'numeric'}
                     autoCapitalize="none"
                     onChangeText={(text) =>
@@ -1180,12 +1177,10 @@ class GenerateInvoiceSlip extends Component {
 
                   <TextInput
                     style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                    underlineColorAndroid="transparent"
-                    placeholder={I18n.t("APPROVED BY *")}
-                    placeholderTextColor="#6F6F6F"
-                    textAlignVertical="center"
-                    keyboardType={'default'}
-                    autoCapitalize="none"
+                    mode="flat"
+                    activeUnderlineColor='#000'
+                    underlineColor={'#6f6f6f'}
+                    label={I18n.t("APPROVED BY *")}
                     onChangeText={(text) => this.handleApprovedBy(text)}
                   />
                   <View style={Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile}>
@@ -1242,12 +1237,11 @@ class GenerateInvoiceSlip extends Component {
 
                     <View style={{ marginTop: 0, width: deviceWidth }}>
                       <TextInput style={styles.createUserinput}
-                        underlineColorAndroid="transparent"
-                        placeholder="MOBILE NUMBER *"
-                        placeholderTextColor="#353C4050"
-                        keyboardType="name-phone-pad"
-                        textAlignVertical="center"
-                        autoCapitalize="none"
+                        mode="flat"
+                        activeUnderlineColor='#000'
+                        underlineColor={'#6f6f6f'}
+                        label="MOBILE NUMBER *"
+                        keyboardType='phone-pad'
                         value={this.state.customerPhoneNumber}
                         onChangeText={(text) => this.handleCustomerPhoneNumber(text)}
                         onEndEditing={() => this.endEditing()}
@@ -1256,22 +1250,21 @@ class GenerateInvoiceSlip extends Component {
 
 
                     <TextInput style={styles.createUserinput}
-                      underlineColorAndroid="transparent"
-                      placeholder="CUSTOMER NAME *"
-                      placeholderTextColor="#353C4050"
-                      textAlignVertical="center"
-                      autoCapitalize="none"
+                      mode="flat"
+                      activeUnderlineColor='#000'
+                      underlineColor={'#6f6f6f'}
+                      label="CUSTOMER NAME *"
                       value={this.state.customerName}
                       onChangeText={this.handleCustomerName}
                     />
 
                     <View>
                       <TextInput style={styles.createUserinput}
-                        underlineColorAndroid="transparent"
-                        placeholder="EMAIL"
-                        placeholderTextColor="#353C4050"
-                        textAlignVertical="center"
-                        autoCapitalize="none"
+                        mode="flat"
+                        activeUnderlineColor='#000'
+                        underlineColor={'#6f6f6f'}
+                        label="EMAIL"
+                        keyboardType='email-address'
                         value={this.state.customerEmail}
                         onChangeText={this.handleCustomerEmail}
                       />
@@ -1313,11 +1306,10 @@ class GenerateInvoiceSlip extends Component {
 
 
                     <TextInput style={styles.createUserinput}
-                      underlineColorAndroid="transparent"
-                      placeholder="ADDRESS"
-                      placeholderTextColor="#353C4050"
-                      textAlignVertical="center"
-                      autoCapitalize="none"
+                      mode="flat"
+                      activeUnderlineColor='#000'
+                      underlineColor={'#6f6f6f'}
+                      label="ADDRESS"
                       value={this.state.customerAddress}
                       onChangeText={this.handleCustomerAddress}
                     />
@@ -1329,11 +1321,10 @@ class GenerateInvoiceSlip extends Component {
 
                     <View>
                       <TextInput style={styles.createUserinput}
-                        underlineColorAndroid="transparent"
-                        placeholder="GST NUMBER"
-                        placeholderTextColor="#353C4050"
-                        textAlignVertical="center"
-                        autoCapitalize="none"
+                        mode="flat"
+                        activeUnderlineColor='#000'
+                        underlineColor={'#6f6f6f'}
+                        label="GST NUMBER"
                         value={this.state.customerGSTNumber}
                         onChangeText={this.handleCustomerGSTNumber}
                       />

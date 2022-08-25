@@ -4,24 +4,24 @@ import React, { Component } from "react";
 import {
   Dimensions,
   FlatList,
-  Image,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
+  Image, ScrollView, StyleSheet,
+  TouchableOpacity, View
 } from "react-native";
 import DatePicker from "react-native-date-picker";
 import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Modal from "react-native-modal";
+import { Text, TextInput } from "react-native-paper";
+import IconFA from 'react-native-vector-icons/FontAwesome';
+import scss from "../../commonUtils/assets/styles/style.scss";
 import Loader from "../../commonUtils/loader";
 import { RH, RW } from "../../Responsive";
 import InventoryService from "../services/InventoryService";
 import {
   cancelBtn,
   cancelBtnText,
+  datePicker,
   datePickerBtnText,
   datePickerButton1,
   datePickerButton2,
@@ -37,22 +37,8 @@ import {
   filterMainContainer,
   filterSubContainer
 } from "../Styles/PopupStyles";
-import {
-  buttonContainer,
-  buttonImageStyle,
-  buttonStyle,
-  buttonStyle1,
-  filterBtn,
-  flatListHeaderContainer,
-  flatListMainContainer,
-  flatlistSubContainer,
-  flatListTitle,
-  highText,
-  listEmptyMessage,
-  textContainer,
-  textStyleLight,
-  textStyleMedium
-} from "../Styles/Styles";
+import { flatListTitle, listEmptyMessage } from "../Styles/Styles";
+
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -76,6 +62,8 @@ export default class ReBarcode extends Component {
       startDate: "",
       endDate: "",
       barCodeId: "",
+      viewBarcode: false,
+      viewBarcodeData: []
     };
   }
 
@@ -100,7 +88,6 @@ export default class ReBarcode extends Component {
       .post(InventoryService.getbarcodeTexttileAdjustments() + request, params)
       .then((res) => {
         if (res.data) {
-          // this.setState({ reBarcodesData: [] })
           this.setState({
             loading: false,
             reBarcodesData: this.state.reBarcodesData.concat(res.data.content),
@@ -342,31 +329,30 @@ export default class ReBarcode extends Component {
       <View>
         {this.state.loading && <Loader loading={this.state.loading} />}
         <FlatList
+          removeClippedSubviews={false}
+          style={scss.flatListBody}
           ListHeaderComponent={
-            <View style={flatListHeaderContainer}>
-              <Text style={flatListTitle}>Re-Barcode List</Text>
-              {!this.state.filterActive && (
-                <TouchableOpacity
-                  style={filterBtn}
-                  onPress={() => this.filterAction()}
-                >
-                  <Image
-                    style={{ alignSelf: "center", top: RH(5) }}
-                    source={require("../assets/images/promofilter.png")}
-                  />
-                </TouchableOpacity>
-              )}
-              {this.state.filterActive && (
-                <TouchableOpacity
-                  style={filterBtn}
-                  onPress={() => this.clearFilterAction()}
-                >
-                  <Image
-                    style={{ alignSelf: "center", top: RH(5) }}
-                    source={require("../assets/images/clearFilterSearch.png")}
-                  />
-                </TouchableOpacity>
-              )}
+            <View style={scss.headerContainer}>
+              <Text style={flatListTitle}>Re-Barcode List - <Text style={{ color: "#ED1C24" }}>{this.state.reBarcodesData.length}</Text></Text>
+              <View style={scss.headerContainer}>
+                {!this.state.filterActive && (
+                  <IconFA
+                    name="sliders"
+                    size={25}
+                    onPress={() => this.filterAction()}
+                  >
+                  </IconFA>
+                )}
+                {this.state.filterActive && (
+                  <IconFA
+                    name="sliders"
+                    size={25}
+                    color="#ED1C24"
+                    onPress={() => this.clearFilterAction()}
+                  >
+                  </IconFA>
+                )}
+              </View>
             </View>
           }
           data={
@@ -379,52 +365,47 @@ export default class ReBarcode extends Component {
             <Text style={listEmptyMessage}>&#9888; Records Not Found</Text>
           }
           renderItem={({ item, index }) => (
-            <View style={flatListMainContainer}>
-              <View style={flatlistSubContainer}>
-                <View style={textContainer}>
-                  <Text style={highText}>
-                    {I18n.t("PARENT BARCODE")}: {item.toBeBarcodeId}
-                  </Text>
-                </View>
-                <View style={textContainer}>
-                  <Text style={textStyleMedium} selectable={true}>
-                    {item.currentBarcodeId}
-                  </Text>
-                  <Text style={textStyleLight}>
-                    {I18n.t("EMPLOYEE ID")}: {"\n"}
-                    {item.createdBy}
-                  </Text>
-                </View>
-                <View style={textContainer}>
-                  <Text style={textStyleLight}>
-                    {I18n.t("DATE")}: {"\n"}
-                    {item.fromDate}
-                  </Text>
-                  <View style={buttonContainer}>
-                    <TouchableOpacity
-                      style={buttonStyle1}
-                      onPress={() => this.print(item, index)}
-                    >
-                      <Image
-                        style={buttonImageStyle}
-                        source={require("../assets/images/print.png")}
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={buttonStyle}
+            <ScrollView>
+              <View style={scss.flatListContainer}>
+                <View style={scss.flatListSubContainer}>
+                  <View style={scss.textContainer}>
+                    <Text style={scss.highText}>
+                      {I18n.t("PARENT BARCODE")}: {item.toBeBarcodeId}
+                    </Text>
+                  </View>
+                  <View style={scss.textContainer}>
+                    <Text style={scss.textStyleMedium} selectable={true}>
+                      {item.currentBarcodeId}
+                    </Text>
+                    <Text style={scss.textStyleLight}>
+                      {I18n.t("EMPLOYEE ID")}: {"\n"}
+                      {item.createdBy}
+                    </Text>
+                  </View>
+                  <View style={scss.flatListFooter}>
+                    <Text style={scss.footerText}>
+                      {I18n.t("DATE")}:
+                      {item.lastModifiedDate ? item.lastModifiedDate.toString().split(/T/)[0]
+                        : item.lastModifiedDate}
+                    </Text>
+                    <IconFA
+                      name="eye"
+                      size={20}
                       onPress={() => this.seeDetails(item, index)}
                     >
-                      <Image
-                        style={buttonImageStyle}
-                        source={require("../assets/images/eye.png")}
-                      />
-                    </TouchableOpacity>
+                    </IconFA>
                   </View>
                 </View>
               </View>
-            </View>
+            </ScrollView>
           )}
         />
+
+        {this.state.viewBarcode && (
+          <View>
+
+          </View>
+        )}
 
         {this.state.flagFilterOpen && (
           <View>
@@ -432,20 +413,16 @@ export default class ReBarcode extends Component {
               <View style={filterMainContainer}>
                 <View>
                   <View style={filterSubContainer}>
-                    <View>
-                      <Text style={filterHeading}> {I18n.t("Filter By")} </Text>
-                    </View>
-                    <View>
-                      <TouchableOpacity
-                        style={filterCloseImage}
-                        onPress={() => this.modelCancel()}
-                      >
-                        <Image
-                          style={{ margin: 5 }}
-                          source={require("../assets/images/modelcancel.png")}
-                        />
-                      </TouchableOpacity>
-                    </View>
+                    <Text style={filterHeading}> {I18n.t("Filter By")} </Text>
+                    <TouchableOpacity
+                      style={filterCloseImage}
+                      onPress={() => this.modelCancel()}
+                    >
+                      <Image
+                        style={{ margin: RH(5) }}
+                        source={require("../assets/images/modelcancel.png")}
+                      />
+                    </TouchableOpacity>
                   </View>
                 </View>
                 <KeyboardAwareScrollView enableOnAndroid={true}>
@@ -455,37 +432,25 @@ export default class ReBarcode extends Component {
                     onPress={() => this.datepickerClicked()}
                   >
                     <Text style={dateText}>
-                      {this.state.startDate
-                        ? this.state.startDate
-                        : "Start Date"}
+                      {this.state.startDate === ""
+                        ? "Start Date"
+                        : this.state.startDate}
                     </Text>
                     <Image
-                      style={styles.calenderpng}
+                      style={filter.calenderpng}
                       source={require("../assets/images/calender.png")}
                     />
                   </TouchableOpacity>
-                  <TouchableOpacity
-                    style={dateSelector}
-                    testID="openModal"
-                    onPress={() => this.enddatepickerClicked()}
-                  >
-                    <Text style={dateText}>
-                      {this.state.endDate ? this.state.endDate : "End Date"}
-                    </Text>
-                    <Image
-                      style={styles.calenderpng}
-                      source={require("../assets/images/calender.png")}
-                    />
-                  </TouchableOpacity>
-                  {this.state.datepickerOpen && this.state.flagRebarCode && (
-                    <View style={styles.dateTopView}>
-                      <View style={styles.dateTop2}>
+                  {this.state.datepickerOpen && (
+                    <View style={filter.dateTopView}>
+                      <View style={filter.dateTop2}>
                         <TouchableOpacity
                           style={datePickerButton1}
                           onPress={() => this.datepickerCancelClicked()}
                         >
                           <Text style={datePickerBtnText}> Cancel </Text>
                         </TouchableOpacity>
+
                         <TouchableOpacity
                           style={datePickerButton2}
                           onPress={() => this.datepickerDoneClicked()}
@@ -494,31 +459,51 @@ export default class ReBarcode extends Component {
                         </TouchableOpacity>
                       </View>
                       <DatePicker
-                        style={styles.date}
+                        style={datePicker}
                         date={this.state.date}
                         mode={"date"}
                         onDateChange={(date) => this.setState({ date })}
                       />
                     </View>
                   )}
-                  {this.state.datepickerendOpen && this.state.flagRebarCode && (
-                    <View style={styles.dateTopView}>
-                      <View style={styles.dateTop2}>
-                        <TouchableOpacity
-                          style={datePickerButton1}
-                          onPress={() => this.datepickerCancelClicked()}
-                        >
-                          <Text style={datePickerBtnText}> Cancel </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={datePickerButton2}
-                          onPress={() => this.datepickerendDoneClicked()}
-                        >
-                          <Text style={datePickerBtnText}> Done </Text>
-                        </TouchableOpacity>
+                  <TouchableOpacity
+                    style={dateSelector}
+                    testID="openModal"
+                    onPress={() => this.enddatepickerClicked()}
+                  >
+                    <Text style={dateText}>
+                      {this.state.endDate === ""
+                        ? "End Date"
+                        : this.state.endDate}
+                    </Text>
+                    <Image
+                      style={filter.calenderpng}
+                      source={require("../assets/images/calender.png")}
+                    />
+                  </TouchableOpacity>
+
+                  {this.state.datepickerendOpen && (
+                    <View style={filter.dateTopView}>
+                      <View style={filter.dateTop2}>
+                        <View>
+                          <TouchableOpacity
+                            style={datePickerButton1}
+                            onPress={() => this.datepickerCancelClicked()}
+                          >
+                            <Text style={datePickerBtnText}> Cancel </Text>
+                          </TouchableOpacity>
+                        </View>
+                        <View>
+                          <TouchableOpacity
+                            style={datePickerButton2}
+                            onPress={() => this.datepickerendDoneClicked()}
+                          >
+                            <Text style={datePickerBtnText}> Done </Text>
+                          </TouchableOpacity>
+                        </View>
                       </View>
                       <DatePicker
-                        style={styles.date}
+                        style={datePicker}
                         date={this.state.enddate}
                         mode={"date"}
                         onDateChange={(enddate) => this.setState({ enddate })}
@@ -526,29 +511,29 @@ export default class ReBarcode extends Component {
                     </View>
                   )}
                   <TextInput
+                    mode="outlined"
+                    activeOutlineColor="#6F6F6F"
                     style={inputField}
                     underlineColorAndroid="transparent"
-                    placeholder={I18n.t("RE-BARCODE ID")}
+                    placeholder={I18n.t("BARCODE ID")}
                     placeholderTextColor="#6F6F6F"
                     textAlignVertical="center"
                     autoCapitalize="none"
                     value={this.state.barCodeId}
                     onChangeText={this.handlebarCodeId}
                   />
-                  <View>
-                    <TouchableOpacity
-                      style={submitBtn}
-                      onPress={() => this.applyReBarcodeFilter()}
-                    >
-                      <Text style={submitBtnText}>{I18n.t("APPLY")}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={cancelBtn}
-                      onPress={() => this.modelCancel()}
-                    >
-                      <Text style={cancelBtnText}>{I18n.t("CANCEL")}</Text>
-                    </TouchableOpacity>
-                  </View>
+                  <TouchableOpacity
+                    style={submitBtn}
+                    onPress={() => this.applyReBarcodeFilter(0)}
+                  >
+                    <Text style={submitBtnText}>{I18n.t("APPLY")}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={cancelBtn}
+                    onPress={() => this.modelCancel()}
+                  >
+                    <Text style={cancelBtnText}>{I18n.t("CANCEL")}</Text>
+                  </TouchableOpacity>
                 </KeyboardAwareScrollView>
               </View>
             </Modal>
@@ -560,6 +545,39 @@ export default class ReBarcode extends Component {
 }
 
 const styles = StyleSheet.create({
+  spaceText: {
+    height: Device.isTablet ? 2 : 1,
+    width: deviceWidth,
+    backgroundColor: "lightgray",
+  },
+  date: {
+    width: deviceWidth,
+    height: RH(200),
+    marginTop: RH(50),
+  },
+  calenderpng: {
+    position: "absolute",
+    top: RH(10),
+    right: 0,
+  },
+  dateTopView: {
+    height: RW(280),
+    width: deviceWidth,
+    backgroundColor: "#ffffff",
+  },
+  dateTop2: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: Device.isTablet ? 15 : RH(10),
+    marginLeft: Device.isTablet ? 20 : RW(10),
+    marginRight: Device.isTablet ? 20 : RW(10),
+  },
+  mainContainer: {
+    flex: 1,
+  },
+});
+
+const filter = StyleSheet.create({
   spaceText: {
     height: Device.isTablet ? 2 : 1,
     width: deviceWidth,

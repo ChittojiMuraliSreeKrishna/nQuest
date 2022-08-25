@@ -215,11 +215,11 @@ class GiftVocher extends Component {
   }
 
   applyVoucherFilter() {
-    const { startDate, endDate, gvNumber ,searchQuery} = this.state
+    const { startDate, endDate, gvNumber, searchQuery } = this.state
     const obj = {
       fromDate: startDate ? startDate : undefined,
       toDate: endDate ? endDate : undefined,
-      gvNumber: gvNumber ? gvNumber : searchQuery?searchQuery:undefined
+      gvNumber: gvNumber ? gvNumber : searchQuery ? searchQuery : undefined
     }
     CustomerService.searchGiftVoucher(obj).then((res) => {
       this.setState({ filterVouchersData: res.data.result, filterActive: true })
@@ -338,12 +338,11 @@ class GiftVocher extends Component {
                     </View>
                   )}
                   <TextInput
-                    placeholder={('GV Number')}
+                    mode="flat"
+                    activeUnderlineColor='#000'
+                    underlineColor={'#6f6f6f'}
+                    label={('GV Number')}
                     style={[inputField, { borderColor: '#8F9EB717' }]}
-                    placeholderTextColor="#6f6f6f60"
-                    textAlignVertical="center"
-                    keyboardType={'default'}
-                    autoCapitalize='none'
                     value={this.state.gvNumber}
                     onChangeText={(text) => this.handleGvNumber(text)}
                   />
@@ -387,11 +386,10 @@ class GiftVocher extends Component {
             <Text style={styles.inputFieldText}>{I18n.t('GV Number')}</Text>
             <TextInput
               style={[inputField, { borderColor: gvNumberValid ? '#8F9EB717' : '#dd0000' }]}
-              placeholder={('Enter GV')}
-              placeholderTextColor="#6f6f6f60"
-              textAlignVertical="center"
-              keyboardType={'default'}
-              autoCapitalize='none'
+              mode="flat"
+              activeUnderlineColor='#000'
+              underlineColor={'#6f6f6f'}
+              label={('Enter GV')}
               value={this.state.gvNumber}
               onChangeText={(text) => this.handleGvNumber(text)}
             />
@@ -476,11 +474,10 @@ class GiftVocher extends Component {
               <Text style={styles.inputFieldText}>{I18n.t('Amount')}</Text>
               <TextInput
                 style={[inputField, { borderColor: giftValueValid ? '#8F9EB717' : '#dd0000' }]}
-                placeholder={I18n.t('Enter Amount')}
-                placeholderTextColor="#6f6f6f60"
-                textAlignVertical="center"
-                keyboardType={'default'}
-                autoCapitalize='none'
+                label={I18n.t('Enter Amount')}
+                mode="flat"
+                activeUnderlineColor='#000'
+                underlineColor={'#6f6f6f'}
                 value={this.state.giftValue}
                 onChangeText={(text) => this.handleValue(text)}
               />
@@ -489,12 +486,13 @@ class GiftVocher extends Component {
               )}
               <Text style={styles.inputFieldText}>{I18n.t('Description')}</Text>
               <TextInput
+                mode="flat"
+                activeUnderlineColor='#000'
+                underlineColor={'#6f6f6f'}
                 multiline
                 numberOfLines={5}
                 style={[styles.textArea, { borderColor: '#8F9EB717' }]}
-                placeholder={I18n.t('Write')}
-                placeholderTextColor="#6f6f6f60"
-                keyboardType={'default'}
+                label={I18n.t('Write')}
                 value={this.state.description}
                 onChangeText={(text) => this.handleDescription(text)}
               />

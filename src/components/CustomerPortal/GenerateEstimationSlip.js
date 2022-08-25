@@ -533,13 +533,11 @@ class GenerateEstimationSlip extends Component {
                 </View>
                 <>
                   <TextInput style={[Device.isTablet ? styles.input_tablet_normal : styles.input_mobile_normal, { width: Device.isTablet ? 200 : 150 }]}
-                    underlineColorAndroid="transparent"
-                    placeholder={I18n.t("SM Number")}
-                    placeholderTextColor="#6F6F6F60"
-                    textAlignVertical="center"
-                    autoCapitalize="none"
+                    mode="flat"
+                    activeUnderlineColor='#000'
+                    underlineColor='#6f6f6f'
+                    label={I18n.t("SM Number")}
                     maxLength={4}
-                    keyboardType={'default'}
                     value={this.state.smnumber}
                     onChangeText={(text) => this.handleSmCode(text)}
                   />
@@ -551,10 +549,10 @@ class GenerateEstimationSlip extends Component {
                 </>
                 <View style={{ flexDirection: 'row' }}>
                   <TextInput style={Device.isTablet ? styles.input_tablet_normal_start : styles.input_mobile_normal_start}
-                    underlineColorAndroid="transparent"
-                    placeholder={I18n.t("BARCODE")}
-                    placeholderTextColor="#6F6F6F60"
-                    textAlignVertical="center"
+                    mode="flat"
+                    activeUnderlineColor='#000'
+                    underlineColor='#6f6f6f'
+                    label={I18n.t("BARCODE")}
                     value={this.state.barcodeId}
                     onChangeText={this.handleBarCode}
                     onEndEditing={() => this.endEditing()}
@@ -582,24 +580,20 @@ class GenerateEstimationSlip extends Component {
 
                 {this.state.uom === "Pieces" && (
                   <TextInput style={[Device.isTablet ? styles.input_tablet_notedit : styles.input_mobile_notedit, { marginLeft: Device.isTablet ? deviceWidth / 2.4 : deviceWidth / 2.15, width: Device.isTablet ? 160 : 80 }]}
-                    underlineColorAndroid="transparent"
-                    placeholder="QTY"
-                    placeholderTextColor="#6F6F6F60"
-                    // textAlignVertical="center"
-                    keyboardType={'default'}
-                    autoCapitalize="none"
+                    mode="flat"
+                    activeUnderlineColor='#000'
+                    underlineColor='#6f6f6f'
+                    label={"QTY"}
                     editable={false} selectTextOnFocus={false}
                   />
                 )}
 
                 {this.state.uom === "Meters" && (
                   <TextInput style={[Device.isTablet ? styles.input_tablet_normal : styles.input_mobile_normal, { marginLeft: Device.isTablet ? deviceWidth / 1.8 : deviceWidth / 2.15, width: Device.isTablet ? 200 : 80 }]}
-                    underlineColorAndroid="transparent"
-                    placeholder="QTY"
-                    keyboardType={'default'}
-                    placeholderTextColor="#6F6F6F60"
-                    // textAlignVertical="center"
-                    autoCapitalize="none"
+                    mode="flat"
+                    activeUnderlineColor='#000'
+                    underlineColor='#6f6f6f'
+                    label={"QTY"}
                     value={this.state.saleQuantity}
                     onChangeText={this.handleQty}
                   />
@@ -680,9 +674,10 @@ class GenerateEstimationSlip extends Component {
                                   fontFamily: 'regular',
                                   fontSize: Device.isTablet ? 22 : 12,
                                 }}
-                                underlineColorAndroid="transparent"
-                                placeholder="01"
-                                placeholderTextColor="color.accent"
+                                mode="flat"
+                                activeUnderlineColor='#000'
+                                underlineColor='#6f6f6f'
+                                label={"01"}
                                 value={('0' + item.quantity).slice(-2)}
                                 onChangeText={(text) => this.updateQty(text, index, item)}
                               />
@@ -891,7 +886,7 @@ class GenerateEstimationSlip extends Component {
                 //   </View>
 
                 // </View>
-                /> 
+                />
                 // :<View>
                 //   <Text style={{ justifyContent: 'center', fontSize: RF(18) ,color:color.accent}}>Data not found</Text>
                 // </View>
