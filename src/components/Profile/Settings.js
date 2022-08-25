@@ -39,8 +39,11 @@ export default class Settings extends Component {
 
   // Logout
   async logOut() {
-    props.navigation.push("Login");
-  }
+	AsyncStorage.clear()
+	global.homeButtonClicked = false;
+	global.profileButtonClicked = false;
+	this.props.navigation.navigate("Login") 
+ }
 
   // Input Actions
   handleGender = (value) => {
@@ -152,12 +155,12 @@ export default class Settings extends Component {
     });
   }
 
-  async logOut() {
-    AsyncStorage.removeItem("phone_number");
-    AsyncStorage.clear().then(() => console.log('Cleared'))
-    this.props.navigation.navigate("Login")
-    return true;
-  }
+//   async logOut() {
+//     AsyncStorage.removeItem("phone_number");
+//     AsyncStorage.clear().then(() => console.log('Cleared'))
+//     this.props.navigation.navigate("Login")
+//     return true;
+//   }
 
   render() {
     const { mobileNumberValid, emailValid, errors } = this.state

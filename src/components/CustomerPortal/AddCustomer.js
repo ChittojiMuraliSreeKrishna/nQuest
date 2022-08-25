@@ -207,13 +207,12 @@ export default class AddCustomer extends Component {
         <Text style={styles.headings}>{I18n.t("Customer Name")} <Text style={{ color: 'red' }}>*</Text></Text>
         <TextInput
           style={nameValid ? Device.isTablet ? styles.input_tablet : styles.input_mobile : Device.isTablet ? styles.inputError_tablet : styles.inputError_mobile}
-          placeholder={I18n.t('CUSTOMER NAME')}
-          placeholderTextColor={nameValid ? "#6F6F6F" : '#dd0000'}
-          textAlignVertical="center"
-          keyboardType={'default'}
+          mode="flat"
+          activeUnderlineColor='#000'
+          underlineColor={nameValid ? '#6f6f6f' : "#dd0000"}
+          label={I18n.t('CUSTOMER NAME')}
           maxLength={25}
           onBlur={this.handleNameValid}
-          autoCapitalize='none'
           value={this.state.name}
           onChangeText={(text) => this.handleCustomerName(text)}
         />
@@ -221,13 +220,12 @@ export default class AddCustomer extends Component {
         <Text style={styles.headings}>{I18n.t("Mobile Number")} <Text style={{ color: 'red' }}>*</Text></Text>
         <TextInput
           style={mobileValid ? Device.isTablet ? styles.input_tablet : styles.input_mobile : Device.isTablet ? styles.inputError_tablet : styles.inputError_mobile}
-          placeholder={I18n.t('MOBILE NUMBER')}
-          placeholderTextColor={mobileValid ? "#6F6F6F" : '#dd0000'}
-          textAlignVertical="center"
-          // keyboardType={'default'}
-          autoCapitalize='none'
+          mode="flat"
+          activeUnderlineColor='#000'
+          underlineColor={mobileValid ? '#6f6f6f' : "#dd0000"}
+          label={I18n.t('MOBILE NUMBER')}
           maxLength={10}
-          keyboardType={'number-pad'}
+          keyboardType='phone-pad'
           onBlur={this.handleMobileValid}
           textContentType='telephoneNumber'
           value={this.state.phoneNumber}
@@ -236,10 +234,11 @@ export default class AddCustomer extends Component {
         {!mobileValid && <Message imp={true} message={this.state.errors["mobile"]} />}
         <Text style={styles.headings}>{I18n.t("Email")}</Text>
         <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-          placeholder={I18n.t('EMAIL')}
-          placeholderTextColor="#6f6f6f60"
-          textAlignVertical="center"
-          keyboardType={'default'}
+          mode="flat"
+          activeUnderlineColor='#000'
+          underlineColor={emailValid ? '#6f6f6f' : "#dd0000"}
+          label={I18n.t('EMAIL')}
+          keyboardType='email-address'
           autoCapitalize='none'
           value={this.state.email}
           onChangeText={(text) => this.handleEmail(text)}
@@ -247,21 +246,19 @@ export default class AddCustomer extends Component {
         {!emailValid && <Message imp={false} message={this.state.errors["email"]} />}
         <Text style={styles.headings}>{I18n.t("Address")}</Text>
         <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-          placeholder={I18n.t('ADDRESS')}
-          placeholderTextColor="#6f6f6f60"
-          textAlignVertical="center"
-          keyboardType={'default'}
-          autoCapitalize='none'
+          mode="flat"
+          activeUnderlineColor='#000'
+          underlineColor={'#6f6f6f'}
+          label={I18n.t('ADDRESS')}
           value={this.state.address}
           onChangeText={(text) => this.handleAddress(text)}
         />
         <Text style={styles.headings}>{I18n.t("GST Number")}</Text>
         <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-          placeholder={I18n.t('GST Number')}
-          placeholderTextColor="#6f6f6f60"
-          textAlignVertical="center"
-          keyboardType={'default'}
-          autoCapitalize='none'
+          mode="flat"
+          activeUnderlineColor='#000'
+          underlineColor={gstValid?'#6f6f6f':'#dd0000'}
+          label={I18n.t('GST Number')}
           value={this.state.gstNumber}
           onBlur={(text) => this.handleGstNumberValid(text)}
           onChangeText={(text) => this.handleGstNumber(text)}
