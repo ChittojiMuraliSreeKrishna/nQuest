@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
@@ -13,6 +13,10 @@ import { RH, RF, RW } from '../../Responsive';
 import { filterBtn, flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleLight, textStyleMedium } from '../Styles/Styles';
 import Modal from 'react-native-modal'
 import AddGiftVoucher from './AddGiftVoucher'
+import { color } from '../Styles/colorStyles';
+import { Searchbar, TextInput } from 'react-native-paper';
+import { customerErrorMessages } from '../Errors/errors';
+import Message from '../Errors/Message';
 
 var deviceheight = Dimensions.get('window').height;
 var deviceheight = Dimensions.get('window').height;
@@ -35,6 +39,16 @@ class GiftVocher extends Component {
       endDate: "",
       toDate: "",
       giftVochersList: [],
+      flagFilterOpen: false,
+      filterActive: false,
+      searchQuery: '',
+      errors: {},
+      gvNumberValid: true,
+      startDateValid: true,
+      endDateValid: true,
+      giftValueValid: true,
+      searchQueryValid: true,
+      searchQueryError: ''
     };
   }
 
@@ -103,55 +117,86 @@ class GiftVocher extends Component {
     this.setState({ giftValue: text });
   }
 
-  async addGiftVocher() {
-    if (this.state.gvNumber === "") {
-      alert("Please Enter GV Number");
-    } else if (this.state.startDate === "") {
-      alert("Please Select the Start Date");
-    } else if (this.state.endDate === "") {
-      alert("Please Select the End Date");
-    } else if (this.state.giftValue === "") {
-      alert("Please Enter the Gift Value");
-    }
-    else {
+  validationForm() {
+    let isFormValid = true;
+    let errors = {};
 
-      const clientId = await AsyncStorage.getItem("custom:clientId1");
-      this.setState({ clientId: clientId });
-      // const user = AsyncStorage.getItem("username");
-      const obj = {
-        "gvNumber": this.state.gvNumber,
-        "description": this.state.description,
-        "fromDate": this.state.date,
-        "toDate": this.state.enddate,
-        "clientId": this.state.clientId,
-        "value": this.state.giftValue
-      };
-      console.log(obj);
-      axios.post(CustomerService.saveGiftVocher(), obj).then(res => {
-        if (res && res.data.isSuccess === "true") {
-          this.setState({
-            gvNumber: '',
-            description: '',
-            giftValue: '',
-            datepickerOpen: false,
-            datepickerendOpen: false,
-            date: new Date(),
-            enddate: new Date(),
-            fromDate: "",
-            startDate: "",
-            endDate: "",
-            toDate: "",
-            giftVochersList: [],
-            filterVouchersData: [],
-            modalVisible: true,
-            flagGiftVoucherAdd: false,
-            flagFilterOpen: false
-          });
-          this.getGiftVocherList();
-          console.log(res.data);
-        }
-        alert(res.data.message);
-      });
+    if (this.state.gvNumber === '') {
+      isFormValid = false;
+      errors["gvNumber"] = customerErrorMessages.gvNumber;
+      this.setState({ gvNumberValid: false });
+    }
+    if (this.state.startDate === '') {
+      isFormValid = false;
+      errors["startDate"] = customerErrorMessages.startDate;
+      this.setState({ startDateValid: false });
+    }
+    if (this.state.endDate === '') {
+      isFormValid = false;
+      errors["endDate"] = customerErrorMessages.endDate;
+      this.setState({ endDateValid: false });
+    }
+    if (this.state.giftValue === "") {
+      isFormValid = false;
+      errors["giftValue"] = customerErrorMessages.giftValue;
+      this.setState({ giftValueValid: false });
+    }
+    this.setState({ errors: errors });
+    return isFormValid;
+  }
+
+  async addGiftVocher() {
+    const isFormValid = this.validationForm();
+    if (isFormValid) {
+      if (this.state.gvNumber === "") {
+        alert("Please Enter GV Number");
+      } else if (this.state.startDate === "") {
+        alert("Please Select the Start Date");
+      } else if (this.state.endDate === "") {
+        alert("Please Select the End Date");
+      } else if (this.state.giftValue === "") {
+        alert("Please Enter the Gift Value");
+      }
+      else {
+
+        const clientId = await AsyncStorage.getItem("custom:clientId1");
+        this.setState({ clientId: clientId });
+        // const user = AsyncStorage.getItem("username");
+        const obj = {
+          "gvNumber": this.state.gvNumber,
+          "description": this.state.description,
+          "fromDate": this.state.date,
+          "toDate": this.state.enddate,
+          "clientId": this.state.clientId,
+          "value": this.state.giftValue
+        };
+        console.log(obj);
+        axios.post(CustomerService.saveGiftVocher(), obj).then(res => {
+          if (res && res.data.isSuccess === "true") {
+            this.setState({
+              gvNumber: '',
+              description: '',
+              giftValue: '',
+              datepickerOpen: false,
+              datepickerendOpen: false,
+              date: new Date(),
+              enddate: new Date(),
+              fromDate: "",
+              startDate: "",
+              endDate: "",
+              toDate: "",
+              giftVochersList: [],
+              filterVouchersData: [],
+              modalVisible: true,
+              flagGiftVoucherAdd: false,
+              flagFilterOpen: false
+            });
+            this.getGiftVocherList();
+            console.log(res.data);
+          }
+          alert(res.data.message);
+        });
+      }
     }
   }
 
@@ -162,7 +207,7 @@ class GiftVocher extends Component {
   }
 
   filterAction() {
-    this.setState({ flagFilterOpen: true, modalVisible: true })
+    this.setState({ flagFilterOpen: true, modalVisible: true, filterActive: true })
   }
 
   modelCancel() {
@@ -170,22 +215,44 @@ class GiftVocher extends Component {
   }
 
   applyVoucherFilter() {
-    const { startDate, endDate, gvNumber } = this.state
+    const { startDate, endDate, gvNumber ,searchQuery} = this.state
     const obj = {
       fromDate: startDate ? startDate : undefined,
       toDate: endDate ? endDate : undefined,
-      gvNumber: gvNumber ? gvNumber : undefined
+      gvNumber: gvNumber ? gvNumber : searchQuery?searchQuery:undefined
     }
     CustomerService.searchGiftVoucher(obj).then((res) => {
       this.setState({ filterVouchersData: res.data.result, filterActive: true })
     })
   }
 
+  validationField() {
+    let isFormValid = true;
+    let errors = '';
+    if (this.state.searchQuery < 2) {
+      isFormValid = false;
+      errors = customerErrorMessages.searchQuery;
+      this.setState({ searchQueryValid: false });
+    }
+    this.setState({ searchQueryError: errors });
+    return isFormValid;
+  }
+
+  async onChangeSearch(text) {
+    const isFormValid = this.validationField();
+    await this.setState({
+      searchQuery: text
+    })
+    if (isFormValid) {
+      this.applyVoucherFilter()
+    }
+  }
 
 
   render() {
+    const { gvNumberValid, startDateValid, endDateValid, giftValueValid, searchQueryValid } = this.state
     return (
-      <View>
+      <View style={{ backgroundColor: "#FFFFFF" }}>
         {this.state.flagFilterOpen &&
           <View>
             <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
@@ -272,7 +339,7 @@ class GiftVocher extends Component {
                   )}
                   <TextInput
                     placeholder={('GV Number')}
-                    style={inputField}
+                    style={[inputField, { borderColor: '#8F9EB717' }]}
                     placeholderTextColor="#6f6f6f60"
                     textAlignVertical="center"
                     keyboardType={'default'}
@@ -294,11 +361,33 @@ class GiftVocher extends Component {
           </View>
         }
         <View>
-          <Text style={flats.titleStyle}>{I18n.t('Generate Gift Voucher')}</Text>
+          <View style={{ flexDirection: 'row' }}>
+            <View style={styles.searchBarStyles}>
+              <Searchbar
+                placeholder="Search"
+                onChangeText={(text) => this.onChangeSearch(text)}
+                value={this.state.searchQuery}
+              />
+            </View>
+            <TouchableOpacity
+              style={styles.filterBtnStyle}
+              onPress={() => this.filterAction()} >
+              <Image source={
+                // this.state.filterActive ? 
+                // require('../assets/images/clearFilterSearch.png') : 
+                require('../assets/images/promofilter.png')} />
+            </TouchableOpacity>
+          </View>
+          {!searchQueryValid && (
+            <Message imp={true} message={this.state.searchQueryError} />
+          )}
+
+          <Text style={styles.titleStyle}>{I18n.t('Generate Gift Voucher')}</Text>
           <View>
+            <Text style={styles.inputFieldText}>{I18n.t('GV Number')}</Text>
             <TextInput
-              style={inputField}
-              placeholder={('GV NUMBER *')}
+              style={[inputField, { borderColor: gvNumberValid ? '#8F9EB717' : '#dd0000' }]}
+              placeholder={('Enter GV')}
               placeholderTextColor="#6f6f6f60"
               textAlignVertical="center"
               keyboardType={'default'}
@@ -306,24 +395,16 @@ class GiftVocher extends Component {
               value={this.state.gvNumber}
               onChangeText={(text) => this.handleGvNumber(text)}
             />
-            <TextInput
-              style={inputField}
-              placeholder={I18n.t('DESCRIPTION')}
-              placeholderTextColor="#6f6f6f60"
-              textAlignVertical="center"
-              keyboardType={'default'}
-              autoCapitalize='none'
-              value={this.state.description}
-              onChangeText={(text) => this.handleDescription(text)}
-            />
+            {!gvNumberValid && (
+              <Message imp={true} message={this.state.errors['gvNumber']} />
+            )}
+            <Text style={styles.inputFieldText}>{I18n.t('From Date')}</Text>
             <TouchableOpacity
-              style={dateSelector}
+              style={[dateSelector, { borderColor: startDateValid ? '#8F9EB717' : '#dd0000' }]}
               testID="openModal"
               onPress={() => this.datepickerClicked()}
             >
-              <Text
-                style={dateText}
-              >{this.state.startDate === "" ? 'Start Date' : this.state.startDate}</Text>
+              <Text style={dateText}>{this.state.startDate === "" ? 'DD/MM/YYYY' : this.state.startDate}</Text>
               <Image style={styles.calenderpng} source={require('../assets/images/calender.png')} />
             </TouchableOpacity>
             {this.state.datepickerOpen && (
@@ -348,14 +429,18 @@ class GiftVocher extends Component {
                 />
               </View>
             )}
+            {!startDateValid && (
+              <Message imp={true} message={this.state.errors['startDate']} />
+            )}
+            <Text style={styles.inputFieldText}>{I18n.t('To Date')}</Text>
             <TouchableOpacity
-              style={dateSelector}
+              style={[dateSelector, { borderColor: endDateValid ? '#8F9EB717' : '#dd0000' }]}
               testID="openModal"
               onPress={() => this.enddatepickerClicked()}
             >
               <Text
                 style={dateText}
-              >{this.state.endDate === '' ? 'End Date' : this.state.endDate}</Text>
+              >{this.state.endDate === '' ? 'DD/MM/YYYY' : this.state.endDate}</Text>
               <Image style={styles.calenderpng} source={require('../assets/images/calender.png')} />
             </TouchableOpacity>
 
@@ -384,16 +469,34 @@ class GiftVocher extends Component {
                 />
               </View>
             )}
+            {!startDateValid && (
+              <Message imp={true} message={this.state.errors['endDate']} />
+            )}
             <View >
+              <Text style={styles.inputFieldText}>{I18n.t('Amount')}</Text>
               <TextInput
-                style={inputField}
-                placeholder={I18n.t('GIFT VALUE *')}
+                style={[inputField, { borderColor: giftValueValid ? '#8F9EB717' : '#dd0000' }]}
+                placeholder={I18n.t('Enter Amount')}
                 placeholderTextColor="#6f6f6f60"
                 textAlignVertical="center"
                 keyboardType={'default'}
                 autoCapitalize='none'
                 value={this.state.giftValue}
                 onChangeText={(text) => this.handleValue(text)}
+              />
+              {!startDateValid && (
+                <Message imp={true} message={this.state.errors['giftValue']} />
+              )}
+              <Text style={styles.inputFieldText}>{I18n.t('Description')}</Text>
+              <TextInput
+                multiline
+                numberOfLines={5}
+                style={[styles.textArea, { borderColor: '#8F9EB717' }]}
+                placeholder={I18n.t('Write')}
+                placeholderTextColor="#6f6f6f60"
+                keyboardType={'default'}
+                value={this.state.description}
+                onChangeText={(text) => this.handleDescription(text)}
               />
               <TouchableOpacity
                 style={submitBtn}
@@ -408,22 +511,7 @@ class GiftVocher extends Component {
         <FlatList
           ListHeaderComponent={<View style={flatListHeaderContainer}>
             <Text style={flatListTitle}>{I18n.t('Gift Vouchers')}</Text>
-            <View>
-              {!this.state.filterActive &&
-                <TouchableOpacity
-                  style={filterBtn}
-                  onPress={() => this.filterAction()} >
-                  <Image style={{ alignSelf: 'center', top: RH(5) }} source={require('../assets/images/promofilter.png')} />
-                </TouchableOpacity>
-              }
-              {this.state.filterActive &&
-                <TouchableOpacity
-                  style={filterBtn}
-                  onPress={() => this.clearFilterAction()} >
-                  <Image style={{ alignSelf: 'center', top: RH(5) }} source={require('../assets/images/clearFilterSearch.png')} />
-                </TouchableOpacity>
-              }
-            </View>
+
           </View>}
           data={this.state.filterActive ? this.state.filterVouchersData : this.state.giftVochersList}
           scrollEnabled={true}
@@ -452,145 +540,13 @@ class GiftVocher extends Component {
           )}
 
         />
-      </View>
+      </View >
 
     );
   }
 }
 
 export default GiftVocher;
-
-const flats = StyleSheet.create({
-  buttons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  text: {
-    height: '100%',
-    flexDirection: 'column',
-    justifyContent: 'space-around',
-  },
-
-  titleStyle: {
-    fontSize: RF(15),
-    fontFamily: 'medium',
-    color: '#00000090',
-    margin: 10
-  },
-
-
-  // flats for Mobile
-  flatlistContainer_mobile: {
-    height: 150,
-    backgroundColor: '#fbfbfb',
-    borderBottomWidth: 5,
-    borderBottomColor: '#ffffff',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  flatlistSubContainer_mobile: {
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-between',
-    paddingLeft: 10,
-    paddingRight: 10,
-    alignItems: 'center',
-    height: 140
-  },
-  flatlistTextAccent_mobile: {
-    fontFamily: 'medium',
-    fontSize: 16,
-    color: '#ED1C24'
-  },
-  flatlistText_mobile: {
-    fontFamily: 'regular',
-    fontSize: 12,
-    color: '#353c40'
-  },
-  flatlistTextCommon_mobile: {
-    fontFamily: 'regular',
-    fontSize: 12,
-    color: '#808080'
-  },
-  editButton_mobile: {
-    width: 30,
-    height: 30,
-    borderBottomLeftRadius: 5,
-    borderTopLeftRadius: 5,
-    borderWidth: 1,
-    borderColor: "lightgray",
-    // borderRadius:5,
-  },
-  deleteButton_mobile: {
-    width: 30,
-    height: 30,
-    borderBottomRightRadius: 5,
-    borderTopRightRadius: 5,
-    borderWidth: 1,
-    borderColor: "lightgray",
-  },
-
-
-  // flats for Tablet
-  flatlistContainer_tablet: {
-    height: 200,
-    backgroundColor: '#fbfbfb',
-    borderBottomWidth: 5,
-    borderBottomColor: '#ffffff',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  flatlistSubContainer_tablet: {
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-between',
-    paddingLeft: 20,
-    paddingRight: 20,
-    alignItems: 'center',
-    height: 160
-  },
-  flatlistTextAccent_tablet: {
-    fontFamily: 'medium',
-    fontSize: 21,
-    color: '#ED1C24'
-  },
-  flatlistText_tablet: {
-    fontFamily: 'regular',
-    fontSize: 21,
-    color: '#353c40'
-  },
-  flatlistTextCommon_tablet: {
-    fontFamily: 'regular',
-    fontSize: 17,
-    color: '#808080'
-  },
-  flatlstTextCommon_tablet: {
-    fontFamily: 'regular',
-    fontSize: 17,
-    color: '#808080'
-  },
-  editButton_tablet: {
-    width: 50,
-    height: 50,
-    borderBottomLeftRadius: 5,
-    borderTopLeftRadius: 5,
-    borderWidth: 1,
-    borderColor: "lightgray",
-    // borderRadius:5,
-  },
-  deleteButton_tablet: {
-    width: 50,
-    height: 50,
-    borderBottomRightRadius: 5,
-    borderTopRightRadius: 5,
-    borderWidth: 1,
-    borderColor: "lightgray",
-  },
-
-
-});
 
 const styles = StyleSheet.create({
   spaceText: {
@@ -608,6 +564,12 @@ const styles = StyleSheet.create({
     top: RH(10),
     right: 0,
   },
+  titleStyle: {
+    fontSize: RF(20),
+    fontFamily: "bold",
+    color: color.accent,
+    margin: RF(10)
+  },
   dateTopView: {
     height: RW(280),
     width: deviceWidth,
@@ -620,318 +582,41 @@ const styles = StyleSheet.create({
     marginLeft: Device.isTablet ? 20 : RW(10),
     marginRight: Device.isTablet ? 20 : RW(10)
   },
-  mainContainer: {
-    flex: 1,
+  searchBarStyles: {
+    width: Device.isTablet ? deviceWidth / 1.35 : deviceWidth / 1.3,
+    paddingTop: RF(10),
+    paddingBottom: RF(10),
+    paddingLeft: RF(10)
   },
-
-  logoImage: {
+  filterBtnStyle: {
+    padding: RF(10),
     alignSelf: 'center',
-    width: 300,
-    height: 230,
-
+    backgroundColor: "#353C40",
+    width: Device.isTablet ? 100 : 50,
+    height: Device.isTablet ? 55 : 45
   },
-  containerForActivity: {
-    flex: 1,
-    backgroundColor: '#623FA0',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    color: 'white',
-    fontSize: 20,
-    margin: 20
-  },
-  imagealign: {
-    marginTop: 40,
-    marginRight: 10,
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    height: deviceheight + 40,
-    backgroundColor: '#FFFFFF'
-  },
-  ytdImageValue: {
-    alignSelf: 'center',
-  },
-  loading: {
-    flex: 1,
-    justifyContent: 'center'
-    // alignItems: 'center',
-  },
-
-  // Mobile Styles
-  hederText_mobile: {
-    color: "#353C40",
-    fontSize: 20,
-    fontFamily: "bold",
-    marginLeft: 10,
-    marginTop: 10,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    fontSize: 28,
-  },
-  headerText2_mobile: {
-    color: "#353C40",
-    fontSize: 20,
-    fontFamily: "bold",
-    marginLeft: 10,
-    marginTop: 0,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    height: 45,
-    fontSize: 28,
-  },
-  bottomImage_mobile: {
-    position: 'absolute',
-    right: 0,
-    bottom: 40,
-    width: 162,
-    height: 170
-  },
-  input_mobile: {
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 20,
-    height: 44,
-    marginTop: 5,
-    marginBottom: 5,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 14,
-  },
-  signInButton_mobile: {
-    backgroundColor: '#ED1C24',
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 10,
-    marginBottom: 10,
-    width: deviceWidth - 40,
-    height: 50,
-    borderRadius: 10,
-    fontWeight: 'bold',
-    // marginBottom:100,
-  },
-  signInButtonText_mobile: {
-    color: 'white',
-    alignSelf: 'center',
-    fontSize: 15,
+  inputFieldText: {
+    justifyContent: "center",
+    marginLeft: RW(20),
+    // marginRight: RW(20),
+    marginTop: RH(5),
     fontFamily: "regular",
+    paddingLeft: RW(15),
+    fontSize: RF(15),
+    color: '#B4B7B8'
   },
-  navigationText_mobile: {
-    fontSize: 16,
-    color: '#858585',
-    fontFamily: "regular",
-  },
-  navigationButtonText_mobile: {
-    color: '#353C40',
-    fontSize: 16,
-    fontFamily: "bold",
-    textDecorationLine: 'underline'
-  },
-  rnSelect_mobile: {
-    color: '#8F9EB7',
-    fontSize: 15
-  },
-  rnSelectContainer_mobile: {
-    justifyContent: 'center',
-    height: 44,
-    marginTop: 5,
-    marginBottom: 10,
-    marginLeft: 20,
-    marginRight: 20,
-    paddingLeft: 15,
-    borderColor: '#8F9EB717',
+  textArea: {
+    justifyContent: "center",
+    marginLeft: RW(20),
+    marginRight: RW(20),
+    marginTop: RH(5),
+    marginBottom: RH(5),
+    borderColor: color.border,
     borderRadius: 3,
-    backgroundColor: '#FBFBFB',
+    backgroundColor: color.light,
     borderWidth: 1,
-    fontFamily: 'regular',
-    fontSize: 14,
-  },
-  filterDateButton_mobile: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 5,
-    marginBottom: 5,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    height: 50,
-    backgroundColor: "#F6F6F6",
-    borderRadius: 5,
-  },
-  filterDateButtonText_mobile: {
-    marginLeft: 16,
-    marginTop: 20,
-    color: "#6F6F6F",
-    fontSize: 15,
-    fontFamily: "regular"
-  },
-  datePickerContainer_mobile: {
-    height: 280,
-    width: deviceWidth,
-    backgroundColor: '#ffffff'
-  },
-  datePickerButton_mobile: {
-    position: 'absolute',
-    left: 20,
-    top: 10,
-    height: 30,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  datePickerEndButton_mobile: {
-    position: 'absolute',
-    right: 20,
-    top: 10,
-    height: 30,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  datePickerButtonText_mobile: {
-    textAlign: 'center',
-    marginTop: 5,
-    color: "#ffffff",
-    fontSize: 15,
-    fontFamily: "regular"
-  },
-
-  // Tablet Styles
-  headerText_tablet: {
-    color: "#353C40",
-    fontSize: 40,
-    fontFamily: "bold",
-    marginLeft: 10,
-    marginTop: 10,
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-  headerText2_tablet: {
-    color: "#353C40",
-    fontSize: 40,
-    fontFamily: "bold",
-    marginLeft: 10,
-    marginTop: 0,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    height: 55,
-  },
-  bottomImage_tablet: {
-    position: 'absolute',
-    right: 0,
-    bottom: 40,
-    width: 202,
-    height: 230
-  },
-  input_tablet: {
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 20,
-    height: 60,
-    marginTop: 5,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 22,
-  },
-  signInButton_tablet: {
-    backgroundColor: '#ED1C24',
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 10,
-    marginBottom: 10,
-    width: deviceWidth - 40,
-    height: 60,
-    borderRadius: 10,
-    fontWeight: 'bold',
-    // marginBottom:100,
-  },
-  signInButtonText_tablet: {
-    color: 'white',
-    alignSelf: 'center',
-    fontSize: 20,
     fontFamily: "regular",
-  },
-  navigationText_tablet: {
-    fontSize: 22,
-    color: '#858585',
-    fontFamily: "regular",
-  },
-  navigationButtonText_tablet: {
-    color: '#353C40',
-    fontSize: 22,
-    fontFamily: "bold",
-    textDecorationLine: 'underline'
-  },
-  rnSelect_tablet: {
-    color: '#8F9EB7',
-    fontSize: 20
-  },
-  rnSelectContainer_tablet: {
-    justifyContent: 'center',
-    height: 54,
-    marginTop: 5,
-    marginBottom: 10,
-    marginLeft: 20,
-    marginRight: 20,
-    paddingLeft: 15,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    fontSize: 20,
-  },
-  filterDateButton_tablet: {
-    width: deviceWidth / 2.4,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 10,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    height: 60,
-    backgroundColor: "#F6F6F6",
-    borderRadius: 5,
-  },
-  filterDateButtonText_tablet: {
-    marginLeft: 16,
-    marginTop: 20,
-    color: "#6F6F6F",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  datePickerButton_tablet: {
-    position: 'absolute',
-    left: 20,
-    top: 10,
-    height: 40,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  datePickerButtonText_tablet: {
-    textAlign: 'center',
-    marginTop: 5,
-    color: "#ffffff",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  datePickerEndButton_tablet: {
-    position: 'absolute',
-    right: 20,
-    top: 10,
-    height: 40,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
+    paddingLeft: RW(15),
+    fontSize: RF(14),
+  }
 });;

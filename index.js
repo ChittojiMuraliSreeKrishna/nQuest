@@ -31,7 +31,7 @@ axios.interceptors.request.use(
 axios.interceptors.response.use((response) => response, (error) => {
    // if(error.)
    // whatever you want to do with the error
-   console.log(error.response.status);
+   console.log(error.response.error);
    if (error.response.status === 404) {
       // alert('The requested resource does not exist or has been deleted')
    }
@@ -42,6 +42,10 @@ axios.interceptors.response.use((response) => response, (error) => {
    }
    if (error.response.status === 400) {
       error.response.data && error.response.data.message && alert(error.response.data.message)
+   }
+   
+   if (error.response.status === 500) {
+      error.response.data && error.response.data.error && alert(error.response.data.error)
    }
 
 });

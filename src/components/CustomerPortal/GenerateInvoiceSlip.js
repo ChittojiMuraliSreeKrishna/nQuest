@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
@@ -14,8 +14,12 @@ import { openDatabase } from 'react-native-sqlite-storage';
 import { customerErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
 import CustomerService from '../services/CustomerService';
+import { color } from '../Styles/colorStyles';
 import { inputField } from '../Styles/FormFields';
-
+import ScanIcon from 'react-native-vector-icons/MaterialCommunityIcons'
+import { RH, RW } from '../../Responsive';
+import { flatListMainContainer, flatlistSubContainer, flatListTextStyle, textContainer, textStyleMedium, textStyleMediumColor } from '../Styles/Styles';
+import { TextInput } from 'react-native-paper'
 var deviceWidth = Dimensions.get('window').width;
 var deviceHeight = Dimensions.get('window').height;
 
@@ -75,7 +79,7 @@ class GenerateInvoiceSlip extends Component {
       domainId: 1,
       tableHead: ['S.No', 'Barcode', 'Product', 'Price Per Qty', 'Qty', 'Sales Rate'],
       tableData: [],
-      privilages: [{ bool: false, name: "Tag Customer" }, { bool: false, name: "Bill Level Discount" }],
+      privilages: [{ bool: false, name: "Tag Customer" }, { bool: false, name: "Bill Level Discount" }, { bool: false, name: "Check Promo Disc" }],
       inventoryDelete: false,
       lineItemDelete: false,
       uom: [],
@@ -179,7 +183,8 @@ class GenerateInvoiceSlip extends Component {
       returnData: "",
       disableButton: false,
       discountAmountValid: true,
-      errors: {}
+      errors: {},
+      dsNumberValid: true
     };
   }
 
@@ -215,20 +220,6 @@ class GenerateInvoiceSlip extends Component {
     this.listRef.scrollToOffset({ offset: 0, animated: true });
   }
 
-  incrementForTable() {
-
-  }
-
-  updateQty() {
-
-  }
-
-  decreamentForTable() {
-
-  }
-
-
-
   getDiscountReasons() {
     axios.get(CustomerService.getDiscountReasons()).then((res) => {
       if (res.status === 200) {
@@ -252,6 +243,7 @@ class GenerateInvoiceSlip extends Component {
   }
 
   topbarAction1 = (item, index) => {
+    console.log("+++++++++++++++++", item);
     if (this.state.privilages[index].bool === true) {
       this.state.privilages[index].bool = false;
     }
@@ -273,6 +265,9 @@ class GenerateInvoiceSlip extends Component {
       } else {
         this.setState({ handleBillDiscount: false, modalVisible: false });
       }
+      if (item.name === "Check Promo Disc") {
+        this.checkPromo()
+      }
       if (index != i) {
         this.state.privilages[i].bool = false;
       }
@@ -280,6 +275,35 @@ class GenerateInvoiceSlip extends Component {
     }
   };
 
+  checkPromo() {
+    const { storeId, domainId, barCodeList } = this.state;
+    CustomerService.getCheckPromoAmount(storeId, domainId, barCodeList).then(res => {
+      let calculatedDisc = res.data.result.calculatedDiscountVo;
+      console.log({ calculatedDisc });
+      if (res?.data && res?.data?.result[0].calculatedDiscountVo) {
+        this.setState({ promoDisc: res?.data?.result });
+        this.state.barCodeList.forEach(barcodeData => {
+          this.state.promoDisc.forEach(promo => {
+            if (barcodeData.barcode === promo.barcode) {
+              if (promo.calculatedDiscountVo) {
+                if (promo.calculatedDiscountVo.discountAvailable) {
+                  barcodeData.itemDiscount = parseInt(promo.calculatedDiscountVo.calculatedDiscount);
+                  barcodeData.totalMrp = barcodeData.totalMrp - barcodeData.itemDiscount;
+                }
+              } else {
+                barcodeData.itamDiscount = "No discount";
+              }
+            }
+          });
+        });
+        this.setState({ barList: this.state.barList });
+        this.calculateTotal();
+      } else {
+        console.log("in error")
+        alert("No Promo Available");
+      }
+    });
+  }
 
   getDeliverySlipDetails() {
     this.setState({ barCodeList: [], finalList: [], rBarCodeList: [], dlslips: [] });
@@ -445,201 +469,205 @@ class GenerateInvoiceSlip extends Component {
         });
 
         // slabVos.forEach(taxData => {
-        this.state.barCodeList.forEach(taxData =>{
-        // if (this.state.netPayableAmount >= taxData[0].priceFrom && this.state.netPayableAmount <= taxData[0].priceTo) {
-        //   const taxPer = taxData[0].taxVo.taxLabel.split(' ')[1].split('%')[0];
-        //   const tax = parseInt(taxPer) / 100;
+        this.state.barCodeList.forEach(taxData => {
+          // if (this.state.netPayableAmount >= taxData[0].priceFrom && this.state.netPayableAmount <= taxData[0].priceTo) {
+          //   const taxPer = taxData[0].taxVo.taxLabel.split(' ')[1].split('%')[0];
+          //   const tax = parseInt(taxPer) / 100;
 
-        //   const totalTax = this.state.netPayableAmount * tax;
+          //   const totalTax = this.state.netPayableAmount * tax;
 
-        //   const central = totalTax / 2;
-        //   this.setState({ centralGST: Math.ceil(central) });
-        //   slabCheck = true;
-        //   slabCheck = true;
-        //   this.setState({ stateGST: taxData[0].taxVo.cgst, centralGST: taxData[0].taxVo.cgst });
+          //   const central = totalTax / 2;
+          //   this.setState({ centralGST: Math.ceil(central) });
+          //   slabCheck = true;
+          //   slabCheck = true;
+          //   this.setState({ stateGST: taxData[0].taxVo.cgst, centralGST: taxData[0].taxVo.cgst });
+          // }
+          sgst = sgst + taxData.sgst
+          cgst = cgst + taxData.cgst
+          totalTax = sgst + cgst
+
+        });
+
+        this.setState({ centralGST: Math.round(cgst) });
+        this.setState({ stateGST: Math.round(sgst) });
+
+        // if (!slabCheck) {
+        //   // this.setState({ stateGST: 70, centralGST: 70 });
+        //   console.log("Checking the slab");
         // }
-        sgst = sgst + taxData.sgst
-        cgst = cgst + taxData.cgst
-        totalTax = sgst + cgst
-
-      });
-
-    this.setState({ centralGST: Math.round(cgst) });
-    this.setState({ stateGST: Math.round(sgst) });
-
-    // if (!slabCheck) {
-    //   // this.setState({ stateGST: 70, centralGST: 70 });
-    //   console.log("Checking the slab");
-    // }
-    const grandTotal = this.state.netPayableAmount 
-    // + this.state.centralGST * 2;
-    this.setState({ grandNetAmount: grandTotal, netPayableAmount: grandTotal });
-  }
-});
+        const grandTotal = this.state.netPayableAmount
+        // + this.state.centralGST * 2;
+        this.setState({ grandNetAmount: grandTotal, netPayableAmount: grandTotal });
+      }
+    });
   }
 
 
-pay() {
-  let obj = {
-    totalAmount: this.state.netPayableAmount,
-    grossAmount: this.state.grossAmount,
-    totalDiscount: this.state.totalDiscount,
-    CGST: this.state.centralGST, totalPromoDisc: this.state.totalPromoDisc,
-    manualDisc: this.state.manualDisc,
-    taxAmount: this.state.taxAmount,
-    approvedBy: this.state.approvedBy,
-    reasonDiscount: this.state.reasonDiscount,
-    discountAmount: this.state.discountAmount,
-    userId: this.state.userId,
-    dsNumberList: this.state.dsNumberList,
-    customerName: this.state.customerName,
-    customerPhoneNumber: this.state.customerMobilenumber,
-    customerGSTNumber: this.state.customerGSTNumber, customerAddress: this.state.customerAddress,
-    customerGender: this.state.customerGender,
-    totalQty: this.state.totalQty.toString(),
-    onGoBack: () => this.invoiceUpdate(),
-  };
-  this.props.navigation.navigate('TextilePayment', obj);
-  console.log("data in invoice slip", obj);
-}
-
-invoiceUpdate() {
-  this.setState({ barCodeList: [] });
-  this.setState({ dsNumber: [] });
-}
-
-endEditing() {
-  if (this.state.dsNumber === "") {
-    alert("Please enter ES Number");
-  }
-  else {
-    this.setState({ disableButton: false });
-    this.getDeliverySlipDetails();
-  }
-}
-
-handleDsNumber = (text) => {
-  this.setState({ dsNumber: text });
-};
-
-handleBarcode = (text) => {
-  this.setState({ barcodeId: text });
-};
-
-addCustomer() {
-
-}
-
-tagCustomer() {
-  if (this.state.mobileNumber.length === 0 || this.state.mobileNumber.length < 10) {
-    alert("please enter a valid 10 digit mobile number");
-  } else {
-    const obj = {
-      "id": "",
-      "phoneNo": "+91" + this.state.mobileNumber,
-      "name": "",
-      "active": false,
-      "inActive": false,
-      "roleId": "",
-      "storeId": ""
+  pay() {
+    let obj = {
+      totalAmount: this.state.netPayableAmount,
+      grossAmount: this.state.grossAmount,
+      totalDiscount: this.state.totalDiscount,
+      CGST: this.state.centralGST, totalPromoDisc: this.state.totalPromoDisc,
+      manualDisc: this.state.manualDisc,
+      taxAmount: this.state.taxAmount,
+      approvedBy: this.state.approvedBy,
+      reasonDiscount: this.state.reasonDiscount,
+      discountAmount: this.state.discountAmount,
+      userId: this.state.userId,
+      dsNumberList: this.state.dsNumberList,
+      customerName: this.state.customerName,
+      customerPhoneNumber: this.state.customerMobilenumber,
+      customerGSTNumber: this.state.customerGSTNumber, customerAddress: this.state.customerAddress,
+      customerGender: this.state.customerGender,
+      totalQty: this.state.totalQty.toString(),
+      onGoBack: () => this.invoiceUpdate(),
     };
-    axios.get(CustomerService.getCustomerMobile() + "/" + obj.phoneNo).then((res) => {
-      console.log(res);
-      if (res) {
-        console.log(res.data);
-        const mobileData = res.data.result;
-        this.setState({
-          userId: res.data.result.userId, customerFullName: res.data.result.userName
-        });
-        this.setState({ modalVisible: false });
-        this.state.mobileData = {
-          address: this.state.address,
-          altMobileNo: "",
-          dob: this.state.dob,
-          gender: mobileData.gender,
-          gstNumber: this.state.gstNumber,
-          mobileNumber: mobileData.phoneNumber,
-          name: mobileData.userName,
-          email: this.state.customerEmail,
-        };
+    this.props.navigation.navigate('TextilePayment', obj);
+    console.log("data in invoice slip", obj);
+  }
 
-        this.setState({
-          isBillingDetails: true,
-          customerMobilenumber: mobileData.phoneNumber,
-        });
+  invoiceUpdate() {
+    this.setState({ barCodeList: [] });
+    this.setState({ dsNumber: [] });
+  }
 
+  endEditing() {
+    const isFormValid = this.validationForm()
+    if (isFormValid) {
+      this.setState({ disableButton: false });
+      this.getDeliverySlipDetails();
+    }
+  }
+
+  handleDsNumber = (text) => {
+    this.setState({ dsNumber: text });
+  };
+
+  handleBarcode = (text) => {
+    this.setState({ barcodeId: text });
+  };
+
+  addCustomer() {
+
+  }
+
+  tagCustomer() {
+    if (this.state.mobileNumber.length === 0 || this.state.mobileNumber.length < 10) {
+      alert("please enter a valid 10 digit mobile number");
+    } else {
+      const obj = {
+        "id": "",
+        "phoneNo": "+91" + this.state.mobileNumber,
+        "name": "",
+        "active": false,
+        "inActive": false,
+        "roleId": "",
+        "storeId": ""
+      };
+      axios.get(CustomerService.getCustomerMobile() + "/" + obj.phoneNo).then((res) => {
+        console.log(res);
+        if (res) {
+          console.log(res.data);
+          const mobileData = res.data.result;
+          this.setState({
+            userId: res.data.result.userId, customerFullName: res.data.result.userName
+          });
+          this.setState({ modalVisible: false });
+          this.state.mobileData = {
+            address: this.state.address,
+            altMobileNo: "",
+            dob: this.state.dob,
+            gender: mobileData.gender,
+            gstNumber: this.state.gstNumber,
+            mobileNumber: mobileData.phoneNumber,
+            name: mobileData.userName,
+            email: this.state.customerEmail,
+          };
+
+          this.setState({
+            isBillingDetails: true,
+            customerMobilenumber: mobileData.phoneNumber,
+          });
+
+        }
+      }).catch(() => {
+        this.setState({ loading: false });
+        alert('Unable to get customer details');
+      });
+    }
+  }
+
+  handleMobileNumber(text) {
+    this.setState({ mobileNumber: text });
+  }
+
+  getMobileDetails() {
+    axios.get(CustomerService.getMobileData() + "/" + "+918466043606").then((res) => {
+      if (res.data.result) {
+        this.state.mobileData = res.data.result;
+        console.log(this.state.mobileData);
+        this.setState({
+          customerName: res.data.result.name,
+          gender: res.data.result.gender,
+          dob: res.data.result.dob,
+          customerEmail: res.data.result.email,
+          customerGST: res.data.result.gstNumber,
+          address: res.data.result.address,
+        });
+      } else {
+        toast.error("No Data Found");
       }
     }).catch(() => {
       this.setState({ loading: false });
       alert('Unable to get customer details');
     });
   }
-}
 
-handleMobileNumber(text) {
-  this.setState({ mobileNumber: text });
-}
+  validationForm() {
+    let isFormValid = true;
+    let errors = {};
 
-getMobileDetails() {
-  axios.get(CustomerService.getMobileData() + "/" + "+918466043606").then((res) => {
-    if (res.data.result) {
-      this.state.mobileData = res.data.result;
-      console.log(this.state.mobileData);
-      this.setState({
-        customerName: res.data.result.name,
-        gender: res.data.result.gender,
-        dob: res.data.result.dob,
-        customerEmail: res.data.result.email,
-        customerGST: res.data.result.gstNumber,
-        address: res.data.result.address,
-      });
-    } else {
-      toast.error("No Data Found");
+    if (this.state.discountAmount > this.state.netPayableAmount) {
+      isFormValid = false;
+      errors["discountAmount"] = customerErrorMessages.discountAmount;
+      this.setState({ discountAmountValid: false });
     }
-  }).catch(() => {
-    this.setState({ loading: false });
-    alert('Unable to get customer details');
-  });
-}
 
-validationForm() {
-  let isFormValid = true;
-  let errors = {};
+    if (this.state.dsNumber === '') {
+      isFormValid = false;
+      errors["dsNumber"] = customerErrorMessages.dsNumber;
+      this.setState({ dsNumberValid: false });
+    }
 
-  if (this.state.discountAmount > this.state.netPayableAmount) {
-    isFormValid = false;
-    errors["discountAmount"] = customerErrorMessages.discountAmount;
-    this.setState({ discountAmountValid: false });
+    this.setState({ errors: errors });
+    return isFormValid;
   }
 
-  this.setState({ errors: errors });
-  return isFormValid;
-}
 
+  handleDiscountAmount(value) {
+    this.setState({ discountAmount: value });
+  }
 
-handleDiscountAmount(value) {
-  this.setState({ discountAmount: value });
-}
+  handleApprovedBy(text) {
+    this.setState({ approvedBy: text });
+  }
 
-handleApprovedBy(text) {
-  this.setState({ approvedBy: text });
-}
+  handleDiscountReason = (value) => {
+    this.setState({ reasonDiscount: value });
+  };
 
-handleDiscountReason = (value) => {
-  this.setState({ reasonDiscount: value });
-};
-
-billDiscount() {
-  const isFormValid = this.validationForm();
-  if (isFormValid) {
-    if (this.state.discountAmount === "0") {
-      alert("discount amount cannot be empty");
-    } else if (this.state.approvedBy === "") {
-      alert("approved By cannot be empty");
-    } else if (this.state.reasonDiscount === "") {
-      alert("reason cannot be empty");
-    }
-    else {
+  billDiscount() {
+    const isFormValid = this.validationForm();
+    if (isFormValid) {
+      // if (this.state.discountAmount === "0") {
+      //   alert("discount amount cannot be empty");
+      // } else if (this.state.approvedBy === "") {
+      //   alert("approved By cannot be empty");
+      // } else if (this.state.reasonDiscount === "") {
+      //   alert("reason cannot be empty");
+      // }
+      // else {
       // this.state.netPayableAmount = 0;
       console.log(this.state.totalPromoDisc, this.state.discountAmount);
       const totalDisc =
@@ -662,662 +690,694 @@ billDiscount() {
         });
 
     }
+
   }
 
-}
-
-navigateToScan() {
-  global.barcodeId = 'something';
-  this.props.navigation.navigate('ScanBarCode', {
-    isFromNewSale: true, isFromAddProduct: false,
-    onGoBack: () => this.refreshTextile(),
-  });
-}
-
-refreshTextile() {
-  if (global.barcodeId != 'something') {
-    this.setState({ dsNumber: global.barcodeId },
-      () => {
-        this.getDeliverySlipDetails();
-      });
-    this.setState({ barcodeId: '' });
+  navigateToScan() {
     global.barcodeId = 'something';
+    this.props.navigation.navigate('ScanBarCode', {
+      isFromNewSale: true, isFromAddProduct: false,
+      onGoBack: () => this.refreshTextile(),
+    });
   }
-}
 
-navigateToScanCode() {
-  global.barcodeId = 'something';
-  this.props.navigation.navigate('ScanBarCode', {
-    isFromNewSale: false, isFromAddProduct: false, invoiceScan: true,
-    onGoBack: () => this.refresh(),
-  });
-}
+  refreshTextile() {
+    if (global.barcodeId != 'something') {
+      this.setState({ dsNumber: global.barcodeId },
+        () => {
+          this.getDeliverySlipDetails();
+        });
+      this.setState({ barcodeId: '' });
+      global.barcodeId = 'something';
+    }
+  }
 
-refresh() {
-  if (global.barcodeId != 'something') {
-    this.setState({ barcodeId: global.barcodeId },
-      () => {
-        this.getRetailBarcodeList();
-      });
-    this.setState({ dsNumber: "" });
+  navigateToScanCode() {
     global.barcodeId = 'something';
+    this.props.navigation.navigate('ScanBarCode', {
+      isFromNewSale: false, isFromAddProduct: false, invoiceScan: true,
+      onGoBack: () => this.refresh(),
+    });
   }
-  console.log('bar-code is' + this.state.barcodeId);
-}
+
+  refresh() {
+    if (global.barcodeId != 'something') {
+      this.setState({ barcodeId: global.barcodeId },
+        () => {
+          this.getRetailBarcodeList();
+        });
+      this.setState({ dsNumber: "" });
+      global.barcodeId = 'something';
+    }
+    console.log('bar-code is' + this.state.barcodeId);
+  }
 
 
-render() {
-  console.log(global.barcodeId);
-  AsyncStorage.getItem("tokenkey").then((value) => {
-    console.log(value);
-  }).catch(() => {
-    this.setState({ loading: false });
-    console.log('There is error getting token');
-  });
-  return (
-    <View style={{ flex: 1 }}>
-      {this.state.flagone && (
-        <ScrollView>
-          <View
-            style={{
-              flex: 1,
-              paddingHorizontal: 0,
-              paddingVertical: 0,
-              marginTop: 10,
-            }}>
-            <View>
-              <View style={{ flexDirection: 'row', width: Device.isTablet ? deviceWidth - 20 : deviceWidth - 10, justifyContent: 'space-between' }}>
-                <TextInput style={[inputField, { width: Device.isTablet ? deviceWidth / 1.45 : deviceWidth / 1.6 }]}
-                  underlineColorAndroid="transparent"
-                  placeholder={I18n.t("Enter ES Number")}
-                  placeholderTextColor="#6F6F6F60"
-                  textAlignVertical="center"
-                  keyboardType={'default'}
-                  autoCapitalize="none"
-                  value={this.state.dsNumber}
-                  // onEndEditing
-                  onChangeText={(text) => this.handleDsNumber(text)}
-                  onEndEditing={() => this.endEditing()}
-                />
-                <TouchableOpacity
-                  style={{ backgroundColor: "#ED1C24", width: Device.isTablet ? 120 : 80, height: Device.isTablet ? 55 : 45, borderRadius: 10, marginTop: Device.isTablet ? 5 : 10 }}
-                  onPress={() => this.navigateToScan()} >
-                  <Text style={[Device.isTablet ? styles.navButtonText_tablet : styles.navButtonText_mobile, { paddingTop: Device.isTablet ? 5 : 5 }]}> {I18n.t('SCAN')} </Text>
-                </TouchableOpacity>
-              </View>
-              {/* <TextInput style={inputField}
-                  underlineColorAndroid="transparent"
-                  placeholder={I18n.t("Enter Barcode")}
-                  placeholderTextColor="#6F6F6F60"
-                  textAlignVertical="center"
-                  keyboardType={'default'}
-                  value={this.state.barcodeId}
-                  autoCapitalize="none"
-                  // onEndEditing
-                  onChangeText={(text) => this.handleBarcode(text)}
-                  onEndEditing={() => this.endEditing()}
-                /> */}
-            </View>
-            {this.state.barCodeList.length !== 0 && (
-              <FlatList
-                style={styles.flatList}
-                horizontal
-                data={this.state.privilages}
-                showsVerticalScrollIndicator={false}
-                showsHorizontalScrollIndicator={false}
-                renderItem={({ item, index }) => (
-                  <TouchableOpacity style={{
-                    height: 36,
-                    width: 200,
-                    borderWidth: 1,
-                    backgroundColor: item.bool ? '#ED1C24' : '#FFFFFF',
-                    borderColor: item.bool ? '#ED1C24' : '#858585',
-                    borderRadius: 5,
-                    marginLeft: 10,
-                  }} onPress={() => this.topbarAction1(item, index)} >
-
-                    <Text style={{ fontSize: 16, alignItems: 'center', alignSelf: 'center', marginTop: 5, color: item.bool ? "#FFFFFF" : '#858585', fontFamily: 'regular' }}>
-                      {item.name}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-                ListFooterComponent={<View style={{ width: 15 }}></View>}
-              />
-            )}
-            {this.state.lineItemDelete && (
+  render() {
+    console.log(global.barcodeId);
+    AsyncStorage.getItem("tokenkey").then((value) => {
+      console.log(value);
+    }).catch(() => {
+      this.setState({ loading: false });
+      console.log('There is error getting token');
+    });
+    return (
+      <View style={{ flex: 1 }}>
+        {this.state.flagone && (
+          <ScrollView>
+            <View
+              style={{
+                flex: 1,
+                paddingHorizontal: 0,
+                paddingVertical: 0,
+                marginTop: 10,
+                backgroundColor: color.white
+              }}>
               <View>
-                <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}>
-                  <View style={[styles.filterMainContainer, { height: Device.isTablet ? 350 : 300, marginTop: Device.isTablet ? deviceHeight - 350 : deviceHeight - 300, backgroundColor: '#ED1C24' }]}>
-                    <View>
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
-                        <View>
-                          <Text style={{ marginTop: 15, fontSize: Device.isTablet ? 22 : 17, marginLeft: 20, color: '#ffffff' }} > {I18n.t("Delete Item")} </Text>
-                        </View>
-                        <View>
-                          <TouchableOpacity style={{ width: Device.isTablet ? 60 : 50, height: Device.isTablet ? 60 : 50, marginTop: Device.isTablet ? 20 : 15, }} onPress={() => this.modelCancel()}>
-                            <Image style={{ width: Device.isTablet ? 20 : 15, height: Device.isTablet ? 20 : 15, margin: 5 }} source={require('../assets/images/modalCloseWhite.png')} />
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                      <Text style={{
-                        height: Device.isTablet ? 2 : 1,
-                        width: deviceWidth,
-                        backgroundColor: 'lightgray',
-                      }}></Text>
-                    </View>
-
-                    <View style={{ backgroundColor: '#ffffff' }}>
-                      <Text style={{
-                        textAlign: 'center',
-                        fontFamily: 'regular',
-                        fontSize: Device.isTablet ? 17 : 22,
-                        marginTop: 15,
-                        color: '#353C40'
-                      }}> {I18n.t("Are you sure want to delete NewSale Item")} ?  </Text>
-                      <TouchableOpacity
-                        style={{
-                          width: deviceWidth - 40,
-                          marginLeft: 20,
-                          marginRight: 20,
-                          marginTop: 60,
-                          height: 50, backgroundColor: "#ED1C24", borderRadius: 5,
-                        }} onPress={() => this.deleteLineItem(item, index)}
-                      >
-                        <Text style={{
-                          textAlign: 'center', marginTop: 20, color: "#ffffff", fontSize: 15,
-                          fontFamily: "regular"
-                        }}  > {I18n.t("DELETE")} </Text>
-
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        style={{
-                          width: deviceWidth - 40,
-                          marginLeft: 20,
-                          marginRight: 20,
-                          marginTop: 20,
-                          height: 50, backgroundColor: "#ffffff", borderRadius: 5, borderWidth: 1, borderColor: "#ED1C24",
-                        }} onPress={() => this.modelCancel()}
-                      >
-                        <Text style={{
-                          textAlign: 'center', marginTop: 20, color: "#ED1c24", fontSize: 15,
-                          fontFamily: "regular"
-                        }}  > {I18n.t("CANCEL")} </Text>
-
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </Modal>
+                <View style={{ flexDirection: 'row', width: Device.isTablet ? deviceWidth - 20 : deviceWidth - 10 }}>
+                  <TextInput style={[inputField, { width: Device.isTablet ? deviceWidth / 1.45 : deviceWidth / 1.4, borderColor: '#8F9EB717', marginLeft: RW(0) }]}
+                    underlineColorAndroid="transparent"
+                    placeholder={I18n.t("Enter ES Number")}
+                    placeholderTextColor="#6F6F6F60"
+                    textAlignVertical="center"
+                    keyboardType={'default'}
+                    autoCapitalize="none"
+                    value={this.state.dsNumber}
+                    onChangeText={(text) => this.handleDsNumber(text)}
+                    onEndEditing={() => this.endEditing()}
+                  />
+                  <TouchableOpacity
+                    style={{
+                      marginTop: RH(5),
+                      backgroundColor: "#353C40", width: Device.isTablet ? 120 : 70, height: Device.isTablet ? 55 : 45
+                    }}
+                    onPress={() => this.navigateToScan()} >
+                    {/* <Image
+                      source={require('../../commonUtils/assets/Images/scan_icon.png')}
+                    /> */}
+                    <ScanIcon name='barcode-scan' size={30} color={color.white} style={{ paddingTop: 5, alignSelf: 'center' }} />
+                  </TouchableOpacity>
+                </View>
+                {!this.state.dsNumberValid && (
+                  <Message imp={true} message={this.state.errors["dsNumber"]} />
+                )}
               </View>
-            )}
-
-            {(this.state.barCodeList.length !== 0 &&
-              <FlatList style={{ marginTop: 20, marginBottom: 20 }}
-                //  ListHeaderComponent={this.renderHeader}
-                data={this.state.barCodeList}
-                keyExtractor={item => item.email}
-                contentContainerStyle={{ paddingBottom: 230 }}
-                onEndReached={this.onEndReached.bind(this)}
-                scrollEnabled={
-                  false
-                }
-                ref={(ref) => { this.listRef = ref; }}
-                renderItem={({ item, index }) => (
-                  <View style={{
-                    height: Device.isTablet ? 230 : 200,
-                    backgroundColor: '#FFFFFF',
-                    borderBottomWidth: 5,
-                    borderBottomColor: '#FBFBFB',
-                    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
-
-                  }}>
-
-                    <View style={{ flexDirection: 'row', height: Device.isTablet ? 200 : 190, justifyContent: 'flex-start', width: Device.isTablet ? deviceWidth - 40 : deviceWidth - 20 }}>
-                      <View style={{ marginTop: Device.isTablet ? 40 : 20, marginLeft: Device.isTablet ? 40 : 20 }}>
-                        <Image source={require('../assets/images/default.jpeg')}
-                          //source={{ uri: item.image }}
-                          style={{
-                            width: Device.isTablet ? 140 : 90, height: Device.isTablet ? 140 : 90,
-                          }} />
-                      </View>
-                      <Text style={{ fontSize: Device.isTablet ? 21 : 16, fontFamily: 'medium', color: '#353C40' }}>
-                        {item.itemdesc}
+              {this.state.barCodeList.length !== 0 && (
+                <FlatList
+                  style={styles.flatList}
+                  horizontal
+                  data={this.state.privilages}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
+                  renderItem={({ item, index }) => (
+                    <TouchableOpacity style={{
+                      borderWidth: 1,
+                      backgroundColor: item.bool ? '#ED1C24' : '#FFFFFF',
+                      borderColor: item.bool ? '#ED1C24' : '#858585',
+                      borderRadius: 5,
+                      marginLeft: 10, padding: 15
+                    }} onPress={() => this.topbarAction1(item, index)} >
+                      {/* <Image
+                        source={
+                          item.name === "Tag Customer" ? require("../../commonUtils/assets/Images/tag_customer_icon.png") :
+                            item.name === "Bill Level Discount" ? require("../../commonUtils/assets/Images/bill_level_disc.png") :
+                              item.name === "Check Promo Disc" ? require("../../commonUtils/assets/Images/check_promo_disc.png"):""} style={{ height: RH(30), width: RW(45) ,marginTop:4}} /> */}
+                      <Text style={{ fontSize: 16, alignItems: 'center', alignSelf: 'center', marginTop: 5, color: item.bool ? "#FFFFFF" : '#353C40', fontFamily: 'regular' }}>
+                        {item.name}
                       </Text>
-                      <View style={{ flexDirection: "column", marginLeft: Device.isTablet ? 40 : 20 }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: Device.isTablet ? 40 : 30 }}>
-                          <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080' }}>
-                            {I18n.t("ITEM")}: #{item.barCode}
-                          </Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', }}>
-                          <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080' }}>
-                            {I18n.t("QUANTITY")}: {item.quantity}
-                          </Text>
-                          <View style={{ flexDirection: 'row', paddingLeft: Device.isTablet ? 25 : 15 }}>
-                            <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080' }}>
-                              MRP:
-                            </Text>
-                            <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', paddingLeft: 3 }}>
-                              {/* ₹ {(parseInt(item.netamount)).toString()} */}
-                              ₹ {item.itemPrice}
-                            </Text>
+                    </TouchableOpacity>
+                  )}
+                  ListFooterComponent={<View style={{ width: 15 }}></View>}
+                />
+              )}
+
+              {this.state.lineItemDelete && (
+                <View>
+                  <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}>
+                    <View style={[styles.filterMainContainer, { height: Device.isTablet ? 350 : 300, marginTop: Device.isTablet ? deviceHeight - 350 : deviceHeight - 300, backgroundColor: '#ED1C24' }]}>
+                      <View>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
+                          <View>
+                            <Text style={{ marginTop: 15, fontSize: Device.isTablet ? 22 : 17, marginLeft: 20, color: '#ffffff' }} > {I18n.t("Delete Item")} </Text>
+                          </View>
+                          <View>
+                            <TouchableOpacity style={{ width: Device.isTablet ? 60 : 50, height: Device.isTablet ? 60 : 50, marginTop: Device.isTablet ? 20 : 15, }} onPress={() => this.modelCancel()}>
+                              <Image style={{ width: Device.isTablet ? 20 : 15, height: Device.isTablet ? 20 : 15, margin: 5 }} source={require('../assets/images/modalCloseWhite.png')} />
+                            </TouchableOpacity>
                           </View>
                         </View>
+                        <Text style={{
+                          height: Device.isTablet ? 2 : 1,
+                          width: deviceWidth,
+                          backgroundColor: 'lightgray',
+                        }}></Text>
+                      </View>
 
-                        <View style={{ flexDirection: 'column', }}>
-                          <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080' }}>
-                            {I18n.t("DISCOUNT")}: ₹ {this.state.promoDiscount}
-                          </Text>
-                          <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080' }}>
-                            {I18n.t("GROSS AMOUNT")}: ₹ {item.netValue}
-                          </Text>
-                        </View>
-                        <View style={{ flexDirection: 'row' }}>
-                          <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080' }}>CGST: {this.state.centralGST}</Text>
-                          <Text style={{ fontSize: Device.isTablet ? 45 : 35 }}> </Text>
-                          <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080', paddingLeft: Device.isTablet ? 25 : 15 }}>SGST: {this.state.centralGST}</Text>
-                        </View>
+                      <View style={{ backgroundColor: '#ffffff' }}>
+                        <Text style={{
+                          textAlign: 'center',
+                          fontFamily: 'regular',
+                          fontSize: Device.isTablet ? 17 : 22,
+                          marginTop: 15,
+                          color: '#353C40'
+                        }}> {I18n.t("Are you sure want to delete NewSale Item")} ?  </Text>
+                        <TouchableOpacity
+                          style={{
+                            width: deviceWidth - 40,
+                            marginLeft: 20,
+                            marginRight: 20,
+                            marginTop: 60,
+                            height: 50, backgroundColor: "#ED1C24", borderRadius: 5,
+                          }} onPress={() => this.deleteLineItem(item, index)}
+                        >
+                          <Text style={{
+                            textAlign: 'center', marginTop: 20, color: "#ffffff", fontSize: 15,
+                            fontFamily: "regular"
+                          }}  > {I18n.t("DELETE")} </Text>
+
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={{
+                            width: deviceWidth - 40,
+                            marginLeft: 20,
+                            marginRight: 20,
+                            marginTop: 20,
+                            height: 50, backgroundColor: "#ffffff", borderRadius: 5, borderWidth: 1, borderColor: "#ED1C24",
+                          }} onPress={() => this.modelCancel()}
+                        >
+                          <Text style={{
+                            textAlign: 'center', marginTop: 20, color: "#ED1c24", fontSize: 15,
+                            fontFamily: "regular"
+                          }}  > {I18n.t("CANCEL")} </Text>
+
+                        </TouchableOpacity>
                       </View>
                     </View>
+                  </Modal>
+                </View>
+              )}
 
+              {(this.state.barCodeList.length !== 0 &&
+                <FlatList style={{ marginTop: 20, marginBottom: 20 }}
+                  //  ListHeaderComponent={this.renderHeader}
+                  data={this.state.barCodeList}
+                  keyExtractor={item => item}
+                  // contentContainerStyle={{ paddingBottom: 230 }}
+                  onEndReached={this.onEndReached.bind(this)}
+                  scrollEnabled={
+                    false
+                  }
+                  ref={(ref) => { this.listRef = ref; }}
+                  renderItem={({ item, index }) => (
+                    // <View style={{
+                    //   height: Device.isTablet ? 230 : 200,
+                    //   backgroundColor: '#FFFFFF',
+                    //   borderBottomWidth: 5,
+                    //   borderBottomColor: '#FBFBFB',
+                    //   flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
+
+                    // }}>
+
+                    //   <View style={{ flexDirection: 'row', height: Device.isTablet ? 200 : 190, justifyContent: 'flex-start', width: Device.isTablet ? deviceWidth - 40 : deviceWidth - 20 }}>
+                    //     <View style={{ marginTop: Device.isTablet ? 40 : 20, marginLeft: Device.isTablet ? 40 : 20 }}>
+                    //       <Image source={require('../assets/images/default.jpeg')}
+                    //         //source={{ uri: item.image }}
+                    //         style={{
+                    //           width: Device.isTablet ? 140 : 90, height: Device.isTablet ? 140 : 90,
+                    //         }} />
+                    //     </View>
+                    //     <Text style={{ fontSize: Device.isTablet ? 21 : 16, fontFamily: 'medium', color: '#353C40' }}>
+                    //       {item.itemdesc}
+                    //     </Text>
+                    //     <View style={{ flexDirection: "column", marginLeft: Device.isTablet ? 40 : 20 }}>
+                    //       <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: Device.isTablet ? 40 : 30 }}>
+                    //         <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080' }}>
+                    //           {I18n.t("ITEM")}: #{item.barCode}
+                    //         </Text>
+                    //       </View>
+                    //       <View style={{ flexDirection: 'row', }}>
+                    //         <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080' }}>
+                    //           {I18n.t("QUANTITY")}: {item.quantity}
+                    //         </Text>
+                    //         <View style={{ flexDirection: 'row', paddingLeft: Device.isTablet ? 25 : 15 }}>
+                    //           <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080' }}>
+                    //             MRP:
+                    //           </Text>
+                    //           <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', paddingLeft: 3 }}>
+                    //             {/* ₹ {(parseInt(item.netamount)).toString()} */}
+                    //             ₹ {item.itemPrice}
+                    //           </Text>
+                    //         </View>
+                    //       </View>
+
+                    //       <View style={{ flexDirection: 'column', }}>
+                    //         <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080' }}>
+                    //           {I18n.t("DISCOUNT")}: ₹ {this.state.promoDiscount}
+                    //         </Text>
+                    //         <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080' }}>
+                    //           {I18n.t("GROSS AMOUNT")}: ₹ {item.netValue}
+                    //         </Text>
+                    //       </View>
+                    //       <View style={{ flexDirection: 'row' }}>
+                    //         <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080' }}>CGST: {this.state.centralGST}</Text>
+                    //         <Text style={{ fontSize: Device.isTablet ? 45 : 35 }}> </Text>
+                    //         <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080', paddingLeft: Device.isTablet ? 25 : 15 }}>SGST: {this.state.centralGST}</Text>
+                    //       </View>
+                    //     </View>
+                    //   </View>
+
+                    // </View>
+
+                    <>
+                      <View style={[flatListMainContainer, { backgroundColor: color.white }]}>
+                        <View style={flatlistSubContainer}>
+                          <View style={textContainer}>
+                            <Text style={textStyleMediumColor}>{I18n.t("Item")}</Text>
+                            <Text style={textStyleMediumColor}>{I18n.t("QTY")}</Text>
+                            <Text style={textStyleMediumColor}>{I18n.t("MRP")}</Text>
+                          </View>
+                          <View style={textContainer}>
+                            <Text style={textStyleMedium}>{item.barCode}</Text>
+                            <Text style={textStyleMedium}>{('0' + item.quantity).slice(-2)}</Text>
+                            <Text style={textStyleMedium}>₹ {item.itemPrice + '.00'}</Text>
+                          </View>
+
+                          <View style={textContainer}>
+                            <Text style={textStyleMediumColor}>{I18n.t("SGST")}</Text>
+                            <Text style={textStyleMediumColor}>{I18n.t("CGST")} </Text>
+                            <Text style={textStyleMediumColor}>{I18n.t("Discont")} </Text>
+                          </View>
+
+                          <View style={textContainer}>
+                            <Text style={textStyleMedium}>{item.cgst ? item.cgst : 0}</Text>
+                            <Text style={textStyleMedium}>{item.cgst ? item.cgst : 0}</Text>
+                            <Text style={[textStyleMedium, { color: '#2ADC09' }]}>₹{item.promoDiscount + '.00'}</Text>
+                          </View>
+                        </View>
+                      </View>
+                      <View style={flatListTextStyle}>
+                        <Text style={{ fontFamily: 'bold' }}>{I18n.t("GROSS")} :  ₹{item.grossValue + '.00'}</Text>
+                      </View>
+                    </>
+
+                  )}
+                />
+              )}
+
+
+              {this.state.barCodeList.length != 0 && (
+                <View style={{ width: deviceWidth, height: 320, backgroundColor: '#F8F8F8' }}>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 30, justifyContent: 'center', textAlign: 'center', marginTop: 10,
+                    fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
+                  }}>
+                    {I18n.t("ITEMS")} </Text>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 30, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
+                    fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
+                  }}>
+                    {this.state.barCodeList.length} </Text>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 60, justifyContent: 'center', textAlign: 'center', marginTop: 10,
+                    fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
+                  }}>
+                    {I18n.t("DISCOUNT")} </Text>
+                  <Text style={{
+                    color: "#2ADC09", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 60, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
+                    fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
+                  }}>
+                    ₹ {this.state.promoDiscount + '.00'} </Text>
+
+                  <Text style={{
+                    color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 90, fontSize: 20, justifyContent: 'center', textAlign: 'center', marginTop: 10,
+                    fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
+                  }}>
+                    {I18n.t("TOTAL")} </Text>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 90, fontSize: 20, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
+                    fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
+                  }}>
+                    ₹ {this.state.netPayableAmount + '.00'} </Text>
+
+                  <Text style={{
+                    color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 120, fontSize: 20, justifyContent: 'center', textAlign: 'center', marginTop: 10,
+                    fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
+                  }}>
+                    {I18n.t("CUSTOMER NAME")} </Text>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 120, fontSize: 20, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
+                    fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
+                  }}>
+                    {this.state.customerFullName} </Text>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 150, fontSize: 20, justifyContent: 'center', textAlign: 'center', marginTop: 10,
+                    fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
+                  }}>
+                    {I18n.t("CUSTOMER MOBILE NUMBER")} </Text>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 150, fontSize: 20, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
+                    fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
+                  }}>
+                    {this.state.customerMobilenumber} </Text>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 180, fontSize: 20, justifyContent: 'center', textAlign: 'center', marginTop: 10,
+                    fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
+                  }}>
+                    {I18n.t("LOYALTY POINTS")} </Text>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 180, fontSize: 20, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
+                    fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
+                  }}>
+                    - </Text>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 210, fontSize: 20, justifyContent: 'center', textAlign: 'center', marginTop: 10,
+                    fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
+                  }}>
+                    {I18n.t("EXPIRY DATE")} </Text>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 210, fontSize: 20, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
+                    fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
+                  }}>
+                    - </Text>
+                  <View style={styles.TopcontainerforPay}>
+                    <TouchableOpacity
+                      style={Device.isTablet ? styles.signInButton_tablet : styles.signInButton_mobile}
+                      onPress={() => this.pay()} >
+                      <Text style={Device.isTablet ? styles.signInButtonText_tablet : styles.signInButtonText_mobile}> {I18n.t("Checkout")} </Text>
+                    </TouchableOpacity>
                   </View>
-                )}
-              />
-            )}
+                </View>
+              )}
+            </View>
+          </ScrollView>
+        )}
 
 
-            {this.state.barCodeList.length != 0 && (
-              <View style={{ width: deviceWidth, height: 320, position: 'absolute', bottom: 0, backgroundColor: '#FFFFFF' }}>
-                <Text style={{
-                  color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 30, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                  fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
-                }}>
-                  {I18n.t("ITEMS")} </Text>
-                <Text style={{
-                  color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 30, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                  fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
-                }}>
-                  {this.state.barCodeList.length} </Text>
-                <Text style={{
-                  color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 60, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                  fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
-                }}>
-                  {I18n.t("DISCOUNT")} </Text>
-                <Text style={{
-                  color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 60, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                  fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
-                }}>
-                  ₹ {this.state.promoDiscount} </Text>
+        {this.state.customerTagging && (
+          <View style={{ backgroundColor: color.white }}>
+            <Modal isVisible={this.state.modalVisible}>
+              <View style={[Device.isTablet ? styles.filterMainContainer_tablet : styles.filterMainContainer_mobile, { height: Device.isTablet ? 400 : 300 }]}>
 
-                <Text style={{
-                  color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 90, fontSize: 20, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                  fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
-                }}>
-                  {I18n.t("TOTAL")} </Text>
-                <Text style={{
-                  color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 90, fontSize: 20, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                  fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
-                }}>
-                  ₹ {this.state.netPayableAmount} </Text>
+                <View>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
+                    <View>
+                      <Text style={{ marginTop: 15, fontSize: Device.isTablet ? 22 : 17, marginLeft: 20 }} > {I18n.t("Tag Customer")} </Text>
+                    </View>
+                    <View>
+                      <TouchableOpacity style={{ width: Device.isTablet ? 60 : 50, height: Device.isTablet ? 60 : 50, marginTop: Device.isTablet ? 20 : 15, }} onPress={() => this.modelCancel()}>
+                        <Image style={{ margin: 5 }} source={require('../assets/images/modelcancel.png')} />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                  <Text style={{
+                    height: Device.isTablet ? 2 : 1,
+                    width: deviceWidth,
+                    backgroundColor: 'lightgray',
+                  }}></Text>
+                </View>
 
-                <Text style={{
-                  color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 120, fontSize: 20, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                  fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
-                }}>
-                  {I18n.t("CUSTOMER NAME")} </Text>
-                <Text style={{
-                  color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 120, fontSize: 20, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                  fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
-                }}>
-                  {this.state.customerFullName} </Text>
-                <Text style={{
-                  color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 150, fontSize: 20, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                  fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
-                }}>
-                   {I18n.t("CUSTOMER MOBILE NUMBER")} </Text>
-                <Text style={{
-                  color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 150, fontSize: 20, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                  fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
-                }}>
-                  {this.state.customerMobilenumber} </Text>
-                <Text style={{
-                  color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 180, fontSize: 20, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                  fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
-                }}>
-                  {I18n.t("LOYALTY POINTS")} </Text>
-                <Text style={{
-                  color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 180, fontSize: 20, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                  fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
-                }}>
-                  - </Text>
-                <Text style={{
-                  color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 210, fontSize: 20, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                  fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
-                }}>
-                  {I18n.t("EXPIRY DATE")} </Text>
-                <Text style={{
-                  color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 210, fontSize: 20, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                  fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
-                }}>
-                  - </Text>
-                <View style={styles.TopcontainerforPay}>
+
+                <View>
+                  <Text style={{
+                    height: Device.isTablet ? 40 : 20,
+                    textAlign: 'center',
+                    fontFamily: 'regular',
+                    fontSize: Device.isTablet ? 23 : 18,
+                    marginBottom: Device.isTablet ? 25 : 15,
+                    color: '#353C40'
+                  }}> {I18n.t("Please provide customer phone number")}  </Text>
+                  <TextInput
+                    style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
+                    underlineColorAndroid="transparent"
+                    placeholder={I18n.t("MOBILE NUMBER")}
+                    placeholderTextColor="#6F6F6F"
+                    textAlignVertical="center"
+                    keyboardType={'default'}
+                    autoCapitalize="none"
+                    maxLength={10}
+                    value={this.state.mobileNumber}
+                    onChangeText={(text) => this.handleMobileNumber(text)}
+
+                  />
                   <TouchableOpacity
-                    style={Device.isTablet ? styles.signInButton_tablet : styles.signInButton_mobile}
-                    onPress={() => this.pay()} >
-                    <Text style={Device.isTablet ? styles.signInButtonText_tablet : styles.signInButtonText_mobile}> {I18n.t("Checkout")} </Text>
+                    style={[Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile]}
+                    onPress={() => this.tagCustomer()}
+                  >
+                    <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile}  > {I18n.t("CONFIRM")} </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile}
+                    onPress={() => this.modelCancel()}
+                  >
+                    <Text style={Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile}  > {I18n.t("CANCEL")} </Text>
                   </TouchableOpacity>
                 </View>
               </View>
-            )}
+            </Modal>
           </View>
-        </ScrollView>
-      )}
-
-
-      {this.state.customerTagging && (
-        <View>
-          <Modal isVisible={this.state.modalVisible}>
-            <View style={[Device.isTablet ? styles.filterMainContainer_tablet : styles.filterMainContainer_mobile, { height: Device.isTablet ? 400 : 300 }]}>
-
-              <View>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
-                  <View>
-                    <Text style={{ marginTop: 15, fontSize: Device.isTablet ? 22 : 17, marginLeft: 20 }} > {I18n.t("Tag Customer")} </Text>
+        )}
+        {this.state.handleBillDiscount && (
+          <View style={{ backgroundColor: color.white }}>
+            <Modal isVisible={this.state.modalVisible}>
+              <View style={[Device.isTablet ? styles.filterMainContainer_tablet : styles.filterMainContainer_mobile, { height: Device.isTablet ? 500 : 400 }]}>
+                <View>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
+                    <View>
+                      <Text style={{ marginTop: 15, fontSize: Device.isTablet ? 22 : 17, marginLeft: 20 }} > {I18n.t("Bill level Discount")} </Text>
+                    </View>
+                    <View>
+                      <TouchableOpacity style={{ width: Device.isTablet ? 60 : 50, height: Device.isTablet ? 60 : 50, marginTop: Device.isTablet ? 20 : 15, }} onPress={() => this.modelCancel()}>
+                        <Image style={{ margin: 5 }} source={require('../assets/images/modelcancel.png')} />
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                  <View>
-                    <TouchableOpacity style={{ width: Device.isTablet ? 60 : 50, height: Device.isTablet ? 60 : 50, marginTop: Device.isTablet ? 20 : 15, }} onPress={() => this.modelCancel()}>
-                      <Image style={{ margin: 5 }} source={require('../assets/images/modelcancel.png')} />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                <Text style={{
-                  height: Device.isTablet ? 2 : 1,
-                  width: deviceWidth,
-                  backgroundColor: 'lightgray',
-                }}></Text>
-              </View>
-
-
-              <View>
-                <Text style={{
-                  height: Device.isTablet ? 40 : 20,
-                  textAlign: 'center',
-                  fontFamily: 'regular',
-                  fontSize: Device.isTablet ? 23 : 18,
-                  marginBottom: Device.isTablet ? 25 : 15,
-                  color: '#353C40'
-                }}> {I18n.t("Please provide customer phone number")}  </Text>
-                <TextInput
-                  style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                  underlineColorAndroid="transparent"
-                  placeholder={I18n.t("MOBILE NUMBER")}
-                  placeholderTextColor="#6F6F6F"
-                  textAlignVertical="center"
-                  keyboardType={'default'}
-                  autoCapitalize="none"
-                  maxLength={10}
-                  value={this.state.mobileNumber}
-                  onChangeText={(text) => this.handleMobileNumber(text)}
-
-                />
-                <TouchableOpacity
-                  style={[Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile]}
-                  onPress={() => this.tagCustomer()}
-                >
-                  <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile}  > {I18n.t("CONFIRM")} </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile}
-                  onPress={() => this.modelCancel()}
-                >
-                  <Text style={Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile}  > {I18n.t("CANCEL")} </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Modal>
-        </View>
-      )}
-      {this.state.handleBillDiscount && (
-        <View>
-          <Modal isVisible={this.state.modalVisible}>
-            <View style={[Device.isTablet ? styles.filterMainContainer_tablet : styles.filterMainContainer_mobile, { height: Device.isTablet ? 500 : 400 }]}>
-              <View>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
-                  <View>
-                    <Text style={{ marginTop: 15, fontSize: Device.isTablet ? 22 : 17, marginLeft: 20 }} > {I18n.t("Bill level Discount")} </Text>
-                  </View>
-                  <View>
-                    <TouchableOpacity style={{ width: Device.isTablet ? 60 : 50, height: Device.isTablet ? 60 : 50, marginTop: Device.isTablet ? 20 : 15, }} onPress={() => this.modelCancel()}>
-                      <Image style={{ margin: 5 }} source={require('../assets/images/modelcancel.png')} />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                <Text style={{
-                  height: Device.isTablet ? 2 : 1,
-                  width: deviceWidth,
-                  backgroundColor: 'lightgray',
-                }}></Text>
-              </View>
-
-              <View>
-                <TextInput
-                  style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                  underlineColorAndroid="transparent"
-                  placeholder={I18n.t("AMOUNT *")}
-                  placeholderTextColor="#6F6F6F"
-                  textAlignVertical="center"
-                  keyboardType={'numeric'}
-                  autoCapitalize="none"
-                  onChangeText={(text) =>
-                    // console.log(text)
-                    this.handleDiscountAmount(text)
-                  }
-                />
-                {!this.state.discountAmountValid && (
-                  <Message imp={true} message={this.state.errors["discountAmount"]} />
-                )}
-
-                <TextInput
-                  style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                  underlineColorAndroid="transparent"
-                  placeholder={I18n.t("APPROVED BY *")}
-                  placeholderTextColor="#6F6F6F"
-                  textAlignVertical="center"
-                  keyboardType={'default'}
-                  autoCapitalize="none"
-                  onChangeText={(text) => this.handleApprovedBy(text)}
-                />
-                <View style={Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile}>
-                  <RNPickerSelect
-                    // style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
-                    placeholder={{ label: 'REASON *', value: '' }}
-                    Icon={() => {
-                      return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-                    }}
-                    items={
-                      this.state.discReasons
-                    }
-                    onValueChange={this.handleDiscountReason}
-                    style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
-                    value={this.state.reasonDiscount}
-                    useNativeAndroidPickerStyle={false}
-                  />
-                </View>
-                <TouchableOpacity
-                  style={[Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile]}
-                  onPress={() => this.billDiscount()}
-                >
-                  <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile}  > {I18n.t("CONFIRM")} </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile}
-                  onPress={() => this.modelCancel()}
-                >
-                  <Text style={Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile}  > {I18n.t("CANCEL")} </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Modal>
-        </View>
-      )}
-      {this.state.flagCustomerOpen && (
-        <View>
-          <Modal isVisible={this.state.modalVisible}>
-            <KeyboardAwareScrollView KeyboardAwareScrollView
-              enableOnAndroid={true}>
-
-
-              <View style={{
-                flex: 1, justifyContent: 'center', //Centered horizontally
-                alignItems: 'center', color: '#ffffff',
-                borderRadius: 20, borderwidth: 10
-              }}>
-                <View style={{ flex: 1, marginLeft: 20, marginRight: 20, backgroundColor: "#ffffff", marginTop: deviceWidth / 2 - 80 }}>
                   <Text style={{
-                    color: "#353C40", fontSize: 18, fontFamily: "semibold", marginLeft: 20, marginTop: 20, height: 20,
-                    justifyContent: 'center',
-                  }}> {'Personal Information'} </Text>
+                    height: Device.isTablet ? 2 : 1,
+                    width: deviceWidth,
+                    backgroundColor: 'lightgray',
+                  }}></Text>
+                </View>
 
-                  <View style={{ marginTop: 0, width: deviceWidth }}>
-                    <TextInput style={styles.createUserinput}
-                      underlineColorAndroid="transparent"
-                      placeholder="MOBILE NUMBER *"
-                      placeholderTextColor="#353C4050"
-                      keyboardType="name-phone-pad"
-                      textAlignVertical="center"
-                      autoCapitalize="none"
-                      value={this.state.customerPhoneNumber}
-                      onChangeText={(text) => this.handleCustomerPhoneNumber(text)}
-                      onEndEditing={() => this.endEditing()}
-                    />
-                  </View>
-
-
-                  <TextInput style={styles.createUserinput}
+                <View>
+                  <TextInput
+                    style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
                     underlineColorAndroid="transparent"
-                    placeholder="CUSTOMER NAME *"
-                    placeholderTextColor="#353C4050"
+                    placeholder={I18n.t("AMOUNT *")}
+                    placeholderTextColor="#6F6F6F"
                     textAlignVertical="center"
+                    keyboardType={'numeric'}
                     autoCapitalize="none"
-                    value={this.state.customerName}
-                    onChangeText={this.handleCustomerName}
+                    onChangeText={(text) =>
+                      // console.log(text)
+                      this.handleDiscountAmount(text)
+                    }
                   />
+                  {!this.state.discountAmountValid && (
+                    <Message imp={true} message={this.state.errors["discountAmount"]} />
+                  )}
 
-                  <View>
-                    <TextInput style={styles.createUserinput}
-                      underlineColorAndroid="transparent"
-                      placeholder="EMAIL"
-                      placeholderTextColor="#353C4050"
-                      textAlignVertical="center"
-                      autoCapitalize="none"
-                      value={this.state.customerEmail}
-                      onChangeText={this.handleCustomerEmail}
-                    />
-                  </View>
-
-                  <View style={{
-                    justifyContent: 'center',
-                    margin: 40,
-                    height: 44,
-                    marginTop: 5,
-                    marginBottom: 10,
-                    borderColor: '#8F9EB717',
-                    borderRadius: 3,
-                    backgroundColor: '#FBFBFB',
-                    borderWidth: 1,
-                    fontFamily: 'regular',
-                    paddingLeft: 15,
-                    fontSize: 14,
-                  }} >
+                  <TextInput
+                    style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
+                    underlineColorAndroid="transparent"
+                    placeholder={I18n.t("APPROVED BY *")}
+                    placeholderTextColor="#6F6F6F"
+                    textAlignVertical="center"
+                    keyboardType={'default'}
+                    autoCapitalize="none"
+                    onChangeText={(text) => this.handleApprovedBy(text)}
+                  />
+                  <View style={Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile}>
                     <RNPickerSelect
-                      placeholder={{
-                        label: 'GENDER',
-                        value: '',
-                      }}
+                      // style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
+                      placeholder={{ label: 'REASON *', value: '' }}
                       Icon={() => {
                         return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
                       }}
-                      items={[
-                        { label: 'Male', value: 'male' },
-                        { label: 'Female', value: 'female' },
-                      ]}
-                      onValueChange={this.handlecustomerGender}
+                      items={
+                        this.state.discReasons
+                      }
+                      onValueChange={this.handleDiscountReason}
                       style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
-                      value={this.state.customerGender}
+                      value={this.state.reasonDiscount}
                       useNativeAndroidPickerStyle={false}
-
                     />
                   </View>
+                  <TouchableOpacity
+                    style={[Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile]}
+                    onPress={() => this.billDiscount()}
+                  >
+                    <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile}  > {I18n.t("CONFIRM")} </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile}
+                    onPress={() => this.modelCancel()}
+                  >
+                    <Text style={Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile}  > {I18n.t("CANCEL")} </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+          </View>
+        )}
+        {this.state.flagCustomerOpen && (
+          <View style={{ backgroundColor: color.white }}>
+            <Modal isVisible={this.state.modalVisible}>
+              <KeyboardAwareScrollView KeyboardAwareScrollView
+                enableOnAndroid={true}>
 
 
-                  <TextInput style={styles.createUserinput}
-                    underlineColorAndroid="transparent"
-                    placeholder="ADDRESS"
-                    placeholderTextColor="#353C4050"
-                    textAlignVertical="center"
-                    autoCapitalize="none"
-                    value={this.state.customerAddress}
-                    onChangeText={this.handleCustomerAddress}
-                  />
+                <View style={{
+                  flex: 1, justifyContent: 'center', //Centered horizontally
+                  alignItems: 'center', color: '#ffffff',
+                  borderRadius: 20, borderwidth: 10
+                }}>
+                  <View style={{ flex: 1, marginLeft: 20, marginRight: 20, backgroundColor: "#ffffff", marginTop: deviceWidth / 2 - 80 }}>
+                    <Text style={{
+                      color: "#353C40", fontSize: 18, fontFamily: "semibold", marginLeft: 20, marginTop: 20, height: 20,
+                      justifyContent: 'center',
+                    }}> {'Personal Information'} </Text>
 
-                  <Text style={{
-                    color: "#353C40", fontSize: 18, fontFamily: "semibold", marginLeft: 20, marginTop: 20, height: 20,
-                    justifyContent: 'center',
-                  }}> {'Business Information(optional)'} </Text>
+                    <View style={{ marginTop: 0, width: deviceWidth }}>
+                      <TextInput style={styles.createUserinput}
+                        underlineColorAndroid="transparent"
+                        placeholder="MOBILE NUMBER *"
+                        placeholderTextColor="#353C4050"
+                        keyboardType="name-phone-pad"
+                        textAlignVertical="center"
+                        autoCapitalize="none"
+                        value={this.state.customerPhoneNumber}
+                        onChangeText={(text) => this.handleCustomerPhoneNumber(text)}
+                        onEndEditing={() => this.endEditing()}
+                      />
+                    </View>
 
-                  <View>
+
                     <TextInput style={styles.createUserinput}
                       underlineColorAndroid="transparent"
-                      placeholder="GST NUMBER"
+                      placeholder="CUSTOMER NAME *"
                       placeholderTextColor="#353C4050"
                       textAlignVertical="center"
                       autoCapitalize="none"
-                      value={this.state.customerGSTNumber}
-                      onChangeText={this.handleCustomerGSTNumber}
+                      value={this.state.customerName}
+                      onChangeText={this.handleCustomerName}
                     />
+
+                    <View>
+                      <TextInput style={styles.createUserinput}
+                        underlineColorAndroid="transparent"
+                        placeholder="EMAIL"
+                        placeholderTextColor="#353C4050"
+                        textAlignVertical="center"
+                        autoCapitalize="none"
+                        value={this.state.customerEmail}
+                        onChangeText={this.handleCustomerEmail}
+                      />
+                    </View>
+
+                    <View style={{
+                      justifyContent: 'center',
+                      margin: 40,
+                      height: 44,
+                      marginTop: 5,
+                      marginBottom: 10,
+                      borderColor: '#8F9EB717',
+                      borderRadius: 3,
+                      backgroundColor: '#FBFBFB',
+                      borderWidth: 1,
+                      fontFamily: 'regular',
+                      paddingLeft: 15,
+                      fontSize: 14,
+                    }} >
+                      <RNPickerSelect
+                        placeholder={{
+                          label: 'GENDER',
+                          value: '',
+                        }}
+                        Icon={() => {
+                          return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
+                        }}
+                        items={[
+                          { label: 'Male', value: 'male' },
+                          { label: 'Female', value: 'female' },
+                        ]}
+                        onValueChange={this.handlecustomerGender}
+                        style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
+                        value={this.state.customerGender}
+                        useNativeAndroidPickerStyle={false}
+
+                      />
+                    </View>
+
+
+                    <TextInput style={styles.createUserinput}
+                      underlineColorAndroid="transparent"
+                      placeholder="ADDRESS"
+                      placeholderTextColor="#353C4050"
+                      textAlignVertical="center"
+                      autoCapitalize="none"
+                      value={this.state.customerAddress}
+                      onChangeText={this.handleCustomerAddress}
+                    />
+
+                    <Text style={{
+                      color: "#353C40", fontSize: 18, fontFamily: "semibold", marginLeft: 20, marginTop: 20, height: 20,
+                      justifyContent: 'center',
+                    }}> {'Business Information(optional)'} </Text>
+
+                    <View>
+                      <TextInput style={styles.createUserinput}
+                        underlineColorAndroid="transparent"
+                        placeholder="GST NUMBER"
+                        placeholderTextColor="#353C4050"
+                        textAlignVertical="center"
+                        autoCapitalize="none"
+                        value={this.state.customerGSTNumber}
+                        onChangeText={this.handleCustomerGSTNumber}
+                      />
+                    </View>
+
+
+
+                    <TouchableOpacity
+                      style={{
+                        margin: 20,
+                        height: 50, backgroundColor: "#ED1C24", borderRadius: 5, marginLeft: 40, marginRight: 40,
+                      }} onPress={() => this.addCustomer()}
+                    >
+                      <Text style={{
+                        textAlign: 'center', margin: 20, color: "#ffffff", fontSize: 15,
+                        fontFamily: "regular", height: 50,
+                      }}  > TAG/ADD CUSTOMER </Text>
+
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={{
+                        margin: 20,
+                        height: 50, backgroundColor: "#ED1C24", borderRadius: 5, marginLeft: 40, marginRight: 40,
+                      }}
+                      onPress={() => this.cancel()} >
+                      <Text style={{
+                        textAlign: 'center', margin: 20, color: "#ffffff", fontSize: 15,
+                        fontFamily: "regular", height: 50,
+                      }}> {('Cancel')} </Text>
+                    </TouchableOpacity>
+
                   </View>
-
-
-
-                  <TouchableOpacity
-                    style={{
-                      margin: 20,
-                      height: 50, backgroundColor: "#ED1C24", borderRadius: 5, marginLeft: 40, marginRight: 40,
-                    }} onPress={() => this.addCustomer()}
-                  >
-                    <Text style={{
-                      textAlign: 'center', margin: 20, color: "#ffffff", fontSize: 15,
-                      fontFamily: "regular", height: 50,
-                    }}  > TAG/ADD CUSTOMER </Text>
-
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={{
-                      margin: 20,
-                      height: 50, backgroundColor: "#ED1C24", borderRadius: 5, marginLeft: 40, marginRight: 40,
-                    }}
-                    onPress={() => this.cancel()} >
-                    <Text style={{
-                      textAlign: 'center', margin: 20, color: "#ffffff", fontSize: 15,
-                      fontFamily: "regular", height: 50,
-                    }}> {('Cancel')} </Text>
-                  </TouchableOpacity>
 
                 </View>
 
-              </View>
+              </KeyboardAwareScrollView>
+            </Modal>
+          </View>
+        )}
 
-            </KeyboardAwareScrollView>
-          </Modal>
-        </View>
-      )}
-
-    </View>
-  );
-}
+      </View>
+    );
+  }
 }
 export default GenerateInvoiceSlip;
 

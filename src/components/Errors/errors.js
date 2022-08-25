@@ -73,5 +73,16 @@ export const errorLengthMax = {
 };
 
 export const customerErrorMessages = {
-  discountAmount : "/Discount amount not more than net payable amount."
+  discountAmount: "/Discount amount not more than net payable amount.",
+  gvNumber: "/ Please enter the GV number",
+  startDate: "/ Please select the start date",
+  endDate: "/ Please select the end date",
+  giftValue: "/ Please enter the gift amount",
+  searchQuery:" / Please enter two letters to search.",
+  dsNumber:" /Please enter ES Number",
+  smNumber: " /Please enter Sales man number",
+  barcodeId : " /Please enter a barcode",
+  invoiceNumber : " /Please enter the invoice number",
+  customerNumber : " /Please enter a valid 10 digit mobile number",
+  reason:" /Please select reason for return"
 }
