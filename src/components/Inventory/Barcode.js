@@ -6,8 +6,6 @@ import {
   Image,
   ScrollView,
   StyleSheet,
-  Text,
-  TextInput,
   TouchableOpacity,
   View
 } from "react-native";
@@ -16,6 +14,10 @@ import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Modal from "react-native-modal";
+import { Badge, Text, TextInput } from "react-native-paper";
+import IconFA from 'react-native-vector-icons/FontAwesome';
+import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
+import IconMAA from 'react-native-vector-icons/MaterialIcons';
 import scss from "../../commonUtils/assets/styles/style.scss";
 import Loader from "../../commonUtils/loader";
 import { RH, RW } from "../../Responsive";
@@ -45,14 +47,11 @@ import {
   filterSubContainer
 } from "../Styles/PopupStyles";
 import {
-  filterBtn,
   flatListTitle,
   listEmptyMessage,
   loadMoreBtn,
   loadmoreBtnText
 } from "../Styles/Styles";
-import Icon from 'react-native-vector-icons/FontAwesome5';
-
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -103,11 +102,11 @@ export default class Barcode extends Component {
 
   // Filter Action
   filterAction() {
-    this.setState({ flagFilterOpen: true, modalVisible: true });
+    this.setState({ flagFilterOpen: true, modalVisible: true, filterBarcodesList: [] });
   }
 
   clearFilterAction() {
-    this.setState({ flagFilterOpen: false, filterActive: false });
+    this.setState({ flagFilterOpen: false, filterActive: false, barcodesList: [], startDate: "", endDate: "", barCodeId: "", filterBarcodesList: [] });
     this.getAllBarcodes();
   }
 
@@ -387,7 +386,7 @@ export default class Barcode extends Component {
     InventoryService.deleteBarcode(id).then((res) => {
       if (res?.data) {
         alert(res.data.result)
-        this.setState({barcodesList: []})
+        this.setState({ barcodesList: [] })
         this.getAllBarcodes()
       }
     })
@@ -404,41 +403,35 @@ export default class Barcode extends Component {
               <View style={scss.headerContainer}>
                 <Text style={flatListTitle}>
                   Barcode List -{" "}
-                  <Text style={{ color: "#ED1C24" }}>
+                  <Badge size={30} style={{ color: "#ED1C24", }}>
                     {this.state.barcodesList.length}
-                  </Text>{" "}
+                  </Badge>{" "}
                 </Text>
                 <View style={scss.headerContainer}>
-                  <TouchableOpacity
-                    style={filterBtn}
+                  <IconMAA
+                    size={30}
+                    name="playlist-add"
+                    style={{ marginRight: 10 }}
+                    color="#ED1C24"
                     onPress={() => this.handleAddBarcode()}
                   >
-                    <Image
-                      style={{ marginTop: 8 }}
-                      source={require("../../commonUtils/assets/Images/add_barcode.png")}
-                    />
-                  </TouchableOpacity>
+                  </IconMAA>
                   {!this.state.filterActive && (
-                    <TouchableOpacity
-                      style={filterBtn}
+                    <IconFA
+                      name="sliders"
+                      size={25}
                       onPress={() => this.filterAction()}
                     >
-                      <Image
-                        style={{ alignSelf: "center", top: RH(5) }}
-                        source={require("../assets/images/promofilter.png")}
-                      />
-                    </TouchableOpacity>
+                    </IconFA>
                   )}
                   {this.state.filterActive && (
-                    <TouchableOpacity
-                      style={filterBtn}
+                    <IconFA
+                      name="sliders"
+                      size={25}
+                      color="#ED1C24"
                       onPress={() => this.clearFilterAction()}
                     >
-                      <Image
-                        style={{ alignSelf: "center", top: RH(5) }}
-                        source={require("../assets/images/clearFilterSearch.png")}
-                      />
-                    </TouchableOpacity>
+                    </IconFA>
                   )}
                 </View>
               </View>
@@ -489,39 +482,34 @@ export default class Barcode extends Component {
                             : item.createdDate}
                         </Text>
                         <View style={scss.buttonContainer}>
-                          <TouchableOpacity
-                            style={scss.footerButton1}
+                          <IconMA
+                            size={35}
+                            style={{ paddingRight: 10 }}
+                            name="barcode"
+                            color="#ED241C"
                             onPress={() =>
                               this.handleeditbarcode(item, index, true)
                             }
                           >
-                            <Image
-                              style={scss.footerBtnImg}
-                              source={require("../../commonUtils/assets/Images/barcode_list.png")}
-                            />
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            style={scss.footerButton1}
+                          </IconMA>
+                          <IconFA
+                            name="edit"
+                            style={{ paddingRight: 5 }}
+                            size={25}
+                            color="#000"
                             onPress={() =>
                               this.handleeditbarcode(item, index, false)
                             }
                           >
-                            <Image
-                              style={scss.footerBtnImg}
-                              source={require("../assets/images/edit.png")}
-                            />
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            style={scss.footerButton2}
+                          </IconFA>
+                          <IconMA
+                            name="trash-can-outline"
+                            size={25}
                             onPress={() =>
                               this.deleteInventory(item?.id)
                             }
                           >
-                            <Image
-                              style={scss.footerBtnImg}
-                              source={require("../assets/images/delete.png")}
-                            />
-                          </TouchableOpacity>
+                          </IconMA>
                         </View>
                       </View>
                     </View>
@@ -648,6 +636,8 @@ export default class Barcode extends Component {
                     </View>
                   )}
                   <TextInput
+                    mode="outlined"
+                    activeOutlineColor="#6F6F6F"
                     style={inputField}
                     underlineColorAndroid="transparent"
                     placeholder={I18n.t("BARCODE ID")}

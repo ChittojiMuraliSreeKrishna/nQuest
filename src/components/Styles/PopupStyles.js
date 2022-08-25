@@ -1,6 +1,6 @@
 import { Dimensions } from "react-native";
 import Device from "react-native-device-detection";
-import { RH, RW, RF } from '../../Responsive';
+import { RF, RH, RW } from '../../Responsive';
 import { color } from "./colorStyles";
 
 
@@ -9,11 +9,11 @@ var deviceWidth = Dimensions.get("window").width
 
 export const filterMainContainer = {
   backgroundColor: '#ffffff',
-  // marginTop: Device.isTablet ? deviceHeight - RH(500) : deviceHeight - RH(400),
   minHeight: Device.isTablet ? RH(500) : RH(400),
   paddingBottom: Device.isTablet ? RH(20) : RH(10),
   maxHeight: Device.isTablet ? RH(700) : RH(600),
   position: 'absolute',
+  width: '100%',
   bottom: 0
 }
 

@@ -4,8 +4,8 @@ import {
   Dimensions,
   FlatList,
   Image,
+  ScrollView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View
 } from "react-native";
@@ -14,6 +14,10 @@ import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Modal from "react-native-modal";
+import { Text } from 'react-native-paper';
+import IconFA from 'react-native-vector-icons/FontAwesome';
+import IconMa from 'react-native-vector-icons/MaterialCommunityIcons';
+import IconMAA from 'react-native-vector-icons/MaterialIcons';
 import scss from "../../commonUtils/assets/styles/style.scss";
 import Loader from "../../commonUtils/loader";
 import { RH, RW } from "../../Responsive";
@@ -36,17 +40,7 @@ import {
   filterMainContainer,
   filterSubContainer
 } from "../Styles/PopupStyles";
-import {
-  filterBtn,
-  flatListMainContainer,
-  flatlistSubContainer,
-  flatListTitle,
-  highText,
-  listEmptyMessage,
-  textContainer,
-  textStyleLight,
-  textStyleMedium
-} from "../Styles/Styles";
+import { flatListTitle, listEmptyMessage } from "../Styles/Styles";
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
 
@@ -67,6 +61,8 @@ export default class ProductCombo extends Component {
       endDate: "",
       date: new Date(),
       enddate: new Date(),
+      flagViewProduct: false,
+      viewProductData: [],
     };
   }
 
@@ -106,11 +102,11 @@ export default class ProductCombo extends Component {
   }
 
   clearFilterAction() {
-    this.setState({ filterActive: false });
+    this.setState({ filterActive: false, flagFilterOpen: false, filteredProductsList: [], startDate: "", endDate: "" });
   }
 
   modelCancel() {
-    this.setState({ modalVisible: false });
+    this.setState({ modalVisible: false, flagViewProduct: false, flagFilterOpen: false, viewProductData: [] });
   }
 
   // Date Actions
@@ -261,6 +257,17 @@ export default class ProductCombo extends Component {
     );
   }
 
+  viewProductActon(data, index) {
+    this.state.viewProductData.push({ data })
+    this.setState({
+      viewProductData: this.state.viewProductData,
+      modalVisible: true,
+      flagViewProduct: true,
+    })
+    // console.log({ item }, item.barcode)
+    console.log(this.state.viewProductData[0].data.productTextiles)
+  }
+
   render() {
     return (
       <View>
@@ -276,36 +283,30 @@ export default class ProductCombo extends Component {
                 </Text>{" "}
               </Text>
               <View style={scss.headerContainer}>
-                <TouchableOpacity
-                  style={filterBtn}
+                <IconMAA
+                  size={30}
+                  name="playlist-add"
+                  style={{ marginRight: 10 }}
+                  color="#ED1C24"
                   onPress={() => this.handleAddProductCombo()}
                 >
-                  <Image
-                    style={{ marginTop: 8 }}
-                    source={require("../../commonUtils/assets/Images/add_barcode.png")}
-                  />
-                </TouchableOpacity>
+                </IconMAA>
                 {!this.state.filterActive && (
-                  <TouchableOpacity
-                    style={filterBtn}
+                  <IconFA
+                    name="sliders"
+                    size={25}
                     onPress={() => this.filterAction()}
                   >
-                    <Image
-                      style={{ alignSelf: "center", top: 5 }}
-                      source={require("../assets/images/promofilter.png")}
-                    />
-                  </TouchableOpacity>
+                  </IconFA>
                 )}
                 {this.state.filterActive && (
-                  <TouchableOpacity
-                    style={filterBtn}
+                  <IconFA
+                    name="sliders"
+                    size={25}
+                    color="#ED1C24"
                     onPress={() => this.clearFilterAction()}
                   >
-                    <Image
-                      style={{ alignSelf: "center", top: 5 }}
-                      source={require("../assets/images/clearFilterSearch.png")}
-                    />
-                  </TouchableOpacity>
+                  </IconFA>
                 )}
               </View>
             </View>
@@ -315,29 +316,105 @@ export default class ProductCombo extends Component {
           }
           scrollEnabled={true}
           keyExtractor={(item, i) => i.toString()}
+          removeClippedSubviews={false}
           ListEmptyComponent={
             <Text style={listEmptyMessage}>&#9888; Records Not Found</Text>
           }
           renderItem={({ item, index }) => (
-            <View style={flatListMainContainer}>
-              <View style={flatlistSubContainer}>
-                <View style={textContainer}>
-                  <Text style={highText}>Invetory-ID: {item.id}</Text>
+            <View>
+              <ScrollView>
+                <View style={scss.flatListContainer}>
+                  <View style={scss.flatListSubContainer}>
+                    <View style={scss.textContainer}>
+                      <Text style={scss.highText}>Invetory-ID: {item.id}</Text>
+                    </View>
+                    <View style={scss.textContainer}>
+                      <Text style={scss.textStyleMedium}>Store Id: {item.storeId}</Text>
+                      <Text style={scss.textStyleLight}>Combo Name: {item.name}</Text>
+                    </View>
+                    <View style={scss.textContainer}>
+                      <Text style={scss.textStyleLight}>
+                        No.of Items: {item.bundleQuantity}
+                      </Text>
+                      <Text style={scss.textStyleLight}>Unit Price: {item.itemMrp}</Text>
+                    </View>
+                    <View style={scss.flatListFooter}>
+                      <Text style={scss.footerText} selectable={true} >{item.barcode}</Text>
+                      <IconFA
+                        name="eye"
+                        size={20}
+                        onPress={() => this.viewProductActon(item, index)}
+                      >
+                      </IconFA>
+                    </View>
+                  </View>
                 </View>
-                <View style={textContainer}>
-                  <Text style={textStyleMedium}>Store Id: {item.storeId}</Text>
-                  <Text style={textStyleLight}>Combo Name: {item.name}</Text>
-                </View>
-                <View style={textContainer}>
-                  <Text style={textStyleLight}>
-                    No.of Items: {item.bundleQuantity}
-                  </Text>
-                  <Text style={textStyleLight}>Unit Price: {item.value}</Text>
-                </View>
-              </View>
+              </ScrollView>
             </View>
           )}
         />
+        {this.state.flagViewProduct && (
+          <View>
+            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
+              <View style={scss.model_container}>
+                <View>
+                  <View style={scss.model_header}>
+                    <View>
+                      <Text variant="titleLarge"> View Product Combo </Text>
+                    </View>
+                    <View>
+                      <IconMa
+                        name="close"
+                        size={20}
+                        onPress={() => this.modelCancel()}
+                      ></IconMa>
+                    </View>
+                  </View>
+                </View>
+                <ScrollView enableOnAndroid={true}>
+                  <View style={scss.model_body}>
+                    <FlatList
+                      removeClippedSubviews={false}
+                      data={this.state.viewProductData}
+                      renderItem={({ item, index }) => (
+                        <View>
+                          <View style={scss.model_text_container}>
+                            <Text variant="titleMedium" selectable={true} key={Math.random()}>{item.data.barcode}</Text>
+                            <Text variant="bodyLarge">Qty: {item.data.bundleQuantity}</Text>
+                          </View>
+                          <View style={scss.model_text_container}>
+                            <Text variant="bodyLarge">Name: {item.data.name}</Text>
+                            <Text variant="bodyLarge">Price: {item.data.itemMrp}</Text>
+                          </View>
+                          <View>
+                            {item.data.productTextiles.map((data, index) => {
+                              return (
+                                <View id={index} style={scss.model_subbody}>
+                                  <View style={scss.model_text_container}>
+                                    <Text variant="bodyMedium">S.No:  {index + 1}</Text>
+                                    <Text variant="bodyMedium">Name:  {data.name}</Text>
+                                  </View>
+                                  <View style={scss.model_text_container}>
+                                    <Text variant="bodyMedium">Price: {data.itemMrp}</Text>
+                                    <Text variant="bodyMedium">Qty: {data.qty}</Text>
+                                  </View>
+                                  <View style={scss.model_text_container}>
+                                    <Text variant="bodyMedium">{data.barcode}</Text>
+                                    <Text></Text>
+                                  </View>
+                                </View>
+                              )
+                            })}
+                          </View>
+                        </View>
+                      )}
+                    />
+                  </View>
+                </ScrollView>
+              </View>
+            </Modal>
+          </View>
+        )}
         {this.state.flagFilterOpen && (
           <View>
             <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>

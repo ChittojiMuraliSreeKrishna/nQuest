@@ -38,9 +38,6 @@ import {
   rnPickerError,
   submitBtnText
 } from "../Styles/FormFields";
-import {
-  headerTitle
-} from "../Styles/Styles";
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceHeight = Dimensions.get("window").height;
@@ -147,10 +144,8 @@ class AddBarcode extends Component {
     this.setState({ selectedDomain: value }, () => {
       console.log({ value });
       const { selectedDomain } = this.state;
-      if (this.state.selectedDomain === "Textile") {
-        this.getAllDivisions(selectedDomain);
-        this.getAllCatogiries(selectedDomain);
-      }
+      this.getAllDivisions(selectedDomain);
+      this.getAllCatogiries(selectedDomain);
       this.getAllHSNCodes(selectedDomain);
       this.getAllUOM();
     });
@@ -222,7 +217,7 @@ class AddBarcode extends Component {
       if (res?.data) {
         for (let i = 0; i < res.data.length; i++) {
           subSection.push({
-            value: res.data[i].name,
+            value: res.data[i].id,
             label: res.data[i].name,
             id: res.data[i].id,
           });
@@ -247,7 +242,7 @@ class AddBarcode extends Component {
       if (res?.data) {
         for (let i = 0; i < res.data.length; i++) {
           categories.push({
-            value: res.data[i].name,
+            value: res.data[i].id,
             label: res.data[i].name,
             id: res.data[i].id,
           });
@@ -478,25 +473,27 @@ class AddBarcode extends Component {
       errors["name"] = inventoryErrorMessages.name;
       this.setState({ nameValid: false });
     }
-    if (this.state.divisionId === null) {
-      isFormValid = false;
-      errors["divison"] = inventoryErrorMessages.divisionId;
-      this.setState({ divisionValid: false });
-    }
-    if (this.state.sectionId === null) {
-      isFormValid = false;
-      errors["section"] = inventoryErrorMessages.sectionId;
-      this.setState({ sectionValid: false });
-    }
-    if (this.state.subSectionId === null) {
-      isFormValid = false;
-      errors["subSection"] = inventoryErrorMessages.subSectionId;
-      this.setState({ subSectionValid: false });
-    }
-    if (this.state.catogirieId === null) {
-      isFormValid = false;
-      errors["category"] = inventoryErrorMessages.category;
-      this.setState({ categoryValid: false });
+    if (this.selectedDomain === "Textile") {
+      if (this.state.divisionId === null) {
+        isFormValid = false;
+        errors["divison"] = inventoryErrorMessages.divisionId;
+        this.setState({ divisionValid: false });
+      }
+      if (this.state.sectionId === null) {
+        isFormValid = false;
+        errors["section"] = inventoryErrorMessages.sectionId;
+        this.setState({ sectionValid: false });
+      }
+      if (this.state.subSectionId === null) {
+        isFormValid = false;
+        errors["subSection"] = inventoryErrorMessages.subSectionId;
+        this.setState({ subSectionValid: false });
+      }
+      if (this.state.catogirieId === null) {
+        isFormValid = false;
+        errors["category"] = inventoryErrorMessages.category;
+        this.setState({ categoryValid: false });
+      }
     }
     if (String(this.state.colour).length < errorLength.colour) {
       isFormValid = false;
@@ -556,10 +553,10 @@ class AddBarcode extends Component {
     if (isFormValid) {
       // Checking for validations
       const params = {
-        status: selectedDomain === "Retail" ? this.state.status : null,
-        productValidity:
-          selectedDomain === "Retail" ? this.state.productValidity : null,
-        isBarcode: selectedDomain === "Retail" ? false : null,
+        // status: selectedDomain === "Retail" ? this.state.status : null,
+        // productValidity:
+        //   selectedDomain === "Retail" ? this.state.productValidity : null,
+        // isBarcode: selectedDomain === "Retail" ? false : null,
         division: parseInt(this.state.divisionId),
         section: parseInt(this.state.sectionId),
         subSection: parseInt(this.state.subSectionId),
@@ -571,7 +568,6 @@ class AddBarcode extends Component {
         empId: this.state.empId,
         hsnCode: parseInt(this.state.hsnId),
         itemMrp: this.state.listPrice,
-        domainId: 1,
         qty: this.state.quantity,
         storeId: this.state.storeId,
         uom: this.state.uomName,
@@ -623,15 +619,14 @@ class AddBarcode extends Component {
       qtyValid,
     } = this.state;
     return (
-      <View style={styles.mainContainer}>
+      <View>
         {this.state.loading && <Loader loading={this.state.loading} />}
-        <Appbar mode="center-aligned">
+        <Appbar mode="center-aligned" style={styles.mainContainer}>
           <Appbar.BackAction
             onPress={() => this.handleBackButtonClick()}
           />
           <Appbar.Content title="Add Barcode" />
         </Appbar>
-        <Text style={headerTitle}> {I18n.t("Add Barcode")} </Text>
         <ScrollView>
           <Text style={inputHeading}>
             {I18n.t("Domian")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -665,139 +660,137 @@ class AddBarcode extends Component {
               useNativeAndroidPickerStyle={false}
             />
           </View>
-          {this.state.selectedDomain === "Textile" && ( // For Textile Domain only
-            <View>
-              <Text style={inputHeading}>
-                {I18n.t("Division")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
-              </Text>
-              <View
-                style={[
-                  forms.rnp_container,
-                  { borderColor: divisionValid ? "#8F9EB7" : "#dd0000" },
-                ]}
-              >
-                <RNPickerSelect
-                  placeholder={{
-                    label: "Division",
-                  }}
-                  Icon={() => {
-                    return (
-                      <Chevron
-                        style={styles.imagealign}
-                        size={1.5}
-                        color={divisionValid ? "gray" : "#dd0000"}
-                      />
-                    );
-                  }}
-                  items={this.state.divisionsList}
-                  onValueChange={(value) => this.handleDivision(value)}
-                  style={divisionValid ? rnPicker : rnPickerError}
-                  value={this.state.selectedDivision}
-                  useNativeAndroidPickerStyle={false}
-                />
-              </View>
-              {!divisionValid && (
-                <Message imp={true} message={this.state.errors["divison"]} />
-              )}
-              <Text style={inputHeading}>
-                {I18n.t("Section")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
-              </Text>
-              <View
-                style={[
-                  forms.rnp_container,
-                  { borderColor: sectionValid ? "#8F9EB7" : "#dd0000" },
-                ]}
-              >
-                <RNPickerSelect
-                  placeholder={{
-                    label: "Section",
-                  }}
-                  Icon={() => {
-                    return (
-                      <Chevron
-                        style={styles.imagealign}
-                        size={1.5}
-                        color={sectionValid ? "gray" : "#dd0000"}
-                      />
-                    );
-                  }}
-                  items={this.state.sectionsList}
-                  onValueChange={this.handleSection}
-                  style={sectionValid ? rnPicker : rnPickerError}
-                  value={this.state.section}
-                  useNativeAndroidPickerStyle={false}
-                />
-              </View>
-              {!sectionValid && (
-                <Message imp={true} message={this.state.errors["section"]} />
-              )}
-              <Text style={inputHeading}>
-                {I18n.t("Sub Section")}{" "}
-                <Text style={{ color: "#aa0000" }}>*</Text>{" "}
-              </Text>
-              <View
-                style={[
-                  forms.rnp_container,
-                  { borderColor: subSectionValid ? "#8F9EB7" : "#dd0000" },
-                ]}
-              >
-                <RNPickerSelect
-                  placeholder={{
-                    label: "Sub Section",
-                  }}
-                  Icon={() => {
-                    return (
-                      <Chevron
-                        style={styles.imagealign}
-                        size={1.5}
-                        color={subSectionValid ? "gray" : "#dd0000"}
-                      />
-                    );
-                  }}
-                  items={this.state.subSectionsList}
-                  onValueChange={this.handleSubSection}
-                  style={subSectionValid ? rnPicker : rnPickerError}
-                  value={this.state.subSection}
-                  useNativeAndroidPickerStyle={false}
-                />
-              </View>
-              {!subSectionValid && (
-                <Message imp={true} message={this.state.errors["subSection"]} />
-              )}
-              <Text style={inputHeading}>
-                {I18n.t("Category")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
-              </Text>
-              <View
-                style={[
-                  forms.rnp_container,
-                  { borderColor: categoryValid ? "#8F9EB7" : "#dd0000" },
-                ]}
-              >
-                <RNPickerSelect
-                  placeholder={{
-                    label: "Category",
-                  }}
-                  Icon={() => {
-                    return (
-                      <Chevron
-                        style={styles.imagealign}
-                        size={1.5}
-                        color={categoryValid ? "gray" : "#dd0000"}
-                      />
-                    );
-                  }}
-                  items={this.state.categoriesList}
-                  onValueChange={this.handleCateory}
-                  style={categoryValid ? rnPicker : rnPickerError}
-                  value={this.state.category}
-                  useNativeAndroidPickerStyle={false}
-                />
-              </View>
-              {!categoryValid && (
-                <Message imp={true} message={this.state.errors["category"]} />
-              )}
+          <View>
+            <Text style={inputHeading}>
+              {I18n.t("Division")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
+            </Text>
+            <View
+              style={[
+                forms.rnp_container,
+                { borderColor: divisionValid ? "#8F9EB7" : "#dd0000" },
+              ]}
+            >
+              <RNPickerSelect
+                placeholder={{
+                  label: "Division",
+                }}
+                Icon={() => {
+                  return (
+                    <Chevron
+                      style={styles.imagealign}
+                      size={1.5}
+                      color={divisionValid ? "gray" : "#dd0000"}
+                    />
+                  );
+                }}
+                items={this.state.divisionsList}
+                onValueChange={(value) => this.handleDivision(value)}
+                style={divisionValid ? rnPicker : rnPickerError}
+                value={this.state.selectedDivision}
+                useNativeAndroidPickerStyle={false}
+              />
             </View>
-          )}
+            {!divisionValid && (
+              <Message imp={true} message={this.state.errors["divison"]} />
+            )}
+            <Text style={inputHeading}>
+              {I18n.t("Section")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
+            </Text>
+            <View
+              style={[
+                forms.rnp_container,
+                { borderColor: sectionValid ? "#8F9EB7" : "#dd0000" },
+              ]}
+            >
+              <RNPickerSelect
+                placeholder={{
+                  label: "Section",
+                }}
+                Icon={() => {
+                  return (
+                    <Chevron
+                      style={styles.imagealign}
+                      size={1.5}
+                      color={sectionValid ? "gray" : "#dd0000"}
+                    />
+                  );
+                }}
+                items={this.state.sectionsList}
+                onValueChange={this.handleSection}
+                style={sectionValid ? rnPicker : rnPickerError}
+                value={this.state.section}
+                useNativeAndroidPickerStyle={false}
+              />
+            </View>
+            {!sectionValid && (
+              <Message imp={true} message={this.state.errors["section"]} />
+            )}
+            <Text style={inputHeading}>
+              {I18n.t("Sub Section")}{" "}
+              <Text style={{ color: "#aa0000" }}>*</Text>{" "}
+            </Text>
+            <View
+              style={[
+                forms.rnp_container,
+                { borderColor: subSectionValid ? "#8F9EB7" : "#dd0000" },
+              ]}
+            >
+              <RNPickerSelect
+                placeholder={{
+                  label: "Sub Section",
+                }}
+                Icon={() => {
+                  return (
+                    <Chevron
+                      style={styles.imagealign}
+                      size={1.5}
+                      color={subSectionValid ? "gray" : "#dd0000"}
+                    />
+                  );
+                }}
+                items={this.state.subSectionsList}
+                onValueChange={this.handleSubSection}
+                style={subSectionValid ? rnPicker : rnPickerError}
+                value={this.state.subSection}
+                useNativeAndroidPickerStyle={false}
+              />
+            </View>
+            {!subSectionValid && (
+              <Message imp={true} message={this.state.errors["subSection"]} />
+            )}
+            <Text style={inputHeading}>
+              {I18n.t("Category")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
+            </Text>
+            <View
+              style={[
+                forms.rnp_container,
+                { borderColor: categoryValid ? "#8F9EB7" : "#dd0000" },
+              ]}
+            >
+              <RNPickerSelect
+                placeholder={{
+                  label: "Category",
+                }}
+                Icon={() => {
+                  return (
+                    <Chevron
+                      style={styles.imagealign}
+                      size={1.5}
+                      color={categoryValid ? "gray" : "#dd0000"}
+                    />
+                  );
+                }}
+                items={this.state.categoriesList}
+                onValueChange={this.handleCateory}
+                style={categoryValid ? rnPicker : rnPickerError}
+                value={this.state.category}
+                useNativeAndroidPickerStyle={false}
+              />
+            </View>
+            {!categoryValid && (
+              <Message imp={true} message={this.state.errors["category"]} />
+            )}
+          </View>
           {this.state.selectedDomain === "Retail" && ( // For Retail Domain only
             <View>
               <Text style={inputHeading}>
@@ -878,6 +871,7 @@ class AddBarcode extends Component {
             {I18n.t("Colour")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
+            activeOutlineColor="#000"
             mode="outlined"
             style={[
               forms.input_fld,
@@ -902,6 +896,7 @@ class AddBarcode extends Component {
             {I18n.t("Name")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
+            activeOutlineColor="#000"
             mode="outlined"
             outlineColor={nameValid ? "#8F9EB7" : "#dd0000"}
             style={[
@@ -925,6 +920,7 @@ class AddBarcode extends Component {
             {I18n.t("Batch No")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
+            activeOutlineColor="#000"
             mode="outlined"
             outlineColor={batchNoValid ? "#8F9EB7" : "#dd0000"}
             style={[
@@ -948,6 +944,7 @@ class AddBarcode extends Component {
             {I18n.t("Cost Price")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
+            activeOutlineColor="#000"
             mode="outlined"
             outlineColor={costPriceValid ? "#8F9EB7" : "#dd0000"}
             style={[
@@ -973,6 +970,7 @@ class AddBarcode extends Component {
             {I18n.t("List Price")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
+            activeOutlineColor="#000"
             mode="outlined"
             outlineColor={listPriceValid ? "#8F9EB7" : "#dd0000"}
             style={[
@@ -1062,6 +1060,7 @@ class AddBarcode extends Component {
             {I18n.t("EMP ID")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
+            activeOutlineColor="#000"
             mode="outlined"
             outlineColor={empValid ? "#8F9EB7" : "#dd0000"}
             keyboardType="numeric"
@@ -1119,6 +1118,7 @@ class AddBarcode extends Component {
             QTY <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
+            activeOutlineColor="#000"
             mode="outlined"
             outlineColor={qtyValid ? "#8F9EB7" : "#dd0000"}
             style={[

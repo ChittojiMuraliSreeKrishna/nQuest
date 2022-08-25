@@ -66,18 +66,9 @@ class InventoryService {
   // Save Barocodes
   saveBarCode(list, domain, isEdit, value) {
     console.log({ list, domain, isEdit, value });
-    if (domain && domain.label === "Retail") {
-      // Edit Barcode -RETAIL- -> EditBarcode.js
+    
       if (isEdit) {
-        return axios.put(BASE_URL + INVENTORY_PORTAL.updateBarcodes, list);
-      }
-      // Add Barcode -> AddBarcode.js
-      else {
-        return axios.post(BASE_URL + INVENTORY_PORTAL.addBarcodes, list);
-      }
-    } else {
-      if (isEdit) {
-        // Re Barcode -TEXTILE- -> EditBarcode.js
+        // Re Barcode -> EditBarcode.js
         if (value === "REBAR") {
           const reBarcode = BASE_URL + INVENTORY_PORTAL.updatTextileBarcodes;
           console.log({ reBarcode, list });
@@ -97,7 +88,7 @@ class InventoryService {
         console.log({ addBarcode, list });
         return axios.post(addBarcode, list);
       }
-    }
+    
   }
 
   // Getting Barcode Details -> AddProductCombo.js

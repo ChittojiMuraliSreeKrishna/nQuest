@@ -55,7 +55,7 @@ export default class SelectStore extends React.Component {
     if (this.state.selectedItem === null) {
       alert("Select Atleast one Store")
     } else {
-      this.props.navigation.navigate('TopBarNavigation');
+      this.props.navigation.navigate('BottomBar');
     }
   }
 

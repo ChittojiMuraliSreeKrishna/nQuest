@@ -1,5 +1,5 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createStackNavigator } from "@react-navigation/stack";
 import React, { Component } from "react";
 import { Dimensions } from "react-native";
 import HomeIcon from "react-native-vector-icons/Entypo";
@@ -8,14 +8,33 @@ import Settings from "../components/Profile/Settings";
 import TopBarNavigation from "./TopBarNavigation";
 
 const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 
 class BottomTabBar extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      clientId: null
+    }
+  }
+  async componentDidMount() {
+    await AsyncStorage.getItem("custom:clientId").then((value) => {
+      this.setState({ clientId: value })
+    })
+    await AsyncStorage.getItem("roleType").then((value) => {
+      if (value === "client_support") {
+        if (this.state.clientId === 0 || this.state.clientId === null || this.state.clientId === undefined) {
+          this.props.navigation.navigate('SelectClient')
+          alert("Please Select the client")
+        }
+      }
+    });
+  }
   render() {
     return (
       <Tab.Navigator
         initialRouteName="Home"
+        firstRouteName="Home"
         screenOptions={{
           keyboardHidesTabBar: true,
           labelStyle: {
@@ -26,6 +45,7 @@ class BottomTabBar extends Component {
             color: "#dddddd",
             height:
               Platform.OS === "android"
+
                 ? SCREEN_HEIGHT / 11
                 : SCREEN_HEIGHT / 9,
             borderTopWidth: 2,
@@ -45,8 +65,7 @@ class BottomTabBar extends Component {
         }}
       >
         <Tab.Screen
-          name="HOME"
-          title="Home"
+          name="Home"
           options={{
             headerShown: false,
             tabBarLabel: "Home",
@@ -58,7 +77,7 @@ class BottomTabBar extends Component {
         />
 
         <Tab.Screen
-          name="PROFILE"
+          name="Profile"
           options={{
             headerShown: false,
             tabBarLabel: "Profile",

@@ -4,9 +4,7 @@ import Home from "../components/Home/Home";
 import Settings from "../components/Profile/Settings";
 import AccountingNaviagtion from "./AccountingNavigation";
 import CustomerNavigation from "./CustomerNavigation";
-import CustomerRetailNavigation from "./CustomerRetailNavigation";
 import InventoryNavigation from "./InventoryNavigation";
-import InventoryRetailNavigation from "./InventoryRetailNavigation";
 import NewSaleNavigation from "./NewSaleNavigation";
 import PromoNavigation from "./PromoNavigation";
 import ReportsNavigation from "./ReportsNavigation";
@@ -57,19 +55,9 @@ export default class TopBarNavigation extends Component {
             component={CustomerNavigation}
           />
           <Stack.Screen
-            name="CustomerRetailNavigation"
-            options={{ headerShown: false }}
-            component={CustomerRetailNavigation}
-          />
-          <Stack.Screen
             name="NewSaleNavigation"
             options={{ headerShown: false }}
             component={NewSaleNavigation}
-          />
-          <Stack.Screen
-            name="InventoryRetailNavigation"
-            options={{ headerShown: false }}
-            component={InventoryRetailNavigation}
           />
           <Stack.Screen
             name="Settings"
@@ -77,7 +65,6 @@ export default class TopBarNavigation extends Component {
             component={Settings}
           />
         </Stack.Navigator>
-        {/* <BottomTabNav {...this.props} /> */}
       </>
     );
   }

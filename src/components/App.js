@@ -25,6 +25,10 @@ const theme = {
     grey: '#B9B9B9',
     grey_dark: '#898989',
     grey_darker: '#4D4F5C',
+    shadowColor: '#4D4F5C',
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.5,
+    elevation: 1
   }
 }
 export default class App extends React.Component {

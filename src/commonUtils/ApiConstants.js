@@ -82,6 +82,9 @@ export const USER_MANAGEMENT_URL = {
   editRole: "/user-management/roles/updateRole",
   getRolesBySearch: "/user-management/roles/rolesWithFilter",
   getPrivilegesByRoleName: "/user-management/roles/privilagesByName/",
+
+  // Clients
+  getAllClients: "/user-management/client/getClientsForUser"
 };
 
 export const CREATE_DELEVIRY_SLIP_URL = {
