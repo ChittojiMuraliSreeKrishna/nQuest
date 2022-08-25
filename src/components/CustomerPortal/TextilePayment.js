@@ -907,8 +907,7 @@ class TextilePayment extends Component {
                 // this.setState({ loading: false });
                 alert("duplicate record already exists");
             }
-        }
-        );
+        });
         // }
         // else if (global.domainName === "Retail") {
         //     let lineItems = [];

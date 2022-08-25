@@ -13,5 +13,6 @@ export const color = {
   border: "#A6A6A6",
   lightBorder: "#00000010",
   disabledBorder: "#A6A6A6",
-  grey: "#6f6f6f"
+  grey: "#6f6f6f",
+  mediumDark :'#B4B7B8'
 }

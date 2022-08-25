@@ -161,7 +161,7 @@ export const flatListMainContainer = {
 	borderWidth: Device.isTablet ? 2 : 1,
 	borderColor: color.lightBorder,
 	flexDirection: "row",
-	padding: 10,
+	padding: 15,
 	justifyContent: "space-between",
 	alignItems: "center",
 	marginBottom: Device.isTablet ? RH(10) : RH(5),
@@ -174,6 +174,20 @@ export const flatlistSubContainer = {
 	flexDirection: "column",
 	width: "100%",
 	gap: 10,
+};
+
+export const flatListTextStyle = {
+	backgroundColor: '#F8F8F8',
+	borderWidth: Device.isTablet ? 2 : 1,
+	borderColor: color.lightBorder,
+	flexDirection: "row",
+	padding: 5,
+	justifyContent: "space-between",
+	alignItems: "center",
+	marginBottom: Device.isTablet ? RH(10) : RH(5),
+	borderRadius: Device.isTablet ? 10 : 5,
+	width: deviceWidth - RW(10),
+	marginHorizontal: RW(5),
 };
 
 export const highText = {
@@ -259,3 +273,9 @@ export const loadmoreBtnText = {
 	color: color.lightBlack,
 	fontFamily: "bold",
 };
+
+export const textStyleMediumColor = {
+	fontSize: RF(10),
+	fontFamily: 'medium',
+	color: color.mediumDark
+}

@@ -9,6 +9,7 @@ import { urmErrorMessages, errorLength } from '../Errors/errors';
 import CreateCustomerService from '../services/CreateCustomerService';
 import Message from '../Errors/Message';
 import CreateDeliverySlip from '../services/CreateDeliverySlip';
+import { RF } from '../../Responsive';
 
 var deviceheight = Dimensions.get('window').height;
 var deviceheight = Dimensions.get('window').height;
@@ -201,8 +202,8 @@ export default class AddCustomer extends Component {
     const { nameValid, mobileValid, emailValid, gstValid } = this.state;
 
     return (
-      <View>
-        <Text style={Device.isTablet ? styles.headerText_tablet : styles.hederText_mobile}>{I18n.t("Personal Information")}</Text>
+      <View style={{ backgroundColor: '#FFFFFF' }}>
+        <Text style={Device.isTablet ? styles.headerText_tablet : styles.hederText_mobile}>{I18n.t("Personal Details")}</Text>
         <Text style={styles.headings}>{I18n.t("Customer Name")} <Text style={{ color: 'red' }}>*</Text></Text>
         <TextInput
           style={nameValid ? Device.isTablet ? styles.input_tablet : styles.input_mobile : Device.isTablet ? styles.inputError_tablet : styles.inputError_mobile}
@@ -449,7 +450,7 @@ const styles = StyleSheet.create({
   headings: {
     fontSize: Device.isTablet ? 20 : 15,
     marginLeft: 20,
-    color: '#000000',
+    color: '#B4B7B8',
     marginTop: Device.isTablet ? 10 : 5,
     marginBottom: Device.isTablet ? 10 : 5,
   },
@@ -485,14 +486,12 @@ const styles = StyleSheet.create({
 
   // Mobile Styles
   hederText_mobile: {
-    color: "#353C40",
-    fontSize: 20,
+    color: "#ED1C24",
+    fontSize: RF(20),
     fontFamily: "bold",
-    marginLeft: 10,
-    marginTop: 10,
+    margin: RF(10),
     flexDirection: 'column',
-    justifyContent: 'center',
-    fontSize: 28,
+    justifyContent: 'center'
   },
   headerText2_mobile: {
     color: "#353C40",
