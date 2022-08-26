@@ -23,6 +23,7 @@ import {
 } from "../Errors/errors";
 import Message from "../Errors/Message";
 import LoginService from "../services/LoginService";
+import UrmService from '../services/UrmService';
 import { inputField, submitBtn, submitBtnText } from "../Styles/FormFields";
 
 var deviceheight = Dimensions.get("window").height;
@@ -106,11 +107,11 @@ export default class Login extends Component {
   }
 
   async login() {
-    this.clearAllData();
-    await AsyncStorage.removeItem("phone_number").then((res) => {
+    // this.clearAllData();
+    // await AsyncStorage.removeItem("phone_number").then((res) => {
 
-    }).catch(() => { alert("unable to remove phone number") })
-    AsyncStorage.clear()
+    // }).catch(() => { alert("unable to remove phone number") })
+    // AsyncStorage.clear()
     const isFormValid = this.validationForm();
     const { userName, password } = this.state;
     if (isFormValid) {
@@ -212,6 +213,7 @@ export default class Login extends Component {
                       }
                     });
                     console.log({ store });
+                    this.setState({ loading: false });
                     this.setState({ assignedStores: store }, () => {
                       this.getStores();
                     });
@@ -262,7 +264,15 @@ export default class Login extends Component {
         AsyncStorage.setItem("storeName", String(res.data[0].name)).catch(
           (err) => { },
         );
-        this.props.navigation.navigate("BottomBar");
+        AsyncStorage.getItem("rolename").then((name) => {
+          UrmService.getPrivillagesByRoleName(name).then((res) => {
+            if (res) {
+              AsyncStorage.setItem("storeName", storeName).then(() => {
+                this.props.navigation.navigate("BottomBar");
+              })
+            }
+          })
+        })
       }
     });
   }
@@ -277,13 +287,18 @@ export default class Login extends Component {
       let storeName = String(assignedStores[0].name);
       let storeId = String(assignedStores[0].id);
       console.log({ storeName });
-      console.log({ storeId });
+      console.log("storeId", storeId);
       AsyncStorage.setItem("storeId", storeId);
       global.storeName = storeName;
-      console.log("IN login", this.props.navigation);
-      AsyncStorage.setItem("storeName", storeName).then(() => {
-        this.props.navigation.navigate("BottomBar");
-      });
+      AsyncStorage.getItem("rolename").then((name) => {
+        UrmService.getPrivillagesByRoleName(name).then((res) => {
+          if (res) {
+            AsyncStorage.setItem("storeName", storeName).then(() => {
+              this.props.navigation.navigate("BottomBar");
+            })
+          }
+        })
+      })
     }
   }
 
