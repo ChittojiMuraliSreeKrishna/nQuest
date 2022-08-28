@@ -405,7 +405,7 @@ export default class Barcode extends Component {
                   Barcode List -{" "}
                   <Badge size={30} style={{ color: "#ED1C24", }}>
                     {this.state.barcodesList.length}
-                  </Badge>{" "}
+                  </Badge>
                 </Text>
                 <View style={scss.headerContainer}>
                   <IconMAA

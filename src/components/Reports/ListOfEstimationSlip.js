@@ -6,8 +6,10 @@ import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
+import { Appbar } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { RF, RH, RW } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
 import { buttonContainer, buttonImageStyle, buttonStyle1, flatListMainContainer, flatlistSubContainer, highText, textContainer, textStyleLight, textStyleMedium } from '../Styles/Styles';
@@ -42,7 +44,8 @@ export class ListOfEstimationSlip extends Component {
       flagViewDetail: false,
       storeId: 0,
       filterActive: false,
-      estimationSlips: [1, 2, 3]
+      estimationSlips: [],
+      flagFilterOpen: false
     };
   }
 
@@ -59,6 +62,9 @@ export class ListOfEstimationSlip extends Component {
 
   }
 
+  filterAction() {
+    this.setState({ flagFilterOpen: true, modalVisible: true })
+  }
 
 
   handledeleteEstimationSlip(item, index) {
@@ -171,13 +177,12 @@ export class ListOfEstimationSlip extends Component {
     let pageNumber = 0;
     console.log(ReportsService.estimationSlips());
     ReportsService.estimationSlips(obj, pageNumber).then((res) => {
-      console.log(res.data);
+      console.log(res.data.result.deliverySlip);
       if (res.data && res.data["isSuccess"] === "true") {
         if (res.data.result.length !== 0) {
           this.setState({ filterActive: true });
-          this.props.childParams(res.data.result.deliverySlipVo);
-          this.props.modelCancelCallback();
-          this.props.filterActiveCallback();
+          this.setState({ estimationSlips: res.data.result.deliverySlip.content });
+          this.setState({ modalVisible: false, flagFilterOpen: false })
         } else {
           alert("records not found");
         }
@@ -200,7 +205,7 @@ export class ListOfEstimationSlip extends Component {
   }
 
   modelCancel() {
-    this.props.modelCancelCallback();
+    this.setState({ modalVisible: false, flagFilterOpen: false, deleteEstimationSlip: false })
   }
 
 
@@ -209,8 +214,12 @@ export class ListOfEstimationSlip extends Component {
   render() {
     return (
       <View>
+        <Appbar>
+          <Appbar.Content title="List Of Estimation Slips" />
+          <Icon name="sliders" size={25} onPress={() => this.filterAction()}></Icon>
+        </Appbar>
         <FlatList
-          data={this.props.estimationSlip}
+          data={this.state.estimationSlips}
           style={{ marginTop: 20 }}
           scrollEnabled={true}
           keyExtractor={(item, i) => i.toString()}
@@ -301,9 +310,9 @@ export class ListOfEstimationSlip extends Component {
           </View>
         )}
 
-        {this.props.flagFilterEstimationSlip && (
+        {this.state.flagFilterOpen && (
           <View>
-            <Modal isVisible={this.props.modalVisible} style={{ margin: 0 }}>
+            <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}>
               <View style={styles.filterMainContainer} >
                 <View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: RH(5), height: Device.isTablet ? RH(60) : RH(50) }}>

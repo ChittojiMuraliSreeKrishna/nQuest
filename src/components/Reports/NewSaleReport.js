@@ -6,10 +6,11 @@ import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
+import { Appbar } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
+import IconFA from 'react-native-vector-icons/FontAwesome';
 import ReportsService from '../services/ReportsService';
-
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
 
@@ -20,6 +21,7 @@ export default class NewSaleReport extends Component {
     this.state = {
       modalVisible: true,
       flagDeleteNewSale: false,
+      flagFilterNewSale: false,
       date: new Date(),
       enddate: new Date(),
       startDate: "",
@@ -55,20 +57,11 @@ export default class NewSaleReport extends Component {
       customername: "",
       mobile: "",
       createdate: "",
-      newSale: [1, 2, 3]
+      newSale: []
     };
   }
 
   componentDidMount() {
-    if (global.domainName === "Textile") {
-      this.setState({ domainId: 1 });
-    }
-    else if (global.domainName === "Retail") {
-      this.setState({ domainId: 2 });
-    }
-    else if (global.domainName === "Electrical & Electronics") {
-      this.setState({ domainId: 3 });
-    }
 
     AsyncStorage.getItem("storeId").then((value) => {
       storeStringId = value;
@@ -81,8 +74,10 @@ export default class NewSaleReport extends Component {
       console.log('There is error getting storeId');
       //  alert('There is error getting storeId');
     });
+  }
 
-
+  filterAction() {
+    this.setState({ flagFilterNewSale: true, modalVisible: true })
   }
 
 
@@ -118,13 +113,12 @@ export default class NewSaleReport extends Component {
       console.log('params are' + JSON.stringify(obj));
       let pageNumber = 0
       ReportsService.newSaleReports(obj, pageNumber).then((res) => {
-        console.log(res.data);
+        console.log(res.data.result);
         if (res.data && res.data["isSuccess"] === "true") {
           if (res.data.result.length !== 0) {
-            this.props.childParamNewsales(res.data.result.newSaleVo);
-            this.props.filterActiveCallback();
-            this.props.modelCancelCallback();
-            console.error(res.data.result)
+            this.setState({ newSale: res.data.result.newSale.content })
+            this.modelCancel()
+            console.log(this.state.newSale)
           } else {
             alert("records not found");
           }
@@ -223,7 +217,7 @@ export default class NewSaleReport extends Component {
   };
 
   modelCancel() {
-    this.props.modelCancelCallback();
+    this.setState({ modalVisible: false, flagFilterNewSale: false })
   }
 
 
@@ -231,8 +225,16 @@ export default class NewSaleReport extends Component {
   render() {
     return (
       <View>
+        <Appbar>
+          <Appbar.Content title="New Sale Report" />
+          <IconFA
+            name="sliders"
+            size={25}
+            onPress={() => this.filterAction()}
+          ></IconFA>
+        </Appbar>
         <FlatList
-          data={this.props.newSale}
+          data={this.state.newSale}
           style={{ marginTop: 20 }}
           scrollEnabled={true}
           keyExtractor={(item, i) => i.toString()}
@@ -317,9 +319,9 @@ export default class NewSaleReport extends Component {
             </Modal>
           </View>
         )}
-        {this.props.flagFilterNewSale && (
+        {this.state.flagFilterNewSale && (
           <View>
-            <Modal style={{ margin: 0 }} isVisible={this.props.modalVisible}>
+            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
               <View style={styles.filterMainContainer} >
                 <View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>

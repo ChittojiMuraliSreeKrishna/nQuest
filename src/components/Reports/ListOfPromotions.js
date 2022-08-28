@@ -4,15 +4,16 @@ import React, { Component } from 'react';
 import { Dimensions, FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import Device from 'react-native-device-detection';
+import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
+import { Appbar } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
+import { RF, RH, RW } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
-import { RH, RW, RF } from '../../Responsive';
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
-import I18n from 'react-native-i18n';
 
 export class ListOfPromotions extends Component {
 
@@ -161,6 +162,9 @@ export class ListOfPromotions extends Component {
   render() {
     return (
       <View>
+        <Appbar>
+          <Appbar.Content title="List Of Promotions" />
+        </Appbar>
         <FlatList
           data={this.props.listPromotions}
           style={{ marginTop: 20 }}

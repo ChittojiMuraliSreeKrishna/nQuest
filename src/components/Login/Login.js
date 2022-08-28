@@ -107,11 +107,6 @@ export default class Login extends Component {
   }
 
   async login() {
-    // this.clearAllData();
-    // await AsyncStorage.removeItem("phone_number").then((res) => {
-
-    // }).catch(() => { alert("unable to remove phone number") })
-    // AsyncStorage.clear()
     const isFormValid = this.validationForm();
     const { userName, password } = this.state;
     if (isFormValid) {
@@ -308,11 +303,22 @@ export default class Login extends Component {
     });
   }
 
-  async componentDidMount() {
-    AsyncStorage.removeItem("phone_number");
-    AsyncStorage.clear().then(() => console.log('Cleared'))
-    return true;
+  componentDidMount() {
+    this.refresh()
+    this.clearAllData()
   }
+
+  refresh = async () => {
+    try {
+      await AsyncStorage.removeItem("phone_number");
+      await AsyncStorage.clear().then(() => console.log('Cleared'))
+      return true;
+    } catch (error) {
+      console.log(error)
+      return true;
+    }
+  }
+
 
   render() {
     const userValid = this.state.userValid;

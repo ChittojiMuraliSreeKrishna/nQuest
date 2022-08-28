@@ -6,6 +6,8 @@ import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
+import { Appbar } from 'react-native-paper';
+import IconFA from 'react-native-vector-icons/FontAwesome';
 import { RF, RH, RW } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
 
@@ -35,6 +37,7 @@ export class ListOfBarcodes extends Component {
       flagViewDetail: false,
       flagdelete: false,
       modalVisible: true,
+      flagFilterOpen: false,
       barcode: "",
       mrp: "",
       qty: "",
@@ -63,6 +66,10 @@ export class ListOfBarcodes extends Component {
       console.log('There is error getting storeId');
       // alert('There is error getting storeId');
     });
+  }
+
+  filterAction() {
+    this.setState({ flagFilterOpen: true, modalVisible: true })
   }
 
 
@@ -165,12 +172,10 @@ export class ListOfBarcodes extends Component {
     console.log('params are' + JSON.stringify(obj));
     let pageNumber = 0
     ReportsService.getListOfBarcodes(obj, pageNumber).then((res) => {
-      console.log(res.data);
+      console.log(res.data.result);
       if (res.data && res.data["isSuccess"] === "true") {
         if (res.data.result.length !== 0) {
-          this.props.childParamlistBarcodes(res.data.result);
-          this.props.filterActiveCallback();
-          this.props.modelCancelCallback();
+          this.setState({ listBarcodes: res.data.result.content, filterActive: true, modalVisible: false })
         } else {
           alert("records not found");
         }
@@ -188,7 +193,7 @@ export class ListOfBarcodes extends Component {
   }
 
   modelCancel() {
-    this.props.modelCancelCallback();
+    this.setState({ flagFilterOpen: false, modalVisible: false })
   }
 
   estimationModelCancel() {
@@ -207,8 +212,16 @@ export class ListOfBarcodes extends Component {
   render() {
     return (
       <View>
+        <Appbar>
+          <Appbar.Content title="List Of Barcodes" />
+          <IconFA
+            name="sliders"
+            size={25}
+            onPress={() => this.filterAction()}
+          ></IconFA>
+        </Appbar>
         <FlatList
-          data={this.props.listBarcodes}
+          data={this.state.listBarcodes}
           style={{ marginTop: RH(20) }}
           scrollEnabled={true}
           keyExtractor={(item, i) => i.toString()}
@@ -243,9 +256,9 @@ export class ListOfBarcodes extends Component {
           )}
         />
 
-        {this.props.flagFilterListBarcodes && (
+        {this.state.flagFilterOpen && (
           <View>
-            <Modal style={{ margin: 0 }} isVisible={this.props.modalVisible}>
+            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
               <View style={styles.filterMainContainer} >
                 <View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: RH(5), height: Device.isTablet ? RW(60) : RW(50) }}>

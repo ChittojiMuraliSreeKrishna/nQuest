@@ -6,6 +6,7 @@ import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
+import { Appbar } from 'react-native-paper';
 import ReportsService from '../services/ReportsService';
 
 var deviceWidth = Dimensions.get("window").width;
@@ -188,6 +189,9 @@ export class GoodsReturn extends Component {
   render() {
     return (
       <View>
+        <Appbar>
+          <Appbar.Content title="Goods Return" />
+        </Appbar>
         <FlatList
           data={this.props.goodsReturn}
           style={{ marginTop: 20 }}

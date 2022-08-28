@@ -3,9 +3,7 @@ import React, { Component } from "react";
 import {
   FlatList,
   Image,
-  Text,
-  TouchableOpacity,
-  View
+  Text, TextInput as TextInp, TouchableOpacity, View
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Appbar, TextInput } from "react-native-paper";
@@ -244,7 +242,7 @@ export default class AddProductCombo extends Component {
       var additem = parseInt(qtyrr[index].quantity) - 1;
       qtyrr[index].quantity = additem.toString();
     } else {
-      this.state.listOfProducts.splice(index, 1);
+      qtyrr.splice(index, 1)
     }
     this.setState({ listOfProducts: qtyrr });
   }
@@ -308,7 +306,7 @@ export default class AddProductCombo extends Component {
               textAlignVertical="center"
               autoCapitalize="none"
               value={this.state.comboName}
-              onChangeText={this.handleComboName}
+              onChangeText={(value) => this.handleComboName(value)}
             />
             <Message imp={false} message={errors["comboName"]} />
             <Text style={inputHeading}>Combo Price</Text>
@@ -323,7 +321,7 @@ export default class AddProductCombo extends Component {
               textAlignVertical="center"
               autoCapitalize="none"
               value={this.state.comboPrice}
-              onChangeText={this.handleComboPrice}
+              onChangeText={(value) => this.handleComboPrice(value)}
             />
             <Message imp={false} message={errors["comboPrice"]} />
             <Text style={inputHeading}>Combo Qty</Text>
@@ -338,7 +336,7 @@ export default class AddProductCombo extends Component {
               textAlignVertical="center"
               autoCapitalize="none"
               value={this.state.comboQty}
-              onChangeText={this.handleComboQty}
+              onChangeText={(value) => this.handleComboQty(value)}
             />
             <Message imp={false} message={errors["comboQty"]} />
             <Text style={inputHeading}>Barcode</Text>
@@ -353,7 +351,7 @@ export default class AddProductCombo extends Component {
               textAlignVertical="center"
               autoCapitalize="none"
               value={this.state.barCodeId}
-              onChangeText={this.handleBarcodeId}
+              onChangeText={(value) => this.handleBarcodeId(value)}
               onEndEditing={() => {
                 this.getBarcodeDetails();
               }}
@@ -397,10 +395,10 @@ export default class AddProductCombo extends Component {
                     </View>
                     <View style={textContainer}>
                       <Text style={textStyleMedium}>
-                        Barcode: {item.barcode}
+                        {item.barcode}
                       </Text>
                       <Text style={textStyleLight}>
-                        Product Name: {item.name}
+                        name: {item.name}
                       </Text>
                     </View>
                     <View style={textContainer}>
@@ -433,7 +431,7 @@ export default class AddProductCombo extends Component {
                               source={require("../../commonUtils/assets/Images/decrease_qty.png")}
                             />
                           </TouchableOpacity>
-                          <TextInput
+                          <TextInp
                             outlineColor="#8F9EB7"
                             activeOutlineColor="#000"
                             mode="outlined"
@@ -441,20 +439,16 @@ export default class AddProductCombo extends Component {
                               justifyContent: "center",
                               height: 25,
                               width: 25,
-                              borderColor: "#d7d7d7",
-                              backgroundColor: "white",
-                              color: "#d7d7d7",
-                              borderWidth: 1,
                               borderRadius: 8,
                               fontFamily: "regular",
                               fontSize: 14,
                               paddingLeft: 9,
+                              borderColor: '#d7d7d7',
+                              borderWidth: 1,
                             }}
                             value={item.quantity}
                             placeholder="1"
-                            placeholderTextColor={"#d7d7d7"}
                             keyboardType="number-pad"
-                            underlineColorAndroid="transparent"
                             onChangeText={(text) =>
                               this.updateQty(text, index, item)
                             }
@@ -467,6 +461,7 @@ export default class AddProductCombo extends Component {
                               display: "flex",
                               justifyContent: "center",
                               alignItems: "center",
+                              marginTop: 3,
                             }}
                             onPress={() => this.incrementForTable(item, index)}
                           >
