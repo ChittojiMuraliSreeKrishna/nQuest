@@ -12,6 +12,8 @@ import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
 import { RF, RH, RW } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
+import FilterIcon from 'react-native-vector-icons/FontAwesome'
+
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
 
@@ -28,10 +30,13 @@ export class ListOfPromotions extends Component {
       toDate: "",
 
       promoId: "",
-      sotres: [],
+      stores: [],
       selectedStore: "",
       storeId: 0,
       storeName: "",
+      flagFilterListPromotions: false,
+      modalVisible: true,
+      listPromotions: []
     };
   }
 
@@ -140,23 +145,31 @@ export class ListOfPromotions extends Component {
     axios.post(ReportsService.promotionsList(), obj).then((res) => {
       console.log(res.data);
       if (res.data && res.data["isSuccess"] === "true") {
-        this.props.childParamlistofPromotions(res.data.result);
-        this.props.filterActiveCallback();
-        this.props.modelCancelCallback();
+        // this.props.childParamlistofPromotions(res.data.result);
+        // this.props.filterActiveCallback();
+        // this.props.modelCancelCallback();
+        this.modelCancel()
+        this.setState({ listPromotions: res.data.result, filterActive: true, modalVisible: false })
       }
       else {
         alert(res.data.message);
+        this.setState({ startDate: "", endDate: "", promoId: "" })
       }
     }
     ).catch(() => {
       this.setState({ loading: false });
       alert('No Results Found');
-      this.props.modelCancelCallback();
+      this.modelCancel()
+      // this.props.modelCancelCallback();
+      this.setState({ startDate: "", endDate: "", promoId: "" })
     });
+  }
+  filterAction() {
+    this.setState({ flagFilterListPromotions: true, modalVisible: true })
   }
 
   modelCancel() {
-    this.props.modelCancelCallback();
+    this.setState({ flagFilterListPromotions: false, modalVisible: false })
   }
 
   render() {
@@ -164,9 +177,14 @@ export class ListOfPromotions extends Component {
       <View>
         <Appbar>
           <Appbar.Content title="List Of Promotions" />
+          <FilterIcon
+            name="sliders"
+            size={25}
+            onPress={() => this.filterAction()}
+          />
         </Appbar>
         <FlatList
-          data={this.props.listPromotions}
+          data={this.state.listPromotions}
           style={{ marginTop: 20 }}
           scrollEnabled={true}
           keyExtractor={(item, i) => i.toString()}
@@ -188,9 +206,9 @@ export class ListOfPromotions extends Component {
             </View>
           )}
         />
-        {this.props.flagFilterListPromotions && (
+        {this.state.flagFilterListPromotions && (
           <View>
-            <Modal style={{ margin: 0 }} isVisible={this.props.modalVisible}>
+            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
               <View style={styles.filterMainContainer} >
                 <View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
@@ -289,7 +307,7 @@ export class ListOfPromotions extends Component {
                       Icon={() => {
                         return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
                       }}
-                      items={this.state.sotres}
+                      items={this.state.stores}
                       onValueChange={this.handleSelectStores}
                       style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
                       value={this.state.selectedStore}
@@ -419,8 +437,8 @@ const styles = StyleSheet.create({
     // marginRight: -40,
     // paddingLeft: Device.isTablet ? 0 : 20,
     backgroundColor: '#ffffff',
-    marginTop: Device.isTablet ? deviceheight - RH(550) : deviceheight - RH(450),
-    height: Device.isTablet ? RH(550) : RH(450),
+    marginTop: Device.isTablet ? deviceheight - RH(650) : deviceheight - RH(450),
+    height: Device.isTablet ? RH(600) : RH(500),
   },
   // Styles For Mobile
 

@@ -672,12 +672,13 @@ class GenerateEstimationSlip extends Component {
                                   // width: Device.isTablet ? 50 : 30,
                                   color: '#ED1C24',
                                   fontFamily: 'regular',
-                                  fontSize: Device.isTablet ? 22 : 12,
+                                  fontSize: RF(14)
+                                  // fontSize: Device.isTablet ? 22 : 12,
                                 }}
                                 mode="flat"
                                 activeUnderlineColor='#000'
                                 underlineColor='#6f6f6f'
-                                label={"01"}
+                                // label={"01"}
                                 value={('0' + item.quantity).slice(-2)}
                                 onChangeText={(text) => this.updateQty(text, index, item)}
                               />
@@ -1470,10 +1471,10 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     backgroundColor: '#FBFBFB',
     borderWidth: 1,
-    fontFamily: 'regular',
+    // fontFamily: 'regular',
     paddingLeft: 15,
     paddingRight: 15,
-    fontSize: 14,
+    fontSize: RF(14),
   },
   input_mobilebutton_normal: {
     justifyContent: 'center',
@@ -1502,7 +1503,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     backgroundColor: '#FBFBFB',
     borderWidth: 1,
-    fontFamily: 'regular',
+    // fontFamily: 'regular',
     paddingLeft: 15,
     fontSize: 14,
   },
@@ -1672,10 +1673,9 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     backgroundColor: '#FBFBFB',
     borderWidth: 1,
-    fontFamily: 'regular',
+    // fontFamily: 'regular',
     paddingLeft: 15,
-
-    fontSize: 22,
+    fontSize: RF(14),
   },
   input_tabletbutton_normal: {
     justifyContent: 'center',
@@ -1711,9 +1711,9 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     backgroundColor: '#FBFBFB',
     borderWidth: 1,
-    fontFamily: 'regular',
+    // fontFamily: 'regular',
     paddingLeft: 15,
-    fontSize: 22,
+    fontSize: RF(14),
   },
   rnSelect_tablet: {
     color: '#8F9EB7',

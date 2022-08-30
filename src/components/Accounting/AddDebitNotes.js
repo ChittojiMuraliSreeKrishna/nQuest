@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Dimensions, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import Device from 'react-native-device-detection';
 import RNPickerSelect from 'react-native-picker-select';
@@ -9,6 +9,11 @@ import { backButton, backButtonImage, headerTitle, headerTitleContainer, headerT
 import RazorpayCheckout from 'react-native-razorpay';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AccountingService from '../services/AccountingService';
+import { Appbar, TextInput } from 'react-native-paper';
+import I18n from 'react-native-i18n';
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+
+
 var deviceWidth = Dimensions.get('window').width;
 
 export default class AddDebitNotes extends Component {
@@ -50,8 +55,8 @@ export default class AddDebitNotes extends Component {
 
 
   handleBackButtonClick() {
-    this.props.navigation.goBack(null);
-    return true;
+    this.props.navigation.goBack();
+    // return true;
   }
 
   handleCustomerName = (value) => {
@@ -167,78 +172,59 @@ export default class AddDebitNotes extends Component {
   render() {
     return (
       <View>
-        <View style={headerTitleContainer} >
-          <View style={headerTitleSubContainer}>
-            <TouchableOpacity style={backButton} onPress={() => this.handleBackButtonClick()}>
-              <Image style={backButtonImage} source={require('../assets/images/backButton.png')} />
-            </TouchableOpacity>
-            <Text style={headerTitle}>
-              Add Debit Notes
-            </Text>
-          </View>
-        </View>
-        <ScrollView>
-          <Text style={inputHeading}>Mobile Number</Text>
+        <Appbar mode="center-aligned" style={styles.mainContainer}>
+          <Appbar.BackAction
+            onPress={() => this.handleBackButtonClick()}
+          />
+          <Appbar.Content title={I18n.t("Add Debit Notes")} />
+        </Appbar>
+        <KeyboardAwareScrollView>
+          <Text style={inputHeading}>{I18n.t("Mobile Number")}</Text>
           <TextInput
             style={inputFieldDisabled}
-            underlineColorAndroid="transparent"
-            placeholder="Mobile Number"
-            placeholderTextColor="#000000"
-            editable={false}
-            textAlignVertical="center"
-            autoCapitalize='none'
+            mode='flat'
+            label={I18n.t("Mobile Number")}
+            disabled
             value={this.state.mobileNumber}
             onChangeText={this.handleMobileNumber}
           />
-          <Text style={inputHeading}>Customer Name</Text>
+          <Text style={inputHeading}>{I18n.t("Customer Name")}</Text>
           <TextInput
             style={inputFieldDisabled}
-            underlineColorAndroid="transparent"
-            placeholder="Customer Name"
-            editable={false}
-            placeholderTextColor="#000000"
-            textAlignVertical="center"
-            autoCapitalize='none'
+            mode='flat'
+            label={I18n.t("Customer Name")}
+            disabled
             value={this.state.customerName}
             onChangeText={this.handleCustomerName}
           />
-          <Text style={inputHeading}>Debit Amount</Text>
+          <Text style={inputHeading}>{I18n.t("Debit Amount")}</Text>
           <TextInput
             style={inputFieldDisabled}
-            underlineColorAndroid="transparent"
-            placeholder="Debit Amount"
-            placeholderTextColor="#000000"
-            editable={false}
-            textAlignVertical="center"
-            autoCapitalize='none'
+            mode='flat'
+            label={I18n.t("Debit Amount")}
+            disabled
             value={this.state.debitAmount}
             onChangeText={this.handledebitAmount}
           />
-          <Text style={inputHeading}>Store</Text>
+          <Text style={inputHeading}>{I18n.t("Store")}</Text>
           <TextInput
             style={inputFieldDisabled}
-            underlineColorAndroid="transparent"
-            placeholder="Store Name"
-            placeholderTextColor="#000000"
-            textAlignVertical="center"
-            editable={false}
-            autoCapitalize='none'
+            mode='flat'
+            label={I18n.t("Store Name")}
+            disabled
             value={this.state.storeName}
             onChangeText={this.handleStoreName}
           />
-          <Text style={inputHeading}>Approved By</Text>
+          <Text style={inputHeading}>{I18n.t("Approved By")}</Text>
           <TextInput
             style={inputFieldDisabled}
-            underlineColorAndroid="transparent"
-            placeholder="Approved By"
-            placeholderTextColor="#000000"
-            textAlignVertical="center"
-            editable={false}
-            autoCapitalize='none'
+            mode='flat'
+            label={I18n.t("Approved By")}
+            disabled
             value={this.state.approvedBy}
             onChangeText={this.handleApprovedBy}
           />
-          <Text style={inputHeading}>Payment Type</Text>
+          <Text style={inputHeading}>{I18n.t("Payment Type")}</Text>
           <View style={rnPickerContainer}>
             <RNPickerSelect
               placeholder={{
@@ -257,39 +243,40 @@ export default class AddDebitNotes extends Component {
           </View>
           {this.state.transanctionMode === "Cash" &&
             (<View>
-              <Text style={inputHeading}>Payable Cash</Text>
+              <Text style={inputHeading}>{I18n.t("Payable Cash")}</Text>
               <TextInput
                 style={inputField}
-                underlineColorAndroid="transparent"
-                placeholder="Payable Cash"
-                placeholderTextColor="#6F6F6F"
-                textAlignVertical="center"
-                autoCapitalize="none"
+                mode='flat'
+                keyboardType='phone-pad'
+                activeUnderlineColor='#000'
+                underlineColor={'#6f6f6f'}
+                label={I18n.t("Payable Cash")}
                 value={this.state.payableAmount}
                 onChangeText={this.handlePayableAmount}
               />
             </View>)
           }
-          <Text style={inputHeading}>Comments</Text>
+          <Text style={inputHeading}>{I18n.t("Comments")}</Text>
           <TextInput
             style={inputArea}
-            underlineColorAndroid="transparent"
-            placeholder="COMMENTS"
-            placeholderTextColor="#6F6F6F"
-            textAlignVertical="center"
-            autoCapitalize="none"
+            label={I18n.t('Comments')}
+            activeUnderlineColor='#000'
+            underlineColor={'#6f6f6f'}
+            multiline
+            numberOfLines={5}
+            mode="flat"
             value={this.state.comments}
             onChangeText={this.handleComments}
           />
           <TouchableOpacity style={submitBtn}
             onPress={() => this.saveDebit()}>
-            <Text style={submitBtnText}>SAVE</Text>
+            <Text style={submitBtnText}>{I18n.t("SAVE")}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={cancelBtn}
             onPress={() => this.cancel()}>
-            <Text style={cancelBtnText}>CANCEL</Text>
+            <Text style={cancelBtnText}>{I18n.t("CANCEL")}</Text>
           </TouchableOpacity>
-        </ScrollView>
+        </KeyboardAwareScrollView>
       </View>
     );
   }
@@ -299,5 +286,8 @@ const styles = StyleSheet.create({
   imagealign: {
     marginTop: Device.isTablet ? 25 : 20,
     marginRight: Device.isTablet ? 30 : 20,
+  },
+  mainContainer: {
+    backgroundColor: "#FFFFFF"
   }
 })

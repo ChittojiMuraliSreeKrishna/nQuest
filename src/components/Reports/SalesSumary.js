@@ -8,7 +8,9 @@ import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
 import { Appbar } from 'react-native-paper';
+import { RH } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
+import FilterIcon from 'react-native-vector-icons/FontAwesome'
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -30,7 +32,9 @@ export class SalesSumary extends Component {
       storeName: "",
       selectedStore: "",
       domainId: 0,
-      salesSumaryObject: [1, 2, 3]
+      salesSumaryObject: [],
+      flagFilterSalesSumary: false,
+      modalVisible: true
     };
   }
 
@@ -139,29 +143,40 @@ export class SalesSumary extends Component {
       console.log(res.data);
       if (res.data && res.data["isSuccess"] === "true") {
         if (res.data.result.lenght !== 0) {
-          this.props.childParamSalesSummary(res.data.result);
-          this.props.filterActiveCallback();
-          this.props.childParamSalesSummaryObject();
-          this.props.modelCancelCallback();
+          // this.props.childParamSalesSummary(res.data.result);
+          // this.props.filterActiveCallback();
+          // this.props.childParamSalesSummaryObject();
+          // this.props.modelCancelCallback();
+          this.modelCancel()
+          this.setState({ salesSumaryObject: res.data.result, filterActive: true, modalVisible: false })
         } else {
           alert("records not found");
+          this.setState({ startDate: "", endDate: "" })
         }
       }
       else {
         alert(res.data.message);
-        this.props.modelCancelCallback();
+        this.modelCancel()
+        this.setState({ startDate: "", endDate: "" })
+        // this.props.modelCancelCallback();
       }
     }
     ).catch(() => {
       this.setState({ loading: false });
       alert('No Results Found');
-      this.props.modelCancelCallback();
+      this.modelCancel()
+      // this.props.modelCancelCallback();
 
     });
   }
 
+
+  filterAction() {
+    this.setState({ flagFilterSalesSumary: true, modalVisible: true })
+  }
+
   modelCancel() {
-    this.props.modelCancelCallback();
+    this.setState({ flagFilterSalesSumary: false, modalVisible: false })
   }
 
   render() {
@@ -169,10 +184,15 @@ export class SalesSumary extends Component {
       <View>
         <Appbar>
           <Appbar.Content title="Sales Summary" />
+          <FilterIcon
+            name="sliders"
+            size={25}
+            onPress={() => this.filterAction()}
+          />
         </Appbar>
 
         <FlatList
-          data={this.props.salesSumaryObject}
+          data={this.state.salesSumaryObject}
           style={{ marginTop: 20 }}
           scrollEnabled={true}
           ListEmptyComponent={<Text style={{ fontSize: Device.isTablet ? 21 : 17, fontFamily: 'bold', color: '#000000', textAlign: 'center', marginTop: deviceheight / 3 }}>&#9888; {I18n.t("Results not loaded")}</Text>}
@@ -242,9 +262,9 @@ export class SalesSumary extends Component {
 
         />
 
-        {this.props.flagFilterSalesSumary && (
+        {this.state.flagFilterSalesSumary && (
           <View>
-            <Modal style={{ margin: 0 }} isVisible={this.props.modalVisible}>
+            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
               <View style={styles.filterMainContainer} >
                 <View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
@@ -457,8 +477,8 @@ const styles = StyleSheet.create({
     // marginRight: -40,
     // paddingLeft: Device.isTablet ? 0 : 20,
     backgroundColor: '#ffffff',
-    marginTop: Device.isTablet ? deviceheight - 500 : deviceheight - 400,
-    height: Device.isTablet ? 500 : 400,
+    marginTop: Device.isTablet ? deviceheight - RH(650) : deviceheight - RH(450),
+    height: Device.isTablet ? RH(600) : RH(500),
   },
 
   // Styles For Mobile

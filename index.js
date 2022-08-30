@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { AppRegistry, LogBox } from 'react-native';
-import * as CryptoJS from 'react-native-crypto-js';
+// import * as CryptoJS from 'react-native-crypto-js';
 import 'react-native-gesture-handler';
 import App from './src/components/App';
 LogBox.ignoreAllLogs(true);
@@ -21,21 +21,22 @@ axios.interceptors.request.use(
 
       console.log('There is error getting token');
     });
-    var text = JSON.stringify(req.data)
-    const key = '23KAVfsyYqk+hxye3/LDM59Ts8hTiAs='
-    const iv = '0000000000000000 '
-    const cipher = CryptoJS.AES.encrypt(text, CryptoJS.enc.Utf8.parse(key), {
-      iv: CryptoJS.enc.Utf8.parse(iv),
-      padding: CryptoJS.pad.Pkcs7,
-      mode: CryptoJS.mode.CBC
-    })
-    var encryptedBytes = cipher.toString()
-    req.data = encryptedBytes;
-    return req;
-  },
-  (err) => {
-    return Promise.reject(err);
-  }
+    // if (ENCRYPTION) {
+    //   var text = JSON.stringify(req.data)
+    //   const key = '23KAVfsyYqk+hxye3/LDM59Ts8hTiAs='
+    //   const iv = '0000000000000000 '
+    //   const cipher = CryptoJS.AES.encrypt(text, CryptoJS.enc.Utf8.parse(key), {
+    //     iv: CryptoJS.enc.Utf8.parse(iv),
+    //     padding: CryptoJS.pad.Pkcs7,
+    //     mode: CryptoJS.mode.CBC
+    //   })
+    //   var encryptedBytes = cipher.toString()
+    //   req.data = encryptedBytes;
+      return req;
+    },
+    (err) => {
+      return Promise.reject(err);
+    }
 );
 
 
@@ -43,7 +44,7 @@ axios.interceptors.request.use(
 axios.interceptors.response.use((response) => response, (error) => {
   // if(error.)
   // whatever you want to do with the error
-  console.log(error.response.error);
+  console.log(error.response.status);
   if (error.response.status === 404) {
     // alert('The requested resource does not exist or has been deleted')
   }
