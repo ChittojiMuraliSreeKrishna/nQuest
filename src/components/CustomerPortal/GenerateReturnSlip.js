@@ -387,7 +387,7 @@ export default class GenerateReturnSlip extends Component {
           this.modelCancel();
 
           this.setState({
-            customerNumber: mobileData.phoneNumber,
+            customerNumber: '',
           });
 
         }
@@ -1228,8 +1228,8 @@ const styles = StyleSheet.create({
   cancelButtonText_mobile: {
     color: 'black',
     alignSelf: 'center',
-    fontSize: 15,
-    fontFamily: "regular",
+    fontSize: RF(14)
+    // fontFamily: "regular",
   },
   navigationText_mobile: {
     fontSize: 16,
@@ -1451,8 +1451,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FBFBFB',
     borderWidth: Device.isTablet ? 2 : 1,
     paddingLeft: 15,
-    fontFamily: 'regular',
-    fontSize: 22,
+    // fontFamily: 'regular',
+    fontSize: RF(14)
   },
   signInButton_tablet: {
     backgroundColor: '#ED1C24',
@@ -1489,8 +1489,8 @@ const styles = StyleSheet.create({
   cancelButtonText_tablet: {
     color: 'black',
     alignSelf: 'center',
-    fontSize: 20,
-    fontFamily: "regular",
+    fontSize: RF(14)
+    // fontFamily: "regular",
   },
   navigationText_tablet: {
     fontSize: 22,

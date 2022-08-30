@@ -8,6 +8,8 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import Modal from 'react-native-modal';
 import { Appbar } from 'react-native-paper';
 import ReportsService from '../services/ReportsService';
+import FilterIcon from 'react-native-vector-icons/FontAwesome'
+import { RH, RW } from '../../Responsive';
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -25,13 +27,13 @@ export class GoodsReturn extends Component {
       endDate: "",
       fromDate: "",
       toDate: "",
-
       returnSlip: "",
       barCode: "",
       empId: "",
       storeId: 0,
       domainId: 0,
-      goodsReturn: [1, 2, 3]
+      goodsReturn: [],
+      flagFilterGoodsReturn: false
     };
   }
 
@@ -132,27 +134,34 @@ export class GoodsReturn extends Component {
     console.log('params are' + JSON.stringify(obj));
     let pageNumber = 0
     ReportsService.returnSlips(obj, pageNumber).then((res) => {
-      console.log(res.data);
+      console.log("returnSlips response",res.data);
       console.log(res.data.result.length);
       if (res.data && res.data["isSuccess"] === "true") {
         if (res.data.result.length !== 0) {
-          this.props.childParamgoodsReturn(res.data.result);
-          this.props.filterActiveCallback();
-          this.props.modelCancelCallback();
+          // this.props.childParamgoodsReturn(res.data.result);
+          // this.props.filterActiveCallback();
+          // this.props.modelCancelCallback();
+          this.modelCancel()
+          this.setState({ goodsReturn: res.data.result, filterActive: true, modalVisible: false })
         } else {
           alert("Results Not Found");
-          this.props.modelCancelCallback();
+          this.modelCancel()
+          this.setState({ startDate: "", endDate: "", returnSlip: "", barcode: "", empId: "" })
+          // this.props.modelCancelCallback();
         }
       }
       else {
         alert(res.data.message);
-        this.props.modelCancelCallback();
+        this.modelCancel()
+        this.setState({ startDate: "", endDate: "", returnSlip: "", barcode: "", empId: "" })
+        // this.props.modelCancelCallback();
       }
     }
     ).catch((err) => {
       this.setState({ loading: false });
       alert("There is an error getting data");
-      this.props.modelCancelCallback();
+      this.modelCancel()
+      // this.props.modelCancelCallback();
     });
   }
 
@@ -178,9 +187,12 @@ export class GoodsReturn extends Component {
   }
 
 
+  filterAction() {
+    this.setState({ flagFilterGoodsReturn: true, modalVisible: true })
+  }
 
   modelCancel() {
-    this.props.modelCancelCallback();
+    this.setState({ flagFilterGoodsReturn: false, modalVisible: false })
   }
 
 
@@ -191,9 +203,14 @@ export class GoodsReturn extends Component {
       <View>
         <Appbar>
           <Appbar.Content title="Goods Return" />
+          <FilterIcon
+            name="sliders"
+            size={25}
+            onPress={() => this.filterAction()}
+          />
         </Appbar>
         <FlatList
-          data={this.props.goodsReturn}
+          data={this.state.goodsReturn}
           style={{ marginTop: 20 }}
           scrollEnabled={true}
           removeClippedSubviews={false}
@@ -202,7 +219,7 @@ export class GoodsReturn extends Component {
           renderItem={({ item, index }) => (
             <View style={Device.isTablet ? flats.flatlistContainer_tablet : flats.flatlistContainer_mobile} >
               <View style={Device.isTablet ? flats.flatlistSubContainer_tablet : flats.flatlistSubContainer_mobile}>
-                {(item.barcodes.length !== 0 &&
+                {(item && item.barcodes.length !== 0 &&
                   <View style={flats.text}>
                     <Text style={Device.isTablet ? flats.flatlistTextAccent_tablet : flats.flatlistTextAccent_mobile} >S NO: {index + 1} </Text>
                     <Text selectable={true} style={Device.isTablet ? flats.flatlistText_tablet : flats.flatlistText_mobile}>{I18n.t("RTS NUMBER")}: {"\n"}{item.rtNumber}</Text>
@@ -211,7 +228,7 @@ export class GoodsReturn extends Component {
                     </Text>
                   </View>
                 )}
-                {(item.barcodes.length === 0 &&
+                {(item && item.barcodes.length === 0 &&
                   <View style={flats.text}>
                     <Text style={Device.isTablet ? flats.flatlistTextAccent_tablet : flats.flatlistTextAccent_mobile} >S NO: {index + 1} </Text>
                     <Text style={Device.isTablet ? flats.flatlistText_tablet : flats.flatlistText_mobile}>{I18n.t("RTS NUMBER")}: {"\n"}{item.rtNumber}</Text>
@@ -236,9 +253,9 @@ export class GoodsReturn extends Component {
           )}
 
         />
-        {this.props.flagFilterGoodsReturn && (
+        {this.state.flagFilterGoodsReturn && (
           <View>
-            <Modal style={{ margin: 0 }} isVisible={this.props.modalVisible}>
+            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
               <View style={styles.filterMainContainer} >
                 <View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
@@ -470,8 +487,8 @@ const styles = StyleSheet.create({
     // marginRight: -40,
     // paddingLeft: Device.isTablet ? 0 : 20,
     backgroundColor: '#ffffff',
-    marginTop: Device.isTablet ? deviceheight - 600 : deviceheight - 500,
-    height: Device.isTablet ? 600 : 500,
+    marginTop: Device.isTablet ? deviceheight - RW(600) : deviceheight - RW(500),
+    height: Device.isTablet ? RH(650) : RH(550),
   },
 
   // Styles For Mobile

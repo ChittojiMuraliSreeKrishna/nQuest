@@ -36,9 +36,9 @@ class TextilePayment extends Component {
             loyaltyPoints: "",
             value: "",
             giftvoucher: "",
-            totalAmount: "",
-            totalDiscount: "",
-            recievedAmount: "",
+            totalAmount: 0,
+            totalDiscount: 0,
+            recievedAmount: 0,
             verifiedCash: "",
             ccCardCash: 0,
             domainId: 0,
@@ -55,9 +55,9 @@ class TextilePayment extends Component {
             customerEmail: '',
             flagCustomerOpen: false,
             flagredeem: false,
-            redeemedPints: "0",
+            redeemedPints: 0,
             enterredeempoint: '',
-            promoDiscount: "0",
+            promoDiscount: 0,
             grossAmount: 0,
             totalPromoDisc: 0,
             CGST: 0,
@@ -65,7 +65,7 @@ class TextilePayment extends Component {
             taxAmount: 0,
             approvedBy: '',
             reasonDiscount: '',
-            userId: "",
+            userId: null,
             dsNumberList: [],
             returnAmount: 0,
             retailBarCodeList: [],
@@ -85,15 +85,17 @@ class TextilePayment extends Component {
             paymentType: [],
             rtNumber: '',
             rtAmount: 0,
-            netCardPayment: 0
+            netCardPayment: 0,
+            createdBy: null
         };
     }
 
     async componentDidMount() {
         var domainStringId = "";
         var storeStringId = "";
+        const userId = await AsyncStorage.getItem("userId");
         const clientId = await AsyncStorage.getItem("custom:clientId1");
-        this.setState({ clientId: clientId })
+        this.setState({ createdBy: userId, clientId: clientId })
         AsyncStorage.getItem("domainDataId").then((value) => {
             domainStringId = value;
             this.setState({ domainId: parseInt(domainStringId) });
@@ -395,7 +397,7 @@ class TextilePayment extends Component {
             "dlSlip": this.state.dsNumberList,
             "lineItemsReVo": null,
             "mobileNumber": this.state.customerPhoneNumber,
-            "createdBy": this.state.clientId,
+            "createdBy": this.state.createdBy,
             "recievedAmount": this.state.cashAmount,
             "returnAmount": this.state.returnCash,
             "paymentAmountType": this.state.paymentType,
@@ -788,13 +790,13 @@ class TextilePayment extends Component {
             // })
         }
         // else if (global.domainName === "Textile") {
-        if (this.state.isCard === true) {
-            const obj = {
-                "paymentType": "Card",
-                "paymentAmount": this.state.ccCardCash
-            }
-            this.state.paymentType.push(obj);
-        }
+        // if (this.state.isCard === true) {
+        //     const obj = {
+        //         "paymentType": "Card",
+        //         "paymentAmount": grandNetAmount
+        //     }
+        //     this.state.paymentType.push(obj);
+        // }
         else if (this.state.isCash === true) {
             const obj = {
                 "paymentType": "Cash",
@@ -821,7 +823,7 @@ class TextilePayment extends Component {
             "domainId": 1,
             "storeId": this.state.storeId,
             "grossAmount": this.state.grossAmount,
-            "createdBy": this.state.clientId,
+            "createdBy": parseInt(this.state.createdBy),
             "totalPromoDisc": this.state.totalPromoDisc,
             "taxAmount": this.state.taxAmount,
             "totalManualDisc": parseInt(this.state.manualDisc),
@@ -842,6 +844,7 @@ class TextilePayment extends Component {
             "paymentAmountType": this.state.paymentType,
             "returnSlipNumber": this.state.rtNumber
         }
+
         console.log(" payment cash method data", obj);
         axios.post(NewSaleService.createOrder(), obj).then((res) => {
             console.log("Invoice data", JSON.stringify(res.data));
@@ -1186,7 +1189,7 @@ class TextilePayment extends Component {
                                         <TouchableOpacity style={{
                                             marginLeft: 0, marginTop: 0,
                                         }} onPress={() => this.cardAction()}>
-                                            <Image source={this.state.isCard ? require('../assets/images/cardselect.png') : require('../assets/images/cashunselect.png')} style={{
+                                            <Image source={this.state.isCard ? require('../assets/images/cardselect.png') : require('../assets/images/cardunselect.png')} style={{
                                                 marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
                                             }} />
                                         </TouchableOpacity>
@@ -1398,7 +1401,7 @@ class TextilePayment extends Component {
                             </View>
                         )}
 
-                        {this.state.redeemedPints !== "0" && (
+                        {this.state.redeemedPints !== 0 && (
                             <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
                                 <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10 }}> REDEEMED POINTS   {this.state.redeemedPints} </Text>
                                 <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10, marginBottom: 10 }}> REMAINING POINTS  {(parseInt(this.state.loyaltyPoints - this.state.redeemedPints)).toString()} </Text>

@@ -17,8 +17,8 @@ import CustomerService from '../services/CustomerService';
 import { color } from '../Styles/colorStyles';
 import { inputField } from '../Styles/FormFields';
 import ScanIcon from 'react-native-vector-icons/MaterialCommunityIcons'
-import { RH, RW } from '../../Responsive';
-import { flatListMainContainer, flatlistSubContainer, flatListTextStyle, textContainer, textStyleMedium, textStyleMediumColor } from '../Styles/Styles';
+import { RF, RH, RW } from '../../Responsive';
+import { flatListMainContainer, flatlistSubContainer, flatListTextStyle, listEmptyMessage, textContainer, textStyleMedium, textStyleMediumColor } from '../Styles/Styles';
 import { TextInput } from 'react-native-paper'
 var deviceWidth = Dimensions.get('window').width;
 var deviceHeight = Dimensions.get('window').height;
@@ -106,7 +106,7 @@ class GenerateInvoiceSlip extends Component {
       rBarCodeList: [],
       discReasons: [],
       selectedDisc: {},
-      userId: "",
+      userId: null,
       deliverySlipData: {
         barcode: [],
         mrp: "",
@@ -167,7 +167,7 @@ class GenerateInvoiceSlip extends Component {
         },
       ],
       customerFullName: "-",
-      customerMobilenumber: "-",
+      customerMobilenumber: "",
       isTextile: false,
       lineItemsList: [],
       paymentOrderId: "",
@@ -205,7 +205,9 @@ class GenerateInvoiceSlip extends Component {
   }
 
   modelCancel() {
-    this.setState({ modalVisible: false });
+    this.setState({
+      modalVisible: false, mobileNumber: ""
+    });
   }
 
   handlenewsaledeleteaction() {
@@ -379,8 +381,8 @@ class GenerateInvoiceSlip extends Component {
         alert(res.data.body);
       }
     }).catch(() => {
-      this.setState({ loading: false });
-      // alert('Getting issue with the estimation slip lineitems');
+      this.setState({ loading: false, dsNumber: "" });
+      alert('Invalid estimation slip number');
     });
 
 
@@ -588,11 +590,12 @@ class GenerateInvoiceSlip extends Component {
           this.setState({
             isBillingDetails: true,
             customerMobilenumber: mobileData.phoneNumber,
+            mobileNumber: ""
           });
 
         }
       }).catch(() => {
-        this.setState({ loading: false });
+        this.setState({ loading: false, mobileNumber: "" });
         alert('Unable to get customer details');
       });
     }
@@ -755,7 +758,7 @@ class GenerateInvoiceSlip extends Component {
               }}>
               <View>
                 <View style={{ flexDirection: 'row', width: Device.isTablet ? deviceWidth - 20 : deviceWidth - 10 }}>
-                  <TextInput style={[inputField, { width: Device.isTablet ? deviceWidth / 1.45 : deviceWidth / 1.4, borderColor: '#8F9EB717', marginLeft: RW(10) ,marginRight:RW(0)}]}
+                  <TextInput style={[inputField, { width: Device.isTablet ? deviceWidth / 1.45 : deviceWidth / 1.4, borderColor: '#8F9EB717', marginLeft: RW(10), marginRight: RW(0) }]}
                     mode="flat"
                     activeUnderlineColor='#000'
                     underlineColor={'#6f6f6f'}
@@ -780,6 +783,7 @@ class GenerateInvoiceSlip extends Component {
                   <Message imp={true} message={this.state.errors["dsNumber"]} />
                 )}
               </View>
+
               {this.state.barCodeList.length !== 0 && (
                 <FlatList
                   style={styles.flatList}
@@ -876,6 +880,7 @@ class GenerateInvoiceSlip extends Component {
                 </View>
               )}
 
+
               {(this.state.barCodeList.length !== 0 &&
                 <FlatList style={{ marginTop: 20, marginBottom: 20 }}
                   //  ListHeaderComponent={this.renderHeader}
@@ -885,6 +890,9 @@ class GenerateInvoiceSlip extends Component {
                   onEndReached={this.onEndReached.bind(this)}
                   scrollEnabled={
                     false
+                  }
+                  ListEmptyComponent={
+                    <Text style={listEmptyMessage}>&#9888; Records Not Found</Text>
                   }
                   ref={(ref) => { this.listRef = ref; }}
                   renderItem={({ item, index }) => (
@@ -1067,6 +1075,7 @@ class GenerateInvoiceSlip extends Component {
                   </View>
                 </View>
               )}
+
             </View>
           </ScrollView>
         )}

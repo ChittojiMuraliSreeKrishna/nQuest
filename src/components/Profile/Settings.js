@@ -38,16 +38,17 @@ export default class Settings extends Component {
   }
 
   // Logout
-  logOut = async () => {
-    try {
-      await AsyncStorage.clear()
-      await this.props.navigation.navigate("Login")
-      return true
-    } catch (error) {
-      console.log({ error })
-      return true
-    }
-  }
+  // logOut = async () => {
+  //   try {
+  //     await AsyncStorage.clear()
+  //     await this.clearAllData()
+  //     await this.props.navigation.navigate("Login")
+  //     return true
+  //   } catch (error) {
+  //     console.log({ error })
+  //     return true
+  //   }
+  // }
 
   // Input Actions
   handleGender = (value) => {
@@ -116,6 +117,7 @@ export default class Settings extends Component {
       if (res?.data) {
         let details = res.data.result
         this.setState({ loading: false, userId: details.userId, userName: details.userName, roleName: details.roleName, emailId: details.email, selectedGender: details.gender, address: details.address, mobileNumber: phonenumber })
+        console.log("nameee", details)
         if (details.dob === null) {
           this.setState({ dateOfBirth: "Date of Birth" })
         } else {
@@ -159,12 +161,15 @@ export default class Settings extends Component {
     });
   }
 
-  //   async logOut() {
-  //     AsyncStorage.removeItem("phone_number");
-  //     AsyncStorage.clear().then(() => console.log('Cleared'))
-  //     this.props.navigation.navigate("Login")
-  //     return true;
-  //   }
+  async logOut() {
+    AsyncStorage.removeItem("phone_number");
+    AsyncStorage.multiRemove([])
+    this.clearAllData()
+    global.username = ''
+    // AsyncStorage.clear().then(() => console.log('Cleared'))
+    this.props.navigation.navigate("Login")
+    return true;
+  }
 
   render() {
     const { mobileNumberValid, emailValid, errors } = this.state

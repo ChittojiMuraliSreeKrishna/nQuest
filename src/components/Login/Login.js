@@ -101,6 +101,7 @@ export default class Login extends Component {
     return isFormValid;
   }
   clearAllData() {
+    AsyncStorage.clear()
     AsyncStorage.getAllKeys()
       .then(keys => AsyncStorage.multiRemove(keys))
 
@@ -235,7 +236,7 @@ export default class Login extends Component {
             }
             this.setState({ userName: "", password: "" })
           } else {
-            alert(res.data.message);
+            alert(res && res.data && res.data.message ? res.data.message : "Please Enter UserName and Password");
             this.setState({ loading: false, userName: "", password: "" });
           }
         })
@@ -304,7 +305,7 @@ export default class Login extends Component {
   }
 
   componentDidMount() {
-    this.refresh()
+    // this.refresh()
     this.clearAllData()
   }
 
@@ -345,6 +346,7 @@ export default class Login extends Component {
               </View>
 
               <View style={{ flex: 5 }}>
+              <Text style={styles.headings}>{I18n.t("Username")}</Text>
                 <TextInput
                   activeUnderlineColor="#000"
                   mode="flat"
@@ -366,7 +368,7 @@ export default class Login extends Component {
                 {!userValid && (
                   <Message imp={true} message={this.state.errors["userName"]} />
                 )}
-
+                <Text style={styles.headings}>{I18n.t("Password")}</Text>
                 <TextInput
                   activeUnderlineColor="#000"
                   mode="flat"
@@ -632,4 +634,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: Device.isTablet ? 25 : 15,
     borderBottomColor: "red",
   },
+  headings: {
+    fontSize: Device.isTablet ? 20 : 15,
+    marginLeft: 20,
+    color: '#B4B7B8',
+    marginTop: Device.isTablet ? 10 : 5,
+    marginBottom: Device.isTablet ? 10 : 5,
+  }
 });
