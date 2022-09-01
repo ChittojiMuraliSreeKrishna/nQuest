@@ -692,7 +692,7 @@ class GenerateEstimationSlip extends Component {
                           <View style={textContainer}>
                             <Text style={textStyleMediumColor}>{I18n.t("SM Number")}</Text>
                             <Text style={textStyleMediumColor}>{I18n.t("Discount Type")} </Text>
-                            <Text style={textStyleMediumColor}>{I18n.t("Discont")} </Text>
+                            <Text style={textStyleMediumColor}>{I18n.t("Discount")} </Text>
                           </View>
 
                           <View style={textContainer}>

@@ -13,6 +13,7 @@ import { Chevron } from 'react-native-shapes';
 import { RF, RH, RW } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
 import FilterIcon from 'react-native-vector-icons/FontAwesome'
+import { flatListMainContainer, flatlistSubContainer, highText, textContainer, textStyleLight, textStyleMedium } from '../Styles/Styles';
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -22,148 +23,48 @@ export class ListOfPromotions extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      date: new Date(),
-      enddate: new Date(),
-      startDate: "",
-      endDate: "",
-      fromDate: "",
-      toDate: "",
-
       promoId: "",
-      stores: [],
-      selectedStore: "",
-      storeId: 0,
-      storeName: "",
       flagFilterListPromotions: false,
       modalVisible: true,
-      listPromotions: []
+      listPromotions: [],
+      promoType: '',
+      promoStatus: '',
+      clientId: null
     };
   }
 
-  componentDidMount() {
-    AsyncStorage.getItem("storeId").then((value) => {
-      storeStringId = value;
-      this.setState({ storeId: parseInt(storeStringId) });
-      console.log(this.state.storeId);
-
-
-    }).catch(() => {
-      this.setState({ loading: false });
-      console.log('There is error getting storeId');
-      // alert('There is error getting storeId');
-    });
-
-    AsyncStorage.getItem("storeName").then((value) => {
-      this.setState({ storeName: value });
-      console.log(this.state.storeName);
-    }).catch(() => {
-      this.setState({ loading: false });
-      console.log('There is error getting storeId');
-      // alert('There is error getting storeId');
-    });
+  async componentDidMount() {
+    const clientId = await AsyncStorage.getItem("custom:clientId1");
+    this.setState({ clientId: clientId })
   }
-
-
-
-  datepickerClicked() {
-    this.setState({ datepickerOpen: true });
-  }
-
-  enddatepickerClicked() {
-    this.setState({ datepickerendOpen: true });
-  }
-
-  datepickerDoneClicked() {
-    if (parseInt(this.state.date.getDate()) < 10 && (parseInt(this.state.date.getMonth()) < 10)) {
-      this.setState({ startDate: this.state.date.getFullYear() + "-0" + (this.state.date.getMonth() + 1) + "-" + "0" + this.state.date.getDate() });
-    }
-    else if (parseInt(this.state.date.getDate()) < 10) {
-      this.setState({ startDate: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-" + "0" + this.state.date.getDate() });
-    }
-    else if (parseInt(this.state.date.getMonth()) < 10) {
-      this.setState({ startDate: this.state.date.getFullYear() + "-0" + (this.state.date.getMonth() + 1) + "-" + this.state.date.getDate() });
-    }
-    else {
-      this.setState({ startDate: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-" + this.state.date.getDate() });
-    }
-
-
-    this.setState({ doneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
-  }
-
-  datepickerendDoneClicked() {
-    if (parseInt(this.state.enddate.getDate()) < 10 && (parseInt(this.state.enddate.getMonth()) < 10)) {
-      this.setState({ endDate: this.state.enddate.getFullYear() + "-0" + (this.state.enddate.getMonth() + 1) + "-" + "0" + this.state.enddate.getDate() });
-    }
-    else if (parseInt(this.state.enddate.getDate()) < 10) {
-      this.setState({ endDate: this.state.enddate.getFullYear() + "-" + (this.state.enddate.getMonth() + 1) + "-" + "0" + this.state.enddate.getDate() });
-    }
-    else if (parseInt(this.state.enddate.getMonth()) < 10) {
-      this.setState({ endDate: this.state.enddate.getFullYear() + "-0" + (this.state.enddate.getMonth() + 1) + "-" + this.state.enddate.getDate() });
-    }
-    else {
-      this.setState({ endDate: this.state.enddate.getFullYear() + "-" + (this.state.enddate.getMonth() + 1) + "-" + this.state.enddate.getDate() });
-    }
-    this.setState({ enddoneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
-  }
-
-  datepickerCancelClicked() {
-    this.setState({ date: new Date(), enddate: new Date(), datepickerOpen: false, datepickerendOpen: false });
-  }
-
-  handleSelectStores = (value) => {
-    this.setState({ selectedStore: value });
-  };
 
   handlePromoId = (value) => {
     this.setState({ promoId: value });
   };
 
   applyListPromotions() {
-    if (this.state.startDate === "") {
-      this.state.startDate = null;
-    }
-    if (this.state.endDate === "") {
-      this.state.endDate = null;
-    }
-    if (this.state.promoId === "") {
-      this.state.promoId = null;
-    }
-
-
     const obj = {
-      // "startDate":this.state.startDate,
-      // "endDate":this.state.endDate,
-      // storeName: this.state.storeName,
-      // "promoId":this.state.promoId,
-      "startDate": "2021-11-01",
-      "endDate": "2021-10-10",
-      "storeName": "Km-Patny",
-      "promoId": 1
+      isActive: this.state.promoStatus,
+      applicability: this.state.promoType,
+      clientId: this.state.clientId
     };
-    console.log('params are' + JSON.stringify(obj));
-    axios.post(ReportsService.promotionsList(), obj).then((res) => {
-      console.log(res.data);
-      if (res.data && res.data["isSuccess"] === "true") {
-        // this.props.childParamlistofPromotions(res.data.result);
-        // this.props.filterActiveCallback();
-        // this.props.modelCancelCallback();
-        this.modelCancel()
-        this.setState({ listPromotions: res.data.result, filterActive: true, modalVisible: false })
+    var pageNumber = 0
+    ReportsService.promotionsList(obj, pageNumber).then((res,err) => {
+      console.log(res.data,err);
+      if (res.data) {
+        this.setState({ listPromotions: res.data.result.content, filterActive: true, modalVisible: false, promoType: '', promoStatus: '' })
       }
       else {
         alert(res.data.message);
-        this.setState({ startDate: "", endDate: "", promoId: "" })
+        this.setState({ promoType: '', promoStatus: '' })
       }
-    }
-    ).catch(() => {
-      this.setState({ loading: false });
-      alert('No Results Found');
+    }).catch(() => {
+      alert('No Records Found');
       this.modelCancel()
-      // this.props.modelCancelCallback();
-      this.setState({ startDate: "", endDate: "", promoId: "" })
+      this.setState({ promoType: '', promoStatus: '' })
     });
   }
+
   filterAction() {
     this.setState({ flagFilterListPromotions: true, modalVisible: true })
   }
@@ -172,9 +73,17 @@ export class ListOfPromotions extends Component {
     this.setState({ flagFilterListPromotions: false, modalVisible: false })
   }
 
+  handlePromoType = (value) => {
+    this.setState({ promoType: value });
+  }
+
+  handlePromoStatus = (value) => {
+    this.setState({ promoStatus: value });
+  }
+
   render() {
     return (
-      <View>
+      <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
         <Appbar>
           <Appbar.Content title="List Of Promotions" />
           <FilterIcon
@@ -185,22 +94,22 @@ export class ListOfPromotions extends Component {
         </Appbar>
         <FlatList
           data={this.state.listPromotions}
-          style={{ marginTop: 20 }}
           scrollEnabled={true}
           keyExtractor={(item, i) => i.toString()}
           ListEmptyComponent={<Text style={{ fontSize: Device.isTablet ? RF(21) : RF(17), fontFamily: 'bold', color: '#000000', textAlign: 'center', marginTop: deviceheight / 3 }}>&#9888; {I18n.t("Results not loaded")}</Text>}
           renderItem={({ item, index }) => (
-            <View style={Device.isTablet ? flats.flatlistContainer_tablet : flats.flatlistContainer_mobile} >
-              <View style={Device.isTablet ? flats.flatlistSubContainer_tablet : flats.flatlistSubContainer_mobile}>
-                <View style={flats.text}>
-                  <Text style={Device.isTablet ? flats.flatlistTextAccent_tablet : flats.flatlistTextAccent_mobile} >PROMO ID: {index + 1} </Text>
-                  <Text style={Device.isTablet ? flats.flatlistText_tablet : flats.flatlistText_mobile}>PROMO NAME: {"\n"} { }</Text>
-                  <Text style={Device.isTablet ? flats.flatlistTextCommon_tablet : flats.flatlistTextCommon_mobile}>BARCODE STORE: {"\n"} { } </Text>
+            <View style={[flatListMainContainer, , { backgroundColor: "#FFF" }]} >
+              <View style={flatlistSubContainer}>
+                <View style={textContainer}>
+                  <Text style={highText} >PROMO ID: {item.promoId}</Text>
                 </View>
-                <View style={flats.text}>
-                  <Text style={Device.isTablet ? flats.flatlistTextCommon_tablet : flats.flatlistTextCommon_mobile} >DESCRIPTION: { } </Text>
-                  <Text style={Device.isTablet ? flats.flatlistTextCommon_tablet : flats.flatlistTextCommon_mobile}>START DATE: {"\n"} { }</Text>
-                  <Text style={Device.isTablet ? flats.flatlistTextCommon_tablet : flats.flatlistTextCommon_mobile}>END DATE: {"\n"} { }</Text>
+                <View style={textContainer}>
+                  <Text style={textStyleMedium}>PROMO NAME: {"\n"} {item.promotionName}</Text>
+                  <Text style={textStyleMedium} >DESCRIPTION: {"\n"}{item.description} </Text>
+                </View>
+                <View style={textContainer}>
+                  <Text style={textStyleMedium}>PROMO APPLY TYPE: {"\n"} {item.promoApplyType}</Text>
+                  <Text style={textStyleMedium}>APPLICABILITY: {"\n"} {item.applicability}</Text>
                 </View>
               </View>
             </View>
@@ -228,92 +137,54 @@ export class ListOfPromotions extends Component {
                   }}></Text>
                 </View>
                 <KeyboardAwareScrollView enableOnAndroid={true} >
-                  <TouchableOpacity
-                    style={Device.isTablet ? styles.filterDateButton_tablet : styles.filterDateButton_mobile}
-                    testID="openModal"
-                    onPress={() => this.datepickerClicked()}
-                  >
-                    <Text
-                      style={Device.isTablet ? styles.filterDateButtonText_tablet : styles.filterDateButtonText_mobile}
-                    >{this.state.startDate == "" ? 'START DATE' : this.state.startDate}</Text>
-                    <Image style={{ position: 'absolute', top: 10, right: 0, }} source={require('../assets/images/calender.png')} />
-                  </TouchableOpacity>
-                  {this.state.datepickerOpen && (
-                    <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
-                      <TouchableOpacity
-                        style={Device.isTablet ? styles.datePickerButton_tablet : styles.datePickerButton_mobile} onPress={() => this.datepickerCancelClicked()}
-                      >
-                        <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Cancel </Text>
-
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={Device.isTablet ? styles.datePickerEndButton_tablet : styles.datePickerEndButton_mobile} onPress={() => this.datepickerDoneClicked()}
-                      >
-                        <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Done </Text>
-
-                      </TouchableOpacity>
-                      <DatePicker style={{ width: deviceWidth, height: RH(200), marginTop: RH(50), }}
-                        date={this.state.date}
-                        mode={'date'}
-                        onDateChange={(date) => this.setState({ date })}
-                      />
-                    </View>
-                  )}
-                  <TouchableOpacity
-                    style={Device.isTablet ? styles.filterDateButton_tablet : styles.filterDateButton_mobile}
-                    testID="openModal"
-                    onPress={() => this.enddatepickerClicked()}
-                  >
-                    <Text
-                      style={Device.isTablet ? styles.filterDateButtonText_tablet : styles.filterDateButtonText_mobile}
-                    >{this.state.endDate == "" ? 'END DATE' : this.state.endDate}</Text>
-                    <Image style={{ position: 'absolute', top: RH(10), right: 0, }} source={require('../assets/images/calender.png')} />
-                  </TouchableOpacity>
-                  {this.state.datepickerendOpen && (
-                    <View style={{ height: RH(280), width: deviceWidth, backgroundColor: '#ffffff' }}>
-                      <TouchableOpacity
-                        style={Device.isTablet ? styles.datePickerButton_tablet : styles.datePickerButton_mobile} onPress={() => this.datepickerCancelClicked()}
-                      >
-                        <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Cancel </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={Device.isTablet ? styles.datePickerEndButton_tablet : styles.datePickerEndButton_mobile} onPress={() => this.datepickerendDoneClicked()}
-                      >
-                        <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Done </Text>
-
-                      </TouchableOpacity>
-                      <DatePicker style={{ width: deviceWidth, height: RH(200), marginTop: RH(50), }}
-                        date={this.state.enddate}
-                        mode={'date'}
-                        onDateChange={(enddate) => this.setState({ enddate })}
-                      />
-                    </View>
-                  )}
-                  <TextInput
-                    style={[Device.isTablet ? styles.input_tablet : styles.input_mobile, { width: deviceWidth - RW(40) }]}
-                    underlineColorAndroid="transparent"
-                    placeholder="PROMO ID"
-                    placeholderTextColor="#6F6F6F"
-                    textAlignVertical="center"
-                    autoCapitalize="none"
-                    value={this.state.promoId}
-                    onChangeText={this.handlePromoId}
-                  />
+                  <Text style={styles.headings}>{I18n.t("Promo Type")}</Text>
                   <View style={[Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile, { width: deviceWidth - RW(40) }]}>
                     <RNPickerSelect
                       placeholder={{
-                        label: 'SELECT STORE'
+                        label: 'Promo Type', value: ''
                       }}
                       Icon={() => {
                         return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
                       }}
-                      items={this.state.stores}
-                      onValueChange={this.handleSelectStores}
+                      items={[{
+                        label: "On Barcode",
+                        value: "promotionForEachBarcode",
+                      },
+                      {
+                        label: "On WholeBill",
+                        value: "promotionForWholeBill",
+                      }]}
+                      onValueChange={this.handlePromoType}
                       style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
-                      value={this.state.selectedStore}
+                      value={this.state.promoType}
                       useNativeAndroidPickerStyle={false}
                     />
                   </View>
+
+                  <Text style={styles.headings}>{I18n.t("Promo Status")}</Text>
+                  <View style={[Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile, { width: deviceWidth - RW(40) }]}>
+                    <RNPickerSelect
+                      placeholder={{
+                        label: 'Promo Status ', value: ''
+                      }}
+                      Icon={() => {
+                        return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
+                      }}
+                      items={[{
+                        label: "Active",
+                        value: "true",
+                      },
+                      {
+                        label: "In Active",
+                        value: "false",
+                      }]}
+                      onValueChange={this.handlePromoStatus}
+                      style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
+                      value={this.state.promoStatus}
+                      useNativeAndroidPickerStyle={false}
+                    />
+                  </View>
+
                   <TouchableOpacity style={Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile}
                     onPress={() => this.applyListPromotions()}>
                     <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile} >APPLY</Text>
@@ -420,7 +291,13 @@ const pickerSelectStyles_tablet = StyleSheet.create({
 
 
 const styles = StyleSheet.create({
-
+  headings: {
+    fontSize: Device.isTablet ? 20 : 15,
+    marginLeft: 20,
+    color: '#B4B7B8',
+    marginTop: Device.isTablet ? 10 : 5,
+    marginBottom: Device.isTablet ? 10 : 5,
+  },
   imagealign: {
     marginTop: Device.isTablet ? RH(25) : RH(20),
     marginRight: Device.isTablet ? RW(30) : RW(20),
@@ -437,8 +314,8 @@ const styles = StyleSheet.create({
     // marginRight: -40,
     // paddingLeft: Device.isTablet ? 0 : 20,
     backgroundColor: '#ffffff',
-    marginTop: Device.isTablet ? deviceheight - RH(650) : deviceheight - RH(450),
-    height: Device.isTablet ? RH(600) : RH(500),
+    marginTop: Device.isTablet ? deviceheight - RH(500) : deviceheight - RH(400),
+    height: Device.isTablet ? RH(500) : RH(400),
   },
   // Styles For Mobile
 

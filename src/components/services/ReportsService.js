@@ -26,7 +26,7 @@ class ReportsService {
 
   promotionsList(data, pageNumber = 0) {
     const param = '?page=' + pageNumber
-    return axios.post(BASE_URL + REPORTS_URL.promotionsList + param, data)
+    return axios.post(BASE_URL + '/connection-pool/promo/promotionsSearching' + param + '&size=10', data)
   }
 
 }

@@ -10,6 +10,9 @@ import { Appbar } from 'react-native-paper';
 import ReportsService from '../services/ReportsService';
 import FilterIcon from 'react-native-vector-icons/FontAwesome'
 import { RH, RW } from '../../Responsive';
+import RNPickerSelect from 'react-native-picker-select';
+import { Chevron } from 'react-native-shapes';
+
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -27,13 +30,15 @@ export class GoodsReturn extends Component {
       endDate: "",
       fromDate: "",
       toDate: "",
-      returnSlip: "",
-      barCode: "",
+      returnSlip: null,
+      barCode: null,
       empId: "",
       storeId: 0,
       domainId: 0,
       goodsReturn: [],
-      flagFilterGoodsReturn: false
+      flagFilterGoodsReturn: false,
+      rtStatus: null,
+      createdBy:null
     };
   }
 
@@ -134,7 +139,7 @@ export class GoodsReturn extends Component {
     console.log('params are' + JSON.stringify(obj));
     let pageNumber = 0
     ReportsService.returnSlips(obj, pageNumber).then((res) => {
-      console.log("returnSlips response",res.data);
+      console.log("returnSlips response", res.data);
       console.log(res.data.result.length);
       if (res.data && res.data["isSuccess"] === "true") {
         if (res.data.result.length !== 0) {
@@ -195,6 +200,9 @@ export class GoodsReturn extends Component {
     this.setState({ flagFilterGoodsReturn: false, modalVisible: false })
   }
 
+  handleRTStatus = (value) => {
+    this.setState({ rtStatus: value })
+  }
 
 
 
@@ -275,6 +283,7 @@ export class GoodsReturn extends Component {
                   }}></Text>
                 </View>
                 <KeyboardAwareScrollView enableOnAndroid={true} >
+                  <Text style={styles.headings}>{I18n.t("From Date")}</Text>
                   <TouchableOpacity
                     style={Device.isTablet ? styles.filterDateButton_tablet : styles.filterDateButton_mobile}
                     testID="openModal"
@@ -282,7 +291,7 @@ export class GoodsReturn extends Component {
                   >
                     <Text
                       style={Device.isTablet ? styles.filterDateButtonText_tablet : styles.filterDateButtonText_mobile}
-                    >{this.state.startDate == "" ? 'START DATE' : this.state.startDate}</Text>
+                    >{this.state.startDate == "" ? 'From Date' : this.state.startDate}</Text>
                     <Image style={{ position: 'absolute', top: 10, right: 0, }} source={require('../assets/images/calender.png')} />
                   </TouchableOpacity>
                   {this.state.datepickerOpen && (
@@ -306,6 +315,7 @@ export class GoodsReturn extends Component {
                       />
                     </View>
                   )}
+                  <Text style={styles.headings}>{I18n.t("To Date")}</Text>
                   <TouchableOpacity
                     style={Device.isTablet ? styles.filterDateButton_tablet : styles.filterDateButton_mobile}
                     testID="openModal"
@@ -313,7 +323,7 @@ export class GoodsReturn extends Component {
                   >
                     <Text
                       style={Device.isTablet ? styles.filterDateButtonText_tablet : styles.filterDateButtonText_mobile}
-                    >{this.state.endDate == "" ? 'END DATE' : this.state.endDate}</Text>
+                    >{this.state.endDate == "" ? 'To Date' : this.state.endDate}</Text>
                     <Image style={{ position: 'absolute', top: 10, right: 0, }} source={require('../assets/images/calender.png')} />
                   </TouchableOpacity>
                   {this.state.datepickerendOpen && (
@@ -336,35 +346,45 @@ export class GoodsReturn extends Component {
                       />
                     </View>
                   )}
+                  <Text style={styles.headings}>{I18n.t("RT Status")}</Text>
+                  <View style={Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile}>
+                    <RNPickerSelect
+                      // style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
+                      placeholder={{ label: 'RT Status', value: '' }}
+                      Icon={() => {
+                        return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
+                      }}
+                      items={[
+                        { label: 'PENDING', value: 'Pending', },
+                        { label: 'COMPLETED', value: 'Completed', },
+                      ]}
+                      onValueChange={this.handleRTStatus}
+                      style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
+                      value={this.state.rtStatus}
+                      useNativeAndroidPickerStyle={false}
+                    />
+                  </View>
+                  <Text style={styles.headings}>{I18n.t("RT Number")}</Text>
                   <TextInput
                     style={[Device.isTablet ? styles.input_tablet : styles.input_mobile, { width: deviceWidth - 40 }]}
                     underlineColorAndroid="transparent"
-                    placeholder={I18n.t("RETURN SLIP")}
+                    placeholder={I18n.t("RT Number")}
                     placeholderTextColor="#6F6F6F"
                     textAlignVertical="center"
                     autoCapitalize="none"
                     value={this.state.returnSlip}
                     onChangeText={this.handleReturnSlip}
                   />
+                  <Text style={styles.headings}>{I18n.t("Barcode")}</Text>
                   <TextInput
                     style={[Device.isTablet ? styles.input_tablet : styles.input_mobile, { width: deviceWidth - 40 }]}
                     underlineColorAndroid="transparent"
-                    placeholder={I18n.t("BARCODE")}
+                    placeholder={I18n.t("Barcode")}
                     placeholderTextColor="#6F6F6F"
                     textAlignVertical="center"
                     autoCapitalize="none"
                     value={this.state.barCode}
                     onChangeText={this.handleBarCode}
-                  />
-                  <TextInput
-                    style={[Device.isTablet ? styles.input_tablet : styles.input_mobile, { width: deviceWidth - 40 }]}
-                    underlineColorAndroid="transparent"
-                    placeholder={I18n.t("EMP ID")}
-                    placeholderTextColor="#6F6F6F"
-                    textAlignVertical="center"
-                    autoCapitalize="none"
-                    value={this.state.empId}
-                    onChangeText={this.handleEmpId}
                   />
                   <TouchableOpacity style={Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile}
                     onPress={() => this.applyGoodsReturn()}>
@@ -487,8 +507,8 @@ const styles = StyleSheet.create({
     // marginRight: -40,
     // paddingLeft: Device.isTablet ? 0 : 20,
     backgroundColor: '#ffffff',
-    marginTop: Device.isTablet ? deviceheight - RW(600) : deviceheight - RW(500),
-    height: Device.isTablet ? RH(650) : RH(550),
+    marginTop: Device.isTablet ? deviceheight - RW(700) : deviceheight - RW(600),
+    height: Device.isTablet ? RH(850) : RH(750),
   },
 
   // Styles For Mobile
@@ -800,7 +820,13 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     fontSize: 20,
   },
-
+  headings: {
+    fontSize: Device.isTablet ? 20 : 15,
+    marginLeft: 20,
+    color: '#B4B7B8',
+    marginTop: Device.isTablet ? 10 : 5,
+    marginBottom: Device.isTablet ? 10 : 5,
+  }
 
 });
 
@@ -929,9 +955,5 @@ const flats = StyleSheet.create({
     borderTopRightRadius: 5,
     borderWidth: 1,
     borderColor: "lightgray",
-  },
-
-
-
-
+  }
 });

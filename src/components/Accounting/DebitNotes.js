@@ -199,7 +199,7 @@ export default class DebitNotes extends Component {
 
   render() {
     return (
-      <View>
+      <View style={{backgroundColor:"#FFFFFF"}}>
         {this.state.loading &&
           <Loader
             loading={this.state.loading} />
@@ -235,10 +235,10 @@ export default class DebitNotes extends Component {
                 </View>
                 <View style={textContainer}>
                   <Text style={textStyleMedium}>STORE: {item.storeId}</Text>
-                  <Text style={textStyleLight}>PAID AMMOUNT: {item.amount}</Text>
+                  {/* <Text style={textStyleLight}>PAID AMOUNT: {item.amount}</Text> */}
                 </View>
                 <View style={textContainer}>
-                  <Text style={textStyleLight}>BALANCE: {item.balanceAmount}</Text>
+                  <Text style={textStyleLight}>BALANCE: {item.amount}</Text>
                   <Text style={textStyleLight}>APPROVED BY: {"\n"}{item.apporvedBy}</Text>
                 </View>
                 <View style={textContainer}>

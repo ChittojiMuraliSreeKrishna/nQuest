@@ -108,7 +108,7 @@ export default class AddDebitNotes extends Component {
       if (res) {
         if (transanctionMode === 'Card') {
           this.savePayment(res.data.amount, res.data.referenceNumber);
-        } else {
+        } else if(transanctionMode === 'Cash'){
           this.props.route.params.onGoBack()
           this.props.navigation.goBack()
         }
