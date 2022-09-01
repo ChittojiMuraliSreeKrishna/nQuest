@@ -972,7 +972,7 @@ class GenerateInvoiceSlip extends Component {
                           <View style={textContainer}>
                             <Text style={textStyleMediumColor}>{I18n.t("SGST")}</Text>
                             <Text style={textStyleMediumColor}>{I18n.t("CGST")} </Text>
-                            <Text style={textStyleMediumColor}>{I18n.t("Discont")} </Text>
+                            <Text style={textStyleMediumColor}>{I18n.t("Discount")} </Text>
                           </View>
 
                           <View style={textContainer}>

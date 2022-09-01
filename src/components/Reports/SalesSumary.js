@@ -193,7 +193,6 @@ export class SalesSumary extends Component {
 
         <FlatList
           data={this.state.salesSumaryObject}
-          style={{ marginTop: 20 }}
           scrollEnabled={true}
           ListEmptyComponent={<Text style={{ fontSize: Device.isTablet ? 21 : 17, fontFamily: 'bold', color: '#000000', textAlign: 'center', marginTop: deviceheight / 3 }}>&#9888; {I18n.t("Results not loaded")}</Text>}
           renderItem={({ item, index }) => {
@@ -345,16 +344,6 @@ export class SalesSumary extends Component {
                       />
                     </View>
                   )}
-                  <TextInput
-                    style={[Device.isTablet ? styles.input_tablet : styles.input_mobile, { width: deviceWidth - 40 }]}
-                    underlineColorAndroid="transparent"
-                    placeholder={I18n.t("STORE")}
-                    placeholderTextColor="#6F6F6F"
-                    textAlignVertical="center"
-                    autoCapitalize="none"
-                    value={this.state.storeName}
-                    onChangeText={this.handleSelectStores}
-                  />
                   <TouchableOpacity style={Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile}
                     onPress={() => this.applySalesSummary()}>
                     <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile} >{I18n.t("APPLY")}</Text>
