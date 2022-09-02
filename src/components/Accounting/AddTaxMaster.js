@@ -4,11 +4,11 @@ import {
   Image,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View
 } from "react-native";
 import Device from "react-native-device-detection";
+import { TextInput, Appbar } from "react-native-paper";
 import AccountingService from "../services/AccountingService";
 import {
   cancelBtn,
@@ -61,7 +61,7 @@ export default class AddTaxMaster extends Component {
   }
   handleBackButtonClick() {
     this.props.navigation.goBack(null);
-    this.props.navigation.onGoBack(null);
+    this.props.route.params.onGoBack(null);
     return true;
   }
 
@@ -155,22 +155,10 @@ export default class AddTaxMaster extends Component {
                     <Loader
                         loading={this.state.loading} />
                 } */}
-        <View style={headerTitleContainer}>
-          <View style={headerTitleSubContainer}>
-            <TouchableOpacity
-              style={backButton}
-              onPress={() => this.handleBackButtonClick()}
-            >
-              <Image
-                style={backButtonImage}
-                source={require("../assets/images/backButton.png")}
-              />
-            </TouchableOpacity>
-            <Text style={headerTitle}>
-              {isTaxEdit ? "Edit Tax Master" : "Add Tax Master"}
-            </Text>
-          </View>
-        </View>
+        <Appbar mode="center-aligned">
+          <Appbar.BackAction onPress={() => this.handleBackButtonClick()}  />
+          <Appbar.Content title={isTaxEdit ? "Edit Tax Master" : "Add Tax Master"} />
+        </Appbar>
         <TextInput
           style={inputField}
           underlineColorAndroid="transparent"
@@ -235,89 +223,6 @@ export default class AddTaxMaster extends Component {
   }
 }
 
-const pickerSelectStyles_mobile = StyleSheet.create({
-  placeholder: {
-    color: "#6F6F6F",
-    fontFamily: "regular",
-    fontSize: 15,
-  },
-  inputIOS: {
-    justifyContent: "center",
-    height: 42,
-    borderRadius: 3,
-    borderWidth: 1,
-    fontFamily: "regular",
-    //paddingLeft: -20,
-    fontSize: 15,
-    borderColor: "#FBFBFB",
-    backgroundColor: "#FBFBFB",
-  },
-  inputAndroid: {
-    justifyContent: "center",
-    height: 42,
-    borderRadius: 3,
-    borderWidth: 1,
-    fontFamily: "regular",
-    //paddingLeft: -20,
-    fontSize: 15,
-    borderColor: "#FBFBFB",
-    backgroundColor: "#FBFBFB",
-    color: "#001B4A",
-
-    // marginLeft: 20,
-    // marginRight: 20,
-    // marginTop: 10,
-    // height: 40,
-    // backgroundColor: '#ffffff',
-    // borderBottomColor: '#456CAF55',
-    // color: '#001B4A',
-    // fontFamily: "bold",
-    // fontSize: 16,
-    // borderRadius: 3,
-  },
-});
-
-const pickerSelectStyles_tablet = StyleSheet.create({
-  placeholder: {
-    color: "#6F6F6F",
-    fontFamily: "regular",
-    fontSize: 20,
-  },
-  inputIOS: {
-    justifyContent: "center",
-    height: 52,
-    borderRadius: 3,
-    borderWidth: 1,
-    fontFamily: "regular",
-    //paddingLeft: -20,
-    fontSize: 20,
-    borderColor: "#FBFBFB",
-    backgroundColor: "#FBFBFB",
-  },
-  inputAndroid: {
-    justifyContent: "center",
-    height: 52,
-    borderRadius: 3,
-    borderWidth: 1,
-    fontFamily: "regular",
-    //paddingLeft: -20,
-    fontSize: 20,
-    borderColor: "#FBFBFB",
-    backgroundColor: "#FBFBFB",
-    color: "#001B4A",
-
-    // marginLeft: 20,
-    // marginRight: 20,
-    // marginTop: 10,
-    // height: 40,
-    // backgroundColor: '#ffffff',
-    // borderBottomColor: '#456CAF55',
-    // color: '#001B4A',
-    // fontFamily: "bold",
-    // fontSize: 16,
-    // borderRadius: 3,
-  },
-});
 
 const styles = StyleSheet.create({
   mainContainer: {

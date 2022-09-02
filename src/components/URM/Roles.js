@@ -6,10 +6,11 @@ import {
 	Image,
 	ScrollView,
 	Text,
-	TextInput,
+	
 	TouchableOpacity,
 	View,
 } from "react-native";
+import { TextInput } from "react-native-paper";
 import DatePicker from "react-native-date-picker";
 import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
@@ -54,6 +55,7 @@ export default class Roles extends Component {
 			flagFilterOpen: false,
 			modalVisible: true,
 			createdDate: "",
+			date: new Date()
 		};
 	}
 
@@ -138,7 +140,7 @@ export default class Roles extends Component {
 			parseInt(this.state.date.getMonth()) < 10
 		) {
 			this.setState({
-				startDate:
+				createdDate:
 					this.state.date.getFullYear() +
 					"-0" +
 					(this.state.date.getMonth() + 1) +
@@ -148,7 +150,7 @@ export default class Roles extends Component {
 			});
 		} else if (parseInt(this.state.date.getDate()) < 10) {
 			this.setState({
-				startDate:
+				createdDate:
 					this.state.date.getFullYear() +
 					"-" +
 					(this.state.date.getMonth() + 1) +
@@ -158,7 +160,7 @@ export default class Roles extends Component {
 			});
 		} else if (parseInt(this.state.date.getMonth()) < 10) {
 			this.setState({
-				startDate:
+				createdDate:
 					this.state.date.getFullYear() +
 					"-0" +
 					(this.state.date.getMonth() + 1) +
@@ -167,7 +169,7 @@ export default class Roles extends Component {
 			});
 		} else {
 			this.setState({
-				startDate:
+				createdDate:
 					this.state.date.getFullYear() +
 					"-" +
 					(this.state.date.getMonth() + 1) +
@@ -187,9 +189,9 @@ export default class Roles extends Component {
 		const { role, createdBy, createdDate } = this.state;
 		this.setState({ loading: true });
 		const searchRole = {
-			roleName: role ? role : null,
-			createdBy: createdBy ? createdBy : null,
-			createdDate: createdDate ? createdDate : null,
+			"roleName": role ? String(role) : null,
+			"createdBy": createdBy ? createdBy : null,
+			"createdDate": createdDate ? createdDate : null,
 		};
 		UrmService.getRolesBySearch(searchRole).then((res) => {
 			if (res) {
@@ -335,6 +337,9 @@ export default class Roles extends Component {
 								</View>
 								<KeyboardAwareScrollView enableOnAndroid={true}>
 									<TextInput
+									mode="outlined"
+									outlineColor="#dfdfdf"
+									activeOutlineColor="#dfdfdf"
 										style={inputField}
 										underlineColorAndroid="transparent"
 										placeholder={I18n.t("ROLE")}
@@ -345,6 +350,9 @@ export default class Roles extends Component {
 										onChangeText={this.handleRole}
 									/>
 									<TextInput
+									mode="outlined"
+									outlineColor="#dfdfdf"
+									activeOutlineColor="#dfdfdf"
 										style={inputField}
 										underlineColorAndroid="transparent"
 										placeholder={I18n.t("CREATED BY")}
@@ -357,13 +365,13 @@ export default class Roles extends Component {
 									<TouchableOpacity
 										style={dateSelector}
 										testID="openModal"
-										onPress={() => this.filterDatepickerClicked()}
+										onPress={() => this.datepickerClicked()}
 									>
 										<Text style={dateText}>
 											{" "}
 											{this.state.createdDate === ""
 												? "CREATED DATE"
-												: this.state.createdDate}{" "}
+												: this.state.createdDate}
 										</Text>
 										<Image
 											style={{ position: "absolute", top: 10, right: 0 }}
@@ -374,13 +382,13 @@ export default class Roles extends Component {
 										<View style={datePickerContainer}>
 											<TouchableOpacity
 												style={datePickerButton1}
-												onPress={() => this.filterDatepickerCancelClicked()}
+												onPress={() => this.datepickerCancelClicked()}
 											>
 												<Text style={datePickerBtnText}> Cancel </Text>
 											</TouchableOpacity>
 											<TouchableOpacity
 												style={datePickerButton2}
-												onPress={() => this.filterDatepickerDoneClicked()}
+												onPress={() => this.datepickerDoneClicked()}
 											>
 												<Text style={datePickerBtnText}> Done </Text>
 											</TouchableOpacity>

@@ -7,10 +7,10 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View
 } from "react-native";
+import { TextInput } from "react-native-paper";
 import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -204,8 +204,8 @@ export default class Stores extends Component {
     const searchStore = {
       stateId: this.state.statecode ? this.state.statecode : null,
       cityId: null,
-      districtId: this.state.districtId ? this.state.districtId : null,
-      storeName: this.state.storeName ? this.state.storeName : null,
+      districtId: this.state.districtId ? this.state.districtId : 0,
+      storeName: this.state.storeName ? String(this.state.storeName) : null,
     };
     console.log("store search", searchStore);
     UrmService.getStoresBySearch(searchStore)
@@ -351,15 +351,7 @@ export default class Stores extends Component {
                           <Text
                             style={[
                               scss.textStyleMedium,
-                              {
-                                backgroundColor: "#ee0000",
-                                color: "#ffffff",
-                                marginTop: 5,
-                                padding: Device.isTablet ? 10 : 5,
-                                alignSelf: "flex-start",
-                                borderRadius: 5,
-                                fontFamily: "medium",
-                              },
+                              scss.inactive_txt
                             ]}
                           >
                             In-Active
@@ -472,6 +464,9 @@ export default class Stores extends Component {
                     />
                   </View>
                   <TextInput
+                  mode="outlined"
+                  outlineColor="#dfdfdf"
+                  activeOutlineColor="dfdfdf"
                     style={inputField}
                     underlineColorAndroid="transparent"
                     placeholder={I18n.t("STORE NAME")}

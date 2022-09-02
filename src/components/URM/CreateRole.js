@@ -7,10 +7,11 @@ import {
 	ScrollView,
 	StyleSheet,
 	Text,
-	TextInput,
+	
 	TouchableOpacity,
 	View,
 } from "react-native";
+import {TextInput,} from 'react-native-paper'
 import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
 import Loader from "../../commonUtils/loader";

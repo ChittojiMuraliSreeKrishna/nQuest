@@ -7,12 +7,12 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View
 } from "react-native";
 import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
+import { TextInput, Appbar } from "react-native-paper";
 import RNPickerSelect from "react-native-picker-select";
 import { Chevron } from "react-native-shapes";
 import Loader from "../../commonUtils/loader";
@@ -394,20 +394,10 @@ export default class AddStore extends Component {
     return (
       <View style={styles.mainContainer}>
         {this.state.loading && <Loader loading={this.state.loading} />}
-        <View style={headerTitleContainer}>
-          <View style={headerTitleSubContainer}>
-            <TouchableOpacity
-              style={backButton}
-              onPress={() => this.handleBackButtonClick()}
-            >
-              <Image
-                style={backButtonImage}
-                source={require("../assets/images/backButton.png")}
-              />
-            </TouchableOpacity>
-            <Text style={headerTitle}>{this.state.navtext}</Text>
-          </View>
-        </View>
+        <Appbar mode="center-aligned">
+          <Appbar.BackAction onPress={() => this.handleBackButtonClick()}  />
+          <Appbar.Content title={this.state.navtext} />
+        </Appbar>
         <ScrollView>
           <Text
             style={{

@@ -208,7 +208,9 @@ export class ListOfEstimationSlip extends Component {
     this.setState({ modalVisible: false, flagFilterOpen: false, deleteEstimationSlip: false })
   }
 
-
+  clearFilterAction() {
+    this.setState({filterActive: false, estimationSlips: [], fromDate: "", toDate: "", dsStatus: "", dsNumber: "", barcode: ""})
+  }
 
 
   render() {
@@ -216,7 +218,19 @@ export class ListOfEstimationSlip extends Component {
       <View>
         <Appbar>
           <Appbar.Content title="List Of Estimation Slips" />
-          <Icon name="sliders" size={25} onPress={() => this.filterAction()}></Icon>
+          {this.state.filterActive ? 
+          <Icon
+            name="sliders"
+            size={25}
+            color="#ed1c24"
+            onPress={() => this.clearFilterAction()}
+          ></Icon> :
+          <Icon
+            name="sliders"
+            size={25}
+            onPress={() => this.filterAction()}
+          ></Icon>
+  }
         </Appbar>
         <FlatList
           data={this.state.estimationSlips}

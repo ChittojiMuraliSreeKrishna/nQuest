@@ -24,8 +24,8 @@ class BottomTabBar extends Component {
     await AsyncStorage.getItem("roleType").then((value) => {
       if (value === "client_support") {
         if (this.state.clientId === 0 || this.state.clientId === null || this.state.clientId === undefined) {
-          this.props.navigation.navigate('SelectClient')
-          alert("Please Select the client")
+          // this.props.navigation.navigate('SelectClient')
+          // alert("Please Select the client")
         }
       }
     });

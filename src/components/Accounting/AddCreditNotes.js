@@ -1,8 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React, { Component } from 'react';
-import { Dimensions, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
+import { Appbar, TextInput } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
 import RazorpayCheckout from 'react-native-razorpay';
 import { Chevron } from 'react-native-shapes';
@@ -201,16 +202,10 @@ export default class AddCreditNotes extends Component {
           <Loader
             loading={this.state.loading} />
         }
-        <View style={headerTitleContainer} >
-          <View style={headerTitleSubContainer}>
-            <TouchableOpacity style={backButton} onPress={() => this.handleBackButtonClick()}>
-              <Image style={backButtonImage} source={require('../assets/images/backButton.png')} />
-            </TouchableOpacity>
-            <Text style={headerTitle}>
-              Add Credit Notes
-            </Text>
-          </View>
-        </View>
+        <Appbar mode="center-aligned">
+          <Appbar.BackAction onPress={() => this.handleBackButtonClick()}  />
+          <Appbar.Content title="Add Credit Notes" />
+        </Appbar>
         <ScrollView>
           <Text
             style={{
