@@ -12,6 +12,12 @@ import FilterIcon from 'react-native-vector-icons/FontAwesome'
 import { RH, RW } from '../../Responsive';
 import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
+import { emptyTextStyle } from '../Styles/FormFields';
+import { flatListMainContainer, flatlistSubContainer, highText, loadMoreBtn, loadmoreBtnText, textContainer, textStyleMedium, textStyleSmall } from '../Styles/Styles';
+import Loader from '../../commonUtils/loader';
+import { formatDate } from '../../commonUtils/DateFormate';
+import { reportErrorMessages } from '../Errors/errors';
+import Message from '../Errors/Message';
 
 
 var deviceWidth = Dimensions.get("window").width;
@@ -30,15 +36,22 @@ export class GoodsReturn extends Component {
       endDate: "",
       fromDate: "",
       toDate: "",
-      returnSlip: null,
+      returnSlipNumber: null,
       barCode: null,
       empId: "",
-      storeId: 0,
+      storeId: null,
       domainId: 0,
       goodsReturn: [],
       flagFilterGoodsReturn: false,
       rtStatus: null,
-      createdBy:null
+      createdBy: null,
+      loadMoreActive: false,
+      totalPages: 0,
+      pageNo: 0,
+      loading: false,
+      barcodeValid: true,
+      returnSlipNumberValid: true,
+      errors: {}
     };
   }
 
@@ -110,73 +123,111 @@ export class GoodsReturn extends Component {
     this.setState({ enddoneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
 
-  applyGoodsReturn() {
-    if (this.state.startDate === "") {
-      this.state.startDate = null;
-    }
-    if (this.state.endDate === "") {
-      this.state.endDate = null;
-    }
-    if (this.state.returnSlip === "") {
-      this.state.returnSlip = null;
-    }
-    if (this.state.barCode === "") {
-      this.state.barCode = null;
-    }
-    if (this.state.empId === "") {
-      this.state.empId = null;
+  validationForm() {
+    let isFormValid = true;
+    let errors = {};
+
+    if (this.state.barCode === '' || this.state.barCode === null) {
+      isFormValid = false;
+      errors["barCode"] = reportErrorMessages.barCode;
+      this.setState({ barcodeValid: false });
     }
 
+    if (this.state.returnSlipNumber === '' || this.state.returnSlipNumber === null) {
+      isFormValid = false;
+      errors["returnSlipNumber"] = reportErrorMessages.returnSlipNumber;
+      this.setState({ returnSlipNumberValid: false });
+    }
+
+    this.setState({ errors: errors });
+    return isFormValid;
+  }
+
+  applyGoodsReturnValidation(pageNumber) {
+    const isFormValid = this.validationForm()
+    if (isFormValid) {
+      this.applyGoodsReturn(pageNumber)
+    }
+  }
+
+  applyGoodsReturn(pageNumber) {
+    this.setState({ loading: true, loadMoreActive: false });
     const obj = {
-      "dateFrom": this.state.startDate,
-      "dateTo": this.state.endDate,
-      rtNumber: this.state.returnSlip,
-      barcode: this.state.barCode,
-      createdBy: this.state.empId,
-      storeId: this.state.storeId,
-      domainId: this.state.domainId
+      dateFrom: this.state.startDate ? this.state.startDate : undefined,
+      dateTo: this.state.endDate ? this.state.endDate : undefined,
+      rtStatus: this.state.rtStatus ? this.state.rtStatus : null,
+      // createdBy: this.state.createdBy ? this.state.createdBy : undefined,
+      rtNumber: this.state.returnSlipNumber ? (this.state.returnSlipNumber).trim() : null,
+      barcode: this.state.barCode ? (this.state.barCode).trim() : null,
+      // domainId: this.state.domainId ? parseInt(this.state.domainId) : undefined,
+      storeId: this.state.storeId ? parseInt(this.state.storeId) : null,
     };
-    console.log('params are' + JSON.stringify(obj));
-    let pageNumber = 0
+    console.log('params are' + JSON.stringify(obj), pageNumber);
     ReportsService.returnSlips(obj, pageNumber).then((res) => {
       console.log("returnSlips response", res.data);
       console.log(res.data.result.length);
       if (res.data && res.data["isSuccess"] === "true") {
         if (res.data.result.length !== 0) {
-          // this.props.childParamgoodsReturn(res.data.result);
-          // this.props.filterActiveCallback();
-          // this.props.modelCancelCallback();
+          res.data.result.content.map((prop, i) => {
+            let barcodeData = "";
+            if (prop.barcodes.length > 0) {
+              barcodeData = Array.prototype.map
+                .call(prop.barcodes, function (item) {
+                  return item.barCode;
+                })
+                .join(",");
+            }
+            prop.barcodeVal = barcodeData;
+            prop.review = false;
+          })
+          this.setState({
+            loading: false,
+            goodsReturn: res.data.result.content,
+            // rsDetailsList: res.data.result.content,
+            totalPages: res.data.result.totalPages
+            // totalPages: res.data.totalPages,
+          })
+          this.continuePagination();
           this.modelCancel()
-          this.setState({ goodsReturn: res.data.result, filterActive: true, modalVisible: false })
         } else {
           alert("Results Not Found");
           this.modelCancel()
-          this.setState({ startDate: "", endDate: "", returnSlip: "", barcode: "", empId: "" })
-          // this.props.modelCancelCallback();
         }
       }
       else {
         alert(res.data.message);
+        this.setState({ loading: false })
         this.modelCancel()
-        this.setState({ startDate: "", endDate: "", returnSlip: "", barcode: "", empId: "" })
-        // this.props.modelCancelCallback();
       }
-    }
-    ).catch((err) => {
+    }).catch((err) => {
+      alert('No Records Found');
       this.setState({ loading: false });
-      alert("There is an error getting data");
       this.modelCancel()
-      // this.props.modelCancelCallback();
-    });
+    })
   }
 
+  // Pagination Function
+  loadMoreList = () => {
+    this.setState({ pageNo: this.state.pageNo + 1 }, () => {
+      this.applyGoodsReturnValidation();
+    });
+  };
+
+
+  continuePagination() {
+    if (this.state.pageNo < this.state.totalPages - 1) {
+      this.setState({ loadMoreActive: true });
+    } else {
+      this.setState({ loadMoreActive: false });
+    }
+  }
 
   datepickerCancelClicked() {
     this.setState({ date: new Date(), enddate: new Date(), datepickerOpen: false, datepickerendOpen: false });
   }
 
-  handleReturnSlip = (value) => {
-    this.setState({ returnSlip: value });
+  handleReturnSlipNumber = (value) => {
+    this.setState({ returnSlipNumber: value });
   };
 
   handleBarCode = (value) => {
@@ -197,7 +248,12 @@ export class GoodsReturn extends Component {
   }
 
   modelCancel() {
-    this.setState({ flagFilterGoodsReturn: false, modalVisible: false })
+    this.setState({
+      flagFilterGoodsReturn: false, modalVisible: false,
+      startDate: '', endDate: '',
+      returnSlip: '', barCode: '',
+      rtStatus: ''
+    })
   }
 
   handleRTStatus = (value) => {
@@ -208,7 +264,7 @@ export class GoodsReturn extends Component {
 
   render() {
     return (
-      <View>
+      <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
         <Appbar>
           <Appbar.Content title="Goods Return" />
           <FilterIcon
@@ -217,50 +273,51 @@ export class GoodsReturn extends Component {
             onPress={() => this.filterAction()}
           />
         </Appbar>
+        {this.state.loading && <Loader loading={this.state.loading} />}
         <FlatList
           data={this.state.goodsReturn}
-          style={{ marginTop: 20 }}
           scrollEnabled={true}
           removeClippedSubviews={false}
           keyExtractor={(item, i) => i.toString()}
-          ListEmptyComponent={<Text style={{ fontSize: Device.isTablet ? 21 : 17, fontFamily: 'bold', color: '#000000', textAlign: 'center', marginTop: deviceheight / 3 }}>&#9888; {I18n.t("Results not loaded")}</Text>}
+          ListEmptyComponent={<Text style={emptyTextStyle}>&#9888; {I18n.t("Results not loaded")}</Text>}
+          // onEndReached={this.loadMoreList}
+          // onEndReachedThreshold={200}
           renderItem={({ item, index }) => (
-            <View style={Device.isTablet ? flats.flatlistContainer_tablet : flats.flatlistContainer_mobile} >
-              <View style={Device.isTablet ? flats.flatlistSubContainer_tablet : flats.flatlistSubContainer_mobile}>
-                {(item && item.barcodes.length !== 0 &&
-                  <View style={flats.text}>
-                    <Text style={Device.isTablet ? flats.flatlistTextAccent_tablet : flats.flatlistTextAccent_mobile} >S NO: {index + 1} </Text>
-                    <Text selectable={true} style={Device.isTablet ? flats.flatlistText_tablet : flats.flatlistText_mobile}>{I18n.t("RTS NUMBER")}: {"\n"}{item.rtNumber}</Text>
-                    <Text style={Device.isTablet ? flats.flatlistTextCommon_tablet : flats.flatlistTextCommon_mobile}>{I18n.t("BARCODE")}: {"\n"}
-                      {item.barcodes[0].barCode}
-                    </Text>
-                  </View>
-                )}
-                {(item && item.barcodes.length === 0 &&
-                  <View style={flats.text}>
-                    <Text style={Device.isTablet ? flats.flatlistTextAccent_tablet : flats.flatlistTextAccent_mobile} >S NO: {index + 1} </Text>
-                    <Text style={Device.isTablet ? flats.flatlistText_tablet : flats.flatlistText_mobile}>{I18n.t("RTS NUMBER")}: {"\n"}{item.rtNumber}</Text>
-                    <Text style={Device.isTablet ? flats.flatlistTextCommon_tablet : flats.flatlistTextCommon_mobile}>{I18n.t("BARCODE")}: {"\n"}{'-'} </Text>
-                  </View>
-                )}
-                <View style={flats.text}>
-                  <Text style={Device.isTablet ? flats.flatlistTextCommon_tablet : flats.flatlistTextCommon_mobile} >{I18n.t("EMP ID")}: { } </Text>
-                  <Text style={Device.isTablet ? flats.flatlistTextCommon_tablet : flats.flatlistTextCommon_mobile}>{I18n.t("RTS DATE")}: {"\n"} {item.createdInfo}</Text>
-                  <Text style={Device.isTablet ? flats.flatlistTextCommon_tablet : flats.flatlistTextCommon_mobile}>{I18n.t("AMOUNT")}: {"\n"} ₹{item.amount}</Text>
+            <View style={[flatListMainContainer, { backgroundColor: "#FFF" }]} >
+              <View style={flatlistSubContainer}>
+                <View style={textContainer}>
+                  <Text style={highText} >S NO: {index + 1} </Text>
+                  <Text selectable={true} style={textStyleSmall}>{I18n.t("RTS NUMBER")}: {"\n"}{item.rtNumber}</Text>
+                  <Text style={textStyleSmall}>{I18n.t("BARCODE")}: {"\n"}{item && item.barcodes.length !== 0 ? item.barcodes[0].barCode : '-'}</Text>
                 </View>
-                <View style={flats.text}>
+                <View style={textContainer}>
+                  <Text style={textStyleSmall} >{I18n.t("EMP ID")}: {item.createdBy} </Text>
+                  <Text style={textStyleSmall}>{I18n.t("RTS DATE")}: {"\n"} {formatDate(item.createdInfo)}</Text>
+                  <Text style={textStyleSmall}>{I18n.t("AMOUNT")}: {"\n"} ₹{item.amount}</Text>
+                </View>
+                <View style={textContainer}>
                   <View style={flats.buttons}>
                     <TouchableOpacity style={Device.isTablet ? flats.deleteButton_tablet : flats.deleteButton_mobile} onPress={() => this.handledeleteNewSale(item, index)}>
                       <Image style={{ alignSelf: 'center', top: 5, height: Device.isTablet ? 30 : 20, width: Device.isTablet ? 30 : 20 }} source={require('../assets/images/delete.png')} />
-
                     </TouchableOpacity>
                   </View>
                 </View>
               </View>
             </View>
           )}
-
+          ListFooterComponent={
+            this.state.loadMoreActive && (
+              <TouchableOpacity
+                style={loadMoreBtn}
+                onPress={() => this.loadMoreList()}
+              >
+                <Text style={loadmoreBtnText}>Load More ?</Text>
+              </TouchableOpacity>
+            )
+          }
         />
+
+
         {this.state.flagFilterGoodsReturn && (
           <View>
             <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
@@ -355,8 +412,8 @@ export class GoodsReturn extends Component {
                         return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
                       }}
                       items={[
-                        { label: 'PENDING', value: 'Pending', },
-                        { label: 'COMPLETED', value: 'Completed', },
+                        { value: 'PENDING', label: 'Pending', },
+                        { value: 'COMPLETED', label: 'Completed', },
                       ]}
                       onValueChange={this.handleRTStatus}
                       style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
@@ -372,9 +429,14 @@ export class GoodsReturn extends Component {
                     placeholderTextColor="#6F6F6F"
                     textAlignVertical="center"
                     autoCapitalize="none"
-                    value={this.state.returnSlip}
-                    onChangeText={this.handleReturnSlip}
+                    value={this.state.returnSlipNumber}
+                    onChangeText={this.handleReturnSlipNumber}
                   />
+                  <Text>
+                    {!this.state.returnSlipNumberValid && (
+                      <Message imp={true} message={this.state.errors["returnSlipNumber"]} />
+                    )}
+                  </Text>
                   <Text style={styles.headings}>{I18n.t("Barcode")}</Text>
                   <TextInput
                     style={[Device.isTablet ? styles.input_tablet : styles.input_mobile, { width: deviceWidth - 40 }]}
@@ -386,8 +448,13 @@ export class GoodsReturn extends Component {
                     value={this.state.barCode}
                     onChangeText={this.handleBarCode}
                   />
+                  <Text style={styles.headings}>
+                    {!this.state.barcodeValid && (
+                      <Message imp={true} message={this.state.errors["barCode"]} />
+                    )}
+                  </Text>
                   <TouchableOpacity style={Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile}
-                    onPress={() => this.applyGoodsReturn()}>
+                    onPress={() => this.applyGoodsReturnValidation(this.state.pageNo)}>
                     <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile} >{I18n.t("APPLY")}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile}

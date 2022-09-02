@@ -24,11 +24,17 @@ class ReportsService {
     return axios.post(BASE_URL + REPORTS_URL.listOfBarcodes + param, data)
   }
 
-  promotionsList(data, pageNumber = 0) {
+  promotionsList(data, pageNumber) {
     const param = '?page=' + pageNumber
+    console.log("param",param,data);
     return axios.post(BASE_URL + '/connection-pool/promo/promotionsSearching' + param + '&size=10', data)
   }
 
+  saleReports(data, storeId) {
+    console.log(data);
+    //   const param = '?storeId='+ storeId; 
+    return axios.post(BASE_URL + '/new-sale/newsale/getsalereport', data);
+  }
 }
 
 export default new ReportsService();

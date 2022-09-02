@@ -13,7 +13,9 @@ import { Chevron } from 'react-native-shapes';
 import { RF, RH, RW } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
 import FilterIcon from 'react-native-vector-icons/FontAwesome'
-import { flatListMainContainer, flatlistSubContainer, highText, textContainer, textStyleLight, textStyleMedium } from '../Styles/Styles';
+import { flatListMainContainer, flatlistSubContainer, highText, loadMoreBtn, loadmoreBtnText, textContainer, textStyleLight, textStyleMedium } from '../Styles/Styles';
+import { emptyTextStyle } from '../Styles/FormFields';
+import Loader from '../../commonUtils/loader';
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -29,7 +31,11 @@ export class ListOfPromotions extends Component {
       listPromotions: [],
       promoType: '',
       promoStatus: '',
-      clientId: null
+      clientId: null,
+      loadMoreActive: false,
+      totalPages: 0,
+      pageNo: 0,
+      loading: false
     };
   }
 
@@ -48,21 +54,36 @@ export class ListOfPromotions extends Component {
       applicability: this.state.promoType,
       clientId: this.state.clientId
     };
-    var pageNumber = 0
-    ReportsService.promotionsList(obj, pageNumber).then((res,err) => {
-      console.log(res.data,err);
+    ReportsService.promotionsList(obj, this.state.pageNo).then((res, err) => {
+      console.log(res.data, err);
       if (res.data) {
-        this.setState({ listPromotions: res.data.result.content, filterActive: true, modalVisible: false, promoType: '', promoStatus: '' })
-      }
-      else {
-        alert(res.data.message);
-        this.setState({ promoType: '', promoStatus: '' })
+        this.setState({
+          listPromotions: res.data.result.content, totalPages: res.data.result.totalPages,
+          filterActive: true, modalVisible: false
+        })
+        this.continuePagination()
       }
     }).catch(() => {
       alert('No Records Found');
       this.modelCancel()
       this.setState({ promoType: '', promoStatus: '' })
     });
+  }
+
+  // Pagination Function
+  loadMoreList = () => {
+    this.setState({ pageNo: this.state.pageNo + 1 }, () => {
+      this.applyListPromotions();
+    });
+  };
+
+
+  continuePagination() {
+    if (this.state.pageNo < this.state.totalPages-1) {
+      this.setState({ loadMoreActive: true });
+    }  else {
+      this.setState({ loadMoreActive: false });
+    }
   }
 
   filterAction() {
@@ -92,13 +113,17 @@ export class ListOfPromotions extends Component {
             onPress={() => this.filterAction()}
           />
         </Appbar>
+        {this.state.loading && <Loader loading={this.state.loading} />}
         <FlatList
           data={this.state.listPromotions}
           scrollEnabled={true}
           keyExtractor={(item, i) => i.toString()}
-          ListEmptyComponent={<Text style={{ fontSize: Device.isTablet ? RF(21) : RF(17), fontFamily: 'bold', color: '#000000', textAlign: 'center', marginTop: deviceheight / 3 }}>&#9888; {I18n.t("Results not loaded")}</Text>}
+          ListEmptyComponent={<Text style={emptyTextStyle}>&#9888; {I18n.t("Results not loaded")}</Text>}
+          removeClippedSubviews={false}
+          // onEndReached={this.loadMoreList}
+          // onEndReachedThreshold={200}
           renderItem={({ item, index }) => (
-            <View style={[flatListMainContainer, , { backgroundColor: "#FFF" }]} >
+            <View style={[flatListMainContainer, { backgroundColor: "#FFF" }]} >
               <View style={flatlistSubContainer}>
                 <View style={textContainer}>
                   <Text style={highText} >PROMO ID: {item.promoId}</Text>
@@ -114,7 +139,18 @@ export class ListOfPromotions extends Component {
               </View>
             </View>
           )}
+          ListFooterComponent={
+            this.state.loadMoreActive && (
+              <TouchableOpacity
+                style={loadMoreBtn}
+                onPress={() => this.loadMoreList()}
+              >
+                <Text style={loadmoreBtnText}>Load More ?</Text>
+              </TouchableOpacity>
+            )
+          }
         />
+
         {this.state.flagFilterListPromotions && (
           <View>
             <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
@@ -186,7 +222,7 @@ export class ListOfPromotions extends Component {
                   </View>
 
                   <TouchableOpacity style={Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile}
-                    onPress={() => this.applyListPromotions()}>
+                    onPress={() => this.applyListPromotions(this.state.pageNo)}>
                     <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile} >APPLY</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile}

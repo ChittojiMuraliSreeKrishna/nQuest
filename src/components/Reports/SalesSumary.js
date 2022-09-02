@@ -11,6 +11,9 @@ import { Appbar } from 'react-native-paper';
 import { RH } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
 import FilterIcon from 'react-native-vector-icons/FontAwesome'
+import { flatListMainContainer, flatlistSubContainer, highText, textContainer, textStyleMedium, textStyleSmall } from '../Styles/Styles';
+import { color } from '../Styles/colorStyles';
+import { emptyTextStyle } from '../Styles/FormFields';
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -27,27 +30,32 @@ export class SalesSumary extends Component {
       endDate: "",
       fromDate: "",
       toDate: "",
-      storeId: 0,
-      sotres: [],
+      storeId: null,
       storeName: "",
-      selectedStore: "",
-      domainId: 0,
       salesSumaryObject: [],
       flagFilterSalesSumary: false,
-      modalVisible: true
+      modalVisible: true,
+      itemId: "",
+      itemName: "",
+      storeList: [],
+      domaindataId: "",
+      dsList: [],
+      totMrp: null,
+      totalDiscount: null,
+      billValue: null
     };
   }
 
   componentDidMount() {
-    if (global.domainName === "Textile") {
-      this.setState({ domainId: 1 });
-    }
-    else if (global.domainName === "Retail") {
-      this.setState({ domainId: 2 });
-    }
-    else if (global.domainName === "Electrical & Electronics") {
-      this.setState({ domainId: 3 });
-    }
+    // if (global.domainName === "Textile") {
+    //   this.setState({ domainId: 1 });
+    // }
+    // else if (global.domainName === "Retail") {
+    //   this.setState({ domainId: 2 });
+    // }
+    // else if (global.domainName === "Electrical & Electronics") {
+    //   this.setState({ domainId: 3 });
+    // }
 
     AsyncStorage.getItem("storeId").then((value) => {
       storeStringId = value;
@@ -116,39 +124,47 @@ export class SalesSumary extends Component {
     this.setState({ date: new Date(), enddate: new Date(), datepickerOpen: false, datepickerendOpen: false });
   }
 
-  handleSelectStores = (value) => {
-    this.setState({ selectedStore: value });
-  };
-
   applySalesSummary() {
-    if (this.state.startDate === "") {
-      this.state.startDate = null;
-    }
-    if (this.state.endDate === "") {
-      this.state.endDate = null;
-    }
-
     const obj = {
-      "dateFrom": this.state.startDate,
-      "dateTo": this.state.endDate,
-      "store": {
-        "id": this.state.storeId,
-        "name": this.state.storeName,
+      dateFrom: this.state.startDate ? this.state.startDate : undefined,
+      dateTo: this.state.endDate ? this.state.endDate : undefined,
+      store: {
+        id:
+          parseInt(this.state.storeId) && parseInt(this.state.storeId) != 0
+            ? this.state.storeId
+            : undefined,
+        name: this.state.storeName,
       },
-      storeId: this.state.storeId,
-      domainId: this.state.domainId
+      storeId:
+        parseInt(this.state.storeId) && parseInt(this.state.storeId) != 0
+          ? parseInt(this.state.storeId)
+          : undefined,
     };
-    console.log('params are' + JSON.stringify(obj));
-    axios.post(ReportsService.saleReports(), obj).then((res) => {
-      console.log(res.data);
+    console.log('params are', obj);
+    ReportsService.saleReports(obj).then((res) => {
+      console.log(res);
       if (res.data && res.data["isSuccess"] === "true") {
         if (res.data.result.lenght !== 0) {
-          // this.props.childParamSalesSummary(res.data.result);
-          // this.props.filterActiveCallback();
-          // this.props.childParamSalesSummaryObject();
-          // this.props.modelCancelCallback();
+          let data = res.data.result;
+          let a = [];
+          data.salesSummery.transction = "Sales Invoicing";
+          data.retunSummery.transction = "Return Invoicing";
+
+          a.push(data.salesSummery);
+          a.push(data.retunSummery);
+          console.log(">>>>>>>>aaaaaaa", a);
+
+          this.setState({
+            dsList: a,
+            totMrp: data.totalMrp,
+            billValue: data.billValue,
+            totalDiscount: data.totalDiscount,
+            totalSgst: data.totalSgst,
+            totalCgst: data.totalCgst,
+            totalIgst: data.totalIgst,
+            totalCess: data.totalCess
+          })
           this.modelCancel()
-          this.setState({ salesSumaryObject: res.data.result, filterActive: true, modalVisible: false })
         } else {
           alert("records not found");
           this.setState({ startDate: "", endDate: "" })
@@ -162,11 +178,9 @@ export class SalesSumary extends Component {
       }
     }
     ).catch(() => {
-      this.setState({ loading: false });
-      alert('No Results Found');
+      alert('No Records Found');
       this.modelCancel()
       // this.props.modelCancelCallback();
-
     });
   }
 
@@ -181,7 +195,7 @@ export class SalesSumary extends Component {
 
   render() {
     return (
-      <View>
+      <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
         <Appbar>
           <Appbar.Content title="Sales Summary" />
           <FilterIcon
@@ -192,74 +206,69 @@ export class SalesSumary extends Component {
         </Appbar>
 
         <FlatList
-          data={this.state.salesSumaryObject}
+          data={this.state.dsList}
           scrollEnabled={true}
-          ListEmptyComponent={<Text style={{ fontSize: Device.isTablet ? 21 : 17, fontFamily: 'bold', color: '#000000', textAlign: 'center', marginTop: deviceheight / 3 }}>&#9888; {I18n.t("Results not loaded")}</Text>}
+          ListEmptyComponent={<Text style={emptyTextStyle}>&#9888; {I18n.t("Results not loaded")}</Text>}
           renderItem={({ item, index }) => {
             if (index === 0) {
-              return <View style={Device.isTablet ? flats.flatlistContainer_tablet : flats.flatlistContainer_mobile} >
-                <View style={Device.isTablet ? flats.flatlistSubContainer_tablet : flats.flatlistSubContainer_mobile}>
-                  <View style={flats.text}>
-                    <Text style={Device.isTablet ? flats.flatlistTextAccent_tablet : flats.flatlistTextAccent_mobile} >{I18n.t("TRANSACTION")}: {"\n"}{'Sales Invoicing'} </Text>
-                    <Text style={Device.isTablet ? flats.flatlistText_tablet : flats.flatlistText_mobile}>{I18n.t("TOTAL MRP")}: {"\n"}
-                      ₹{this.props.salesSumary.salesSummery.totalMrp}
-                    </Text>
+              return <View style={flatListMainContainer}>
+                <View style={flatlistSubContainer}>
+                  <View style={textContainer}>
+                    <Text style={highText} >{I18n.t("TRANSACTION")}: {"\n"}{item.transction} </Text>
+                    <Text style={textStyleSmall}>{I18n.t("TOTAL MRP")}: {"\n"}₹ {item.totalMrp}</Text>
                   </View>
-                  <View style={flats.text}>
-                    <Text style={Device.isTablet ? flats.flatlistTextCommon_tablet : flats.flatlistTextCommon_mobile}>{I18n.t("PROMO OFFER")}: {"\n"}
-                      ₹{this.props.salesSumary.salesSummery.totalDiscount}
-                    </Text>
-                    <Text style={Device.isTablet ? flats.flatlistTextCommon_tablet : flats.flatlistTextCommon_mobile}>{I18n.t("INVOICE AMOUNT")}: {"\n"}
-                      ₹{this.props.salesSumary.salesSummery.billValue}
-                    </Text>
+                  <View style={textContainer}>
+                    <Text style={textStyleSmall}>{I18n.t("PROMO OFFER")}: {"\n"}₹{item.totalDiscount}</Text>
+                    <Text style={textStyleSmall}>{I18n.t("INVOICE AMOUNT")}: {"\n"} ₹{item.billValue}</Text>
                   </View>
                 </View>
               </View>;
             }
             if (index === 1) {
-              return <View style={Device.isTablet ? flats.flatlistContainer_tablet : flats.flatlistContainer_mobile} >
-                <View style={Device.isTablet ? flats.flatlistSubContainer_tablet : flats.flatlistSubContainer_mobile}>
-                  <View style={flats.text}>
-                    <Text style={Device.isTablet ? flats.flatlistTextAccent_tablet : flats.flatlistTextAccent_mobile} >{I18n.t("TRANSACTION")}: {"\n"}{'Return Invoicing'} </Text>
-                    <Text style={Device.isTablet ? flats.flatlistText_tablet : flats.flatlistText_mobile}>TOTAL MRP: {"\n"}
-                      ₹{this.props.salesSumary.retunSummery.totalMrp}
-                    </Text>
+              return <View style={flatListMainContainer} >
+                <View style={flatlistSubContainer}>
+                  <View style={textContainer}>
+                    <Text style={highText} >{I18n.t("TRANSACTION")}: {"\n"}{item.transction} </Text>
+                    <Text style={textStyleSmall}>TOTAL MRP: {"\n"}₹{item.totalMrp}</Text>
                   </View>
-                  <View style={flats.text}>
-                    <Text style={Device.isTablet ? flats.flatlistTextCommon_tablet : flats.flatlistTextCommon_mobile}>{I18n.t("PROMO OFFER")}: {"\n"}
-                      ₹{this.props.salesSumary.retunSummery.totalDiscount}
-                    </Text>
-                    <Text style={Device.isTablet ? flats.flatlistTextCommon_tablet : flats.flatlistTextCommon_mobile}>{I18n.t("INVOICE AMOUNT")}: {"\n"}
-                      ₹{this.props.salesSumary.retunSummery.billValue}
-                    </Text>
+                  <View style={textContainer}>
+                    <Text style={textStyleSmall}>{I18n.t("PROMO OFFER")}: {"\n"}₹{item.totalDiscount}</Text>
+                    <Text style={textStyleSmall}>{I18n.t("INVOICE AMOUNT")}: {"\n"}₹{item.billValue}</Text>
                   </View>
                 </View>
               </View>;
             }
             if (index === 2) {
-
               return <View style={Device.isTablet ? flats.flatlistSubContainerTotal_tablet : flats.flatlistSubContainerTotal_mobile} >
                 <View style={Device.isTablet ? flats.flatlistSubContainerTotal_tablet : flats.flatlistSubContainerTotal_mobile}>
-                  <View style={flats.text}>
-                    <Text style={Device.isTablet ? flats.flatlistTextAccent_tablet : flats.flatlistTextAccent_mobile} ></Text>
-                    <Text style={Device.isTablet ? flats.flatlistText_tablet : flats.flatlistText_mobile}>{I18n.t("TOTAL MRP")}: {"\n"}
-                      ₹{this.props.salesSumary.totalMrp}
+                  <View style={textContainer}>
+                    <Text style={highText} ></Text>
+                    <Text style={textStyleSmall}>{I18n.t("TOTAL MRP")}: {"\n"}₹{item.totalMrp}
                     </Text>
                   </View>
-                  <View style={flats.text}>
-                    <Text style={Device.isTablet ? flats.flatlistTextCommon_tablet : flats.flatlistTextCommon_mobile}>{I18n.t("PROMO OFFER")}: {"\n"}
-                      ₹{this.props.salesSumary.totalDiscount}
-                    </Text>
-                    <Text style={Device.isTablet ? flats.flatlistTextCommon_tablet : flats.flatlistTextCommon_mobile}>{I18n.t("INVOICE AMOUNT")}: {"\n"}
-                      ₹{this.props.salesSumary.billValue}
-                    </Text>
+                  <View style={textContainer}>
+                    <Text style={textStyleSmall}>{I18n.t("PROMO OFFER")}: {"\n"}₹{item.totalDiscount}</Text>
+                    <Text style={textStyleSmall}>{I18n.t("INVOICE AMOUNT")}: {"\n"}₹{item.billValue}</Text>
                   </View>
                 </View>
               </View>;
             }
           }}
-
         />
+
+        {this.state.totMrp !== null &&
+          <View style={[flatListMainContainer, { backgroundColor: color.accent }]}>
+            <View style={flatlistSubContainer}>
+              <View style={textContainer}>
+                <Text style={[textStyleMedium, { color: color.white }]} >{I18n.t("TOTAL MRP")}: {"\n"}₹ {this.state.totMrp} </Text>
+                <Text style={[textStyleMedium, { color: color.white }]}>{I18n.t("TOTAL PROMO OFFER")}: {"\n"}₹ {this.state.totalDiscount}</Text>
+              </View>
+              <View style={textContainer}>
+                <Text style={[textStyleMedium, { color: color.white }]}>{I18n.t("GRAND TOTAL")}: {"\n"}₹ {this.state.billValue}</Text>
+              </View>
+            </View>
+          </View>
+        }
 
         {this.state.flagFilterSalesSumary && (
           <View>
@@ -283,28 +292,29 @@ export class SalesSumary extends Component {
                   }}></Text>
                 </View>
                 <KeyboardAwareScrollView enableOnAndroid={true} >
+                  <Text style={styles.headings}>{I18n.t("From Date")}</Text>
                   <TouchableOpacity
-                    style={Device.isTablet ? styles.filterDateButton_tablet : styles.filterDateButton_mobile}
+                    style={styles.filterDateButton}
                     testID="openModal"
                     onPress={() => this.datepickerClicked()}
                   >
                     <Text
-                      style={Device.isTablet ? styles.filterDateButtonText_tablet : styles.filterDateButtonText_mobile}
+                      style={styles.filterDateButtonText}
                     >{this.state.startDate == "" ? 'START DATE' : this.state.startDate}</Text>
                     <Image style={{ position: 'absolute', top: 10, right: 0, }} source={require('../assets/images/calender.png')} />
                   </TouchableOpacity>
                   {this.state.datepickerOpen && (
                     <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
                       <TouchableOpacity
-                        style={Device.isTablet ? styles.datePickerButton_tablet : styles.datePickerButton_mobile} onPress={() => this.datepickerCancelClicked()}
+                        style={styles.datePickerButton} onPress={() => this.datepickerCancelClicked()}
                       >
-                        <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Cancel </Text>
+                        <Text style={styles.datePickerButtonText}  > Cancel </Text>
 
                       </TouchableOpacity>
                       <TouchableOpacity
-                        style={Device.isTablet ? styles.datePickerEndButton_tablet : styles.datePickerEndButton_mobile} onPress={() => this.datepickerDoneClicked()}
+                        style={styles.datePickerEndButton} onPress={() => this.datepickerDoneClicked()}
                       >
-                        <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Done </Text>
+                        <Text style={styles.datePickerButtonText}  > Done </Text>
 
                       </TouchableOpacity>
                       <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
@@ -314,27 +324,29 @@ export class SalesSumary extends Component {
                       />
                     </View>
                   )}
+
+                  <Text style={styles.headings}>{I18n.t("To Date")}</Text>
                   <TouchableOpacity
-                    style={Device.isTablet ? styles.filterDateButton_tablet : styles.filterDateButton_mobile}
+                    style={styles.filterDateButton}
                     testID="openModal"
                     onPress={() => this.enddatepickerClicked()}
                   >
                     <Text
-                      style={Device.isTablet ? styles.filterDateButtonText_tablet : styles.filterDateButtonText_mobile}
+                      style={styles.filterDateButtonText}
                     >{this.state.endDate == "" ? 'END DATE' : this.state.endDate}</Text>
                     <Image style={{ position: 'absolute', top: 10, right: 0, }} source={require('../assets/images/calender.png')} />
                   </TouchableOpacity>
                   {this.state.datepickerendOpen && (
                     <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
                       <TouchableOpacity
-                        style={Device.isTablet ? styles.datePickerButton_tablet : styles.datePickerButton_mobile} onPress={() => this.datepickerCancelClicked()}
+                        style={styles.datePickerButton} onPress={() => this.datepickerCancelClicked()}
                       >
-                        <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Cancel </Text>
+                        <Text style={styles.datePickerButtonText}  > Cancel </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
-                        style={Device.isTablet ? styles.datePickerEndButton_tablet : styles.datePickerEndButton_mobile} onPress={() => this.datepickerendDoneClicked()}
+                        style={styles.datePickerEndButton} onPress={() => this.datepickerendDoneClicked()}
                       >
-                        <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Done </Text>
+                        <Text style={styles.datePickerButtonText}  > Done </Text>
 
                       </TouchableOpacity>
                       <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
@@ -344,13 +356,14 @@ export class SalesSumary extends Component {
                       />
                     </View>
                   )}
-                  <TouchableOpacity style={Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile}
+
+                  <TouchableOpacity style={styles.filterApplyButton}
                     onPress={() => this.applySalesSummary()}>
-                    <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile} >{I18n.t("APPLY")}</Text>
+                    <Text style={styles.filterButtonText} >{I18n.t("APPLY")}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile}
+                  <TouchableOpacity style={styles.filterCancelButton}
                     onPress={() => this.modelCancel()}>
-                    <Text style={Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile}>{I18n.t("CANCEL")}</Text>
+                    <Text style={styles.filterButtonCancelText}>{I18n.t("CANCEL")}</Text>
                   </TouchableOpacity>
                 </KeyboardAwareScrollView>
               </View>
@@ -363,93 +376,7 @@ export class SalesSumary extends Component {
 }
 
 
-const pickerSelectStyles_mobile = StyleSheet.create({
-  placeholder: {
-    color: "#6F6F6F",
-    fontFamily: "regular",
-    fontSize: 15,
-  },
-  inputIOS: {
-    justifyContent: 'center',
-    height: 42,
-    borderRadius: 3,
-    borderWidth: 1,
-    fontFamily: 'regular',
-    //paddingLeft: -20,
-    fontSize: 15,
-    borderColor: '#FBFBFB',
-    backgroundColor: '#FBFBFB',
-  },
-  inputAndroid: {
-    justifyContent: 'center',
-    height: 42,
-    borderRadius: 3,
-    borderWidth: 1,
-    fontFamily: 'regular',
-    //paddingLeft: -20,
-    fontSize: 15,
-    borderColor: '#FBFBFB',
-    backgroundColor: '#FBFBFB',
-    color: '#001B4A',
-
-    // marginLeft: 20,
-    // marginRight: 20,
-    // marginTop: 10,
-    // height: 40,
-    // backgroundColor: '#ffffff',
-    // borderBottomColor: '#456CAF55',
-    // color: '#001B4A',
-    // fontFamily: "bold",
-    // fontSize: 16,
-    // borderRadius: 3,
-  },
-});
-
-const pickerSelectStyles_tablet = StyleSheet.create({
-  placeholder: {
-    color: "#6F6F6F",
-    fontFamily: "regular",
-    fontSize: 20,
-  },
-  inputIOS: {
-    justifyContent: 'center',
-    height: 52,
-    borderRadius: 3,
-    borderWidth: 1,
-    fontFamily: 'regular',
-    //paddingLeft: -20,
-    fontSize: 20,
-    borderColor: '#FBFBFB',
-    backgroundColor: '#FBFBFB',
-  },
-  inputAndroid: {
-    justifyContent: 'center',
-    height: 52,
-    borderRadius: 3,
-    borderWidth: 1,
-    fontFamily: 'regular',
-    //paddingLeft: -20,
-    fontSize: 20,
-    borderColor: '#FBFBFB',
-    backgroundColor: '#FBFBFB',
-    color: '#001B4A',
-
-    // marginLeft: 20,
-    // marginRight: 20,
-    // marginTop: 10,
-    // height: 40,
-    // backgroundColor: '#ffffff',
-    // borderBottomColor: '#456CAF55',
-    // color: '#001B4A',
-    // fontFamily: "bold",
-    // fontSize: 16,
-    // borderRadius: 3,
-  },
-});
-
-
 const styles = StyleSheet.create({
-
   imagealign: {
     marginTop: Device.isTablet ? 25 : 20,
     marginRight: Device.isTablet ? 30 : 20,
@@ -466,257 +393,43 @@ const styles = StyleSheet.create({
     // marginRight: -40,
     // paddingLeft: Device.isTablet ? 0 : 20,
     backgroundColor: '#ffffff',
-    marginTop: Device.isTablet ? deviceheight - RH(650) : deviceheight - RH(450),
-    height: Device.isTablet ? RH(600) : RH(500),
+    marginTop: Device.isTablet ? deviceheight - RH(550) : deviceheight - RH(350),
+    height: Device.isTablet ? RH(700) : RH(600),
   },
-
-  // Styles For Mobile
-
-  filterMainContainer_mobile: {
-    width: deviceWidth,
-    alignItems: 'center',
-    marginLeft: -20,
-    backgroundColor: "#ffffff",
-    height: 400,
-    position: 'absolute',
-    bottom: -20,
-  },
-  filterByTitle_mobile: {
-    position: 'absolute',
-    left: 20,
-    top: 15,
-    width: 300,
-    height: 20,
-    fontFamily: 'medium',
-    fontSize: 16,
-    color: '#353C40'
-  },
-  filterByTitleDecoration_mobile: {
-    height: Device.isTablet ? 2 : 1,
-    width: deviceWidth,
-    backgroundColor: 'lightgray',
-    marginTop: 50,
-  },
-  filterCloseButton_mobile: {
-    position: 'absolute',
-    right: 8,
-    top: 15,
-    width: 50, height: 50,
-  },
-  filterDateButton_mobile: {
-    width: deviceWidth - 40,
-    marginTop: 5,
-    marginBottom: 10,
-    marginLeft: 20,
-    marginRight: 20,
-    paddingLeft: 15,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    height: 50,
-    backgroundColor: "#F6F6F6",
-    borderRadius: 5,
-  },
-  filterDateButtonText_mobile: {
-    marginLeft: 16,
-    marginTop: 20,
-    color: "#6F6F6F",
-    fontSize: 15,
-    fontFamily: "regular"
-  },
-  datePickerContainer_mobile: {
-    height: 280,
-    width: deviceWidth,
-    backgroundColor: '#ffffff'
-  },
-  datePickerButton_mobile: {
-    position: 'absolute',
-    left: 20,
-    top: 10,
-    height: 30,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  datePickerEndButton_mobile: {
-    position: 'absolute',
-    right: 20,
-    top: 10,
-    height: 30,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  datePickerButtonText_mobile: {
-    textAlign: 'center',
-    marginTop: 5,
-    color: "#ffffff",
-    fontSize: 15,
-    fontFamily: "regular"
-  },
-  input_mobile: {
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 20,
-    height: 44,
-    marginTop: 5,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 14,
-  },
-  filterCloseImage_mobile: {
-    color: '#ED1C24',
-    fontFamily: 'regular',
-    fontSize: 12,
-    position: 'absolute',
-    top: 10,
-    right: 0,
-  },
-  filterApplyButton_mobile: {
+  filterApplyButton: {
     width: deviceWidth - 40,
     marginLeft: 20,
     marginRight: 20,
     marginTop: 20,
-    height: 50,
+    height: Device.isTablet ? 60 : 50,
     backgroundColor: "#ED1C24",
     borderRadius: 5,
   },
-  filterButtonText_mobile: {
+  filterButtonText: {
     textAlign: 'center',
     marginTop: 20,
     color: "#ffffff",
-    fontSize: 15,
+    fontSize: Device.isTablet ? 20 : 15,
     fontFamily: "regular"
   },
-  filterCancelButton_mobile: {
+  filterCancelButton: {
     width: deviceWidth - 40,
     marginLeft: 20,
     marginRight: 20,
     marginTop: 20,
-    height: 50,
+    height: Device.isTablet ? 60 : 50,
     backgroundColor: "#ffffff",
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "#353C4050",
   },
-  filterButtonCancelText_mobile: {
+  filterButtonCancelText: {
     textAlign: 'center',
     marginTop: 20,
     color: "#000000",
-    fontSize: 15,
-    fontFamily: "regular"
+    fontSize: Device.isTablet ? 20 : 15
   },
-  rnSelect_mobile: {
-    color: '#8F9EB7',
-    fontSize: 15
-  },
-  rnSelectContainer_mobile: {
-    justifyContent: 'center',
-    margin: 20,
-    height: 44,
-    marginTop: 5,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 14,
-  },
-
-  // Styles For Tablet
-  filterMainContainer_tablet: {
-    width: deviceWidth,
-    alignItems: 'center',
-    marginLeft: -40,
-    backgroundColor: "#ffffff",
-    height: 500,
-    position: 'absolute',
-    bottom: -40,
-  },
-  filterByTitle_tablet: {
-    position: 'absolute',
-    left: 20,
-    top: 15,
-    width: 300,
-    height: 30,
-    fontFamily: 'medium',
-    fontSize: 21,
-    color: '#353C40'
-  },
-  filterByTitleDecoration_tablet: {
-    height: Device.isTablet ? 2 : 1,
-    width: deviceWidth,
-    backgroundColor: 'lightgray',
-    marginTop: 60,
-  },
-  input_tablet: {
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 20,
-    height: 54,
-    marginTop: 5,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 20,
-  },
-  filterCloseButton_tablet: {
-    position: 'absolute',
-    right: 24,
-    top: 10,
-    width: 60, height: 60,
-  },
-  filterCloseImage_tablet: {
-    color: '#ED1C24',
-    fontFamily: 'regular',
-    fontSize: 17,
-    position: 'absolute',
-    top: 10,
-    right: 24,
-  },
-  filterApplyButton_tablet: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-    height: 60,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  filterButtonText_tablet: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#ffffff",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  filterCancelButton_tablet: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-    height: 60,
-    backgroundColor: "#ffffff",
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#353C4050",
-  },
-  filterButtonCancelText_tablet: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#000000",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  filterDateButton_tablet: {
+  filterDateButton: {
     width: deviceWidth - 40,
     marginTop: 5,
     marginBottom: 10,
@@ -725,60 +438,45 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     borderColor: '#8F9EB717',
     borderRadius: 3,
-    height: 60,
+    height: Device.isTablet ? 60 : 50,
     backgroundColor: "#F6F6F6",
     borderRadius: 5,
   },
-  filterDateButtonText_tablet: {
+  filterDateButtonText: {
     marginLeft: 16,
     marginTop: 20,
     color: "#6F6F6F",
-    fontSize: 20,
-    fontFamily: "regular"
+    fontSize: Device.isTablet ? 20 : 15
   },
-  datePickerButton_tablet: {
+  datePickerButton: {
     position: 'absolute',
     left: 20,
     top: 10,
-    height: 40,
+    height: Device.isTablet ? 40 : 30,
     backgroundColor: "#ED1C24",
     borderRadius: 5,
   },
-  datePickerButtonText_tablet: {
+  datePickerButtonText: {
     textAlign: 'center',
     marginTop: 5,
     color: "#ffffff",
-    fontSize: 20,
-    fontFamily: "regular"
+    fontSize: Device.isTablet ? 20 : 15,
   },
-  datePickerEndButton_tablet: {
+  datePickerEndButton: {
     position: 'absolute',
     right: 20,
     top: 10,
-    height: 40,
+    height: Device.isTablet ? 40 : 30,
     backgroundColor: "#ED1C24",
     borderRadius: 5,
   },
-  rnSelect_tablet: {
-    color: '#8F9EB7',
-    fontSize: 20
-  },
-  rnSelectContainer_tablet: {
-    justifyContent: 'center',
-    margin: 20,
-    height: 54,
-    marginTop: 5,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 20,
-  },
-
-
+  headings: {
+    fontSize: Device.isTablet ? 20 : 15,
+    marginLeft: 20,
+    color: '#B4B7B8',
+    marginTop: Device.isTablet ? 10 : 5,
+    marginBottom: Device.isTablet ? 10 : 5,
+  }
 });
 
 

@@ -4,6 +4,7 @@ import { AppRegistry, LogBox } from 'react-native';
 // import * as CryptoJS from 'react-native-crypto-js';
 import 'react-native-gesture-handler';
 import App from './src/components/App';
+import { logOut } from './src/components/Profile/Settings';
 LogBox.ignoreAllLogs(true);
 
 // // For requests
@@ -50,7 +51,7 @@ axios.interceptors.response.use((response) => response, (error) => {
   }
 
   if (error.response.status === 401) {
-
+    // logOut()
     alert('Please login to access this resource');
   }
   if (error.response.status === 400) {

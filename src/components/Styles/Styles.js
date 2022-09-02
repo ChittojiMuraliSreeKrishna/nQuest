@@ -191,13 +191,19 @@ export const flatListTextStyle = {
 };
 
 export const highText = {
-	fontSize: RF(10),
+	fontSize: RF(14),
 	fontFamily: "medium",
 	color: color.accent,
 };
 
 export const textStyleMedium = {
 	fontSize: RF(10),
+	fontFamily: "medium",
+	color: color.dark,
+};
+
+export const textStyleSmall = {
+	fontSize: RF(8),
 	fontFamily: "medium",
 	color: color.dark,
 };
