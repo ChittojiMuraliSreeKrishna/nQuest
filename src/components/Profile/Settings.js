@@ -14,6 +14,15 @@ import ProfileService from '../services/ProfileService';
 
 var deviceWidth = Dimensions.get("window").width;
 
+
+export const logOut = async (props) => {
+  AsyncStorage.removeItem("phone_number");
+  AsyncStorage.multiRemove([])
+  global.username = ''
+  AsyncStorage.clear().then(() => console.log('Cleared'))
+  props.navigation.navigate("Login")
+  return true;
+}
 export default class Settings extends Component {
   constructor(props) {
     super(props)
@@ -161,23 +170,13 @@ export default class Settings extends Component {
     });
   }
 
-  async logOut() {
-    AsyncStorage.removeItem("phone_number");
-    AsyncStorage.multiRemove([])
-    this.clearAllData()
-    global.username = ''
-    // AsyncStorage.clear().then(() => console.log('Cleared'))
-    this.props.navigation.navigate("Login")
-    return true;
-  }
-
   render() {
     const { mobileNumberValid, emailValid, errors } = this.state
     return (
       <View style={scss.container}>
         <Appbar style={scss.header}>
           <Appbar.Content title="Profile" />
-          <Button icon="logout" mode='text' onPress={() => this.logOut()}>
+          <Button icon="logout" mode='text' onPress={() => logOut(this.props)}>
             Logout
           </Button>
         </Appbar>
