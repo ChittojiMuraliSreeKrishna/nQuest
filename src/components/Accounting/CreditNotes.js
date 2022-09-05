@@ -18,6 +18,9 @@ import Modal from "react-native-modal";
 import Loader from "../../commonUtils/loader";
 import { RF, RH, RW } from "../../Responsive";
 import AccountingService from "../services/AccountingService";
+import scss from "../../commonUtils/assets/styles/style.scss";
+import IconFA from 'react-native-vector-icons/FontAwesome';
+import IconAN from 'react-native-vector-icons/AntDesign';
 import {
 	cancelBtn,
 	cancelBtnText,
@@ -420,61 +423,50 @@ export default class CreditNotes extends Component {
 					scrollEnabled={true}
 					// ListEmptyComponent={<Text style={listEmptyMessage}>&#9888; Records Not Found</Text>}
 					renderItem={({ item, index }) => (
-						<View style={flatListMainContainer}>
-							<View style={flatlistSubContainer}>
-								<View style={textContainer}>
-									<Text style={highText}>#CRM ID: {item.customerId}</Text>
-									<Text style={textStyleLight}>
+						<ScrollView>
+						<View style={scss.flatListContainer}>
+							<View style={scss.flatListSubContainer}>
+								<View style={scss.textContainer}>
+									<Text style={scss.highText}>#CRM ID: {item.customerId}</Text>
+									<Text style={scss.textStyleMedium}>Name: {item.customerName}</Text>
+								</View>
+								<View style={scss.textContainer}>
+									<Text style={scss.textStyleMedium}>STORE: {item.storeId}</Text>
+									<Text style={scss.textStyleLight}>
+										APPROVED BY: {"\n"}
+										{item.createdBy}
+									</Text>
+								</View>
+								<View style={scss.textContainer}>
+									<Text style={scss.textStyleLight}>
+										USED AMMOUNT: {item.usedAmount}
+									</Text>
+									<Text style={scss.textStyleLight}>BALANCE: {item.amount}</Text>
+								</View>
+								<View style={scss.flatListFooter}>
+								<Text style={scss.footerText}>
 										DATE:{" "}
 										{item.createdDate
 											? item.createdDate.toString().split(/T/)[0]
 											: item.createdDate}
 									</Text>
-								</View>
-								<View style={textContainer}>
-									<Text style={textStyleMedium}>STORE: {item.storeId}</Text>
-									<Text style={textStyleLight}>
-										APPROVED BY: {"\n"}
-										{item.createdBy}
-									</Text>
-								</View>
-								<View style={textContainer}>
-									<Text style={textStyleLight}>
-										USED AMMOUNT: {item.usedAmount}
-									</Text>
-									<Text style={textStyleLight}>BALANCE: {item.amount}</Text>
-								</View>
-								<View style={textContainer}>
-									<Text style={textStyleMedium}>Name: {item.customerName}</Text>
-									<View style={buttonContainer}>
-										<TouchableOpacity
-											style={buttonStyle1}
-											onPress={() => this.handleViewCredit(item, index)}
-										>
-											<Image
-												style={buttonImageStyle}
-												source={require("../assets/images/eye.png")}
-											/>
-										</TouchableOpacity>
-
-										<TouchableOpacity
-											style={buttonStyle}
+									<View style={scss.buttonContainer}>
+											<IconFA
+												name="eye"
+												style={{ paddingRight: 10 }}
+												size={25}
+												onPress={() => this.handleViewCredit(item, index)}
+											></IconFA>
+										<IconAN
+											name="plus"
+											size={25}
 											onPress={() => this.handleAddCredit(item, index)}
-										>
-											<Text
-												style={{
-													fontSize: RF(20),
-													textAlign: "center",
-													color: "#00000050",
-												}}
-											>
-												+
-											</Text>
-										</TouchableOpacity>
+										></IconAN>
 									</View>
 								</View>
 							</View>
 						</View>
+						</ScrollView>
 					)}
 				/>
 				{this.state.flagFilterOpen && (

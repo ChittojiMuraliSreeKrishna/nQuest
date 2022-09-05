@@ -5,11 +5,11 @@ import {
 	ScrollView,
 	StyleSheet,
 	Text,
-	TextInput,
 	TouchableOpacity,
 	View,
 } from "react-native";
 import Device from "react-native-device-detection";
+import { Appbar, TextInput } from "react-native-paper";
 import RNPickerSelect from "react-native-picker-select";
 import { Chevron } from "react-native-shapes";
 import AccountingService from "../services/AccountingService";
@@ -291,20 +291,10 @@ export default class AddHsnCode extends Component {
 	render() {
 		return (
 			<View style={styles.mainContainer}>
-				<View style={headerTitleContainer}>
-					<View style={headerTitleSubContainer}>
-						<TouchableOpacity
-							style={backButton}
-							onPress={() => this.handleBackButtonClick()}
-						>
-							<Image
-								style={backButtonImage}
-								source={require("../assets/images/backButton.png")}
-							/>
-						</TouchableOpacity>
-						<Text style={headerTitle}>{this.state.navText}</Text>
-					</View>
-				</View>
+		<Appbar mode="center-aligned">
+          <Appbar.BackAction onPress={() => this.handleBackButtonClick()}  />
+          <Appbar.Content title={this.state.navText} />
+        </Appbar>
 				<ScrollView>
 					<Text style={inputHeading}>HSN Code</Text>
 					<TextInput

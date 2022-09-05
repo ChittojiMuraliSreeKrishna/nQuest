@@ -41,7 +41,8 @@ export class ListOfBarcodes extends Component {
       barcode: "",
       mrp: "",
       qty: "",
-      listBarcodes: []
+      listBarcodes: [],
+      filterActive: false,
     };
   }
 
@@ -70,6 +71,11 @@ export class ListOfBarcodes extends Component {
 
   filterAction() {
     this.setState({ flagFilterOpen: true, modalVisible: true })
+  }
+
+  clearFilterAction() {
+    this.setState({filterActive: false, listBarcodes: [], startDate: "", endDate: "", empId: "",
+    fromPrice: "", toPrice: "", barCode: "" })
   }
 
 
@@ -214,11 +220,19 @@ export class ListOfBarcodes extends Component {
       <View>
         <Appbar>
           <Appbar.Content title="List Of Barcodes" />
+          {this.state.filterActive ? 
+          <IconFA
+            name="sliders"
+            size={25}
+            color="#ed1c24"
+            onPress={() => this.clearFilterAction()}
+          ></IconFA> :
           <IconFA
             name="sliders"
             size={25}
             onPress={() => this.filterAction()}
           ></IconFA>
+  }
         </Appbar>
         <FlatList
           data={this.state.listBarcodes}

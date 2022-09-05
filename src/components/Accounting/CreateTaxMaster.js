@@ -19,6 +19,8 @@ import {
   textStyleLight,
   textStyleMedium
 } from "../Styles/Styles";
+import scss from "../../commonUtils/assets/styles/style.scss";
+
 var deviceHeight = Dimensions.get("window").height;
 var deviceWidth = Dimensions.get("window").width;
 
@@ -93,9 +95,9 @@ export default class CreateTaxMaster extends Component {
         <FlatList
           ListHeaderComponent={
             <View style={flatListHeaderContainer}>
-              <Text style={flatListTitle}>Create Tax Master</Text>
+              <Text style={flatListTitle}>Create Tax Master - <Text style={{color: '#ed1c24'}}>{this.state.taxList.length}</Text></Text>
               <TouchableOpacity onPress={() => this.navigateToAddTax()}>
-                <Text style={{ fontSize: 20 }}>+</Text>
+                <Text style={{ fontSize: 25 }}>+</Text>
               </TouchableOpacity>
             </View>
           }
@@ -103,18 +105,19 @@ export default class CreateTaxMaster extends Component {
           style={{ marginTop: 10 }}
           scrollEnabled={true}
           renderItem={({ item, index }) => (
-            <View style={flatListMainContainer}>
-              <View style={flatlistSubContainer}>
-                <View style={textContainer}>
-                  <Text style={highText}>TAX Label: {item.taxLabel}</Text>
-                  <Text style={textStyleMedium}>CGST: {item.cgst}</Text>
+            <View style={scss.flatListContainer}>
+              <View style={scss.flatListSubContainer}>
+                <View style={scss.textContainer}>
+                  <Text style={scss.textStyleLight}>
+                  <Text style={scss.highText}>{item.taxLabel}</Text></Text>
+                  <Text style={scss.textStyleMedium}>CGST: {item.cgst}</Text>
                 </View>
-                <View style={textContainer}>
-                  <Text style={textStyleLight}>SGST: {item.sgst}</Text>
-                  <Text style={textStyleLight}>IGST: {item.igst}</Text>
+                <View style={scss.textContainer}>
+                  <Text style={scss.textStyleMedium}>SGST: {item.sgst}</Text>
+                  <Text style={scss.textStyleLight}>IGST: {item.igst}</Text>
                 </View>
-                <View style={textContainer}>
-                  <Text style={textStyleLight}>CESS: {item.cess}</Text>
+                <View style={scss.textContainer}>
+                  <Text style={scss.textStyleLight}>CESS: {item.cess}</Text>
                   <View style={buttonContainer}>
                     {/* <TouchableOpacity style={buttonStyle1} onPress={() => this.handleeditTax(item, index)}>
                       <Image style={buttonImageStyle} source={require('../assets/images/edit.png')} />

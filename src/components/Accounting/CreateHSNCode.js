@@ -10,6 +10,7 @@ import {
 import scss from "../../commonUtils/assets/styles/style.scss";
 import Loader from "../../commonUtils/loader";
 import AccountingService from "../services/AccountingService";
+import Icon from 'react-native-vector-icons/AntDesign'
 import {
 	buttonContainer,
 	buttonImageStyle,
@@ -22,6 +23,7 @@ import {
 	textStyleLight,
 	textStyleMedium,
 } from "../Styles/Styles";
+import { ScrollView } from "react-native";
 var deviceWidth = Dimensions.get("window").width;
 
 export default class CreateHSNCode extends Component {
@@ -95,47 +97,57 @@ export default class CreateHSNCode extends Component {
 				<FlatList
 					ListHeaderComponent={
 						<View style={scss.headerContainer}>
-							<Text style={flatListTitle}>Create HSN Code</Text>
-							<TouchableOpacity onPress={() => this.navigateToAddHsnCode()}>
-								<Text style={{ fontSize: 20 }}>+</Text>
-							</TouchableOpacity>
+							<Text style={flatListTitle}>Create HSN Code - <Text style={{color: '#ed1c24'}}>{this.state.hsnList.length}</Text> </Text>
+							<Icon
+							name="plus"
+							size={25}
+							onPress={() => this.navigateToAddHsnCode()}
+							></Icon>
 						</View>
 					}
 					data={this.state.hsnList}
 					style={{ marginTop: 20 }}
 					scrollEnabled={true}
 					renderItem={({ item, index }) => (
-						<View style={flatListMainContainer}>
-							<View style={flatlistSubContainer}>
-								<View style={textContainer}>
-									<Text style={highText}>HSN CODE: {item.hsnCode}</Text>
+						<ScrollView>
+						<View style={scss.flatListContainer}>
+							<View style={scss.flatListSubContainer}>
+								<View style={scss.textContainer}>
+									<Text style={scss.highText}>{item.hsnCode}</Text>
 								</View>
-								<View style={textContainer}>
-									<Text style={textStyleMedium}>
+								<View style={scss.textContainer}>
+									<Text style={scss.textStyleMedium}>
 										GOODS/SERVICES: {"\n"}
 										{item.description}
 									</Text>
-									<Text style={textStyleLight}>
+									<Text style={scss.textStyleLight}>
 										TAX APPLICABLE: {"\n"}
 										{item.taxAppliesOn}
 									</Text>
 								</View>
-								<View style={textContainer}>
+								<View style={scss.textContainer}>
 									<Text style={textStyleLight}>SLAB: {item.slabBased}</Text>
-									<View style={buttonContainer}>
-										<TouchableOpacity
-											style={buttonStyle1}
+								</View>
+								<View style={scss.flatListFooter}>
+								<Text style={scss.footerText}>
+                        Date :{" "}
+                        {item.createdDate
+                          ? item.createdDate.toString().split(/T/)[0]
+                          : item.createdDate}
+                      </Text>
+					  <TouchableOpacity
+											style={scss.footerSingleBtn}
 											onPress={() => this.handleeditHsn(item, index)}
 										>
 											<Image
-												style={buttonImageStyle}
+												style={scss.footerBtnImg}
 												source={require("../assets/images/edit.png")}
 											/>
 										</TouchableOpacity>
-									</View>
 								</View>
 							</View>
 						</View>
+						</ScrollView>
 					)}
 				/>
 			</View>

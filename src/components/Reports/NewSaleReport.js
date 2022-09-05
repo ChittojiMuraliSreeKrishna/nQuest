@@ -116,7 +116,7 @@ export default class NewSaleReport extends Component {
         console.log(res.data.result);
         if (res.data && res.data["isSuccess"] === "true") {
           if (res.data.result.length !== 0) {
-            this.setState({ newSale: res.data.result.newSale.content })
+            this.setState({ newSale: res.data.result.newSale.content, filterActive: true })
             this.modelCancel()
             console.log(this.state.newSale)
           } else {
@@ -220,6 +220,9 @@ export default class NewSaleReport extends Component {
     this.setState({ modalVisible: false, flagFilterNewSale: false })
   }
 
+  clearFilterAction() {
+    this.setState({filterActive: false, newSale: [], fromDate: "", toDate: "", billPosition: "", invoiceNumber: "", mobileNumber: "", empId: ""})
+  }
 
 
   render() {
@@ -227,11 +230,19 @@ export default class NewSaleReport extends Component {
       <View>
         <Appbar>
           <Appbar.Content title="New Sale Report" />
+          {this.state.filterActive ? 
+          <IconFA
+            name="sliders"
+            size={25}
+            color="#ed1c24"
+            onPress={() => this.clearFilterAction()}
+          ></IconFA> :
           <IconFA
             name="sliders"
             size={25}
             onPress={() => this.filterAction()}
           ></IconFA>
+  }
         </Appbar>
         <FlatList
           data={this.state.newSale}
