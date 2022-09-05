@@ -526,12 +526,12 @@ class GenerateInvoiceSlip extends Component {
       onGoBack: () => this.invoiceUpdate(),
     };
     this.props.navigation.navigate('TextilePayment', obj);
+    this.invoiceUpdate()
     console.log("data in invoice slip", obj);
   }
 
   invoiceUpdate() {
-    this.setState({ barCodeList: [] });
-    this.setState({ dsNumber: [] });
+    this.setState({ barCodeList: [], dsNumber: '', dsNumberList: [] });
   }
 
   endEditing() {
@@ -769,10 +769,10 @@ class GenerateInvoiceSlip extends Component {
                   />
                   <TouchableOpacity
                     style={{
-                      marginTop: RH(5),
-                      backgroundColor: "#353C40", width: Device.isTablet ? 120 : 70, height: Device.isTablet ? 55 : 45
+                      marginTop: RH(10),
+                      backgroundColor: "#353C40", width: Device.isTablet ? 120 : 50, height: Device.isTablet ? 55 : 45
                     }}
-                    onPress={() => this.navigateToScan()} >
+                    onPress={() => this.navigateToScanCode()} >
                     {/* <Image
                       source={require('../../commonUtils/assets/Images/scan_icon.png')}
                     /> */}

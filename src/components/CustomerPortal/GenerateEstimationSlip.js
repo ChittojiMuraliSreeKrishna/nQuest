@@ -672,7 +672,7 @@ class GenerateEstimationSlip extends Component {
                                   // width: Device.isTablet ? 50 : 30,
                                   color: '#ED1C24',
                                   fontFamily: 'regular',
-                                  fontSize: RF(14)
+                                  fontSize: RF(10)
                                   // fontSize: Device.isTablet ? 22 : 12,
                                 }}
                                 mode="flat"
