@@ -215,6 +215,7 @@ export default class Settings extends Component {
               underlineColor='#6f6f6f'
               keyboardType="phone-pad"
               style={scss.inputField}
+              maxLength={13}
               label="Mobile"
               value={this.state.mobileNumber}
               onChangeText={(value) => this.handleMobileNumber(value)}

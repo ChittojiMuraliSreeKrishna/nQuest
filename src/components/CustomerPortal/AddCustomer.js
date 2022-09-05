@@ -15,6 +15,7 @@ var deviceheight = Dimensions.get('window').height;
 var deviceheight = Dimensions.get('window').height;
 var deviceWidth = Dimensions.get("window").width;
 
+var mobileNumber = ''
 
 export default class AddCustomer extends Component {
 
@@ -107,6 +108,7 @@ export default class AddCustomer extends Component {
             alert(res.data.message);
           } else {
             alert("Customer Added Successfully");
+            mobileNumber = ''
           }
           this.setState({
             username: "",
@@ -151,6 +153,7 @@ export default class AddCustomer extends Component {
 
   handleMobileNumber(text) {
     this.setState({ phoneNumber: text });
+    mobileNumber = text
   }
 
   handleMobileValid = () => {
@@ -228,7 +231,7 @@ export default class AddCustomer extends Component {
           keyboardType='phone-pad'
           onBlur={this.handleMobileValid}
           textContentType='telephoneNumber'
-          value={this.state.phoneNumber}
+          value={mobileNumber}
           onChangeText={(text) => this.handleMobileNumber(text)}
         />
         {!mobileValid && <Message imp={true} message={this.state.errors["mobile"]} />}
@@ -257,7 +260,7 @@ export default class AddCustomer extends Component {
         <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
           mode="flat"
           activeUnderlineColor='#000'
-          underlineColor={gstValid?'#6f6f6f':'#dd0000'}
+          underlineColor={gstValid ? '#6f6f6f' : '#dd0000'}
           label={I18n.t('GST Number')}
           value={this.state.gstNumber}
           onBlur={(text) => this.handleGstNumberValid(text)}
@@ -484,7 +487,7 @@ const styles = StyleSheet.create({
   // Mobile Styles
   hederText_mobile: {
     color: "#ED1C24",
-    fontSize: RF(20),
+    fontSize: RF(16),
     fontFamily: "bold",
     margin: RF(10),
     flexDirection: 'column',
@@ -591,7 +594,7 @@ const styles = StyleSheet.create({
   // Tablet Styles
   headerText_tablet: {
     color: "#353C40",
-    fontSize: 40,
+    fontSize: RF(18),
     fontFamily: "bold",
     marginLeft: 10,
     marginTop: 10,

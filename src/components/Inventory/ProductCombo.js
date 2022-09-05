@@ -326,7 +326,7 @@ export default class ProductCombo extends Component {
                 <View style={scss.flatListContainer}>
                   <View style={scss.flatListSubContainer}>
                     <View style={scss.textContainer}>
-                      <Text style={scss.highText}>Invetory-ID: {item.id}</Text>
+                      <Text style={scss.highText}>Inventory-ID: {item.id}</Text>
                     </View>
                     <View style={scss.textContainer}>
                       <Text style={scss.textStyleMedium}>Store Id: {item.storeId}</Text>

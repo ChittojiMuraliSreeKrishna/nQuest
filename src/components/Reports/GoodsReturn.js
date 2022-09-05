@@ -329,7 +329,7 @@ export class GoodsReturn extends Component {
                     </View>
                     <View>
                       <TouchableOpacity style={{ width: Device.isTablet ? 60 : 50, height: Device.isTablet ? 60 : 50, marginTop: Device.isTablet ? 20 : 15, }} onPress={() => this.modelCancel()}>
-                        <Image style={{ margin: 5 }} source={require('../assets/images/modelcancel.png')} />
+                        <Image style={{ margin: RH(5) }} source={require('../assets/images/modelcancel.png')} />
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -574,8 +574,8 @@ const styles = StyleSheet.create({
     // marginRight: -40,
     // paddingLeft: Device.isTablet ? 0 : 20,
     backgroundColor: '#ffffff',
-    marginTop: Device.isTablet ? deviceheight - RW(700) : deviceheight - RW(600),
-    height: Device.isTablet ? RH(850) : RH(750),
+    marginTop: Device.isTablet ? deviceheight - RH(550) : deviceheight - RH(500),
+    height: Device.isTablet ? RH(550) : RH(480)
   },
 
   // Styles For Mobile

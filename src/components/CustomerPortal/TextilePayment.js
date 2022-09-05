@@ -15,6 +15,9 @@ import Loader from '../../commonUtils/loader';
 import LoginService from '../services/LoginService';
 import NewSaleService from '../services/NewSaleService';
 import PromotionsService from '../services/PromotionsService';
+import { Appbar } from 'react-native-paper';
+
+
 var deviceWidth = Dimensions.get('window').width;
 var deviceWidth = Dimensions.get('window').width;
 var deviceheight = Dimensions.get('window').height;
@@ -1114,33 +1117,14 @@ class TextilePayment extends Component {
 
     render() {
         return (
-            <View style={styles.container}>
-                {this.state.loading &&
-                    <Loader
-                        loading={this.state.loading} />
-                }
-
-                <View style={styles.viewswidth}>
-                    <TouchableOpacity style={{
-                        position: 'absolute',
-                        left: 10,
-                        top: 30,
-                        width: 40,
-                        height: 40,
-                    }} onPress={() => this.handleBackButtonClick()}>
-                        <Image source={require('../assets/images/backButton.png')} />
-                    </TouchableOpacity>
-                    <Text style={{
-                        position: 'absolute',
-                        left: 70,
-                        top: 47,
-                        width: 300,
-                        height: 20,
-                        fontFamily: 'bold',
-                        fontSize: 18,
-                        color: '#353C40'
-                    }}> Payment method </Text>
-                </View>
+            <View style={styles.mainContainer}>
+                {this.state.loading && <Loader loading={this.state.loading} />}
+                <Appbar style={styles.subContainer}>
+                    <Appbar.BackAction
+                        onPress={() => this.handleBackButtonClick()}
+                    />
+                    <Appbar.Content title="Payment method" />
+                </Appbar>
 
                 <ScrollView>
                     <View style={styles.container}>
@@ -1944,6 +1928,14 @@ export default TextilePayment;
 
 
 const styles = StyleSheet.create({
+    mainContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        // backgroundColor: '#FAFAFF'
+    },
+    subContainer: {
+        backgroundColor: '#FFFFFF'
+    },
     filterMainContainer: {
         marginLeft: -40,
         marginRight: -40,
@@ -2064,11 +2056,6 @@ const styles = StyleSheet.create({
         paddingTop: 30,
         backgroundColor: '#FFFFFF',
         borderRadius: 10,
-    },
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        // backgroundColor: '#FAFAFF'
     },
     flatListContainer: {
         marginTop: 20,
