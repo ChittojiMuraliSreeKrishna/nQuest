@@ -404,7 +404,7 @@ export default class Barcode extends Component {
                 <Text style={flatListTitle}>
                   Barcode List -{" "}
                   <Badge size={30} style={{ color: "#ED1C24", }}>
-                    {this.state.barcodesList.length}
+                    {this.state.filterActive ? this.state.filterBarcodesList.length : this.state.barcodesList.length}
                   </Badge>
                 </Text>
                 <View style={scss.headerContainer}>
@@ -456,8 +456,10 @@ export default class Barcode extends Component {
                         <Text style={scss.highText}>S.NO: {index + 1}</Text>
                       </View>
                       <View style={scss.textContainer}>
-                        <Text style={scss.textStyleMedium}>
-                          {I18n.t("DOMAIN")}: {item.domainType}
+                        <Text style={scss.textStyleLight}> {I18n.t("DOMAIN")}:
+                          <Text style={scss.textStyleMedium}>
+                            {item.domainType}
+                          </Text>
                         </Text>
                         <Text style={scss.textStyleLight}>
                           {I18n.t("VALUE")}: ₹{item.value}
@@ -494,7 +496,7 @@ export default class Barcode extends Component {
                           </IconMA>
                           <IconFA
                             name="edit"
-                            style={{ paddingRight: 5 }}
+                            style={[scss.action_icons, { paddingRight: 5 }]}
                             size={25}
                             color="#000"
                             onPress={() =>
@@ -505,6 +507,7 @@ export default class Barcode extends Component {
                           <IconMA
                             name="trash-can-outline"
                             size={25}
+                            style={scss.action_icons}
                             onPress={() =>
                               this.deleteInventory(item?.id)
                             }

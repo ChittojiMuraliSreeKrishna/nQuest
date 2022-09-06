@@ -167,6 +167,7 @@ export default class Inventory extends Component {
                       scss.pageNavigationBtn,
                       {
                         borderColor: item.bool ? "#ED1C24" : "#d7d7d7",
+                        borderBottomWidth: item.bool ? 3 : 0
                       },
                     ]}
                     onPress={() => this.topbarAction1(item, index)}

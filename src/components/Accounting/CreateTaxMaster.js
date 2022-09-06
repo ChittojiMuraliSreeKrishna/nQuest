@@ -2,24 +2,16 @@ import React, { Component } from "react";
 import {
   Dimensions,
   FlatList,
-  Text,
-  TouchableOpacity,
-  View
+  ScrollView,
+  Text, View
 } from "react-native";
+import IconIA from 'react-native-vector-icons/Ionicons';
+import scss from "../../commonUtils/assets/styles/style.scss";
 import Loader from "../../commonUtils/loader";
 import AccountingService from "../services/AccountingService";
 import {
-  buttonContainer,
-  flatListHeaderContainer,
-  flatListMainContainer,
-  flatlistSubContainer,
-  flatListTitle,
-  highText,
-  textContainer,
-  textStyleLight,
-  textStyleMedium
+  flatListHeaderContainer, flatListTitle
 } from "../Styles/Styles";
-import scss from "../../commonUtils/assets/styles/style.scss";
 
 var deviceHeight = Dimensions.get("window").height;
 var deviceWidth = Dimensions.get("window").width;
@@ -95,41 +87,36 @@ export default class CreateTaxMaster extends Component {
         <FlatList
           ListHeaderComponent={
             <View style={flatListHeaderContainer}>
-              <Text style={flatListTitle}>Create Tax Master - <Text style={{color: '#ed1c24'}}>{this.state.taxList.length}</Text></Text>
-              <TouchableOpacity onPress={() => this.navigateToAddTax()}>
-                <Text style={{ fontSize: 25 }}>+</Text>
-              </TouchableOpacity>
+              <Text style={flatListTitle}>Create Tax Master - <Text style={{ color: '#ed1c24' }}>{this.state.taxList.length}</Text></Text>
+              <IconIA
+                name="add-circle-outline"
+                size={25}
+                onPress={() => this.navigateToAddTax()}
+              ></IconIA>
             </View>
           }
           data={this.state.taxList}
-          style={{ marginTop: 10 }}
+          style={{ backgroundColor: '#FFF' }}
           scrollEnabled={true}
           renderItem={({ item, index }) => (
-            <View style={scss.flatListContainer}>
-              <View style={scss.flatListSubContainer}>
-                <View style={scss.textContainer}>
-                  <Text style={scss.textStyleLight}>
-                  <Text style={scss.highText}>{item.taxLabel}</Text></Text>
-                  <Text style={scss.textStyleMedium}>CGST: {item.cgst}</Text>
-                </View>
-                <View style={scss.textContainer}>
-                  <Text style={scss.textStyleMedium}>SGST: {item.sgst}</Text>
-                  <Text style={scss.textStyleLight}>IGST: {item.igst}</Text>
-                </View>
-                <View style={scss.textContainer}>
-                  <Text style={scss.textStyleLight}>CESS: {item.cess}</Text>
-                  <View style={buttonContainer}>
-                    {/* <TouchableOpacity style={buttonStyle1} onPress={() => this.handleeditTax(item, index)}>
-                      <Image style={buttonImageStyle} source={require('../assets/images/edit.png')} />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={buttonStyle} onPress={() => this.handledeleteTax(item, index)}>
-                      <Image style={buttonImageStyle} source={require('../assets/images/delete.png')} />
-                    </TouchableOpacity> */}
+            <ScrollView>
+              <View style={scss.flatListContainer}>
+                <View style={scss.flatListSubContainer}>
+                  <View style={scss.textContainer}>
+                    <Text style={scss.textStyleLight}>
+                      <Text style={scss.highText}>{item.taxLabel}</Text></Text>
+                    <Text style={scss.textStyleMedium}>CGST: {item.cgst}</Text>
+                  </View>
+                  <View style={scss.textContainer}>
+                    <Text style={scss.textStyleMedium}>SGST: {item.sgst}</Text>
+                    <Text style={scss.textStyleLight}>IGST: {item.igst}</Text>
+                  </View>
+                  <View style={scss.textContainer}>
+                    <Text style={scss.textStyleLight}>CESS: {item.cess}</Text>
                   </View>
                 </View>
               </View>
-            </View>
+            </ScrollView>
           )}
         />
       </View>

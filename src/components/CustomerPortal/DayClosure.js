@@ -1,15 +1,16 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React, { Component } from 'react';
-import { Alert, Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
+import scss from '../../commonUtils/assets/styles/style.scss';
+import Loader from '../../commonUtils/loader';
+import { RF, RH, RW } from '../../Responsive';
+import CustomerService from '../services/CustomerService';
+import { flatListTitle } from '../Styles/Styles';
 var deviceheight = Dimensions.get('window').height;
 var deviceheight = Dimensions.get('window').height;
 var deviceWidth = Dimensions.get("window").width;
-import { RF, RH, RW } from '../../Responsive';
-import CustomerService from '../services/CustomerService';
-import { flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleLight, textStyleMedium } from '../Styles/Styles';
-import Loader from '../../commonUtils/loader';
 export default class DayClosure extends Component {
 
   constructor(props) {
@@ -62,34 +63,36 @@ export default class DayClosure extends Component {
           <Loader
             loading={this.state.loading} />
         }
-        <FlatList
-          ListHeaderComponent={<View style={flatListHeaderContainer}>
-            <Text style={flatListTitle}>List of Pending Dl slips</Text>
-            {this.state.enableButton && (
-              <TouchableOpacity style={styles.closeBtn} onPress={() => this.closeDay()}>
-                <Text style={styles.closeBtnText}>Day Closure</Text>
-              </TouchableOpacity>
-            )}
-          </View>}
-          data={this.state.dayClosureList}
-          scrollEnabled={true}
-          style={{ marginTop: 20 }}
-          ListEmptyComponent={<Text style={styles.emptyText}>No Pending Delivery Slips</Text>}
-          renderItem={({ item, index }) => (
-            <View style={flatListMainContainer}>
-              <View style={flatlistSubContainer}>
-                <View style={textContainer}>
-                  <Text style={highText}>S.No: {index + 1}</Text>
-                  <Text style={textStyleLight}>M.R.P: {item.mrp}</Text>
-                </View>
-                <View style={textContainer}>
-                  <Text style={textStyleMedium}>DsNumber: {"\n"}{item.dsNumber}</Text>
-                  <Text style={textStyleLight}>SalesMan: {item.salesMan}</Text>
+        <View>
+          <FlatList
+            style={{ backgroundColor: '#FFF' }}
+            ListHeaderComponent={<View style={scss.headerContainer}>
+              <Text style={flatListTitle}>List of Pending Dl slips - <Text style={{ color: '#ED1C24' }}>{this.state.dayClosureList.length}</Text> </Text>
+              {this.state.enableButton && (
+                <TouchableOpacity style={styles.closeBtn} onPress={() => this.closeDay()}>
+                  <Text style={styles.closeBtnText}>Day Closure</Text>
+                </TouchableOpacity>
+              )}
+            </View>}
+            data={this.state.dayClosureList}
+            scrollEnabled={true}
+            ListEmptyComponent={<Text style={styles.emptyText}>No Pending Delivery Slips</Text>}
+            renderItem={({ item, index }) => (
+              <View style={scss.flatListContainer}>
+                <View style={scss.flatListSubContainer}>
+                  <View style={scss.textContainer}>
+                    <Text style={scss.highText}>S.No: {index + 1}</Text>
+                    <Text style={scss.textStyleLight}>M.R.P: {item.mrp}</Text>
+                  </View>
+                  <View style={scss.textContainer}>
+                    <Text style={scss.textStyleMedium}>DsNumber: {"\n"}{item.dsNumber}</Text>
+                    <Text style={scss.textStyleLight}>SalesMan: {item.salesMan}</Text>
+                  </View>
                 </View>
               </View>
-            </View>
-          )}
-        />
+            )}
+          />
+        </View>
       </View>
     );
   }
@@ -119,7 +122,7 @@ const styles = StyleSheet.create({
   closeBtn: {
     width: RW(150),
     height: RH(40),
-    backgroundColor:'#ED1C24',
+    backgroundColor: '#ED1C24',
     borderRadius: Device.isTablet ? 10 : 5,
   },
   closeBtnText: {

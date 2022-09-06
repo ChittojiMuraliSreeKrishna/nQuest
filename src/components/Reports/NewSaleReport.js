@@ -1,15 +1,18 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
-import { Appbar } from 'react-native-paper';
+import { Appbar, TextInput } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
 import IconFA from 'react-native-vector-icons/FontAwesome';
+import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
+import forms from '../../commonUtils/assets/styles/formFields.scss';
+import scss from '../../commonUtils/assets/styles/style.scss';
 import ReportsService from '../services/ReportsService';
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -221,7 +224,7 @@ export default class NewSaleReport extends Component {
   }
 
   clearFilterAction() {
-    this.setState({filterActive: false, newSale: [], fromDate: "", toDate: "", billPosition: "", invoiceNumber: "", mobileNumber: "", empId: ""})
+    this.setState({ filterActive: false, newSale: [], fromDate: "", toDate: "", billPosition: "", invoiceNumber: "", mobileNumber: "", empId: "" })
   }
 
 
@@ -230,19 +233,21 @@ export default class NewSaleReport extends Component {
       <View>
         <Appbar>
           <Appbar.Content title="New Sale Report" />
-          {this.state.filterActive ? 
-          <IconFA
-            name="sliders"
-            size={25}
-            color="#ed1c24"
-            onPress={() => this.clearFilterAction()}
-          ></IconFA> :
-          <IconFA
-            name="sliders"
-            size={25}
-            onPress={() => this.filterAction()}
-          ></IconFA>
-  }
+          {this.state.filterActive ?
+            <IconFA
+              name="sliders"
+              style={{ marginRight: 10 }}
+              size={25}
+              color="#ed1c24"
+              onPress={() => this.clearFilterAction()}
+            ></IconFA> :
+            <IconFA
+              name="sliders"
+              style={{ marginRight: 10 }}
+              size={25}
+              onPress={() => this.filterAction()}
+            ></IconFA>
+          }
         </Appbar>
         <FlatList
           data={this.state.newSale}
@@ -251,34 +256,46 @@ export default class NewSaleReport extends Component {
           keyExtractor={(item, i) => i.toString()}
           ListEmptyComponent={<Text style={{ fontSize: Device.isTablet ? 21 : 17, fontFamily: 'bold', color: '#000000', textAlign: 'center', marginTop: deviceheight / 3 }}>&#9888; {I18n.t("Results not loaded")}</Text>}
           renderItem={({ item, index }) => (
-            <View style={Device.isTablet ? flats.flatlistContainer_tablet : flats.flatlistContainer_mobile} >
-              <View style={Device.isTablet ? flats.flatlistSubContainer_tablet : flats.flatlistSubContainer_mobile}>
-                <View style={flats.text}>
-                  <Text style={Device.isTablet ? flats.flatlistTextAccent_tablet : flats.flatlistTextAccent_mobile} >S.NO: {index + 1} </Text>
-                  <Text style={Device.isTablet ? flats.flatlistText_tablet : flats.flatlistText_mobile}>INVOICE NUMBER: {"\n"} {item.invoiceNumber}</Text>
-                  <Text style={Device.isTablet ? flats.flatlistTextCommon_tablet : flats.flatlistTextCommon_mobile}>{I18n.t("EMP ID")}: {item.empId} </Text>
-                </View>
-                <View style={flats.text}>
-                  <Text style={Device.isTablet ? flats.flatlistTextCommon_tablet : flats.flatlistTextCommon_mobile} >{I18n.t("INVOICE DATE")}: {"\n"} {item.createdDate} </Text>
-                  <Text style={Device.isTablet ? flats.flatlistTextCommon_tablet : flats.flatlistTextCommon_mobile}>{I18n.t("BILL POSITION")}: {item.status}</Text>
-                </View>
+            <ScrollView>
+              <View style={scss.flatListContainer} >
+                <View style={scss.flatListSubContainer}>
+                  <View style={scss.textContainer}>
+                    <Text style={scss.highText} >S.NO: {index + 1} </Text>
+                    <Text style={scss.textStyleMedium}>INVOICE NUMBER: {"\n"} {item.invoiceNumber}</Text>
+                  </View>
+                  <View style={scss.textContainer}>
+                    <Text style={scss.textStyleLight}>{I18n.t("EMP ID")}: {item.empId} </Text>
+                    <Text style={scss.textStyleLight}> {item.status}</Text>
+                  </View>
 
-                <View style={flats.text}>
-                  <Text style={Device.isTablet ? flats.flatlistTextCommon_tablet : flats.flatlistTextCommon_mobile} >{I18n.t("NET AMOUNT")}:{"\n"} ₹ {item.netPayableAmount} </Text>
-                  <View style={flats.buttons}>
-
-                    <TouchableOpacity style={Device.isTablet ? flats.editButton_tablet : flats.editButton_mobile} onPress={() => this.handledeleteNewSale(item, index)}>
-                      <Image style={{ alignSelf: 'center', top: 5, height: Device.isTablet ? 30 : 20, width: Device.isTablet ? 30 : 20 }} source={require('../assets/images/delete.png')} />
-
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={Device.isTablet ? flats.deleteButton_tablet : flats.deleteButton_mobile} onPress={() => this.handleviewNewSale(item, index)}>
-                      <Image style={{ alignSelf: 'center', top: 5 }} source={require('../assets/images/eye.png')} />
-                    </TouchableOpacity>
+                  <View style={scss.textContainer}>
+                    <Text style={scss.textStyleLight} >{I18n.t("NET AMOUNT")}: ₹ {item.netPayableAmount} </Text>
+                  </View>
+                  <View style={scss.flatListFooter}>
+                    <Text style={scss.footerText}>
+                      {I18n.t("DATE")}:
+                      {item.createdDate ? item.createdDate.toString().split(/T/)[0]
+                        : item.createdDate}
+                    </Text>
+                    <View style={scss.buttonContainer}>
+                      <IconFA
+                        name='eye'
+                        size={25}
+                        style={{ marginRight: 10 }}
+                        onPress={() => this.handleviewNewSale(item, index)}
+                      >
+                      </IconFA>
+                      <IconMA
+                        name='trash-can-outline'
+                        size={25}
+                        onPress={() => this.handledeleteNewSale(item, index)}
+                      >
+                      </IconMA>
+                    </View>
                   </View>
                 </View>
               </View>
-            </View>
+            </ScrollView>
           )}
         />
         {this.state.flagDeleteNewSale && (
@@ -352,16 +369,28 @@ export default class NewSaleReport extends Component {
                   }}></Text>
                 </View>
                 <KeyboardAwareScrollView enableOnAndroid={true} >
-                  <TouchableOpacity
-                    style={Device.isTablet ? styles.filterDateButton_tablet : styles.filterDateButton_mobile}
-                    testID="openModal"
-                    onPress={() => this.datepickerClicked()}
-                  >
-                    <Text
-                      style={Device.isTablet ? styles.filterDateButtonText_tablet : styles.filterDateButtonText_mobile}
-                    >{this.state.startDate == "" ? 'START DATE' : this.state.startDate}</Text>
-                    <Image style={{ position: 'absolute', top: 10, right: 0, }} source={require('../assets/images/calender.png')} />
-                  </TouchableOpacity>
+                  <View style={forms.filter_dates_container}>
+                    <TouchableOpacity
+                      style={forms.filter_dates}
+                      testID="openModal"
+                      onPress={() => this.datepickerClicked()}
+                    >
+                      <Text
+                        style={forms.filter_dates_text}
+                      >{this.state.startDate == "" ? 'START DATE' : this.state.startDate}</Text>
+                      <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={forms.filter_dates}
+                      testID="openModal"
+                      onPress={() => this.enddatepickerClicked()}
+                    >
+                      <Text
+                        style={forms.filter_dates_text}
+                      >{this.state.endDate == "" ? 'END DATE' : this.state.endDate}</Text>
+                      <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                    </TouchableOpacity>
+                  </View>
                   {this.state.datepickerOpen && (
                     <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
                       <TouchableOpacity
@@ -383,16 +412,7 @@ export default class NewSaleReport extends Component {
                       />
                     </View>
                   )}
-                  <TouchableOpacity
-                    style={Device.isTablet ? styles.filterDateButton_tablet : styles.filterDateButton_mobile}
-                    testID="openModal"
-                    onPress={() => this.enddatepickerClicked()}
-                  >
-                    <Text
-                      style={Device.isTablet ? styles.filterDateButtonText_tablet : styles.filterDateButtonText_mobile}
-                    >{this.state.endDate == "" ? 'END DATE' : this.state.endDate}</Text>
-                    <Image style={{ position: 'absolute', top: 10, right: 0, }} source={require('../assets/images/calender.png')} />
-                  </TouchableOpacity>
+
                   {this.state.datepickerendOpen && (
                     <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
                       <TouchableOpacity
@@ -413,7 +433,7 @@ export default class NewSaleReport extends Component {
                       />
                     </View>
                   )}
-                  <View style={[Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile, { width: deviceWidth - 40 }]}>
+                  <View style={[styles.rnSelectContainer_mobile, { width: deviceWidth - 30 }]}>
                     <RNPickerSelect
                       placeholder={{
                         label: 'BILL POSITION'
@@ -434,7 +454,10 @@ export default class NewSaleReport extends Component {
                     />
                   </View>
                   <TextInput
-                    style={[Device.isTablet ? styles.input_tablet : styles.input_mobile, { width: deviceWidth - 40 }]}
+                    outlineColor='#d8d8d8'
+                    mode='outlined'
+                    activeOutlineColor='#d8d8d8'
+                    style={forms.input_fld}
                     underlineColorAndroid="transparent"
                     placeholder={I18n.t("INVOICE NUMBER")}
                     placeholderTextColor="#6F6F6F"
@@ -444,7 +467,10 @@ export default class NewSaleReport extends Component {
                     onChangeText={this.handleInvoiceNumber}
                   />
                   <TextInput
-                    style={[Device.isTablet ? styles.input_tablet : styles.input_mobile, { width: deviceWidth - 40 }]}
+                    outlineColor='#d8d8d8'
+                    mode='outlined'
+                    activeOutlineColor='#d8d8d8'
+                    style={forms.input_fld}
                     underlineColorAndroid="transparent"
                     placeholder={I18n.t("MOBILE NUMBER")}
                     placeholderTextColor="#6F6F6F"
@@ -456,7 +482,10 @@ export default class NewSaleReport extends Component {
                     onChangeText={this.handleMobile}
                   />
                   <TextInput
-                    style={[Device.isTablet ? styles.input_tablet : styles.input_mobile, { width: deviceWidth - 40 }]}
+                    outlineColor='#d8d8d8'
+                    mode='outlined'
+                    activeOutlineColor='#d8d8d8'
+                    style={forms.input_fld}
                     underlineColorAndroid="transparent"
                     placeholder={I18n.t("EMP ID")}
                     placeholderTextColor="#6F6F6F"
@@ -465,14 +494,16 @@ export default class NewSaleReport extends Component {
                     value={this.state.empId}
                     onChangeText={this.handleEmpId}
                   />
-                  <TouchableOpacity style={Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile}
-                    onPress={() => this.getSaleBills()}>
-                    <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile} >{I18n.t("APPLY")}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile}
-                    onPress={() => this.modelCancel()}>
-                    <Text style={Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile}>{I18n.t("CANCEL")}</Text>
-                  </TouchableOpacity>
+                  <View style={forms.action_buttons_container}>
+                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                      onPress={() => this.getSaleBills()}>
+                      <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                      onPress={() => this.modelCancel()}>
+                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </KeyboardAwareScrollView>
               </View>
             </Modal>
@@ -1752,12 +1783,12 @@ const styles = StyleSheet.create({
   rnSelectContainer_mobile: {
     justifyContent: 'center',
     margin: 20,
-    height: 44,
+    height: 45,
     marginTop: 5,
     marginBottom: 10,
-    borderColor: '#8F9EB717',
+    borderColor: '#d8d8d8',
     borderRadius: 3,
-    backgroundColor: '#FBFBFB',
+    backgroundColor: '#FFF',
     borderWidth: Device.isTablet ? 2 : 1,
     fontFamily: 'regular',
     paddingLeft: 15,

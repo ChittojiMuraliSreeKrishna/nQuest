@@ -28,7 +28,7 @@
 .flatListContainer {
 	background-color: $white;
 	border-radius: 6px;
-	border: 2.5px solid $shadow;
+	border: 1px solid $border-box;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
@@ -146,9 +146,9 @@
 .active_txt {
 	background-color: $active-txt;
 	color: $green;
-	font-weight: bold;
 	padding: 5px;
 	border-radius: 5px;
+	font-weight: bold;
 }
 
 .inactive_txt {
@@ -210,4 +210,8 @@
   min-width: 90%;
   max-width: 100%;
   padding: 5px 15px;
+}
+
+.action_icons {
+  color: $secondary-color;
 }

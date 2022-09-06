@@ -1,17 +1,20 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView } from 'react-native';
+import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import Device from 'react-native-device-detection';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
-import { RF, RH, RW } from '../../Responsive';
-import AccountingService from '../services/AccountingService';
-import { cancelBtn, cancelBtnText, datePickerBtnText, datePickerButton1, datePickerButton2, dateSelector, dateText, inputField, rnPicker, rnPickerContainer, submitBtn, submitBtnText } from '../Styles/FormFields';
-import { deleteCloseBtn, deleteContainer, deleteHeader, deleteHeading, deleteText, filterCloseImage, filterHeading, filterMainContainer, filterSubContainer } from '../Styles/PopupStyles';
-import { buttonContainer, buttonImageStyle, buttonStyle, buttonStyle1, filterBtn, flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleLight, textStyleMedium } from '../Styles/Styles';
-var deviceWidth = Dimensions.get("window").width;
+import IconFA from 'react-native-vector-icons/FontAwesome';
+import IconIA from 'react-native-vector-icons/Ionicons';
+import scss from "../../commonUtils/assets/styles/style.scss";
 import Loader from '../../commonUtils/loader';
+import { RH, RW } from '../../Responsive';
+import AccountingService from '../services/AccountingService';
+import { cancelBtn, cancelBtnText, datePickerBtnText, datePickerButton1, datePickerButton2, dateSelector, dateText, inputField, submitBtn, submitBtnText } from '../Styles/FormFields';
+import { filterCloseImage, filterHeading, filterMainContainer, filterSubContainer } from '../Styles/PopupStyles';
+import { flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleLight, textStyleMedium } from '../Styles/Styles';
+var deviceWidth = Dimensions.get("window").width;
 
 export default class DebitNotes extends Component {
 
@@ -199,7 +202,7 @@ export default class DebitNotes extends Component {
 
   render() {
     return (
-      <View style={{backgroundColor:"#FFFFFF"}}>
+      <View style={{ backgroundColor: "#FFFFFF" }}>
         {this.state.loading &&
           <Loader
             loading={this.state.loading} />
@@ -209,48 +212,63 @@ export default class DebitNotes extends Component {
           style={{ marginTop: 10 }}
           scrollEnabled={true}
           ListHeaderComponent={<View style={flatListHeaderContainer}>
-            <Text style={flatListTitle}>Debit Notes</Text>
+            <Text style={flatListTitle}>Debit Notes - <Text style={{ color: '#ED1C24' }}>{this.state.filterActive ? this.state.filterDebitNotes.length : this.state.debitNotes.length}</Text> </Text>
             {!this.state.filterActive &&
-              <TouchableOpacity
-                style={filterBtn}
-                onPress={() => this.filterAction()} >
-                <Image style={{ alignSelf: 'center', top: 5 }} source={require('../assets/images/promofilter.png')} />
-              </TouchableOpacity>
+              <IconFA
+                size={25}
+                name="sliders"
+                onPress={() => this.filterAction()}
+              ></IconFA>
 
             }
             {this.state.filterActive &&
-              <TouchableOpacity
-                style={filterBtn}
-                onPress={() => this.clearFilterAction()} >
-                <Image style={{ alignSelf: 'center', top: 5 }} source={require('../assets/images/clearFilterSearch.png')} />
-              </TouchableOpacity>
-            }
+              <IconFA
+                size={25}
+                name="sliders"
+                color='#ED1C24'
+                onPress={() => this.clearFilterAction()}
+              ></IconFA>}
           </View>}
           renderItem={({ item, index }) => (
-            <View style={flatListMainContainer} >
-              <View style={flatlistSubContainer}>
-                <View style={textContainer}>
-                  <Text style={highText}>#CRM ID: {item.customerId}</Text>
-                  <Text style={textStyleMedium}>Customer Name: {"\n"}{item.customerName}</Text>
+            <View style={scss.flatListContainer} >
+              <View style={scss.flatListSubContainer}>
+                <View style={scss.textContainer}>
+                  <Text style={scss.highText}>#CRM ID: {item.customerId}</Text>
+                  <Text style={scss.textStyleLight}>Customer Name:
+                    <Text style={scss.textStyleMedium}> {"\n"}{item.customerName}</Text>
+                  </Text>
                 </View>
-                <View style={textContainer}>
-                  <Text style={textStyleMedium}>STORE: {item.storeId}</Text>
+                <View style={scss.textContainer}>
+                  <Text style={scss.textStyleLight}>STORE:
+                    <Text style={scss.textStyleMedium}>{item.storeId}</Text>
+                  </Text>
                   {/* <Text style={textStyleLight}>PAID AMOUNT: {item.amount}</Text> */}
                 </View>
-                <View style={textContainer}>
-                  <Text style={textStyleLight}>BALANCE: {item.amount}</Text>
-                  <Text style={textStyleLight}>APPROVED BY: {"\n"}{item.apporvedBy}</Text>
+                <View style={scss.textContainer}>
+                  <Text style={scss.textStyleLight}>BALANCE: {item.amount}</Text>
+                  <Text style={scss.textStyleLight}>APPROVED BY: {"\n"}{item.apporvedBy}</Text>
                 </View>
-                <View style={textContainer}>
-                  <Text style={textStyleLight}>DATE: {item.lastModifiedDate ? item.lastModifiedDate.toString().split(/T/)[0] : item.lastModifiedDate}</Text>
-                  <View style={buttonContainer}>
-                    <TouchableOpacity style={buttonStyle1} onPress={() => this.handleViewDebit(item, index)}>
-                      <Image style={buttonImageStyle} source={require('../assets/images/eye.png')} />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={buttonStyle} onPress={() => this.handleAddDebit(item, index)}>
-                      <Text style={{ fontSize: RF(20), textAlign: 'center' }}>+</Text>
-                    </TouchableOpacity>
+                <View style={scss.flatListFooter}>
+                  <Text style={scss.footerText}>
+                    Date:{" "}
+                    {item.createdDate
+                      ? item.createdDate.toString().split(/T/)[0]
+                      : item.createdDate}
+                  </Text>
+                  <View style={scss.buttonContainer}>
+                    <IconFA
+                      name='eye'
+                      onPress={() => this.handleViewDebit(item, index)}
+                      size={25}
+                      style={scss.action_icons}
+                    >
+                    </IconFA>
+                    <IconIA
+                      name='add-circle-outline'
+                      size={25}
+                      style={[scss.action_icons, { marginLeft: 10 }]}
+                      onPress={() => this.handleAddDebit(item, index)}
+                    ></IconIA>
                   </View>
                 </View>
               </View>
@@ -395,7 +413,9 @@ export default class DebitNotes extends Component {
                           </View>
                           <View style={textContainer}>
                             <Text style={textStyleLight}>AMOUNT: {item.amount}</Text>
-                            <Text style={textStyleLight}>DATE: {item.createdDate}</Text>
+                            <Text style={textStyleLight}>DATE: {item.createdDate
+                              ? item.createdDate.toString().split(/T/)[0]
+                              : item.createdDate}</Text>
                           </View>
                         </View>
                       </View>

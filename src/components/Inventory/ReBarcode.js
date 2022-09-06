@@ -333,7 +333,7 @@ export default class ReBarcode extends Component {
           style={scss.flatListBody}
           ListHeaderComponent={
             <View style={scss.headerContainer}>
-              <Text style={flatListTitle}>Re-Barcode List - <Text style={{ color: "#ED1C24" }}>{this.state.reBarcodesData.length}</Text></Text>
+              <Text style={flatListTitle}>Re-Barcode List - <Text style={{ color: "#ED1C24" }}>{this.state.filterActive ? this.state.filterRebarcodesData.length : this.state.reBarcodesData.length}</Text></Text>
               <View style={scss.headerContainer}>
                 {!this.state.filterActive && (
                   <IconFA
@@ -390,6 +390,7 @@ export default class ReBarcode extends Component {
                     </Text>
                     <IconFA
                       name="eye"
+                      style={scss.action_icons}
                       size={20}
                       onPress={() => this.seeDetails(item, index)}
                     >

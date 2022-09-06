@@ -290,7 +290,7 @@ export class TopBar extends Component {
             {this.state.modalVisibleData && (
               <View>
                 <Modal
-                  style={{ margin: 0, backgroundColor: "rgba(0,0,0,0.7)" }}
+                  style={{ margin: 0, backgroundColor: "rgba(0,0,0,0.7)", }}
                   transparent={true}
                   animationType="fade"
                   visible={this.state.modalVisibleData}
@@ -351,13 +351,15 @@ const styles = StyleSheet.create({
     fontFamily: "bold",
   },
   modalContainer: {
-    backgroundColor: "rgba(0,0,0,0.4)",
+    // backgroundColor: transparent,
+    // backgroundColor: "rgba(0,0,0,0.01)",
     // opacity:0.5,
     // height:'100%',
     // width:'100%',
-    // justifyContent:'center',
-    // alignContent:'center',
-    // alignItems:'center',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignContent: 'center',
+    alignItems: 'center',
   },
   modalView: {
     backgroundColor: "white",
@@ -370,7 +372,9 @@ const styles = StyleSheet.create({
     // height: "auto",
     // maxHeight: "70vh",
     // marginTop: "calc(100vh - 85vh - 20px)",
-    // backgroundColor: "#fff",
+    backgroundColor: "#fff",
+    width: '60%',
+    borderRadius: 10
     // borderRadius: 4,
     // padding: 5
   },

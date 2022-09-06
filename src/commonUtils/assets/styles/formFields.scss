@@ -2,12 +2,12 @@
 
 .input_fld {
 	justify-content: center;
+	height: 45px;
 	margin: 5px 20px;
-	height: 50px;
 	width: 92%;
 	font-weight: normal;
 	padding-left: 10px;
-	font-size: 20px;
+	font-size: 14px;
 }
 
 .active_fld {
@@ -52,4 +52,80 @@
 	border-color: $border;
 	border-radius: 5px;
 	border-width: 2px;
+}
+
+
+.filter_dates_container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+	margin: 5px 20px;
+	width: 92%;
+
+}
+
+.filter_dates {
+  width: 45%;
+  border-color: #d8d8d8;
+  border-width: 1px;
+  max-height: 45px;
+  border-radius: 5px;
+  margin: 5px 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.calender_image {
+  margin-top: 5px;
+}
+
+.filter_dates_text {
+  font-size: 14px;
+  text-align: center;
+}
+
+.action_buttons {
+  width: 45%;
+  border-color: #8F9EB717;
+  border-width: 3px;
+  height: 45px;
+  margin: 10px 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  border-radius: 10px;
+}
+
+.action_buttons_container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.submit_btn {
+  background-color: $primary-color;
+}
+
+.submit_btn_text {
+  color: $white;
+  text-align: center;
+  font-size: 16px;
+  padding: 10px 0;
+}
+
+.cancel_btn {
+  background-color: $white;
+}
+
+.cancel_btn_text {
+  color: $black;
+  text-align: center;
+  font-size: 16px;
+  padding: 10px 0;
+
 }

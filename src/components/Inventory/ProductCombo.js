@@ -279,7 +279,7 @@ export default class ProductCombo extends Component {
               <Text style={flatListTitle}>
                 Products Combo -{" "}
                 <Text style={{ color: "#ED1C24" }}>
-                  {this.state.productComboList.length}
+                  {this.state.filterActive ? this.state.filteredProductsList.length : this.state.productComboList.length}
                 </Text>{" "}
               </Text>
               <View style={scss.headerContainer}>
@@ -329,7 +329,9 @@ export default class ProductCombo extends Component {
                       <Text style={scss.highText}>Inventory-ID: {item.id}</Text>
                     </View>
                     <View style={scss.textContainer}>
-                      <Text style={scss.textStyleMedium}>Store Id: {item.storeId}</Text>
+                      <Text style={scss.textStyleLight}>Store Id:
+                        <Text style={scss.textStyleMedium}> {item.storeId}</Text>
+                      </Text>
                       <Text style={scss.textStyleLight}>Combo Name: {item.name}</Text>
                     </View>
                     <View style={scss.textContainer}>
@@ -343,6 +345,7 @@ export default class ProductCombo extends Component {
                       <IconFA
                         name="eye"
                         size={20}
+                        style={scss.action_icons}
                         onPress={() => this.viewProductActon(item, index)}
                       >
                       </IconFA>

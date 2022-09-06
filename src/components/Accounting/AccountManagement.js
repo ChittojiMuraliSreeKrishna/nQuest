@@ -115,7 +115,7 @@ export default class AccountManagement extends Component {
         } else if (this.state.privilages[0].name === "Debit Notes") {
           this.setState({ flagDebitNotes: false });
         } else if (this.state.privilages[0].name === "Create Tax Master") {
-          this.setState({ flagCreditNotes: true });
+          this.setState({ flagTaxMaster: true });
         } else if (this.state.privilages[0].name === "Create HSN Code") {
           this.setState({ flagHSNCode: true });
         } else {
@@ -218,7 +218,7 @@ export default class AccountManagement extends Component {
                   <TouchableOpacity
                     style={[
                       scss.pageNavigationBtn,
-                      { borderColor: item.bool ? "#ED1C24" : "#858585" },
+                      { borderColor: item.bool ? "#ED1C24" : "", borderBottomWidth: item.bool ? 3 : 0 },
                     ]}
                     onPress={() => this.topbarAction(item, index)}
                   >

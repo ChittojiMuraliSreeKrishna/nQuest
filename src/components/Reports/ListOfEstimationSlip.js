@@ -1,18 +1,20 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
-import { Appbar } from 'react-native-paper';
+import { Appbar, TextInput } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
+import forms from '../../commonUtils/assets/styles/formFields.scss';
+import scss from '../../commonUtils/assets/styles/style.scss';
 import { RF, RH, RW } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
-import { buttonContainer, buttonImageStyle, buttonStyle1, flatListMainContainer, flatlistSubContainer, highText, textContainer, textStyleLight, textStyleMedium } from '../Styles/Styles';
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -205,75 +207,86 @@ export class ListOfEstimationSlip extends Component {
   }
 
   modelCancel() {
-    this.setState({ modalVisible: false, flagFilterOpen: false, deleteEstimationSlip: false })
+    this.setState({ modalVisible: false, flagFilterOpen: false, deleteEstimationSlip: false, flagViewDetail: false })
   }
 
   clearFilterAction() {
-    this.setState({filterActive: false, estimationSlips: [], fromDate: "", toDate: "", dsStatus: "", dsNumber: "", barcode: ""})
+    this.setState({ filterActive: false, estimationSlips: [], fromDate: "", toDate: "", dsStatus: "", dsNumber: "", barcode: "", flagViewDetail: false, flagFilterOpen: false })
   }
 
 
   render() {
     return (
       <View>
-        <Appbar>
-          <Appbar.Content title="List Of Estimation Slips" />
-          {this.state.filterActive ? 
-          <Icon
-            name="sliders"
-            size={25}
-            color="#ed1c24"
-            onPress={() => this.clearFilterAction()}
-          ></Icon> :
-          <Icon
-            name="sliders"
-            size={25}
-            onPress={() => this.filterAction()}
-          ></Icon>
-  }
-        </Appbar>
         <FlatList
           data={this.state.estimationSlips}
-          style={{ marginTop: 20 }}
+          ListHeaderComponent={
+            <Appbar>
+              <Appbar.Content title="List Of Estimation Slips" />
+              {this.state.filterActive ?
+                <Icon
+                  name="sliders"
+                  size={25}
+                  style={{ marginRight: 10 }}
+                  color="#ed1c24"
+                  onPress={() => this.clearFilterAction()}
+                ></Icon> :
+                <Icon
+                  name="sliders"
+                  size={25}
+                  style={{ marginRight: 10 }}
+                  onPress={() => this.filterAction()}
+                ></Icon>
+              }
+            </Appbar>
+          }
           scrollEnabled={true}
           keyExtractor={(item, i) => i.toString()}
           ListEmptyComponent={<Text style={{ fontSize: Device.isTablet ? 21 : 17, fontFamily: 'bold', color: '#000000', textAlign: 'center', marginTop: deviceheight / 3 }}>&#9888; {I18n.t("Results not loaded")}</Text>}
           renderItem={({ item, index }) => (
-            <View style={flatListMainContainer} >
-              <View style={flatlistSubContainer}>
-                <View style={textContainer}>
-                  <Text style={highText} >S.NO: {index + 1} </Text>
-                  <Text style={textStyleLight} >{I18n.t("DS STATUS")}: {"\n"}{item.status} </Text>
-                </View>
-                <View style={textContainer}>
-                  <Text style={textStyleMedium}> {I18n.t("DS NUMBER")}: {"\n"} {item.dsNumber}</Text>
-                  <Text style={textStyleLight}>{I18n.t("DS DATE")}: {"\n"} {item.lastModified} </Text>
-                </View>
-                <View style={textContainer}>
-                  <Text style={textStyleLight}>{I18n.t("GROSS AMOUNT")}: {"\n"} ₹{item.netAmount}</Text>
-                  <Text style={textStyleLight}>{I18n.t("PROMO DISC")}: {"\n"} {item.promoDisc} </Text>
-                </View>
-                <View style={textContainer}>
-                  <Text style={textStyleLight} >{I18n.t("NET AMOUNT")}:{"\n"} ₹{item.netAmount} </Text>
-                  <View style={buttonContainer}>
-
-                    <TouchableOpacity style={buttonStyle1} onPress={() => this.handledeleteEstimationSlip(item, index)}>
-                      <Image style={buttonImageStyle} source={require('../assets/images/delete.png')} />
-
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={buttonStyle1} onPress={() => this.handleviewEstimationSlip(item, index)}>
-                      <Image style={buttonImageStyle} source={require('../assets/images/eye.png')} />
-                    </TouchableOpacity>
+            <ScrollView>
+              <View style={scss.flatListContainer} >
+                <View style={scss.flatListSubContainer}>
+                  <View style={scss.textContainer}>
+                    <Text style={scss.highText} >S.NO: {index + 1} </Text>
+                    <Text style={scss.textStyleLight} >{I18n.t("DS STATUS")}: {"\n"}{item.status} </Text>
+                  </View>
+                  <View style={scss.textContainer}>
+                    <Text style={scss.textStyleMedium}> {I18n.t("DS NUMBER")}: {"\n"} {item.dsNumber}</Text>
+                    <Text style={scss.textStyleLight}>{I18n.t("DS DATE")}: {"\n"} {item.lastModified} </Text>
+                  </View>
+                  <View style={scss.textContainer}>
+                    <Text style={scss.textStyleLight}>{I18n.t("GROSS AMOUNT")}: {"\n"} ₹{item.netAmount}</Text>
+                    <Text style={scss.textStyleLight}>{I18n.t("PROMO DISC")}: {"\n"} {item.promoDisc} </Text>
+                  </View>
+                  <View style={scss.textContainer}>
+                    <Text style={scss.textStyleLight} >{I18n.t("NET AMOUNT")}:{"\n"} ₹{item.netAmount} </Text>
+                  </View>
+                  <View style={scss.flatListFooter}>
+                    <Text style={scss.footerText}>
+                      {I18n.t("DATE")}:
+                      {item.lastModifiedDate ? item.lastModifiedDate.toString().split(/T/)[0]
+                        : item.lastModifiedDate}
+                    </Text>
+                    <View style={scss.buttonContainer}>
+                      <Icon
+                        name="eye"
+                        size={25}
+                        style={{ paddingRight: 10 }}
+                        onPress={() => this.handleviewEstimationSlip(item, index)}
+                      ></Icon>
+                      <IconMA
+                        name="trash-can-outline"
+                        size={25}
+                        onPress={() => this.handledeleteEstimationSlip(item, index)}
+                      ></IconMA>
+                    </View>
                   </View>
                 </View>
               </View>
-            </View>
+            </ScrollView>
           )}
         />
-        {/* {this.props.estimationSlip.length === 0 &&
-                    <Text style={{ fontSize: Device.isTablet ? 21 : 17, fontFamily: 'bold', color: '#000000', textAlign: 'center', marginTop: deviceheight/3 }}>&#9888; {I18n.t("Results not loaded")}</Text>
-                } */}
         {this.state.deleteEstimationSlip && (
           <View>
             <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}>
@@ -347,16 +360,28 @@ export class ListOfEstimationSlip extends Component {
                 </View>
 
                 <KeyboardAwareScrollView enableOnAndroid={true} >
-                  <TouchableOpacity
-                    style={Device.isTablet ? styles.filterDateButton_tablet : styles.filterDateButton_mobile}
-                    testID="openModal"
-                    onPress={() => this.datepickerClicked()}
-                  >
-                    <Text
-                      style={Device.isTablet ? styles.filterDateButtonText_tablet : styles.filterDateButtonText_mobile}
-                    >{this.state.startDate == "" ? 'START DATE' : this.state.startDate}</Text>
-                    <Image style={{ position: 'absolute', top: RH(10), right: 0, }} source={require('../assets/images/calender.png')} />
-                  </TouchableOpacity>
+                  <View style={forms.filter_dates_container}>
+                    <TouchableOpacity
+                      style={forms.filter_dates}
+                      testID="openModal"
+                      onPress={() => this.datepickerClicked()}
+                    >
+                      <Text
+                        style={forms.filter_dates_text}
+                      >{this.state.startDate == "" ? 'START DATE' : this.state.startDate}</Text>
+                      <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={forms.filter_dates}
+                      testID="openModal"
+                      onPress={() => this.enddatepickerClicked()}
+                    >
+                      <Text
+                        style={forms.filter_dates_text}
+                      >{this.state.endDate == "" ? 'END DATE' : this.state.endDate}</Text>
+                      <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                    </TouchableOpacity>
+                  </View>
                   {this.state.datepickerOpen && (
                     <View style={{ height: RH(280), width: deviceWidth, backgroundColor: '#ffffff' }}>
                       <TouchableOpacity
@@ -378,16 +403,7 @@ export class ListOfEstimationSlip extends Component {
                       />
                     </View>
                   )}
-                  <TouchableOpacity
-                    style={Device.isTablet ? styles.filterDateButton_tablet : styles.filterDateButton_mobile}
-                    testID="openModal"
-                    onPress={() => this.enddatepickerClicked()}
-                  >
-                    <Text
-                      style={Device.isTablet ? styles.filterDateButtonText_tablet : styles.filterDateButtonText_mobile}
-                    >{this.state.endDate == "" ? 'END DATE' : this.state.endDate}</Text>
-                    <Image style={{ position: 'absolute', top: RH(10), right: 0, }} source={require('../assets/images/calender.png')} />
-                  </TouchableOpacity>
+
                   {this.state.datepickerendOpen && (
                     <View style={{ height: RH(280), width: deviceWidth, backgroundColor: '#ffffff' }}>
                       <TouchableOpacity
@@ -408,7 +424,7 @@ export class ListOfEstimationSlip extends Component {
                       />
                     </View>
                   )}
-                  <View style={[Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile, { width: deviceWidth - 40 }]}>
+                  <View style={[styles.rnSelectContainer_mobile, { width: deviceWidth - 30 }]}>
                     <RNPickerSelect
                       // style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
                       placeholder={{
@@ -423,7 +439,7 @@ export class ListOfEstimationSlip extends Component {
                         { label: 'Cancelled', value: 'Cancelled' },
                       ]}
                       onValueChange={this.handleDsStatus}
-                      style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
+                      style={pickerSelectStyles_mobile}
                       value={this.state.dsStatus}
                       useNativeAndroidPickerStyle={false}
                     />
@@ -431,7 +447,10 @@ export class ListOfEstimationSlip extends Component {
 
                   </View>
                   <TextInput
-                    style={[Device.isTablet ? styles.input_tablet : styles.input_mobile, { width: deviceWidth - RW(40) }]}
+                    outlineColor='#d8d8d8'
+                    mode='outlined'
+                    activeOutlineColor='#d8d8d8'
+                    style={forms.input_fld}
                     underlineColorAndroid="transparent"
                     placeholder={I18n.t("DS NUMBER")}
                     placeholderTextColor="#6F6F6F"
@@ -441,7 +460,10 @@ export class ListOfEstimationSlip extends Component {
                     onChangeText={this.handleDsNumber}
                   />
                   <TextInput
-                    style={[Device.isTablet ? styles.input_tablet : styles.input_mobile, { width: deviceWidth - 40 }]}
+                    outlineColor='#d8d8d8'
+                    mode='outlined'
+                    activeOutlineColor='#d8d8d8'
+                    style={forms.input_fld}
                     underlineColorAndroid="transparent"
                     placeholder={I18n.t("BARCODE")}
                     placeholderTextColor="#6F6F6F"
@@ -450,15 +472,16 @@ export class ListOfEstimationSlip extends Component {
                     value={this.state.barcode}
                     onChangeText={this.handleBarCode}
                   />
-
-                  <TouchableOpacity style={Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile}
-                    onPress={() => this.applyEstimationSlipFilter()}>
-                    <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile} >{I18n.t("APPLY")}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile}
-                    onPress={() => this.modelCancel()}>
-                    <Text style={Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile}>{I18n.t("CANCEL")}</Text>
-                  </TouchableOpacity>
+                  <View style={forms.action_buttons_container}>
+                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                      onPress={() => this.applyEstimationSlipFilter()}>
+                      <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                      onPress={() => this.modelCancel()}>
+                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </KeyboardAwareScrollView>
               </View>
             </Modal>
@@ -547,7 +570,7 @@ const pickerSelectStyles_mobile = StyleSheet.create({
   placeholder: {
     color: "#6F6F6F",
     fontFamily: "regular",
-    fontSize: RF(15),
+    fontSize: RF(14),
   },
   inputIOS: {
     justifyContent: 'center',
@@ -556,32 +579,21 @@ const pickerSelectStyles_mobile = StyleSheet.create({
     borderWidth: Device.isTablet ? 2 : 1,
     fontFamily: 'regular',
     //paddingLeft: -20,
-    fontSize: RF(15),
+    fontSize: RF(14),
     borderColor: '#FBFBFB',
     backgroundColor: '#FBFBFB',
   },
   inputAndroid: {
     justifyContent: 'center',
-    height: RF(42),
+    height: RF(44),
+    width: '100%',
     borderRadius: 3,
     borderWidth: Device.isTablet ? 2 : 1,
     fontFamily: 'regular',
-    //paddingLeft: -20,
-    fontSize: RF(15),
+    fontSize: RF(14),
     borderColor: '#FBFBFB',
     backgroundColor: '#FBFBFB',
     color: '#001B4A',
-
-    // marginLeft: RW(20),
-    // marginRight: RW(20),
-    // marginTop: 10,
-    // height: 40,
-    // backgroundColor: '#ffffff',
-    // borderBottomColor: '#456CAF55',
-    // color: '#001B4A',
-    // fontFamily: "bold",
-    // fontSize: 16,
-    // borderRadius: 3,
   },
 });
 
@@ -813,13 +825,13 @@ const styles = StyleSheet.create({
   rnSelectContainer_mobile: {
     justifyContent: 'center',
     margin: RH(20),
-    height: RH(44),
+    height: RH(45),
     marginTop: RH(5),
     marginBottom: RH(10),
-    borderColor: '#8F9EB717',
+    borderColor: '#d8d8d8',
     borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: Device.isTablet ? 2 : 1,
+    backgroundColor: '#FFF',
+    borderWidth: 1,
     fontFamily: 'regular',
     paddingLeft: RW(15),
     fontSize: 14,

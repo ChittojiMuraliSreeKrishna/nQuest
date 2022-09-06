@@ -10,13 +10,15 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import { TextInput } from "react-native-paper";
 import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Modal from "react-native-modal";
+import { TextInput } from "react-native-paper";
 import RNPickerSelect from "react-native-picker-select";
 import { Chevron } from "react-native-shapes";
+import IconFA from 'react-native-vector-icons/FontAwesome';
+import IconMA from 'react-native-vector-icons/MaterialIcons';
 import scss from "../../commonUtils/assets/styles/style.scss";
 import Loader from "../../commonUtils/loader";
 import UrmService from "../services/UrmService";
@@ -35,7 +37,6 @@ import {
   filterMainContainer,
   filterSubContainer
 } from "../Styles/PopupStyles";
-import { filterBtn } from "../Styles/Styles";
 var deviceWidth = Dimensions.get("window").width;
 var deviceHeight = Dimensions.get("window").height;
 
@@ -250,44 +251,33 @@ export default class Stores extends Component {
               <Text style={scss.flat_heading}>
                 Stores -{" "}
                 <Text style={{ color: "#ED1C24" }}>
-                  {this.state.storesList.length}
+                  {this.state.filterActive ? this.state.filterStoresData.length : this.state.storesList.length}
                 </Text>
               </Text>
               <View style={scss.subHeader}>
-                <TouchableOpacity
-                  style={[filterBtn]}
+                <IconMA
+                  name="add-business"
+                  size={30}
+                  style={{ marginRight: 10 }}
+                  color="#ED1C24"
                   onPress={() => this.handleCreateStore()}
-                >
-                  <Image
-                    style={{
-                      alignSelf: "flex-end",
-                      height: 20,
-                      width: 30,
-                    }}
-                    source={require("../../commonUtils/assets/Images/add_store.png")}
-                  />
-                </TouchableOpacity>
+                ></IconMA>
                 {!this.state.filterActive && (
-                  <TouchableOpacity
-                    style={filterBtn}
+                  <IconFA
+                    name="sliders"
+                    style={{ marginRight: 10 }}
+                    size={25}
                     onPress={() => this.filterAction()}
-                  >
-                    <Image
-                      style={{ alignSelf: "flex-end" }}
-                      source={require("../assets/images/promofilter.png")}
-                    />
-                  </TouchableOpacity>
+                  ></IconFA>
                 )}
                 {this.state.filterActive && (
-                  <TouchableOpacity
-                    style={filterBtn}
+                  <IconFA
+                    name="sliders"
+                    style={{ marginRight: 10 }}
+                    color="#ED1C24"
+                    size={25}
                     onPress={() => this.clearFilterAction()}
-                  >
-                    <Image
-                      style={{ alignSelf: "center" }}
-                      source={require("../assets/images/clearFilterSearch.png")}
-                    />
-                  </TouchableOpacity>
+                  ></IconFA>
                 )}
               </View>
             </View>
@@ -361,8 +351,7 @@ export default class Stores extends Component {
                     </View>
                     <View style={scss.textContainer}>
                       <Text style={scss.textStyleLight}>
-                        {I18n.t("Created By")}
-                        {"\n"}
+                        {I18n.t("Created By")}: {" "}
                         <Text style={scss.textStyleMedium}>
                           {item.createdBy}
                         </Text>
@@ -375,15 +364,12 @@ export default class Stores extends Component {
                           ? item.createdDate.toString().split(/T/)[0]
                           : item.createdDate}
                       </Text>
-                      <TouchableOpacity
-                        style={scss.footerSingleBtn}
+                      <IconFA
+                        name="edit"
                         onPress={() => this.handleeditStore(item, index)}
-                      >
-                        <Image
-                          style={scss.footerBtnImg}
-                          source={require("../../commonUtils/assets/Images/edit.png")}
-                        />
-                      </TouchableOpacity>
+                        size={25}
+                        style={scss.action_icons}
+                      ></IconFA>
                     </View>
                   </View>
                 </View>
@@ -464,9 +450,9 @@ export default class Stores extends Component {
                     />
                   </View>
                   <TextInput
-                  mode="outlined"
-                  outlineColor="#dfdfdf"
-                  activeOutlineColor="dfdfdf"
+                    mode="outlined"
+                    outlineColor="#dfdfdf"
+                    activeOutlineColor="dfdfdf"
                     style={inputField}
                     underlineColorAndroid="transparent"
                     placeholder={I18n.t("STORE NAME")}
