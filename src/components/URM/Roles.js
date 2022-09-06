@@ -6,7 +6,7 @@ import {
 	Image,
 	ScrollView,
 	Text,
-	
+
 	TouchableOpacity,
 	View,
 } from "react-native";
@@ -33,6 +33,8 @@ import {
 	submitBtn,
 	submitBtnText,
 } from "../Styles/FormFields";
+import forms from '../../commonUtils/assets/styles/formFields.scss';
+
 import {
 	filterCloseImage,
 	filterHeading,
@@ -55,12 +57,13 @@ export default class Roles extends Component {
 			flagFilterOpen: false,
 			modalVisible: true,
 			createdDate: "",
-			date: new Date()
+			date: new Date(),
+			role: ''
 		};
 	}
 
 	async componentDidMount() {
-    const clientId = await AsyncStorage.getItem("custom:clientId1");
+		const clientId = await AsyncStorage.getItem("custom:clientId1");
 		this.setState({ clientId: clientId });
 		this.getRolesList();
 	}
@@ -189,18 +192,23 @@ export default class Roles extends Component {
 		const { role, createdBy, createdDate } = this.state;
 		this.setState({ loading: true });
 		const searchRole = {
-			"roleName": role ? String(role) : null,
-			"createdBy": createdBy ? createdBy : null,
-			"createdDate": createdDate ? createdDate : null,
+			roleName: role ? role : null,
+			createdBy: createdBy ? createdBy : null,
+			createdDate: createdDate ? createdDate : null,
 		};
+		console.log(searchRole);
 		UrmService.getRolesBySearch(searchRole).then((res) => {
-			if (res) {
+			console.log(res);
+			if (res && res.data && res.data['status'] === 200) {
 				let rolesList = res.data.result;
 				console.log({ rolesList });
 				this.setState({ filterRolesData: rolesList, filterActive: true });
 			}
-			this.setState({ loading: false, modalVisible: false });
-		});
+			else {
+				alert(res && res.data && res.data.message)
+			}
+			this.setState({ loading: false, modalVisible: false, role: '', createdBy: '' });
+		})
 	}
 
 	// Edit Role Action
@@ -337,9 +345,9 @@ export default class Roles extends Component {
 								</View>
 								<KeyboardAwareScrollView enableOnAndroid={true}>
 									<TextInput
-									mode="outlined"
-									outlineColor="#dfdfdf"
-									activeOutlineColor="#dfdfdf"
+										mode="outlined"
+										outlineColor="#dfdfdf"
+										activeOutlineColor="#dfdfdf"
 										style={inputField}
 										underlineColorAndroid="transparent"
 										placeholder={I18n.t("ROLE")}
@@ -350,9 +358,9 @@ export default class Roles extends Component {
 										onChangeText={this.handleRole}
 									/>
 									<TextInput
-									mode="outlined"
-									outlineColor="#dfdfdf"
-									activeOutlineColor="#dfdfdf"
+										mode="outlined"
+										outlineColor="#dfdfdf"
+										activeOutlineColor="#dfdfdf"
 										style={inputField}
 										underlineColorAndroid="transparent"
 										placeholder={I18n.t("CREATED BY")}
@@ -400,19 +408,16 @@ export default class Roles extends Component {
 											/>
 										</View>
 									)}
-
-									<TouchableOpacity
-										style={submitBtn}
-										onPress={() => this.applyRoleFilter()}
-									>
-										<Text style={submitBtnText}>{I18n.t("APPLY")}</Text>
-									</TouchableOpacity>
-									<TouchableOpacity
-										style={cancelBtn}
-										onPress={() => this.modelCancel()}
-									>
-										<Text style={cancelBtnText}>{I18n.t("CANCEL")}</Text>
-									</TouchableOpacity>
+									<View style={forms.action_buttons_container}>
+										<TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+											onPress={() => this.applyRoleFilter()}>
+											<Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+										</TouchableOpacity>
+										<TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+											onPress={() => this.modelCancel()}>
+											<Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+										</TouchableOpacity>
+									</View>
 								</KeyboardAwareScrollView>
 							</View>
 						</Modal>

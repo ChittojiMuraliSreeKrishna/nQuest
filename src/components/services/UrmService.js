@@ -143,10 +143,8 @@ class UrmService {
     return axios.get(getRoles + params + pages);
   }
 
-  getRolesBySearch(searchRole) {
-    let filterRoles = BASE_URL + USER_MANAGEMENT_URL.getRolesBySearch;
-    console.log({ filterRoles, searchRole });
-    return axios.post(filterRoles, searchRole);
+  getRolesBySearch(data) {
+    return axios.post(BASE_URL + USER_MANAGEMENT_URL.getRolesBySearch, data);
   }
 
   // Save Role

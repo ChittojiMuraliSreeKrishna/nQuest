@@ -18,6 +18,7 @@ import Loader from '../../commonUtils/loader';
 import { formatDate } from '../../commonUtils/DateFormate';
 import { reportErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
+import forms from '../../commonUtils/assets/styles/formFields.scss';
 
 
 var deviceWidth = Dimensions.get("window").width;
@@ -296,8 +297,8 @@ export class GoodsReturn extends Component {
                   <Text style={textStyleSmall}>{I18n.t("AMOUNT")}: {"\n"} ₹{item.amount}</Text>
                 </View>
                 <View style={textContainer}>
-                  <View style={flats.buttons}>
-                    <TouchableOpacity style={Device.isTablet ? flats.deleteButton_tablet : flats.deleteButton_mobile} onPress={() => this.handledeleteNewSale(item, index)}>
+                  <View style={styles.buttons}>
+                    <TouchableOpacity style={styles.deleteButton} onPress={() => this.handledeleteNewSale(item, index)}>
                       <Image style={{ alignSelf: 'center', top: 5, height: Device.isTablet ? 30 : 20, width: Device.isTablet ? 30 : 20 }} source={require('../assets/images/delete.png')} />
                     </TouchableOpacity>
                   </View>
@@ -340,30 +341,36 @@ export class GoodsReturn extends Component {
                   }}></Text>
                 </View>
                 <KeyboardAwareScrollView enableOnAndroid={true} >
-                  <Text style={styles.headings}>{I18n.t("From Date")}</Text>
-                  <TouchableOpacity
-                    style={Device.isTablet ? styles.filterDateButton_tablet : styles.filterDateButton_mobile}
-                    testID="openModal"
-                    onPress={() => this.datepickerClicked()}
-                  >
-                    <Text
-                      style={Device.isTablet ? styles.filterDateButtonText_tablet : styles.filterDateButtonText_mobile}
-                    >{this.state.startDate == "" ? 'From Date' : this.state.startDate}</Text>
-                    <Image style={{ position: 'absolute', top: 10, right: 0, }} source={require('../assets/images/calender.png')} />
-                  </TouchableOpacity>
+                  <View style={forms.filter_dates_container}>
+                    <TouchableOpacity
+                      style={forms.filter_dates}
+                      testID="openModal"
+                      onPress={() => this.datepickerClicked()}
+                    >
+                      <Text
+                        style={forms.filter_dates_text}
+                      >{this.state.startDate == "" ? 'START DATE' : this.state.startDate}</Text>
+                      <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={forms.filter_dates}
+                      testID="openModal"
+                      onPress={() => this.enddatepickerClicked()}
+                    >
+                      <Text
+                        style={forms.filter_dates_text}
+                      >{this.state.endDate == "" ? 'END DATE' : this.state.endDate}</Text>
+                      <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                    </TouchableOpacity>
+                  </View>
+
                   {this.state.datepickerOpen && (
                     <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
-                      <TouchableOpacity
-                        style={Device.isTablet ? styles.datePickerButton_tablet : styles.datePickerButton_mobile} onPress={() => this.datepickerCancelClicked()}
-                      >
-                        <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Cancel </Text>
-
+                      <TouchableOpacity style={styles.datePickerButton} onPress={() => this.datepickerCancelClicked()}>
+                        <Text style={styles.datePickerButtonText}  > Cancel </Text>
                       </TouchableOpacity>
-                      <TouchableOpacity
-                        style={Device.isTablet ? styles.datePickerEndButton_tablet : styles.datePickerEndButton_mobile} onPress={() => this.datepickerDoneClicked()}
-                      >
-                        <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Done </Text>
-
+                      <TouchableOpacity style={styles.datePickerEndButton} onPress={() => this.datepickerDoneClicked()}>
+                        <Text style={styles.datePickerButtonText}  > Done </Text>
                       </TouchableOpacity>
                       <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
                         date={this.state.date}
@@ -372,28 +379,17 @@ export class GoodsReturn extends Component {
                       />
                     </View>
                   )}
-                  <Text style={styles.headings}>{I18n.t("To Date")}</Text>
-                  <TouchableOpacity
-                    style={Device.isTablet ? styles.filterDateButton_tablet : styles.filterDateButton_mobile}
-                    testID="openModal"
-                    onPress={() => this.enddatepickerClicked()}
-                  >
-                    <Text
-                      style={Device.isTablet ? styles.filterDateButtonText_tablet : styles.filterDateButtonText_mobile}
-                    >{this.state.endDate == "" ? 'To Date' : this.state.endDate}</Text>
-                    <Image style={{ position: 'absolute', top: 10, right: 0, }} source={require('../assets/images/calender.png')} />
-                  </TouchableOpacity>
                   {this.state.datepickerendOpen && (
                     <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
                       <TouchableOpacity
-                        style={Device.isTablet ? styles.datePickerButton_tablet : styles.datePickerButton_mobile} onPress={() => this.datepickerCancelClicked()}
+                        style={styles.datePickerButton} onPress={() => this.datepickerCancelClicked()}
                       >
-                        <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Cancel </Text>
+                        <Text style={styles.datePickerButtonText}  > Cancel </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
-                        style={Device.isTablet ? styles.datePickerEndButton_tablet : styles.datePickerEndButton_mobile} onPress={() => this.datepickerendDoneClicked()}
+                        style={styles.datePickerEndButton} onPress={() => this.datepickerendDoneClicked()}
                       >
-                        <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Done </Text>
+                        <Text style={styles.datePickerButtonText}  > Done </Text>
 
                       </TouchableOpacity>
                       <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
@@ -404,7 +400,7 @@ export class GoodsReturn extends Component {
                     </View>
                   )}
                   <Text style={styles.headings}>{I18n.t("RT Status")}</Text>
-                  <View style={Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile}>
+                  <View style={styles.rnSelectContainer}>
                     <RNPickerSelect
                       // style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
                       placeholder={{ label: 'RT Status', value: '' }}
@@ -423,7 +419,7 @@ export class GoodsReturn extends Component {
                   </View>
                   <Text style={styles.headings}>{I18n.t("RT Number")}</Text>
                   <TextInput
-                    style={[Device.isTablet ? styles.input_tablet : styles.input_mobile, { width: deviceWidth - 40 }]}
+                    style={[styles.input, { width: deviceWidth - 40 }]}
                     underlineColorAndroid="transparent"
                     placeholder={I18n.t("RT Number")}
                     placeholderTextColor="#6F6F6F"
@@ -439,7 +435,7 @@ export class GoodsReturn extends Component {
                   </Text>
                   <Text style={styles.headings}>{I18n.t("Barcode")}</Text>
                   <TextInput
-                    style={[Device.isTablet ? styles.input_tablet : styles.input_mobile, { width: deviceWidth - 40 }]}
+                    style={[styles.input, { width: deviceWidth - 40 }]}
                     underlineColorAndroid="transparent"
                     placeholder={I18n.t("Barcode")}
                     placeholderTextColor="#6F6F6F"
@@ -453,14 +449,16 @@ export class GoodsReturn extends Component {
                       <Message imp={true} message={this.state.errors["barCode"]} />
                     )}
                   </Text>
-                  <TouchableOpacity style={Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile}
-                    onPress={() => this.applyGoodsReturnValidation(this.state.pageNo)}>
-                    <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile} >{I18n.t("APPLY")}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile}
-                    onPress={() => this.modelCancel()}>
-                    <Text style={Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile}>{I18n.t("CANCEL")}</Text>
-                  </TouchableOpacity>
+                  <View style={forms.action_buttons_container}>
+                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                      onPress={() => this.applyGoodsReturnValidation(this.state.pageNo)}>
+                      <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                      onPress={() => this.modelCancel()}>
+                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </KeyboardAwareScrollView>
               </View>
             </Modal>
@@ -577,94 +575,11 @@ const styles = StyleSheet.create({
     marginTop: Device.isTablet ? deviceheight - RH(550) : deviceheight - RH(500),
     height: Device.isTablet ? RH(550) : RH(480)
   },
-
-  // Styles For Mobile
-
-  filterMainContainer_mobile: {
-    width: deviceWidth,
-    alignItems: 'center',
-    marginLeft: -20,
-    backgroundColor: "#ffffff",
-    height: 530,
-    position: 'absolute',
-    bottom: -20,
-  },
-  filterByTitle_mobile: {
-    position: 'absolute',
-    left: 20,
-    top: 15,
-    width: 300,
-    height: 20,
-    fontFamily: 'medium',
-    fontSize: 16,
-    color: '#353C40'
-  },
-  filterByTitleDecoration_mobile: {
-    height: Device.isTablet ? 2 : 1,
-    width: deviceWidth,
-    backgroundColor: 'lightgray',
-    marginTop: 50,
-  },
-  filterCloseButton_mobile: {
-    position: 'absolute',
-    right: 8,
-    top: 15,
-    width: 50,
-    height: 50,
-  },
-  filterDateButton_mobile: {
-    width: deviceWidth - 40,
-    marginTop: 5,
-    marginBottom: 10,
-    marginLeft: 20,
-    marginRight: 20,
-    paddingLeft: 15,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    height: 50,
-    backgroundColor: "#F6F6F6",
-    borderRadius: 5,
-  },
-  filterDateButtonText_mobile: {
-    marginLeft: 16,
-    marginTop: 20,
-    color: "#6F6F6F",
-    fontSize: 15,
-    fontFamily: "regular"
-  },
-  datePickerContainer_mobile: {
-    height: 280,
-    width: deviceWidth,
-    backgroundColor: '#ffffff'
-  },
-  datePickerButton_mobile: {
-    position: 'absolute',
-    left: 20,
-    top: 10,
-    height: 30,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  datePickerEndButton_mobile: {
-    position: 'absolute',
-    right: 20,
-    top: 10,
-    height: 30,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  datePickerButtonText_mobile: {
-    textAlign: 'center',
-    marginTop: 5,
-    color: "#ffffff",
-    fontSize: 15,
-    fontFamily: "regular"
-  },
-  input_mobile: {
+  input: {
     justifyContent: 'center',
     marginLeft: 20,
     marginRight: 20,
-    height: 44,
+    height: Device.isTablet ? 54 : 44,
     marginTop: 5,
     marginBottom: 10,
     borderColor: '#8F9EB717',
@@ -673,199 +588,32 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     fontFamily: 'regular',
     paddingLeft: 15,
-    fontSize: 14,
-  },
-  filterCloseImage_mobile: {
-    color: '#ED1C24',
-    fontFamily: 'regular',
-    fontSize: 12,
-    position: 'absolute',
-    top: 10,
-    right: 0,
-  },
-  filterApplyButton_mobile: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-    height: 50,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  filterButtonText_mobile: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#ffffff",
-    fontSize: 15,
-    fontFamily: "regular"
-  },
-  filterCancelButton_mobile: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-    height: 50,
-    backgroundColor: "#ffffff",
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#353C4050",
-  },
-  filterButtonCancelText_mobile: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#000000",
-    fontSize: 15,
-    fontFamily: "regular"
+    fontSize: Device.isTablet ? 20 : 14,
   },
   rnSelect_mobile: {
     color: '#8F9EB7',
     fontSize: 15
   },
-  rnSelectContainer_mobile: {
-    justifyContent: 'center',
-    margin: 20,
-    height: 44,
-    marginTop: 5,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 14,
-  },
-
-  // Styles For Tablet
-  filterMainContainer_tablet: {
-    width: deviceWidth,
-    alignItems: 'center',
-    marginLeft: -40,
-    backgroundColor: "#ffffff",
-    height: 600,
-    position: 'absolute',
-    bottom: -40,
-  },
-  filterByTitle_tablet: {
-    position: 'absolute',
-    left: 20,
-    top: 15,
-    width: 300,
-    height: 30,
-    fontFamily: 'medium',
-    fontSize: 21,
-    color: '#353C40'
-  },
-  filterByTitleDecoration_tablet: {
-    height: Device.isTablet ? 2 : 1,
-    width: deviceWidth,
-    backgroundColor: 'lightgray',
-    marginTop: 60,
-  },
-  input_tablet: {
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 20,
-    height: 54,
-    marginTop: 5,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 20,
-  },
-  filterCloseButton_tablet: {
-    position: 'absolute',
-    right: 24,
-    top: 10,
-    width: 60,
-    height: 60,
-  },
-  filterCloseImage_tablet: {
-    color: '#ED1C24',
-    fontFamily: 'regular',
-    fontSize: 17,
-    position: 'absolute',
-    top: 10,
-    right: 24,
-  },
-  filterApplyButton_tablet: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-    height: 60,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  filterButtonText_tablet: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#ffffff",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  filterCancelButton_tablet: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-    height: 60,
-    backgroundColor: "#ffffff",
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#353C4050",
-  },
-  filterButtonCancelText_tablet: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#000000",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  filterDateButton_tablet: {
-    width: deviceWidth - 40,
-    marginTop: 5,
-    marginBottom: 10,
-    marginLeft: 20,
-    marginRight: 20,
-    paddingLeft: 15,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    height: 60,
-    backgroundColor: "#F6F6F6",
-    borderRadius: 5,
-  },
-  filterDateButtonText_tablet: {
-    marginLeft: 16,
-    marginTop: 20,
-    color: "#6F6F6F",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  datePickerButton_tablet: {
+  datePickerButton: {
     position: 'absolute',
     left: 20,
     top: 10,
-    height: 40,
+    height: Device.isTablet ? 40 : 30,
     backgroundColor: "#ED1C24",
     borderRadius: 5,
   },
-  datePickerButtonText_tablet: {
+  datePickerButtonText: {
     textAlign: 'center',
     marginTop: 5,
     color: "#ffffff",
-    fontSize: 20,
+    fontSize: Device.isTablet ? 20 : 15,
     fontFamily: "regular"
   },
-  datePickerEndButton_tablet: {
+  datePickerEndButton: {
     position: 'absolute',
     right: 20,
     top: 10,
-    height: 40,
+    height: Device.isTablet ? 40 : 30,
     backgroundColor: "#ED1C24",
     borderRadius: 5,
   },
@@ -873,10 +621,10 @@ const styles = StyleSheet.create({
     color: '#8F9EB7',
     fontSize: 20
   },
-  rnSelectContainer_tablet: {
+  rnSelectContainer: {
     justifyContent: 'center',
     margin: 20,
-    height: 54,
+    height: Device.isTablet ? 54 : 44,
     marginTop: 5,
     marginBottom: 10,
     borderColor: '#8F9EB717',
@@ -885,7 +633,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     fontFamily: 'regular',
     paddingLeft: 15,
-    fontSize: 20,
+    fontSize: Device.isTablet ? 20 : 15,
   },
   headings: {
     fontSize: Device.isTablet ? 20 : 15,
@@ -893,131 +641,14 @@ const styles = StyleSheet.create({
     color: '#B4B7B8',
     marginTop: Device.isTablet ? 10 : 5,
     marginBottom: Device.isTablet ? 10 : 5,
-  }
-
-});
-
-
-
-// Styles For Flat-Lists
-
-
-const flats = StyleSheet.create({
+  },
   buttons: {
     flexDirection: 'row',
     justifyContent: 'center',
   },
-  text: {
-    height: '100%',
-    flexDirection: 'column',
-    justifyContent: 'space-around',
-  },
-
-
-  // flats for Mobile
-  flatlistContainer_mobile: {
-    height: 150,
-    backgroundColor: '#fbfbfb',
-    borderBottomWidth: 5,
-    borderBottomColor: '#ffffff',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  flatlistSubContainer_mobile: {
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-between',
-    paddingLeft: 10,
-    paddingRight: 10,
-    alignItems: 'center',
-    height: 140
-  },
-  flatlistTextAccent_mobile: {
-    fontFamily: 'medium',
-    fontSize: 16,
-    color: '#ED1C24'
-  },
-  flatlistText_mobile: {
-    fontFamily: 'regular',
-    fontSize: 12,
-    color: '#353c40'
-  },
-  flatlistTextCommon_mobile: {
-    fontFamily: 'regular',
-    fontSize: 12,
-    color: '#808080'
-  },
-  editButton_mobile: {
-    width: 30,
-    height: 30,
-    borderBottomLeftRadius: 5,
-    borderTopLeftRadius: 5,
-    borderWidth: 1,
-    borderColor: "lightgray",
-    // borderRadius:5,
-  },
-  deleteButton_mobile: {
-    width: 30,
-    height: 30,
-    borderBottomRightRadius: 5,
-    borderTopRightRadius: 5,
-    borderWidth: 1,
-    borderColor: "lightgray",
-  },
-
-
-  // flats for Tablet
-  flatlistContainer_tablet: {
-    height: 200,
-    backgroundColor: '#fbfbfb',
-    borderBottomWidth: 5,
-    borderBottomColor: '#ffffff',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  flatlistSubContainer_tablet: {
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-between',
-    paddingLeft: 20,
-    paddingRight: 20,
-    alignItems: 'center',
-    height: 160
-  },
-  flatlistTextAccent_tablet: {
-    fontFamily: 'medium',
-    fontSize: 21,
-    color: '#ED1C24'
-  },
-  flatlistText_tablet: {
-    fontFamily: 'regular',
-    fontSize: 21,
-    color: '#353c40'
-  },
-  flatlistTextCommon_tablet: {
-    fontFamily: 'regular',
-    fontSize: 17,
-    color: '#808080'
-  },
-  flatlstTextCommon_tablet: {
-    fontFamily: 'regular',
-    fontSize: 17,
-    color: '#808080'
-  },
-  editButton_tablet: {
-    width: 50,
-    height: 50,
-    borderBottomLeftRadius: 5,
-    borderTopLeftRadius: 5,
-    borderWidth: 1,
-    borderColor: "lightgray",
-    // borderRadius:5,
-  },
-  deleteButton_tablet: {
-    width: 50,
-    height: 50,
+  deleteButton: {
+    width: Device.isTablet ? 50 : 30,
+    height: Device.isTablet ? 50 : 30,
     borderBottomRightRadius: 5,
     borderTopRightRadius: 5,
     borderWidth: 1,

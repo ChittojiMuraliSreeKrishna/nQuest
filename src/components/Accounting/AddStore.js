@@ -84,6 +84,7 @@ export default class AddStore extends Component {
       statusValid: true,
       storeStatus: "",
       gstEdit: true,
+      cityValid: true
     };
   }
 
@@ -283,6 +284,12 @@ export default class AddStore extends Component {
       errors["status"] = urmErrorMessages.status;
     }
 
+    if (this.state.city === "") {
+      errors['city'] = urmErrorMessages.city;
+      formIsValid = false
+      this.setState({ cityValid: false })
+    }
+
     this.setState({ errors: errors });
     return formIsValid;
   }
@@ -308,6 +315,10 @@ export default class AddStore extends Component {
       this.setState({ mobileValid: true });
     }
   };
+
+  handleCityValid = () => {
+
+  }
 
   saveStore() {
     const formIsValid = this.validationForm();
@@ -389,13 +400,13 @@ export default class AddStore extends Component {
       districtValid,
       mobileValid,
       gstValid,
-      statusValid,
+      statusValid,cityValid
     } = this.state;
     return (
       <View style={styles.mainContainer}>
         {this.state.loading && <Loader loading={this.state.loading} />}
         <Appbar mode="center-aligned">
-          <Appbar.BackAction onPress={() => this.handleBackButtonClick()}  />
+          <Appbar.BackAction onPress={() => this.handleBackButtonClick()} />
           <Appbar.Content title={this.state.navtext} />
         </Appbar>
         <ScrollView>
@@ -476,17 +487,22 @@ export default class AddStore extends Component {
           {!districtValid && (
             <Message imp={true} message={this.state.errors["district"]} />
           )}
-          <Text style={inputHeading}>{I18n.t("City")}</Text>
+          <Text style={inputHeading}>{I18n.t("City")}{" "}
+            <Text style={{ color: "#aa0000" }}>*</Text>
+          </Text>
           <TextInput
             style={inputField}
             underlineColorAndroid="transparent"
             placeholder={I18n.t("CITY")}
-            placeholderTextColor="#6F6F6F"
+            placeholderTextColor={cityValid ? "#6F6F6F" : "#dd0000"}
             textAlignVertical="center"
             autoCapitalize="none"
             value={this.state.city}
             onChangeText={(value) => this.handleCity(value)}
           />
+          {!cityValid && (
+            <Message imp={true} message={this.state.errors["city"]} />
+          )}
 
           <Text style={inputHeading}>{I18n.t("Area")}</Text>
           <TextInput

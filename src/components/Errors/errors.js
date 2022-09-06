@@ -15,7 +15,8 @@ export const urmErrorMessages = {
   gstNumber: "/ Gst Number must be 15 characters or more",
   verificationCode: '/ Please enter the verification code',
   userStatus: '/Please Select The User Status',
-  selectedStores: '/Please Select Atleast One Store'
+  selectedStores: '/Please Select Atleast One Store',
+  city:'/Please enter city name'
 };
 
 export const inventoryErrorMessages = {
