@@ -4,7 +4,6 @@ import { AppRegistry, LogBox } from 'react-native';
 // import * as CryptoJS from 'react-native-crypto-js';
 import 'react-native-gesture-handler';
 import App from './src/components/App';
-import { logOut } from './src/components/Profile/Settings';
 LogBox.ignoreAllLogs(true);
 
 // // For requests
@@ -12,14 +11,14 @@ axios.interceptors.request.use(
   (req) => {
     AsyncStorage.getItem("tokenkey").then((value) => {
       var finalToken = value.replace('"', '');
-      // console.log(finalToken);
-      axios.defaults.headers.common = { 'Authorization': 'Bearer' + ' ' + finalToken };
-      //console.log("Request to server:::::::::::::::::::" + 'Bearer' + ' ' + finalToken);
+      const clientId = JSON.parse(AsyncStorage.getItem("custom:clientId1"))
+      console.log({ clientId })
+      // axios.defaults.headers.common = { 'Authorization': 'Bearer' + ' ' + finalToken, 'clientId': clientId ? clientId : 0 };
+      req.headers.Authorization = "Bearer" + " " + finalToken
+      req.headers.clientId = clientId ? clientId : "0"
     }).catch((err) => {
       this.setState({ loading: false });
-      // alert('There is error getting token');
       alert(err);
-
       console.log('There is error getting token');
     });
     // if (ENCRYPTION) {
@@ -33,11 +32,11 @@ axios.interceptors.request.use(
     //   })
     //   var encryptedBytes = cipher.toString()
     //   req.data = encryptedBytes;
-      return req;
-    },
-    (err) => {
-      return Promise.reject(err);
-    }
+    return req;
+  },
+  (err) => {
+    return Promise.reject(err);
+  }
 );
 
 

@@ -205,6 +205,7 @@ export default class Promotions extends Component {
                     scss.pageNavigationBtn,
                     {
                       borderColor: item.bool ? "#ED1C24" : "#858585",
+                      borderBottomWidth: item.bool ? 3 : 0
                     },
                   ]}
                   onPress={() => this.topbarAction1(item, index)}

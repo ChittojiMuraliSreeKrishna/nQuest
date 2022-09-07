@@ -9,9 +9,7 @@ import IconIA from 'react-native-vector-icons/Ionicons';
 import scss from "../../commonUtils/assets/styles/style.scss";
 import Loader from "../../commonUtils/loader";
 import AccountingService from "../services/AccountingService";
-import {
-  flatListHeaderContainer, flatListTitle
-} from "../Styles/Styles";
+import { flatListTitle } from "../Styles/Styles";
 
 var deviceHeight = Dimensions.get("window").height;
 var deviceWidth = Dimensions.get("window").width;
@@ -86,11 +84,11 @@ export default class CreateTaxMaster extends Component {
         {this.state.loading && <Loader loading={this.state.loading} />}
         <FlatList
           ListHeaderComponent={
-            <View style={flatListHeaderContainer}>
+            <View style={scss.headerContainer}>
               <Text style={flatListTitle}>Create Tax Master - <Text style={{ color: '#ed1c24' }}>{this.state.taxList.length}</Text></Text>
               <IconIA
                 name="add-circle-outline"
-                size={25}
+                size={30}
                 onPress={() => this.navigateToAddTax()}
               ></IconIA>
             </View>

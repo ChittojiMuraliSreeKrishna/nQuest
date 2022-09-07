@@ -94,7 +94,7 @@ export default class CreateHSNCode extends Component {
             </View>
           }
           data={this.state.hsnList}
-          style={{ marginTop: 20 }}
+          style={scss.flatListBody}
           scrollEnabled={true}
           renderItem={({ item, index }) => (
             <ScrollView>
