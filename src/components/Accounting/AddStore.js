@@ -281,6 +281,12 @@ export default class AddStore extends Component {
       errors["status"] = urmErrorMessages.status;
     }
 
+    if (this.state.city === "") {
+      errors['city'] = urmErrorMessages.city;
+      formIsValid = false
+      this.setState({ cityValid: false })
+    }
+
     this.setState({ errors: errors });
     return formIsValid;
   }
@@ -306,6 +312,10 @@ export default class AddStore extends Component {
       this.setState({ mobileValid: true });
     }
   };
+
+  handleCityValid = () => {
+
+  }
 
   saveStore() {
     const formIsValid = this.validationForm();
@@ -389,6 +399,7 @@ export default class AddStore extends Component {
       gstValid,
       statusValid,
       cityValid
+
     } = this.state;
     return (
       <View style={styles.mainContainer}>
@@ -475,7 +486,9 @@ export default class AddStore extends Component {
           {!districtValid && (
             <Message imp={true} message={this.state.errors["district"]} />
           )}
+
           <Text style={inputHeading}>{I18n.t("City")} <Text style={{ color: "#aa0000" }}>*</Text> </Text>
+
           <TextInput
             activeOutlineColor="#000"
             mode="outlined"
@@ -492,6 +505,7 @@ export default class AddStore extends Component {
           {!cityValid && (
             <Message imp={true} message={this.state.errors["city"]} />
           )}
+
           <Text style={inputHeading}>{I18n.t("Area")}</Text>
           <TextInput
             activeOutlineColor="#000"

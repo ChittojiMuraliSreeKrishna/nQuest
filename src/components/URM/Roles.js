@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { Component } from "react";
 import {
+
   Dimensions,
   FlatList,
   Image,
@@ -9,6 +10,7 @@ import {
 
   TouchableOpacity,
   View
+
 } from "react-native";
 import DatePicker from "react-native-date-picker";
 import Device from "react-native-device-detection";
@@ -33,6 +35,8 @@ import {
   submitBtn,
   submitBtnText
 } from "../Styles/FormFields";
+import forms from '../../commonUtils/assets/styles/formFields.scss';
+
 import {
   filterCloseImage,
   filterHeading,
@@ -45,6 +49,7 @@ var deviceheight = Dimensions.get("window").height;
 var deviceWidth = Dimensions.get("window").width;
 
 export default class Roles extends Component {
+
   constructor(props) {
     super(props);
     this.state = {
@@ -64,6 +69,7 @@ export default class Roles extends Component {
     this.setState({ clientId: clientId });
     this.getRolesList();
   }
+
 
   // Refreshing the List
   refresh() {
@@ -184,6 +190,7 @@ export default class Roles extends Component {
     });
   }
 
+
   // Apply Filter Action
   applyRoleFilter() {
     const { role, createdBy, createdDate } = this.state;
@@ -203,6 +210,7 @@ export default class Roles extends Component {
     });
   }
 
+
   // Edit Role Action
   handleeditrole(item, index) {
     this.props.navigation.navigate("CreateRole", {
@@ -212,6 +220,7 @@ export default class Roles extends Component {
       goBack: () => this.refresh(),
     });
   }
+
 
   render() {
     const { filterActive, rolesData, filterRolesData } = this.state;
@@ -421,4 +430,5 @@ export default class Roles extends Component {
       </View>
     );
   }
+
 }

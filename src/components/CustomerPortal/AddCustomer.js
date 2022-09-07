@@ -65,7 +65,7 @@ export default class AddCustomer extends Component {
     const emailReg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
 
-    if (this.state.name.length < 6) {
+    if (this.state.name.length <3) {
       isFormValid = false;
       errors["name"] = urmErrorMessages.customerName;
       this.setState({ nameValid: false });
@@ -215,7 +215,7 @@ export default class AddCustomer extends Component {
           underlineColor={nameValid ? '#6f6f6f' : "#dd0000"}
           label={I18n.t('CUSTOMER NAME')}
           maxLength={25}
-          onBlur={this.handleNameValid}
+          // onBlur={this.handleNameValid}
           value={this.state.name}
           onChangeText={(text) => this.handleCustomerName(text)}
         />
@@ -229,7 +229,7 @@ export default class AddCustomer extends Component {
           label={I18n.t('MOBILE NUMBER')}
           maxLength={10}
           keyboardType='phone-pad'
-          onBlur={this.handleMobileValid}
+          // onBlur={this.handleMobileValid}
           textContentType='telephoneNumber'
           value={mobileNumber}
           onChangeText={(text) => this.handleMobileNumber(text)}
@@ -593,7 +593,7 @@ const styles = StyleSheet.create({
 
   // Tablet Styles
   headerText_tablet: {
-    color: "#353C40",
+    color: "#ED1C24",
     fontSize: RF(18),
     fontFamily: "bold",
     marginLeft: 10,

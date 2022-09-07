@@ -14,6 +14,8 @@ import FilterIcon from 'react-native-vector-icons/FontAwesome'
 import { flatListMainContainer, flatlistSubContainer, highText, textContainer, textStyleMedium, textStyleSmall } from '../Styles/Styles';
 import { color } from '../Styles/colorStyles';
 import { emptyTextStyle } from '../Styles/FormFields';
+import forms from '../../commonUtils/assets/styles/formFields.scss';
+
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -292,17 +294,28 @@ export class SalesSumary extends Component {
                   }}></Text>
                 </View>
                 <KeyboardAwareScrollView enableOnAndroid={true} >
-                  <Text style={styles.headings}>{I18n.t("From Date")}</Text>
-                  <TouchableOpacity
-                    style={styles.filterDateButton}
-                    testID="openModal"
-                    onPress={() => this.datepickerClicked()}
-                  >
-                    <Text
-                      style={styles.filterDateButtonText}
-                    >{this.state.startDate == "" ? 'START DATE' : this.state.startDate}</Text>
-                    <Image style={{ position: 'absolute', top: 10, right: 0, }} source={require('../assets/images/calender.png')} />
-                  </TouchableOpacity>
+                  <View style={forms.filter_dates_container}>
+                    <TouchableOpacity
+                      style={forms.filter_dates}
+                      testID="openModal"
+                      onPress={() => this.datepickerClicked()}
+                    >
+                      <Text
+                        style={forms.filter_dates_text}
+                      >{this.state.startDate == "" ? 'START DATE' : this.state.startDate}</Text>
+                      <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={forms.filter_dates}
+                      testID="openModal"
+                      onPress={() => this.enddatepickerClicked()}
+                    >
+                      <Text
+                        style={forms.filter_dates_text}
+                      >{this.state.endDate == "" ? 'END DATE' : this.state.endDate}</Text>
+                      <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                    </TouchableOpacity>
+                  </View>
                   {this.state.datepickerOpen && (
                     <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
                       <TouchableOpacity
@@ -325,17 +338,6 @@ export class SalesSumary extends Component {
                     </View>
                   )}
 
-                  <Text style={styles.headings}>{I18n.t("To Date")}</Text>
-                  <TouchableOpacity
-                    style={styles.filterDateButton}
-                    testID="openModal"
-                    onPress={() => this.enddatepickerClicked()}
-                  >
-                    <Text
-                      style={styles.filterDateButtonText}
-                    >{this.state.endDate == "" ? 'END DATE' : this.state.endDate}</Text>
-                    <Image style={{ position: 'absolute', top: 10, right: 0, }} source={require('../assets/images/calender.png')} />
-                  </TouchableOpacity>
                   {this.state.datepickerendOpen && (
                     <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
                       <TouchableOpacity
@@ -357,14 +359,16 @@ export class SalesSumary extends Component {
                     </View>
                   )}
 
-                  <TouchableOpacity style={styles.filterApplyButton}
-                    onPress={() => this.applySalesSummary()}>
-                    <Text style={styles.filterButtonText} >{I18n.t("APPLY")}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.filterCancelButton}
-                    onPress={() => this.modelCancel()}>
-                    <Text style={styles.filterButtonCancelText}>{I18n.t("CANCEL")}</Text>
-                  </TouchableOpacity>
+                  <View style={forms.action_buttons_container}>
+                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                      onPress={() => this.applySalesSummary()}>
+                      <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                      onPress={() => this.modelCancel()}>
+                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </KeyboardAwareScrollView>
               </View>
             </Modal>
@@ -393,8 +397,8 @@ const styles = StyleSheet.create({
     // marginRight: -40,
     // paddingLeft: Device.isTablet ? 0 : 20,
     backgroundColor: '#ffffff',
-    marginTop: Device.isTablet ? deviceheight - RH(550) : deviceheight - RH(350),
-    height: Device.isTablet ? RH(700) : RH(600),
+    marginTop: Device.isTablet ? deviceheight - RH(400) : deviceheight - RH(200),
+    height: Device.isTablet ? RH(350) : RH(250),
   },
   filterApplyButton: {
     width: deviceWidth - 40,

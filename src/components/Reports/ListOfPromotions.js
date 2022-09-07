@@ -16,6 +16,7 @@ import FilterIcon from 'react-native-vector-icons/FontAwesome'
 import { flatListMainContainer, flatlistSubContainer, highText, loadMoreBtn, loadmoreBtnText, textContainer, textStyleLight, textStyleMedium } from '../Styles/Styles';
 import { emptyTextStyle } from '../Styles/FormFields';
 import Loader from '../../commonUtils/loader';
+import forms from '../../commonUtils/assets/styles/formFields.scss';
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -79,9 +80,9 @@ export class ListOfPromotions extends Component {
 
 
   continuePagination() {
-    if (this.state.pageNo < this.state.totalPages-1) {
+    if (this.state.pageNo < this.state.totalPages - 1) {
       this.setState({ loadMoreActive: true });
-    }  else {
+    } else {
       this.setState({ loadMoreActive: false });
     }
   }
@@ -174,7 +175,7 @@ export class ListOfPromotions extends Component {
                 </View>
                 <KeyboardAwareScrollView enableOnAndroid={true} >
                   <Text style={styles.headings}>{I18n.t("Promo Type")}</Text>
-                  <View style={[Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile, { width: deviceWidth - RW(40) }]}>
+                  <View style={[styles.rnSelectContainer, { width: deviceWidth - RW(40) }]}>
                     <RNPickerSelect
                       placeholder={{
                         label: 'Promo Type', value: ''
@@ -191,14 +192,14 @@ export class ListOfPromotions extends Component {
                         value: "promotionForWholeBill",
                       }]}
                       onValueChange={this.handlePromoType}
-                      style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
+                      style={pickerSelectStyles}
                       value={this.state.promoType}
                       useNativeAndroidPickerStyle={false}
                     />
                   </View>
 
                   <Text style={styles.headings}>{I18n.t("Promo Status")}</Text>
-                  <View style={[Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile, { width: deviceWidth - RW(40) }]}>
+                  <View style={[styles.rnSelectContainer, { width: deviceWidth - RW(40) }]}>
                     <RNPickerSelect
                       placeholder={{
                         label: 'Promo Status ', value: ''
@@ -215,20 +216,22 @@ export class ListOfPromotions extends Component {
                         value: "false",
                       }]}
                       onValueChange={this.handlePromoStatus}
-                      style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
+                      style={pickerSelectStyles}
                       value={this.state.promoStatus}
                       useNativeAndroidPickerStyle={false}
                     />
                   </View>
 
-                  <TouchableOpacity style={Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile}
-                    onPress={() => this.applyListPromotions(this.state.pageNo)}>
-                    <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile} >APPLY</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile}
-                    onPress={() => this.modelCancel()}>
-                    <Text style={Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile}>CANCEL</Text>
-                  </TouchableOpacity>
+                  <View style={forms.action_buttons_container}>
+                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                      onPress={() => this.applyListPromotions(this.state.pageNo)}>
+                      <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                      onPress={() => this.modelCancel()}>
+                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </KeyboardAwareScrollView>
               </View>
             </Modal>
@@ -240,91 +243,34 @@ export class ListOfPromotions extends Component {
 }
 
 
-const pickerSelectStyles_mobile = StyleSheet.create({
+const pickerSelectStyles = StyleSheet.create({
   placeholder: {
     color: "#6F6F6F",
-    fontFamily: "regular",
-    fontSize: RF(15),
+    fontSize: Device.isTablet ? RF(20) : RF(15),
   },
   inputIOS: {
     justifyContent: 'center',
     height: RH(42),
     borderRadius: 3,
     borderWidth: 1,
-    fontFamily: 'regular',
     //paddingLeft: -20,
-    fontSize: RF(15),
+    fontSize: Device.isTablet ? RF(20) : RF(15),
     borderColor: '#FBFBFB',
     backgroundColor: '#FBFBFB',
   },
 
   inputAndroid: {
     justifyContent: 'center',
-    height: RH(42),
+    height: Device.isTablet ? RH(52) : RH(42),
     borderRadius: 3,
     borderWidth: 1,
-    fontFamily: 'regular',
     //paddingLeft: -20,
-    fontSize: RF(15),
+    fontSize: Device.isTablet ? RF(20) : RF(15),
     borderColor: '#FBFBFB',
     backgroundColor: '#FBFBFB',
-    color: '#001B4A',
-
-    // marginLeft: 20,
-    // marginRight: 20,
-    // marginTop: 10,
-    // height: 40,
-    // backgroundColor: '#ffffff',
-    // borderBottomColor: '#456CAF55',
-    // color: '#001B4A',
-    // fontFamily: "bold",
-    // fontSize: 16,
-    // borderRadius: 3,
+    color: '#001B4A'
   },
 });
-
-const pickerSelectStyles_tablet = StyleSheet.create({
-  placeholder: {
-    color: "#6F6F6F",
-    fontFamily: "regular",
-    fontSize: RF(20),
-  },
-  inputIOS: {
-    justifyContent: 'center',
-    height: RH(52),
-    borderRadius: 3,
-    borderWidth: 1,
-    fontFamily: 'regular',
-    //paddingLeft: -20,
-    fontSize: RF(20),
-    borderColor: '#FBFBFB',
-    backgroundColor: '#FBFBFB',
-  },
-  inputAndroid: {
-    justifyContent: 'center',
-    height: RH(52),
-    borderRadius: 3,
-    borderWidth: 1,
-    fontFamily: 'regular',
-    //paddingLeft: -20,
-    fontSize: RF(20),
-    borderColor: '#FBFBFB',
-    backgroundColor: '#FBFBFB',
-    color: '#001B4A',
-
-    // marginLeft: 20,
-    // marginRight: 20,
-    // marginTop: 10,
-    // height: 40,
-    // backgroundColor: '#ffffff',
-    // borderBottomColor: '#456CAF55',
-    // color: '#001B4A',
-    // fontFamily: "bold",
-    // fontSize: 16,
-    // borderRadius: 3,
-  },
-});
-
 
 const styles = StyleSheet.create({
   headings: {
@@ -346,159 +292,14 @@ const styles = StyleSheet.create({
     right: Device.isTablet ? RW(15) : RW(30),
   },
   filterMainContainer: {
-    // marginLeft: -40,
-    // marginRight: -40,
-    // paddingLeft: Device.isTablet ? 0 : 20,
     backgroundColor: '#ffffff',
     marginTop: Device.isTablet ? deviceheight - RH(500) : deviceheight - RH(400),
     height: Device.isTablet ? RH(500) : RH(400),
   },
-  // Styles For Mobile
-
-  filterMainContainer_mobile: {
-    width: deviceWidth,
-    alignItems: 'center',
-    marginLeft: -RW(20),
-    backgroundColor: "#ffffff",
-    height: RH(400),
-    position: 'absolute',
-    bottom: -RH(20),
-  },
-  filterByTitle_mobile: {
-    position: 'absolute',
-    left: RW(20),
-    top: RH(15),
-    width: RW(300),
-    height: RH(20),
-    fontFamily: 'medium',
-    fontSize: RF(16),
-    color: '#353C40'
-  },
-  filterByTitleDecoration_mobile: {
-    height: Device.isTablet ? 2 : 1,
-    width: deviceWidth,
-    backgroundColor: 'lightgray',
-    marginTop: RH(50),
-  },
-  filterCloseButton_mobile: {
-    position: 'absolute',
-    right: RW(8),
-    top: RH(15),
-    width: RW(50), height: RH(50),
-  },
-  filterDateButton_mobile: {
-    width: deviceWidth - RW(40),
-    marginTop: RH(5),
-    marginBottom: RH(10),
-    marginLeft: RW(20),
-    marginRight: RW(20),
-    paddingLeft: RW(15),
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    height: RH(50),
-    backgroundColor: "#F6F6F6",
-    borderRadius: 5,
-  },
-  filterDateButtonText_mobile: {
-    marginLeft: RW(16),
-    marginTop: RH(20),
-    color: "#6F6F6F",
-    fontSize: RF(15),
-    fontFamily: "regular"
-  },
-  datePickerContainer_mobile: {
-    height: RH(280),
-    width: deviceWidth,
-    backgroundColor: '#ffffff'
-  },
-  datePickerButton_mobile: {
-    position: 'absolute',
-    left: RW(20),
-    top: RH(10),
-    height: RH(30),
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  datePickerEndButton_mobile: {
-    position: 'absolute',
-    right: RW(20),
-    top: RH(10),
-    height: RH(30),
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  datePickerButtonText_mobile: {
-    textAlign: 'center',
-    marginTop: RH(5),
-    color: "#ffffff",
-    fontSize: RF(15),
-    fontFamily: "regular"
-  },
-  input_mobile: {
-    justifyContent: 'center',
-    marginLeft: RW(20),
-    marginRight: RW(20),
-    height: RH(44),
-    marginTop: 5,
-    marginBottom: RH(10),
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: RW(15),
-    fontSize: RF(14),
-  },
-  filterCloseImage_mobile: {
-    color: '#ED1C24',
-    fontFamily: 'regular',
-    fontSize: RF(12),
-    position: 'absolute',
-    top: RH(10),
-    right: 0,
-  },
-  filterApplyButton_mobile: {
-    width: deviceWidth - RW(40),
-    marginLeft: RW(20),
-    marginRight: RW(20),
-    marginTop: RH(20),
-    height: RH(50),
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  filterButtonText_mobile: {
-    textAlign: 'center',
-    marginTop: RH(20),
-    color: "#ffffff",
-    fontSize: RF(15),
-    fontFamily: "regular"
-  },
-  filterCancelButton_mobile: {
-    width: deviceWidth - RF(40),
-    marginLeft: RW(20),
-    marginRight: RW(20),
-    marginTop: RH(20),
-    height: RH(50),
-    backgroundColor: "#ffffff",
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#353C4050",
-  },
-  filterButtonCancelText_mobile: {
-    textAlign: 'center',
-    marginTop: RH(20),
-    color: "#000000",
-    fontSize: RF(15),
-    fontFamily: "regular"
-  },
-  rnSelect_mobile: {
-    color: '#8F9EB7',
-    fontSize: RF(15)
-  },
-  rnSelectContainer_mobile: {
+  rnSelectContainer: {
     justifyContent: 'center',
     margin: RH(20),
-    height: RH(44),
+    height: Device.isTablet ? RH(54) : RH(44),
     marginTop: 5,
     marginBottom: RH(10),
     borderColor: '#8F9EB717',
@@ -507,291 +308,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     fontFamily: 'regular',
     paddingLeft: RW(15),
-    fontSize: RF(14),
-  },
-
-  // Styles For Tablet
-  filterMainContainer_tablet: {
-    width: deviceWidth,
-    alignItems: 'center',
-    marginLeft: -40,
-    backgroundColor: "#ffffff",
-    height: 500,
-    position: 'absolute',
-    bottom: -40,
-  },
-  filterByTitle_tablet: {
-    position: 'absolute',
-    left: 20,
-    top: 15,
-    width: 300,
-    height: 30,
-    fontFamily: 'medium',
-    fontSize: 21,
-    color: '#353C40'
-  },
-  filterByTitleDecoration_tablet: {
-    height: Device.isTablet ? 2 : 1,
-    width: deviceWidth,
-    backgroundColor: 'lightgray',
-
-  },
-  input_tablet: {
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 20,
-    height: 54,
-    marginTop: 5,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 20,
-  },
-  filterCloseButton_tablet: {
-    position: 'absolute',
-    right: 24,
-    top: 10,
-    width: 60, height: 60,
-  },
-  filterCloseImage_tablet: {
-    color: '#ED1C24',
-    fontFamily: 'regular',
-    fontSize: 17,
-    position: 'absolute',
-    top: 10,
-    right: 24,
-  },
-  filterApplyButton_tablet: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-    height: 60,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  filterButtonText_tablet: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#ffffff",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  filterCancelButton_tablet: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-    height: 60,
-    backgroundColor: "#ffffff",
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#353C4050",
-  },
-  filterButtonCancelText_tablet: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#000000",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  filterDateButton_tablet: {
-    width: deviceWidth - 40,
-    marginTop: 5,
-    marginBottom: 10,
-    marginLeft: 20,
-    marginRight: 20,
-    paddingLeft: 15,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    height: 60,
-    backgroundColor: "#F6F6F6",
-    borderRadius: 5,
-  },
-  filterDateButtonText_tablet: {
-    marginLeft: 16,
-    marginTop: 20,
-    color: "#6F6F6F",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  datePickerButton_tablet: {
-    position: 'absolute',
-    left: 20,
-    top: 10,
-    height: 40,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  datePickerButtonText_tablet: {
-    textAlign: 'center',
-    marginTop: 5,
-    color: "#ffffff",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  datePickerEndButton_tablet: {
-    position: 'absolute',
-    right: 20,
-    top: 10,
-    height: 40,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  rnSelect_tablet: {
-    color: '#8F9EB7',
-    fontSize: 20
-  },
-  rnSelectContainer_tablet: {
-    justifyContent: 'center',
-    margin: 20,
-    height: 54,
-    marginTop: 5,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 20,
-  },
-
-
-});
-
-
-
-// Styles For Flat-Lists
-
-
-const flats = StyleSheet.create({
-  buttons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  text: {
-    height: '100%',
-    flexDirection: 'column',
-    justifyContent: 'space-around',
-  },
-
-
-  // flats for Mobile
-  flatlistContainer_mobile: {
-    height: RH(150),
-    backgroundColor: '#fbfbfb',
-    borderBottomWidth: 5,
-    borderBottomColor: '#ffffff',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  flatlistSubContainer_mobile: {
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-between',
-    paddingLeft: RW(10),
-    paddingRight: RW(10),
-    alignItems: 'center',
-    height: RH(140)
-  },
-  flatlistTextAccent_mobile: {
-    fontFamily: 'medium',
-    fontSize: RF(16),
-    color: '#ED1C24'
-  },
-  flatlistText_mobile: {
-    fontFamily: 'regular',
-    fontSize: RF(12),
-    color: '#353c40'
-  },
-  flatlistTextCommon_mobile: {
-    fontFamily: 'regular',
-    fontSize: RF(12),
-    color: '#808080'
-  },
-  editButton_mobile: {
-    width: RW(30),
-    height: RH(30),
-    borderBottomLeftRadius: 5,
-    borderTopLeftRadius: 5,
-    borderWidth: 1,
-    borderColor: "lightgray",
-    // borderRadius:5,
-  },
-  deleteButton_mobile: {
-    width: RW(30),
-    height: RH(30),
-    borderBottomRightRadius: 5,
-    borderTopRightRadius: 5,
-    borderWidth: 1,
-    borderColor: "lightgray",
-  },
-
-
-  // flats for Tablet
-  flatlistContainer_tablet: {
-    height: RH(200),
-    backgroundColor: '#fbfbfb',
-    borderBottomWidth: 5,
-    borderBottomColor: '#ffffff',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  flatlistSubContainer_tablet: {
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-between',
-    paddingLeft: RW(20),
-    paddingRight: RH(20),
-    alignItems: 'center',
-    height: RH(160)
-  },
-  flatlistTextAccent_tablet: {
-    fontFamily: 'medium',
-    fontSize: RF(21),
-    color: '#ED1C24'
-  },
-  flatlistText_tablet: {
-    fontFamily: 'regular',
-    fontSize: RF(21),
-    color: '#353c40'
-  },
-  flatlistTextCommon_tablet: {
-    fontFamily: 'regular',
-    fontSize: RF(17),
-    color: '#808080'
-  },
-  flatlstTextCommon_tablet: {
-    fontFamily: 'regular',
-    fontSize: RF(17),
-    color: '#808080'
-  },
-  editButton_tablet: {
-    width: RW(50),
-    height: RH(50),
-    borderBottomLeftRadius: 5,
-    borderTopLeftRadius: 5,
-    borderWidth: 1,
-    borderColor: "lightgray",
-    // borderRadius:5,
-  },
-  deleteButton_tablet: {
-    width: RW(50),
-    height: RH(50),
-    borderBottomRightRadius: 5,
-    borderTopRightRadius: 5,
-    borderWidth: 1,
-    borderColor: "lightgray",
-  },
-
-
-
-
+    fontSize: Device.isTablet ? RF(20) : RF(14),
+  }
 });
