@@ -76,6 +76,7 @@ export default class DayClosure extends Component {
             </View>}
             data={this.state.dayClosureList}
             scrollEnabled={true}
+            removeClippedSubviews={false}
             ListEmptyComponent={<Text style={styles.emptyText}>No Pending Delivery Slips</Text>}
             renderItem={({ item, index }) => (
               <View style={scss.flatListContainer}>
@@ -85,7 +86,9 @@ export default class DayClosure extends Component {
                     <Text style={scss.textStyleLight}>M.R.P: {item.mrp}</Text>
                   </View>
                   <View style={scss.textContainer}>
-                    <Text style={scss.textStyleMedium}>DsNumber: {"\n"}{item.dsNumber}</Text>
+                    <Text selectable={true} style={scss.textStyleLight}>DsNumber:
+                      <Text style={scss.textStyleMedium}>{"\n"}{item.dsNumber}</Text>
+                    </Text>
                     <Text style={scss.textStyleLight}>SalesMan: {item.salesMan}</Text>
                   </View>
                 </View>

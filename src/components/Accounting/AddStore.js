@@ -2,9 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import React, { Component } from "react";
 import {
-  Dimensions,
-  Image,
-  ScrollView,
+  Dimensions, ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -12,7 +10,7 @@ import {
 } from "react-native";
 import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
-import { TextInput, Appbar } from "react-native-paper";
+import { Appbar, TextInput } from "react-native-paper";
 import RNPickerSelect from "react-native-picker-select";
 import { Chevron } from "react-native-shapes";
 import Loader from "../../commonUtils/loader";
@@ -35,13 +33,6 @@ import {
   submitBtn,
   submitBtnText
 } from "../Styles/FormFields";
-import {
-  backButton,
-  backButtonImage,
-  headerTitle,
-  headerTitleContainer,
-  headerTitleSubContainer
-} from "../Styles/Styles";
 
 var deviceHeight = Dimensions.get("window").height;
 var deviceWidth = Dimensions.get("window").width;
@@ -258,6 +249,12 @@ export default class AddStore extends Component {
       this.setState({ districtValid: false });
     }
 
+    if (this.state.city.length === 0) {
+      errors["city"] = accountingErrorMessages.city;
+      formIsValid = false
+      this.setState({ cityValid: false })
+    }
+
     if (
       this.state.storeName.length < errorLength.name ||
       this.state.storeName === undefined
@@ -400,7 +397,9 @@ export default class AddStore extends Component {
       districtValid,
       mobileValid,
       gstValid,
-      statusValid,cityValid
+      statusValid,
+      cityValid
+
     } = this.state;
     return (
       <View style={styles.mainContainer}>
@@ -487,12 +486,15 @@ export default class AddStore extends Component {
           {!districtValid && (
             <Message imp={true} message={this.state.errors["district"]} />
           )}
-          <Text style={inputHeading}>{I18n.t("City")}{" "}
-            <Text style={{ color: "#aa0000" }}>*</Text>
-          </Text>
+
+          <Text style={inputHeading}>{I18n.t("City")} <Text style={{ color: "#aa0000" }}>*</Text> </Text>
+
           <TextInput
-            style={inputField}
-            underlineColorAndroid="transparent"
+            activeOutlineColor="#000"
+            mode="outlined"
+            outlineColor={cityValid ? "#8F9EB717" : "#dd0000"}
+            style={[inputField,]}
+
             placeholder={I18n.t("CITY")}
             placeholderTextColor={cityValid ? "#6F6F6F" : "#dd0000"}
             textAlignVertical="center"
@@ -506,8 +508,10 @@ export default class AddStore extends Component {
 
           <Text style={inputHeading}>{I18n.t("Area")}</Text>
           <TextInput
+            activeOutlineColor="#000"
+            mode="outlined"
             style={inputField}
-            underlineColorAndroid="transparent"
+            outlineColor="#8F9EB717"
             placeholder={I18n.t("AREA")}
             placeholderTextColor="#6F6F6F"
             textAlignVertical="center"
@@ -520,11 +524,14 @@ export default class AddStore extends Component {
             <Text style={{ color: "#aa0000" }}>*</Text>
           </Text>
           <TextInput
+            activeOutlineColor="#000"
+            mode="outlined"
+            outlineColor={mobileValid ? "#8F9EB717" : "#dd0000"}
             style={[
               inputField,
-              { borderColor: mobileValid ? "#8F9EB717" : "#dd0000" },
+              ,
             ]}
-            underlineColorAndroid="transparent"
+
             placeholder={I18n.t("Phone Number")}
             maxLength={10}
             keyboardType={"numeric"}
@@ -541,8 +548,10 @@ export default class AddStore extends Component {
           )}
           <Text style={inputHeading}>{"Address"}</Text>
           <TextInput
+            activeOutlineColor="#000"
+            mode="outlined"
             style={inputField}
-            underlineColorAndroid="transparent"
+            outlineColor="#8F9EB717"
             placeholder={I18n.t("ADDRESS")}
             placeholderTextColor="#6F6F6F"
             textAlignVertical="center"
@@ -600,11 +609,14 @@ export default class AddStore extends Component {
             {I18n.t("Store Name")} <Text style={{ color: "#aa0000" }}>*</Text>
           </Text>
           <TextInput
+            activeOutlineColor="#000"
+            mode="outlined"
+            outlineColor={storeValid ? "#8F9EB717" : "#dd0000"}
             style={[
               inputField,
-              { borderColor: storeValid ? "#8F9EB717" : "#dd0000" },
+              ,
             ]}
-            underlineColorAndroid="transparent"
+
             placeholder={I18n.t("STORE NAME")}
             placeholderTextColor={storeValid ? "#6F6F6F" : "#dd0000"}
             textAlignVertical="center"
@@ -623,8 +635,10 @@ export default class AddStore extends Component {
                 <Text style={{ color: "#aa0000" }}>*</Text>
               </Text>
               <TextInput
+                activeOutlineColor="#000"
+                mode="outlined"
                 style={inputField}
-                underlineColorAndroid="transparent"
+                outlineColor={gstValid ? "#8F9EB717" : "#dd0000"}
                 placeholder={I18n.t("GST NUMBER")}
                 placeholderTextColor="#6F6F6F"
                 textAlignVertical="center"
@@ -644,11 +658,14 @@ export default class AddStore extends Component {
                 <Text style={{ color: "#aa0000" }}>*</Text>
               </Text>
               <TextInput
+                activeOutlineColor="#000"
+                mode="outlined"
+                outlineColor={gstValid ? "#8F9EB717" : "#dd0000"}
                 style={[
                   inputField,
-                  { borderColor: gstValid ? "#8F9EB717" : "#dd0000" },
+                  ,
                 ]}
-                underlineColorAndroid="transparent"
+
                 placeholder={I18n.t("GST NUMBER")}
                 placeholderTextColor={gstValid ? "#6F6F6F" : "#dd0000"}
                 textAlignVertical="center"

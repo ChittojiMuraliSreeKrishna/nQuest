@@ -196,9 +196,9 @@ export default class Roles extends Component {
 			createdBy: createdBy ? createdBy : null,
 			createdDate: createdDate ? createdDate : null,
 		};
-		console.log("searchRole",searchRole)
+		console.log(searchRole)
 		UrmService.getRolesBySearch(searchRole).then((res) => {
-			console.log(res);
+			console.log(res.data);
 			if (res && res.data && res.data['status'] === 200) {
 				let rolesList = res.data.result;
 				console.log({ rolesList });

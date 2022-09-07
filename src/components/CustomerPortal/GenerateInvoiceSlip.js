@@ -8,21 +8,21 @@ import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from "react-native-modal";
+import { TextInput } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
 import { openDatabase } from 'react-native-sqlite-storage';
+import { default as ScanIcon } from 'react-native-vector-icons/MaterialCommunityIcons';
+import scss from '../../commonUtils/assets/styles/style.scss';
+import { RH, RW } from '../../Responsive';
 import { customerErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
 import CustomerService from '../services/CustomerService';
 import { color } from '../Styles/colorStyles';
 import { inputField } from '../Styles/FormFields';
-import ScanIcon from 'react-native-vector-icons/MaterialCommunityIcons'
-import { RF, RH, RW } from '../../Responsive';
-import { flatListMainContainer, flatlistSubContainer, flatListTextStyle, listEmptyMessage, textContainer, textStyleMedium, textStyleMediumColor } from '../Styles/Styles';
-import { TextInput } from 'react-native-paper'
+import { listEmptyMessage } from '../Styles/Styles';
 var deviceWidth = Dimensions.get('window').width;
 var deviceHeight = Dimensions.get('window').height;
-
 // Connction to access the pre-populated db
 const db = openDatabase({ name: 'tbl_items.db', createFromLocation: 1 });
 const createdb = openDatabase({ name: 'create_items.db', createFromLocation: 1 });
@@ -308,14 +308,12 @@ class GenerateInvoiceSlip extends Component {
   }
 
   getDeliverySlipDetails() {
-    this.setState({ barCodeList: [], finalList: [], rBarCodeList: [], dlslips: [] });
     let costPrice = 0;
     let total = 0;
     let netTotal = 0;
     let promoDiscValue = 0;
     this.setState({ discountAmount: 0, netPayableAmount: 0, totalAmount: 0, promoDiscount: 0 });
     this.state.barCodeList = [];
-    this.state.finalList = [];
     this.state.rBarCodeList = [];
     this.state.dsNumberList = [];
     let esNumber = this.state.dsNumber;
@@ -332,12 +330,14 @@ class GenerateInvoiceSlip extends Component {
       if (res.data) {
         console.log(res.data);
         this.state.dlslips.push(res.data);
+        this.setState({ dsNumber: "" })
         if (this.state.dlslips.length > 1) {
           const barList = this.state.dlslips.filter(
             (test, index, array) =>
               index ===
               array.findIndex((findTest) => findTest.dsNumber === test.dsNumber)
           );
+          console.log({ barList })
 
           if (barList.length > 1) {
             let lineStorage = [];
@@ -384,7 +384,6 @@ class GenerateInvoiceSlip extends Component {
       this.setState({ loading: false, dsNumber: "" });
       alert('Invalid estimation slip number');
     });
-
 
   }
 
@@ -631,12 +630,6 @@ class GenerateInvoiceSlip extends Component {
     let isFormValid = true;
     let errors = {};
 
-    if (this.state.discountAmount > this.state.netPayableAmount) {
-      isFormValid = false;
-      errors["discountAmount"] = customerErrorMessages.discountAmount;
-      this.setState({ discountAmountValid: false });
-    }
-
     if (this.state.dsNumber === '') {
       isFormValid = false;
       errors["dsNumber"] = customerErrorMessages.dsNumber;
@@ -660,8 +653,18 @@ class GenerateInvoiceSlip extends Component {
     this.setState({ reasonDiscount: value });
   };
 
+  billValidation() {
+    let isFormValid = true
+    if (this.state.discountAmount > this.state.netPayableAmount) {
+      isFormValid = false;
+      errors["discountAmount"] = customerErrorMessages.discountAmount;
+      this.setState({ discountAmountValid: false });
+    }
+    return isFormValid
+  }
+
   billDiscount() {
-    const isFormValid = this.validationForm();
+    const isFormValid = this.billValidation();
     if (isFormValid) {
       // if (this.state.discountAmount === "0") {
       //   alert("discount amount cannot be empty");
@@ -735,6 +738,12 @@ class GenerateInvoiceSlip extends Component {
     console.log('bar-code is' + this.state.barcodeId);
   }
 
+  removeBarcode(item, index) {
+    console.log({ item })
+    this.state.barCodeList.splice(index, 1)
+    this.setState({ barCodeList: this.state.barCodeList, netPayableAmount: this.state.netPayableAmount - item.grossValue, promoDiscount: 0 })
+  }
+
 
   render() {
     console.log(global.barcodeId);
@@ -744,6 +753,7 @@ class GenerateInvoiceSlip extends Component {
       this.setState({ loading: false });
       console.log('There is error getting token');
     });
+
     return (
       <View style={{ flex: 1 }}>
         {this.state.flagone && (
@@ -753,7 +763,6 @@ class GenerateInvoiceSlip extends Component {
                 flex: 1,
                 paddingHorizontal: 0,
                 paddingVertical: 0,
-                marginTop: 10,
                 backgroundColor: color.white
               }}>
               <View>
@@ -896,96 +905,56 @@ class GenerateInvoiceSlip extends Component {
                   }
                   ref={(ref) => { this.listRef = ref; }}
                   renderItem={({ item, index }) => (
-                    // <View style={{
-                    //   height: Device.isTablet ? 230 : 200,
-                    //   backgroundColor: '#FFFFFF',
-                    //   borderBottomWidth: 5,
-                    //   borderBottomColor: '#FBFBFB',
-                    //   flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
-
-                    // }}>
-
-                    //   <View style={{ flexDirection: 'row', height: Device.isTablet ? 200 : 190, justifyContent: 'flex-start', width: Device.isTablet ? deviceWidth - 40 : deviceWidth - 20 }}>
-                    //     <View style={{ marginTop: Device.isTablet ? 40 : 20, marginLeft: Device.isTablet ? 40 : 20 }}>
-                    //       <Image source={require('../assets/images/default.jpeg')}
-                    //         //source={{ uri: item.image }}
-                    //         style={{
-                    //           width: Device.isTablet ? 140 : 90, height: Device.isTablet ? 140 : 90,
-                    //         }} />
-                    //     </View>
-                    //     <Text style={{ fontSize: Device.isTablet ? 21 : 16, fontFamily: 'medium', color: '#353C40' }}>
-                    //       {item.itemdesc}
-                    //     </Text>
-                    //     <View style={{ flexDirection: "column", marginLeft: Device.isTablet ? 40 : 20 }}>
-                    //       <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: Device.isTablet ? 40 : 30 }}>
-                    //         <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080' }}>
-                    //           {I18n.t("ITEM")}: #{item.barCode}
-                    //         </Text>
-                    //       </View>
-                    //       <View style={{ flexDirection: 'row', }}>
-                    //         <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080' }}>
-                    //           {I18n.t("QUANTITY")}: {item.quantity}
-                    //         </Text>
-                    //         <View style={{ flexDirection: 'row', paddingLeft: Device.isTablet ? 25 : 15 }}>
-                    //           <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080' }}>
-                    //             MRP:
-                    //           </Text>
-                    //           <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', paddingLeft: 3 }}>
-                    //             {/* ₹ {(parseInt(item.netamount)).toString()} */}
-                    //             ₹ {item.itemPrice}
-                    //           </Text>
-                    //         </View>
-                    //       </View>
-
-                    //       <View style={{ flexDirection: 'column', }}>
-                    //         <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080' }}>
-                    //           {I18n.t("DISCOUNT")}: ₹ {this.state.promoDiscount}
-                    //         </Text>
-                    //         <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080' }}>
-                    //           {I18n.t("GROSS AMOUNT")}: ₹ {item.netValue}
-                    //         </Text>
-                    //       </View>
-                    //       <View style={{ flexDirection: 'row' }}>
-                    //         <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080' }}>CGST: {this.state.centralGST}</Text>
-                    //         <Text style={{ fontSize: Device.isTablet ? 45 : 35 }}> </Text>
-                    //         <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080', paddingLeft: Device.isTablet ? 25 : 15 }}>SGST: {this.state.centralGST}</Text>
-                    //       </View>
-                    //     </View>
-                    //   </View>
-
-                    // </View>
-
-                    <>
-                      <View style={[flatListMainContainer, { backgroundColor: color.white }]}>
-                        <View style={flatlistSubContainer}>
-                          <View style={textContainer}>
-                            <Text style={textStyleMediumColor}>{I18n.t("Item")}</Text>
-                            <Text style={textStyleMediumColor}>{I18n.t("QTY")}</Text>
-                            <Text style={textStyleMediumColor}>{I18n.t("MRP")}</Text>
+                    <ScrollView>
+                      <View style={[scss.flatListContainer]}>
+                        <View style={scss.flatListSubContainer}>
+                          <View style={scss.textContainer}>
+                            <View>
+                              <Text style={scss.textStyleLight}>{I18n.t("Item")}
+                                {"\n"}
+                                <Text style={scss.textStyleMedium}>{item.barCode}</Text>
+                              </Text>
+                            </View>
+                            <View>
+                              <Text style={scss.textStyleLight}>{I18n.t("QTY")}
+                                {"\n"}
+                                <Text style={scss.textStyleMedium}>{('0' + item.quantity).slice(-2)}</Text>
+                              </Text>
+                            </View>
                           </View>
-                          <View style={textContainer}>
-                            <Text style={textStyleMedium}>{item.barCode}</Text>
-                            <Text style={textStyleMedium}>{('0' + item.quantity).slice(-2)}</Text>
-                            <Text style={textStyleMedium}>₹ {item.itemPrice + '.00'}</Text>
+                          <View style={scss.textContainer}>
+                            <View>
+                              <Text style={scss.textStyleLight}>{I18n.t("CGST")}
+                                {"\n"}
+                                <Text style={scss.textStyleMedium}>{item.cgst ? item.cgst : 0}</Text>
+                              </Text>
+                            </View>
+                            <Text style={scss.textStyleLight}>{I18n.t("SGST")}
+                              {"\n"}
+                              <Text style={scss.textStyleMedium}>{item.cgst ? item.cgst : 0}</Text>
+                            </Text>
                           </View>
 
-                          <View style={textContainer}>
-                            <Text style={textStyleMediumColor}>{I18n.t("SGST")}</Text>
-                            <Text style={textStyleMediumColor}>{I18n.t("CGST")} </Text>
-                            <Text style={textStyleMediumColor}>{I18n.t("Discount")} </Text>
+
+                          <View style={scss.textContainer}>
+                            <Text style={scss.textStyleLight}>{I18n.t("MRP")}
+                              {"\n"}
+                              <Text style={scss.textStyleMedium}>₹ {item.itemPrice + '.00'}</Text>
+                            </Text>
+                            <Text style={scss.textStyleLight}>{I18n.t("Discount")}{"\n"} <Text style={[scss.textStyleMedium, { color: '#2ADC09' }]}>₹{item.promoDiscount + '.00'}</Text> </Text>
                           </View>
 
-                          <View style={textContainer}>
-                            <Text style={textStyleMedium}>{item.cgst ? item.cgst : 0}</Text>
-                            <Text style={textStyleMedium}>{item.cgst ? item.cgst : 0}</Text>
-                            <Text style={[textStyleMedium, { color: '#2ADC09' }]}>₹{item.promoDiscount + '.00'}</Text>
-                          </View>
                         </View>
                       </View>
-                      <View style={flatListTextStyle}>
-                        <Text style={{ fontFamily: 'bold' }}>{I18n.t("GROSS")} :  ₹{item.grossValue + '.00'}</Text>
+                      <View style={scss.flatListFooter}>
+                        <Text style={scss.footerText}>{I18n.t("GROSS")} :  ₹{item.grossValue + '.00'}</Text>
+                        {/* <IconMA
+                          name='trash-can-outline'
+                          size={25}
+                          onPress={() => this.removeBarcode(item, index)}
+                        ></IconMA> */}
                       </View>
-                    </>
+                    </ScrollView>
 
                   )}
                 />
@@ -1077,305 +1046,312 @@ class GenerateInvoiceSlip extends Component {
               )}
 
             </View>
-          </ScrollView>
-        )}
+          </ScrollView >
+        )
+        }
 
 
-        {this.state.customerTagging && (
-          <View style={{ backgroundColor: color.white }}>
-            <Modal isVisible={this.state.modalVisible}>
-              <View style={[Device.isTablet ? styles.filterMainContainer_tablet : styles.filterMainContainer_mobile, { height: Device.isTablet ? 400 : 300 }]}>
+        {
+          this.state.customerTagging && (
+            <View style={{ backgroundColor: color.white }}>
+              <Modal isVisible={this.state.modalVisible}>
+                <View style={[Device.isTablet ? styles.filterMainContainer_tablet : styles.filterMainContainer_mobile, { height: Device.isTablet ? 400 : 300 }]}>
 
-                <View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
-                    <View>
-                      <Text style={{ marginTop: 15, fontSize: Device.isTablet ? 22 : 17, marginLeft: 20 }} > {I18n.t("Tag Customer")} </Text>
+                  <View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
+                      <View>
+                        <Text style={{ marginTop: 15, fontSize: Device.isTablet ? 22 : 17, marginLeft: 20 }} > {I18n.t("Tag Customer")} </Text>
+                      </View>
+                      <View>
+                        <TouchableOpacity style={{ width: Device.isTablet ? 60 : 50, height: Device.isTablet ? 60 : 50, marginTop: Device.isTablet ? 20 : 15, }} onPress={() => this.modelCancel()}>
+                          <Image style={{ margin: 5 }} source={require('../assets/images/modelcancel.png')} />
+                        </TouchableOpacity>
+                      </View>
                     </View>
-                    <View>
-                      <TouchableOpacity style={{ width: Device.isTablet ? 60 : 50, height: Device.isTablet ? 60 : 50, marginTop: Device.isTablet ? 20 : 15, }} onPress={() => this.modelCancel()}>
-                        <Image style={{ margin: 5 }} source={require('../assets/images/modelcancel.png')} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                  <Text style={{
-                    height: Device.isTablet ? 2 : 1,
-                    width: deviceWidth,
-                    backgroundColor: 'lightgray',
-                  }}></Text>
-                </View>
-
-
-                <View>
-                  <Text style={{
-                    height: Device.isTablet ? 40 : 20,
-                    textAlign: 'center',
-                    fontFamily: 'regular',
-                    fontSize: Device.isTablet ? 23 : 18,
-                    marginBottom: Device.isTablet ? 25 : 15,
-                    color: '#353C40'
-                  }}> {I18n.t("Please provide customer phone number")}  </Text>
-                  <TextInput
-                    style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                    mode="flat"
-                    activeUnderlineColor='#000'
-                    underlineColor={'#6f6f6f'}
-                    label={I18n.t("MOBILE NUMBER")}
-                    keyboardType='phone-pad'
-                    maxLength={10}
-                    value={this.state.mobileNumber}
-                    onChangeText={(text) => this.handleMobileNumber(text)}
-
-                  />
-                  <TouchableOpacity
-                    style={[Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile]}
-                    onPress={() => this.tagCustomer()}
-                  >
-                    <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile}  > {I18n.t("CONFIRM")} </Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile}
-                    onPress={() => this.modelCancel()}
-                  >
-                    <Text style={Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile}  > {I18n.t("CANCEL")} </Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </Modal>
-          </View>
-        )}
-        {this.state.handleBillDiscount && (
-          <View style={{ backgroundColor: color.white }}>
-            <Modal isVisible={this.state.modalVisible}>
-              <View style={[Device.isTablet ? styles.filterMainContainer_tablet : styles.filterMainContainer_mobile, { height: Device.isTablet ? 500 : 400 }]}>
-                <View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
-                    <View>
-                      <Text style={{ marginTop: 15, fontSize: Device.isTablet ? 22 : 17, marginLeft: 20 }} > {I18n.t("Bill level Discount")} </Text>
-                    </View>
-                    <View>
-                      <TouchableOpacity style={{ width: Device.isTablet ? 60 : 50, height: Device.isTablet ? 60 : 50, marginTop: Device.isTablet ? 20 : 15, }} onPress={() => this.modelCancel()}>
-                        <Image style={{ margin: 5 }} source={require('../assets/images/modelcancel.png')} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                  <Text style={{
-                    height: Device.isTablet ? 2 : 1,
-                    width: deviceWidth,
-                    backgroundColor: 'lightgray',
-                  }}></Text>
-                </View>
-
-                <View>
-                  <TextInput
-                    style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                    mode="flat"
-                    activeUnderlineColor='#000'
-                    underlineColor={'#6f6f6f'}
-                    label={I18n.t("AMOUNT *")}
-                    keyboardType={'numeric'}
-                    autoCapitalize="none"
-                    onChangeText={(text) =>
-                      // console.log(text)
-                      this.handleDiscountAmount(text)
-                    }
-                  />
-                  {!this.state.discountAmountValid && (
-                    <Message imp={true} message={this.state.errors["discountAmount"]} />
-                  )}
-
-                  <TextInput
-                    style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                    mode="flat"
-                    activeUnderlineColor='#000'
-                    underlineColor={'#6f6f6f'}
-                    label={I18n.t("APPROVED BY *")}
-                    onChangeText={(text) => this.handleApprovedBy(text)}
-                  />
-                  <View style={Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile}>
-                    <RNPickerSelect
-                      // style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
-                      placeholder={{ label: 'REASON *', value: '' }}
-                      Icon={() => {
-                        return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-                      }}
-                      items={
-                        this.state.discReasons
-                      }
-                      onValueChange={this.handleDiscountReason}
-                      style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
-                      value={this.state.reasonDiscount}
-                      useNativeAndroidPickerStyle={false}
-                    />
-                  </View>
-                  <TouchableOpacity
-                    style={[Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile]}
-                    onPress={() => this.billDiscount()}
-                  >
-                    <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile}  > {I18n.t("CONFIRM")} </Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile}
-                    onPress={() => this.modelCancel()}
-                  >
-                    <Text style={Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile}  > {I18n.t("CANCEL")} </Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </Modal>
-          </View>
-        )}
-        {this.state.flagCustomerOpen && (
-          <View style={{ backgroundColor: color.white }}>
-            <Modal isVisible={this.state.modalVisible}>
-              <KeyboardAwareScrollView KeyboardAwareScrollView
-                enableOnAndroid={true}>
-
-
-                <View style={{
-                  flex: 1, justifyContent: 'center', //Centered horizontally
-                  alignItems: 'center', color: '#ffffff',
-                  borderRadius: 20, borderwidth: 10
-                }}>
-                  <View style={{ flex: 1, marginLeft: 20, marginRight: 20, backgroundColor: "#ffffff", marginTop: deviceWidth / 2 - 80 }}>
                     <Text style={{
-                      color: "#353C40", fontSize: 18, fontFamily: "semibold", marginLeft: 20, marginTop: 20, height: 20,
-                      justifyContent: 'center',
-                    }}> {'Personal Information'} </Text>
-
-                    <View style={{ marginTop: 0, width: deviceWidth }}>
-                      <TextInput style={styles.createUserinput}
-                        mode="flat"
-                        activeUnderlineColor='#000'
-                        underlineColor={'#6f6f6f'}
-                        label="MOBILE NUMBER *"
-                        keyboardType='phone-pad'
-                        value={this.state.customerPhoneNumber}
-                        onChangeText={(text) => this.handleCustomerPhoneNumber(text)}
-                        onEndEditing={() => this.endEditing()}
-                      />
-                    </View>
+                      height: Device.isTablet ? 2 : 1,
+                      width: deviceWidth,
+                      backgroundColor: 'lightgray',
+                    }}></Text>
+                  </View>
 
 
-                    <TextInput style={styles.createUserinput}
+                  <View>
+                    <Text style={{
+                      height: Device.isTablet ? 40 : 20,
+                      textAlign: 'center',
+                      fontFamily: 'regular',
+                      fontSize: Device.isTablet ? 23 : 18,
+                      marginBottom: Device.isTablet ? 25 : 15,
+                      color: '#353C40'
+                    }}> {I18n.t("Please provide customer phone number")}  </Text>
+                    <TextInput
+                      style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
                       mode="flat"
                       activeUnderlineColor='#000'
                       underlineColor={'#6f6f6f'}
-                      label="CUSTOMER NAME *"
-                      value={this.state.customerName}
-                      onChangeText={this.handleCustomerName}
+                      label={I18n.t("MOBILE NUMBER")}
+                      keyboardType='phone-pad'
+                      maxLength={10}
+                      value={this.state.mobileNumber}
+                      onChangeText={(text) => this.handleMobileNumber(text)}
+
                     />
+                    <TouchableOpacity
+                      style={[Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile]}
+                      onPress={() => this.tagCustomer()}
+                    >
+                      <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile}  > {I18n.t("CONFIRM")} </Text>
+                    </TouchableOpacity>
 
-                    <View>
-                      <TextInput style={styles.createUserinput}
-                        mode="flat"
-                        activeUnderlineColor='#000'
-                        underlineColor={'#6f6f6f'}
-                        label="EMAIL"
-                        keyboardType='email-address'
-                        value={this.state.customerEmail}
-                        onChangeText={this.handleCustomerEmail}
-                      />
+                    <TouchableOpacity
+                      style={Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile}
+                      onPress={() => this.modelCancel()}
+                    >
+                      <Text style={Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile}  > {I18n.t("CANCEL")} </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </Modal>
+            </View>
+          )
+        }
+        {
+          this.state.handleBillDiscount && (
+            <View style={{ backgroundColor: color.white }}>
+              <Modal isVisible={this.state.modalVisible}>
+                <View style={[Device.isTablet ? styles.filterMainContainer_tablet : styles.filterMainContainer_mobile, { height: Device.isTablet ? 500 : 400 }]}>
+                  <View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
+                      <View>
+                        <Text style={{ marginTop: 15, fontSize: Device.isTablet ? 22 : 17, marginLeft: 20 }} > {I18n.t("Bill level Discount")} </Text>
+                      </View>
+                      <View>
+                        <TouchableOpacity style={{ width: Device.isTablet ? 60 : 50, height: Device.isTablet ? 60 : 50, marginTop: Device.isTablet ? 20 : 15, }} onPress={() => this.modelCancel()}>
+                          <Image style={{ margin: 5 }} source={require('../assets/images/modelcancel.png')} />
+                        </TouchableOpacity>
+                      </View>
                     </View>
+                    <Text style={{
+                      height: Device.isTablet ? 2 : 1,
+                      width: deviceWidth,
+                      backgroundColor: 'lightgray',
+                    }}></Text>
+                  </View>
 
-                    <View style={{
-                      justifyContent: 'center',
-                      margin: 40,
-                      height: 44,
-                      marginTop: 5,
-                      marginBottom: 10,
-                      borderColor: '#8F9EB717',
-                      borderRadius: 3,
-                      backgroundColor: '#FBFBFB',
-                      borderWidth: 1,
-                      fontFamily: 'regular',
-                      paddingLeft: 15,
-                      fontSize: 14,
-                    }} >
+                  <View>
+                    <TextInput
+                      style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
+                      mode="flat"
+                      activeUnderlineColor='#000'
+                      underlineColor={'#6f6f6f'}
+                      label={I18n.t("AMOUNT *")}
+                      keyboardType={'numeric'}
+                      autoCapitalize="none"
+                      onChangeText={(text) =>
+                        // console.log(text)
+                        this.handleDiscountAmount(text)
+                      }
+                    />
+                    {!this.state.discountAmountValid && (
+                      <Message imp={true} message={this.state.errors["discountAmount"]} />
+                    )}
+
+                    <TextInput
+                      style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
+                      mode="flat"
+                      activeUnderlineColor='#000'
+                      underlineColor={'#6f6f6f'}
+                      label={I18n.t("APPROVED BY *")}
+                      onChangeText={(text) => this.handleApprovedBy(text)}
+                    />
+                    <View style={Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile}>
                       <RNPickerSelect
-                        placeholder={{
-                          label: 'GENDER',
-                          value: '',
-                        }}
+                        // style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
+                        placeholder={{ label: 'REASON *', value: '' }}
                         Icon={() => {
                           return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
                         }}
-                        items={[
-                          { label: 'Male', value: 'male' },
-                          { label: 'Female', value: 'female' },
-                        ]}
-                        onValueChange={this.handlecustomerGender}
+                        items={
+                          this.state.discReasons
+                        }
+                        onValueChange={this.handleDiscountReason}
                         style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
-                        value={this.state.customerGender}
+                        value={this.state.reasonDiscount}
                         useNativeAndroidPickerStyle={false}
-
                       />
                     </View>
+                    <TouchableOpacity
+                      style={[Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile]}
+                      onPress={() => this.billDiscount()}
+                    >
+                      <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile}  > {I18n.t("CONFIRM")} </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile}
+                      onPress={() => this.modelCancel()}
+                    >
+                      <Text style={Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile}  > {I18n.t("CANCEL")} </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </Modal>
+            </View>
+          )
+        }
+        {
+          this.state.flagCustomerOpen && (
+            <View style={{ backgroundColor: color.white }}>
+              <Modal isVisible={this.state.modalVisible}>
+                <KeyboardAwareScrollView KeyboardAwareScrollView
+                  enableOnAndroid={true}>
 
 
-                    <TextInput style={styles.createUserinput}
-                      mode="flat"
-                      activeUnderlineColor='#000'
-                      underlineColor={'#6f6f6f'}
-                      label="ADDRESS"
-                      value={this.state.customerAddress}
-                      onChangeText={this.handleCustomerAddress}
-                    />
+                  <View style={{
+                    flex: 1, justifyContent: 'center', //Centered horizontally
+                    alignItems: 'center', color: '#ffffff',
+                    borderRadius: 20, borderwidth: 10
+                  }}>
+                    <View style={{ flex: 1, marginLeft: 20, marginRight: 20, backgroundColor: "#ffffff", marginTop: deviceWidth / 2 - 80 }}>
+                      <Text style={{
+                        color: "#353C40", fontSize: 18, fontFamily: "semibold", marginLeft: 20, marginTop: 20, height: 20,
+                        justifyContent: 'center',
+                      }}> {'Personal Information'} </Text>
 
-                    <Text style={{
-                      color: "#353C40", fontSize: 18, fontFamily: "semibold", marginLeft: 20, marginTop: 20, height: 20,
-                      justifyContent: 'center',
-                    }}> {'Business Information(optional)'} </Text>
+                      <View style={{ marginTop: 0, width: deviceWidth }}>
+                        <TextInput style={styles.createUserinput}
+                          mode="flat"
+                          activeUnderlineColor='#000'
+                          underlineColor={'#6f6f6f'}
+                          label="MOBILE NUMBER *"
+                          keyboardType='phone-pad'
+                          value={this.state.customerPhoneNumber}
+                          onChangeText={(text) => this.handleCustomerPhoneNumber(text)}
+                          onEndEditing={() => this.endEditing()}
+                        />
+                      </View>
 
-                    <View>
+
                       <TextInput style={styles.createUserinput}
                         mode="flat"
                         activeUnderlineColor='#000'
                         underlineColor={'#6f6f6f'}
-                        label="GST NUMBER"
-                        value={this.state.customerGSTNumber}
-                        onChangeText={this.handleCustomerGSTNumber}
+                        label="CUSTOMER NAME *"
+                        value={this.state.customerName}
+                        onChangeText={this.handleCustomerName}
                       />
+
+                      <View>
+                        <TextInput style={styles.createUserinput}
+                          mode="flat"
+                          activeUnderlineColor='#000'
+                          underlineColor={'#6f6f6f'}
+                          label="EMAIL"
+                          keyboardType='email-address'
+                          value={this.state.customerEmail}
+                          onChangeText={this.handleCustomerEmail}
+                        />
+                      </View>
+
+                      <View style={{
+                        justifyContent: 'center',
+                        margin: 40,
+                        height: 44,
+                        marginTop: 5,
+                        marginBottom: 10,
+                        borderColor: '#8F9EB717',
+                        borderRadius: 3,
+                        backgroundColor: '#FBFBFB',
+                        borderWidth: 1,
+                        fontFamily: 'regular',
+                        paddingLeft: 15,
+                        fontSize: 14,
+                      }} >
+                        <RNPickerSelect
+                          placeholder={{
+                            label: 'GENDER',
+                            value: '',
+                          }}
+                          Icon={() => {
+                            return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
+                          }}
+                          items={[
+                            { label: 'Male', value: 'male' },
+                            { label: 'Female', value: 'female' },
+                          ]}
+                          onValueChange={this.handlecustomerGender}
+                          style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
+                          value={this.state.customerGender}
+                          useNativeAndroidPickerStyle={false}
+
+                        />
+                      </View>
+
+
+                      <TextInput style={styles.createUserinput}
+                        mode="flat"
+                        activeUnderlineColor='#000'
+                        underlineColor={'#6f6f6f'}
+                        label="ADDRESS"
+                        value={this.state.customerAddress}
+                        onChangeText={this.handleCustomerAddress}
+                      />
+
+                      <Text style={{
+                        color: "#353C40", fontSize: 18, fontFamily: "semibold", marginLeft: 20, marginTop: 20, height: 20,
+                        justifyContent: 'center',
+                      }}> {'Business Information(optional)'} </Text>
+
+                      <View>
+                        <TextInput style={styles.createUserinput}
+                          mode="flat"
+                          activeUnderlineColor='#000'
+                          underlineColor={'#6f6f6f'}
+                          label="GST NUMBER"
+                          value={this.state.customerGSTNumber}
+                          onChangeText={this.handleCustomerGSTNumber}
+                        />
+                      </View>
+
+
+
+                      <TouchableOpacity
+                        style={{
+                          margin: 20,
+                          height: 50, backgroundColor: "#ED1C24", borderRadius: 5, marginLeft: 40, marginRight: 40,
+                        }} onPress={() => this.addCustomer()}
+                      >
+                        <Text style={{
+                          textAlign: 'center', margin: 20, color: "#ffffff", fontSize: 15,
+                          fontFamily: "regular", height: 50,
+                        }}  > TAG/ADD CUSTOMER </Text>
+
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={{
+                          margin: 20,
+                          height: 50, backgroundColor: "#ED1C24", borderRadius: 5, marginLeft: 40, marginRight: 40,
+                        }}
+                        onPress={() => this.cancel()} >
+                        <Text style={{
+                          textAlign: 'center', margin: 20, color: "#ffffff", fontSize: 15,
+                          fontFamily: "regular", height: 50,
+                        }}> {('Cancel')} </Text>
+                      </TouchableOpacity>
+
                     </View>
-
-
-
-                    <TouchableOpacity
-                      style={{
-                        margin: 20,
-                        height: 50, backgroundColor: "#ED1C24", borderRadius: 5, marginLeft: 40, marginRight: 40,
-                      }} onPress={() => this.addCustomer()}
-                    >
-                      <Text style={{
-                        textAlign: 'center', margin: 20, color: "#ffffff", fontSize: 15,
-                        fontFamily: "regular", height: 50,
-                      }}  > TAG/ADD CUSTOMER </Text>
-
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={{
-                        margin: 20,
-                        height: 50, backgroundColor: "#ED1C24", borderRadius: 5, marginLeft: 40, marginRight: 40,
-                      }}
-                      onPress={() => this.cancel()} >
-                      <Text style={{
-                        textAlign: 'center', margin: 20, color: "#ffffff", fontSize: 15,
-                        fontFamily: "regular", height: 50,
-                      }}> {('Cancel')} </Text>
-                    </TouchableOpacity>
 
                   </View>
 
-                </View>
+                </KeyboardAwareScrollView>
+              </Modal>
+            </View>
+          )
+        }
 
-              </KeyboardAwareScrollView>
-            </Modal>
-          </View>
-        )}
-
-      </View>
+      </View >
     );
   }
 }

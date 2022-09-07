@@ -5,8 +5,7 @@ import {
   Image,
   ScrollView,
   StyleSheet,
-  Text,
-  TouchableOpacity,
+  Text, TouchableOpacity,
   View
 } from "react-native";
 import DatePicker from "react-native-date-picker";
