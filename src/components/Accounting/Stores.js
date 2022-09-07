@@ -203,7 +203,7 @@ export default class Stores extends Component {
   // Applying Filter
   applyStoreFilter() {
     const searchStore = {
-      // stateId: this.state.statecode ? this.state.statecode : null,
+      stateId: this.state.statecode ? this.state.statecode : null,
       cityId: null,
       districtId: this.state.districtId ? this.state.districtId : 0,
       storeName: this.state.storeName ? String(this.state.storeName) : null,

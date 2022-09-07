@@ -1,9 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { Component } from 'react'
-import { Dimensions, FlatList, StyleSheet, Text, View } from 'react-native'
-import { Button, RadioButton } from 'react-native-paper'
-import LoginService from '../services/LoginService'
-import { submitBtn, submitBtnText } from '../Styles/FormFields'
+import React, { Component } from 'react';
+import { Dimensions, FlatList, StyleSheet, Text, View } from 'react-native';
+import { Button, RadioButton } from 'react-native-paper';
+import LoginService from '../services/LoginService';
+import { submitBtn, submitBtnText } from '../Styles/FormFields';
 var deviceWidth = Dimensions.get('window').width;
 var deviceHeight = Dimensions.get('window').height;
 
@@ -45,7 +45,8 @@ export class SelectClient extends Component {
 
   handleChecked = (item, index) => {
     this.setState({ selectedItem: index })
-    AsyncStorage.setItem("custom:clientId1", String(item.id)).then(() => { }).catch(() => { alert('There is an error saving clientId') })
+    AsyncStorage.setItem("custom:clientId1", String(item.id)).then((value) => { console.log({ value }) }).catch(() => { alert('There is an error saving clientId') })
+
   }
 
 

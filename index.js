@@ -3,35 +3,33 @@ import axios from 'axios';
 import { AppRegistry, LogBox } from 'react-native';
 // import * as CryptoJS from 'react-native-crypto-js';
 import 'react-native-gesture-handler';
+import { ENCRYPTION } from './src/commonUtils/Base';
 import App from './src/components/App';
 LogBox.ignoreAllLogs(true);
 
-// // For requests
+// For requests
 axios.interceptors.request.use(
   (req) => {
     AsyncStorage.getItem("tokenkey").then((value) => {
       var finalToken = value.replace('"', '');
-      const clientId = JSON.parse(AsyncStorage.getItem("custom:clientId1"))
-      console.log({ clientId })
-      // axios.defaults.headers.common = { 'Authorization': 'Bearer' + ' ' + finalToken, 'clientId': clientId ? clientId : 0 };
-      req.headers.Authorization = "Bearer" + " " + finalToken
-      req.headers.clientId = clientId ? clientId : "0"
-    }).catch((err) => {
-      this.setState({ loading: false });
-      alert(err);
-      console.log('There is error getting token');
+      console.log({ finalToken })
+      AsyncStorage.getItem("custom:clientId1").then((value) => {
+        console.log({ value })
+        axios.defaults.headers.common = { 'Authorization': 'Bearer' + ' ' + finalToken, 'clientId': value ? value : 0 };
+      })
     });
-    // if (ENCRYPTION) {
-    //   var text = JSON.stringify(req.data)
-    //   const key = '23KAVfsyYqk+hxye3/LDM59Ts8hTiAs='
-    //   const iv = '0000000000000000 '
-    //   const cipher = CryptoJS.AES.encrypt(text, CryptoJS.enc.Utf8.parse(key), {
-    //     iv: CryptoJS.enc.Utf8.parse(iv),
-    //     padding: CryptoJS.pad.Pkcs7,
-    //     mode: CryptoJS.mode.CBC
-    //   })
-    //   var encryptedBytes = cipher.toString()
-    //   req.data = encryptedBytes;
+    if (ENCRYPTION) {
+      var text = JSON.stringify(req.data)
+      const key = '23KAVfsyYqk+hxye3/LDM59Ts8hTiAs='
+      const iv = '0000000000000000 '
+      const cipher = CryptoJS.AES.encrypt(text, CryptoJS.enc.Utf8.parse(key), {
+        iv: CryptoJS.enc.Utf8.parse(iv),
+        padding: CryptoJS.pad.Pkcs7,
+        mode: CryptoJS.mode.CBC
+      })
+      var encryptedBytes = cipher.toString()
+      req.data = encryptedBytes;
+    }
     return req;
   },
   (err) => {
