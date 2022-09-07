@@ -43,6 +43,7 @@ export const accountingErrorMessages = {
   domain: "/ Please select the Domain",
   state: "/ Please select the state",
   district: "/ Please select the district",
+  city: "/ Please Enter the city",
   storeName: "/ Store Name must be 3 characters or more",
   gst: "/ Enter the valid 15 Digit GST Number",
   store: "/ Please select the store"
@@ -79,16 +80,16 @@ export const customerErrorMessages = {
   startDate: "/ Please select the start date",
   endDate: "/ Please select the end date",
   giftValue: "/ Please enter the gift amount",
-  searchQuery:" / Please enter two letters to search.",
-  dsNumber:" /Please enter ES Number",
+  searchQuery: " / Please enter two letters to search.",
+  dsNumber: " /Please enter ES Number",
   smNumber: " /Please enter Sales man number",
-  barcodeId : " /Please enter a barcode",
-  invoiceNumber : " /Please enter the invoice number",
-  customerNumber : " /Please enter a valid 10 digit mobile number",
-  reason:" /Please select reason for return"
+  barcodeId: " /Please enter a barcode",
+  invoiceNumber: " /Please enter the invoice number",
+  customerNumber: " /Please enter a valid 10 digit mobile number",
+  reason: " /Please select reason for return"
 }
 
 export const reportErrorMessages = {
-  barCode:"/Please enter a barcode",
-  returnSlipNumber:" /Please enter the return slip number"
+  barCode: "/Please enter a barcode",
+  returnSlipNumber: " /Please enter the return slip number"
 }

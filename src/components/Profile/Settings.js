@@ -144,17 +144,17 @@ export default class Settings extends Component {
     let isFormValid = true
     let errors = {}
     const emailReg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    if (this.state.mobileNumber.length > 0 && this.state.mobileNumber.length < 10) {
+    if (this.state.mobileNumber.length !== 13) {
       isFormValid = false
-      errors["mobile"] = "please enter a valid 10 digit mobile number";
+      errors["mobile"] = "Please Enter a valid 10 digit mobile number With state code";
       this.setState({ mobileNumberValid: true })
     }
     if (emailReg.test(this.state.emailId) === false) {
       isFormValid = false
-      errors["email"] = "Please enter a valid email id"
+      errors["email"] = "Please Enter a valid email id"
       this.setState({ emailValid: true })
     }
-    this.setState({ erros: errors })
+    this.setState({ errors: errors })
     return isFormValid
   }
 
@@ -208,7 +208,7 @@ export default class Settings extends Component {
               value={this.state.emailId}
               onChangeText={(value) => this.handleEmail(value)}
             />
-            {emailValid && <Message imp={true} message={"please enter a valid email id"} />}
+            {emailValid && <Message imp={true} message={this.state.errors["email"]} />}
             <TextInput
               mode='flat'
               activeUnderlineColor='#000'
@@ -220,7 +220,7 @@ export default class Settings extends Component {
               value={this.state.mobileNumber}
               onChangeText={(value) => this.handleMobileNumber(value)}
             />
-            {mobileNumberValid && <Message imp={true} message={"please enter a valid 10 digit mobile number"} />}
+            {mobileNumberValid && <Message imp={true} message={this.state.errors["mobile"]} />}
             <View
               style={
                 Device.isTablet

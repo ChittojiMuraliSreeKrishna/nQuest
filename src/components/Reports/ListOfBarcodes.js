@@ -225,7 +225,7 @@ export class ListOfBarcodes extends Component {
         <FlatList
           ListHeaderComponent={
             <Appbar>
-              <Appbar.Content title="List Of Barcodes" />
+              <Appbar.Content title={`List Of Barcodes - ${this.state.listBarcodes.length}`} />
               {this.state.filterActive ?
                 <IconFA
                   name="sliders"

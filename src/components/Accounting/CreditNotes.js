@@ -407,7 +407,7 @@ export default class CreditNotes extends Component {
               ? this.state.filterCreditData
               : this.state.creditNotes
           }
-          style={{ marginTop: 10 }}
+          style={scss.flatListBody}
           scrollEnabled={true}
           // ListEmptyComponent={<Text style={listEmptyMessage}>&#9888; Records Not Found</Text>}
           renderItem={({ item, index }) => (
