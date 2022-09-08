@@ -370,8 +370,8 @@ export default class Settings extends Component {
               value={this.state.address}
               onChange={(value) => this.handleAddress(value)}
             />
-            <Button style={scss.submitBtn} textColor="#fff" onPress={() => this.profileUpdate()} mode='elevated'>SAVE</Button>
-            <Button style={scss.changeBtn} textColor="#000" onPress={() => this.changePassword()} mode='outlined'>Change Password</Button>
+              <Button style={scss.submitBtn} textColor="#fff" onPress={() => this.profileUpdate()} mode='elevated'>SAVE</Button>
+              <Button style={scss.changeBtn} textColor="#000" onPress={() => this.changePassword()} mode='outlined'>Change Password</Button>
             <View style={{ margin: 25 }}></View>
           </KeyboardAwareScrollView>
         </View>

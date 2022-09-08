@@ -428,13 +428,8 @@ export default class GenerateReturnSlip extends Component {
             onChangeText={(text) => this.handleInvoiceNumber(text)}
             onEndEditing={() => this.endEditing()}
           />
-          <TouchableOpacity
-            style={{
-              marginTop: RH(5),
-              backgroundColor: "#353C40", width: Device.isTablet ? 120 : 50, height: Device.isTablet ? 55 : 45
-            }}
-            onPress={() => this.navigateToScanCode()} >
-            <ScanIcon name='barcode-scan' size={30} color={color.white} style={{ paddingTop: 5, alignSelf: 'center' }} />
+          <TouchableOpacity style={{ padding: RF(10) }} onPress={() => this.navigateToScanCode()} >
+            <ScanIcon name='barcode-scan' size={30} color={color.black}  />
           </TouchableOpacity>
         </View>
         {!this.state.invoiceNumberValid && (

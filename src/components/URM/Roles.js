@@ -232,7 +232,7 @@ export default class Roles extends Component {
 							<Text style={flatListTitle}>
 								Roles -{" "}
 								<Text style={{ color: "#ED1C24" }}>
-									{this.state.rolesData.length}
+									{filterActive ? filterRolesData.length : rolesData.length}
 								</Text>
 							</Text>
 							<View style={scss.headerContainer}>
