@@ -88,8 +88,3 @@ export const customerErrorMessages = {
   customerNumber: " /Please enter a valid 10 digit mobile number",
   reason: " /Please select reason for return"
 }
-
-export const reportErrorMessages = {
-  barCode: "/Please enter a barcode",
-  returnSlipNumber: " /Please enter the return slip number"
-}

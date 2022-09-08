@@ -251,7 +251,6 @@ export const textStyle = {
 export const emptyTextStyle = {
   fontSize: Device.isTablet ? RF(21) : RF(17),
   fontFamily: 'bold',
-  color: 'red',
   textAlign: 'center',
   marginTop: deviceheight / 3
 }
