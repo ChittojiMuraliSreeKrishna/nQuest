@@ -14,13 +14,16 @@ import { Chevron } from 'react-native-shapes';
 import { openDatabase } from 'react-native-sqlite-storage';
 import { default as ScanIcon } from 'react-native-vector-icons/MaterialCommunityIcons';
 import scss from '../../commonUtils/assets/styles/style.scss';
-import { RH, RW } from '../../Responsive';
+import { RF, RH, RW } from '../../Responsive';
 import { customerErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
 import CustomerService from '../services/CustomerService';
 import { color } from '../Styles/colorStyles';
 import { inputField } from '../Styles/FormFields';
 import { listEmptyMessage } from '../Styles/Styles';
+import forms from '../../commonUtils/assets/styles/formFields.scss';
+
+
 var deviceWidth = Dimensions.get('window').width;
 var deviceHeight = Dimensions.get('window').height;
 // Connction to access the pre-populated db
@@ -261,7 +264,7 @@ class GenerateInvoiceSlip extends Component {
       } else {
         this.setState({ customerTagging: false, modalVisible: false });
       }
-      if (item.name === "Bill Level Discount" && this.state.disableButton === false) {
+      if (item.name === "Bill Level Discount") {
         // this.setState({ customerTagging: true, modalVisible: true });
         this.setState({ handleBillDiscount: true, modalVisible: true });
       } else {
@@ -655,11 +658,14 @@ class GenerateInvoiceSlip extends Component {
 
   billValidation() {
     let isFormValid = true
+    let errors = {};
+
     if (this.state.discountAmount > this.state.netPayableAmount) {
       isFormValid = false;
       errors["discountAmount"] = customerErrorMessages.discountAmount;
       this.setState({ discountAmountValid: false });
     }
+    this.setState({ errors: errors });
     return isFormValid
   }
 
@@ -675,7 +681,6 @@ class GenerateInvoiceSlip extends Component {
       // }
       // else {
       // this.state.netPayableAmount = 0;
-      console.log(this.state.totalPromoDisc, this.state.discountAmount);
       const totalDisc =
         this.state.totalPromoDisc + parseInt(this.state.discountAmount);
       if (totalDisc < this.state.grandNetAmount) {
@@ -685,7 +690,6 @@ class GenerateInvoiceSlip extends Component {
         // this.getTaxAmount();
       }
       const promDisc = parseInt(this.state.discountAmount) + this.state.totalPromoDisc;
-      console.log('vinodfdsfdsffs' + promDisc);
       this.setState({ showDiscReason: true, promoDiscount: promDisc });
 
       this.setState({ modalVisible: false },
@@ -776,16 +780,8 @@ class GenerateInvoiceSlip extends Component {
                     onChangeText={(text) => this.handleDsNumber(text)}
                     onEndEditing={() => this.endEditing()}
                   />
-                  <TouchableOpacity
-                    style={{
-                      marginTop: RH(10),
-                      backgroundColor: "#353C40", width: Device.isTablet ? 120 : 50, height: Device.isTablet ? 55 : 45
-                    }}
-                    onPress={() => this.navigateToScanCode()} >
-                    {/* <Image
-                      source={require('../../commonUtils/assets/Images/scan_icon.png')}
-                    /> */}
-                    <ScanIcon name='barcode-scan' size={30} color={color.white} style={{ paddingTop: 5, alignSelf: 'center' }} />
+                  <TouchableOpacity style={{ padding: RF(10) }} onPress={() => this.navigateToScanCode()} >
+                    <ScanIcon name='barcode-scan' size={30} color={color.black} />
                   </TouchableOpacity>
                 </View>
                 {!this.state.dsNumberValid && (
@@ -1097,19 +1093,18 @@ class GenerateInvoiceSlip extends Component {
                       onChangeText={(text) => this.handleMobileNumber(text)}
 
                     />
-                    <TouchableOpacity
-                      style={[Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile]}
-                      onPress={() => this.tagCustomer()}
-                    >
-                      <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile}  > {I18n.t("CONFIRM")} </Text>
+                    <View style={forms.action_buttons_container}>
+                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                      onPress={() => this.tagCustomer()}>
+                      <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
                     </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile}
-                      onPress={() => this.modelCancel()}
-                    >
-                      <Text style={Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile}  > {I18n.t("CANCEL")} </Text>
+                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                      onPress={() => this.modelCancel()}>
+                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                     </TouchableOpacity>
+                  </View>
+                  
+                  
                   </View>
                 </View>
               </Modal>
@@ -1181,7 +1176,17 @@ class GenerateInvoiceSlip extends Component {
                         useNativeAndroidPickerStyle={false}
                       />
                     </View>
-                    <TouchableOpacity
+                    <View style={forms.action_buttons_container}>
+                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                        onPress={() => this.billDiscount()}>
+                        <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                        onPress={() => this.modelCancel()}>
+                        <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                      </TouchableOpacity>
+                    </View>
+                    {/* <TouchableOpacity
                       style={[Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile]}
                       onPress={() => this.billDiscount()}
                     >
@@ -1193,7 +1198,7 @@ class GenerateInvoiceSlip extends Component {
                       onPress={() => this.modelCancel()}
                     >
                       <Text style={Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile}  > {I18n.t("CANCEL")} </Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                   </View>
                 </View>
               </Modal>

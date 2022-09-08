@@ -18,6 +18,7 @@ import { Searchbar, TextInput } from 'react-native-paper';
 import { customerErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
+import FilterIcon from 'react-native-vector-icons/FontAwesome';
 
 
 var deviceheight = Dimensions.get('window').height;
@@ -377,10 +378,9 @@ class GiftVocher extends Component {
             <TouchableOpacity
               style={styles.filterBtnStyle}
               onPress={() => this.filterAction()} >
-              <Image source={
-                // this.state.filterActive ? 
-                // require('../assets/images/clearFilterSearch.png') : 
-                require('../assets/images/promofilter.png')} />
+              <FilterIcon
+                name="sliders"
+                size={25} />
             </TouchableOpacity>
           </View>
           {!searchQueryValid && (
@@ -595,7 +595,6 @@ const styles = StyleSheet.create({
   filterBtnStyle: {
     padding: RF(10),
     alignSelf: 'center',
-    backgroundColor: "#353C40",
     width: Device.isTablet ? 100 : 50,
     height: Device.isTablet ? 55 : 45
   },

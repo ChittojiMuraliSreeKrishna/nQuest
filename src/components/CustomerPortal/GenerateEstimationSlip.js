@@ -557,13 +557,8 @@ class GenerateEstimationSlip extends Component {
                     onChangeText={this.handleBarCode}
                     onEndEditing={() => this.endEditing()}
                   />
-                  <TouchableOpacity
-                    style={{
-                      marginTop: RF(2),
-                      backgroundColor: "#353C40", width: Device.isTablet ? 120 : 50, height: Device.isTablet ? 45 : 35
-                    }}
-                    onPress={() => this.navigateToScanCode()} >
-                    <ScanIcon name='barcode-scan' size={25} color={color.white} style={{ paddingTop: 5, alignSelf: 'center' }} />
+                  <TouchableOpacity style={{ padding: RF(10) }} onPress={() => this.navigateToScanCode()} >
+                    <ScanIcon name='barcode-scan' size={25} color={color.black}/>
                   </TouchableOpacity>
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Checkbox
