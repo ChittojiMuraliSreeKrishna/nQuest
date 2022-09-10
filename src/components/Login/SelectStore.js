@@ -1,16 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 import React from 'react';
 import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
-import LoginService from '../services/LoginService';
-import { RH, RW, RF } from '../../Responsive';
+import { Appbar } from 'react-native-paper';
+import { RF, RH, RW } from '../../Responsive';
 var deviceWidth = Dimensions.get('window').width;
 I18n.fallbacks = true;
 I18n.defaultLocale = 'english';
 const data = [{ key: "Vijayawada" }, { key: "Kakinada" }, { key: "Anakapalli" }];
-import { backButton, backButtonImage, headerTitle, headerTitleContainer, headerTitleSubContainer, headerTitleSubContainer2, menuButton } from '../Styles/Styles';
 
 export default class SelectStore extends React.Component {
   constructor(props) {
@@ -39,23 +37,25 @@ export default class SelectStore extends React.Component {
       this.getstores();
     } else {
       let storesParams = this.props.route.params.items
-      console.log({storesParams})
+      console.log({ storesParams })
+      AsyncStorage.setItem("storesList", storesParams)
       this.setState({ storesData: storesParams }, () => console.log("stores Data", this.state.storesData))
     }
   }
 
   async getstores() {
     const role = JSON.parse(AsyncStorage.getItem("user"))
-    let storesList = await AsyncStorage.getItem("storesList")
-    console.log("", storesList)
-    this.setState({ storesData: storesList })
+    await AsyncStorage.getItem("storesList").then(value => {
+      console.log({ value })
+      this.setState({ storesData: value })
+    })
   }
 
   letsGoButtonAction() {
     if (this.state.selectedItem === null) {
       alert("Select Atleast one Store")
     } else {
-      this.props.navigation.navigate('BottomBar');
+      this.props.navigation.push("HomeNavigation");
     }
   }
 
@@ -80,23 +80,20 @@ export default class SelectStore extends React.Component {
 
 
   render() {
+    console.log(this.state.storesData, "StoreData")
     return (
       <View style={styles.container}>
         <View>
-          <View style={headerTitleContainer}>
-            <View style={headerTitleSubContainer}>
-              <TouchableOpacity style={backButton} onPress={() => this.handleBackButtonClick()}>
-                <Image style={backButtonImage} source={require('../assets/images/backButton.png')} />
-              </TouchableOpacity>
-              <Text style={headerTitle}> {I18n.t('Stores')} </Text>
-            </View>
-          </View>
-          <Text style={Device.isTablet ? styles.headerTitle_tablet : styles.headerTitle_mobile}> {I18n.t('Select the Store')} </Text>
+
           <FlatList
             style={{ width: deviceWidth, marginTop: RH(10) }}
-            ListHeaderComponent={() => {
-              return (<Text></Text>);
-            }}
+            ListHeaderComponent={
+              <Appbar mode='center-aligned'>
+                <Appbar.BackAction
+                  onPress={() => this.handleBackButtonClick()} />
+                <Appbar.Content title="Select Store" />
+              </Appbar>
+            }
             data={this.state.storesData}
             keyExtractor={item => item}
             renderItem={({ item, index }) => (

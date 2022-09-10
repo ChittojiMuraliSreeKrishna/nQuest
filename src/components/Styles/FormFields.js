@@ -139,11 +139,13 @@ export const submitBtn = {
   borderRadius: 5,
   borderWidth: Device.isTablet ? 2 : 1,
   borderColor: color.accent,
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center'
 };
 
 export const submitBtnText = {
   textAlign: "center",
-  marginTop: RH(10),
   color: color.white,
   fontSize: RF(15),
   fontFamily: "regular",

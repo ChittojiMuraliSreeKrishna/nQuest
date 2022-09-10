@@ -5,7 +5,7 @@ import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import DatePicker from "react-native-date-picker";
 import Device from "react-native-device-detection";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { Appbar, Button, TextInput } from 'react-native-paper';
+import { Button, TextInput } from 'react-native-paper';
 import RNPickerSelect from "react-native-picker-select";
 import { Chevron } from "react-native-shapes";
 import scss from '../../commonUtils/assets/styles/Settings.scss';
@@ -20,7 +20,7 @@ export const logOut = async (props) => {
   AsyncStorage.multiRemove([])
   global.username = ''
   AsyncStorage.clear().then(() => console.log('Cleared'))
-  props.navigation.navigate("Login")
+  props.navigation.push("Login")
   return true;
 }
 export default class Settings extends Component {
@@ -174,12 +174,12 @@ export default class Settings extends Component {
     const { mobileNumberValid, emailValid, errors } = this.state
     return (
       <View style={scss.container}>
-        <Appbar style={scss.header}>
-          <Appbar.Content title="Profile" />
+        <View style={scss.header}>
+          <Text style={scss.header_text}>Profile</Text>
           <Button icon="logout" mode='text' onPress={() => logOut(this.props)}>
             Logout
           </Button>
-        </Appbar>
+        </View>
         <View style={scss.subContainer}>
           <KeyboardAwareScrollView>
             <TextInput

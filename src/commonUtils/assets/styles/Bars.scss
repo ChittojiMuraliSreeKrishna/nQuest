@@ -9,6 +9,7 @@
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
+  align-items: center;
 	background-color: $white;
   border-bottom-width: 2px;
   border-color: $border;
@@ -43,7 +44,6 @@
 .heading_title {
 	font-size: 20px;
 	color: $black;
-	margin-top: 5%;
 }
 
 .heading_subtitle {
@@ -60,4 +60,55 @@
 	align-items: center;
 	background-color: $white;
 	padding: 10px 0;
+}
+
+.profileToggleBtn {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.popupModel {
+  background-color: none;
+}
+
+.popupModelContainer {
+  background-color: $white;
+  height: 150px;
+  width: 100%;
+  border-radius: 5px;
+  position: absolute;
+  top: 55px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px 0;
+  border-color: $border;
+  border-width: 2px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border-top-width: 0px;
+}
+
+.popUpButtons {
+  background-color: $white;
+  width: 95%;
+  height: 40px;
+  border-color: $border;
+  border-width: 2px;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.popUpText {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.popUpIcons {
+  margin-left: 5px;
 }

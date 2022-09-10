@@ -17,8 +17,18 @@
 
 .header {
   background-color: $white;
-  border-bottom-color: $secondary-color;
-  border-bottom-width: 2px;
+  height: 40px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+}
+
+.header_text{
+  font-size: 20px;
+  font-weight: bold;
+  color: $black;
 }
 
 .submitBtn {

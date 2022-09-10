@@ -8,17 +8,17 @@ import UpdateNewpassword from "../components/Login/UpdateNewpassword";
 import ManagePassword from "../components/URM/ManagePassword";
 import RegisterClient from "../components/URM/RegisterClient";
 import LoginAfterLanguageSelect from "../components/Welcome/LoginAfterLanguageSelect";
-import BottomTabBar from "./BottomTabBar";
+import TopBarNavigation from "./TopBarNavigation";
 
 const Stack = createStackNavigator();
 export default class HomeNavigation extends React.Component {
   render() {
     return (
-      <Stack.Navigator>
+      <Stack.Navigator initialRouteName="TopBarNavigation">
         <Stack.Screen
-          name="BottomBar"
+          name="TopBarNavigation"
           options={{ headerShown: false }}
-          component={BottomTabBar}
+          component={TopBarNavigation}
         />
         <Stack.Screen
           name="Login"

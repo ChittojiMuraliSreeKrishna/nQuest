@@ -10,9 +10,12 @@ import {
 } from "react-native";
 import I18n from "react-native-i18n";
 import Modal from "react-native-modal";
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import IconMA from 'react-native-vector-icons/MaterialIcons';
 import scss from "../commonUtils/assets/styles/Bars.scss";
 import UrmService from "../components/services/UrmService";
 import { RF } from "../Responsive";
+
 
 var data = [];
 var currentSelection = "";
@@ -93,6 +96,7 @@ export class TopBar extends Component {
 
   // //Before screen render
   async componentWillMount() {
+    currentSelection = "";
     var storeStringId = "";
     var domainStringId = "";
     // this.props.navigation.navigate('Login')
@@ -241,6 +245,38 @@ export class TopBar extends Component {
     this.setState({ refresh: !this.state.refresh });
   }
 
+  modalHandle() {
+    this.setState({ modalVisibleData: !this.state.modalVisibleData });
+  }
+
+  popupHandle() {
+    this.setState({ popupModel: !this.state.popupModel })
+  }
+
+  refresh() {
+    console.log("inside refresh");
+    this.setState({ refresh: !this.state.refresh });
+  }
+
+  openProfilePopup() {
+    this.setState({ popupModel: true })
+  }
+
+  settingsNavigate() {
+    this.props.navigation.navigate("Settings")
+    this.setState({ popupModel: false })
+  }
+
+  selectStoreNavigate() {
+    this.props.navigation.navigate("SelectStore")
+    this.setState({ popupModel: false })
+  }
+
+  logoutNavigation() {
+    this.props.navigation.push("Login")
+    this.setState({ popupModel: false })
+  }
+
   render() {
     var displayName =
       currentSelection === "" ? this.state.firstDisplayName : currentSelection;
@@ -261,13 +297,57 @@ export class TopBar extends Component {
               />
             </View>
             <View style={scss.titleSubContainer}>
-              <Text style={[scss.heading_title, { fontWeight: "bold" }]}>
-                {global.username}
-              </Text>
+              <TouchableOpacity onPress={() => this.openProfilePopup()}
+                style={scss.profileToggleBtn}>
+                <Text style={[scss.heading_title, { fontWeight: "bold" }]}>
+                  {global.username}
+                </Text>
+                <Icon
+                  name="menu-down"
+                  color="#000"
+                  size={25}
+                ></Icon>
+              </TouchableOpacity>
               <Text style={scss.heading_subtitle}>{global.storeName}</Text>
             </View>
           </View>
-
+          {this.state.popupModel && (
+            <Modal isVisible={this.state.popupModel} backdropColor="none"
+              onRequestClose={() => {
+                this.popupHandle();
+              }}
+              style={{ margin: 0 }}
+              onBackButtonPress={() => this.popupHandle()}
+              onBackdropPress={() => this.popupHandle()}
+              animationIn={"slideInDown"} animationOut={"slideOutUp"}>
+              <View style={scss.popupModelContainer}>
+                <TouchableOpacity onPress={() => this.settingsNavigate()} style={scss.popUpButtons}><Text style={scss.popUpText}>Profile</Text>
+                  <IconMA
+                    name="person"
+                    size={20}
+                    style={scss.popUpIcons}
+                  ></IconMA>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => this.selectStoreNavigate()}
+                  disabled={true}
+                  style={[scss.popUpButtons, { backgroundColor: '#EDEDED' }]}><Text style={scss.popUpText}>Select Store</Text>
+                  <IconMA
+                    name="store"
+                    size={20}
+                    style={scss.popUpIcons}
+                  ></IconMA>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => this.logoutNavigation()} style={[scss.popUpButtons]}><Text style={[scss.popUpText, { color: "#ED1C24" }]}>Logout</Text>
+                  <IconMA
+                    name="logout"
+                    color="#ED1C24"
+                    size={20}
+                    style={scss.popUpIcons}
+                  ></IconMA>
+                </TouchableOpacity>
+              </View>
+            </Modal>
+          )}
           <>
             <TouchableOpacity
               style={{ flexDirection: "row", padding: 15 }}
@@ -339,23 +419,14 @@ const styles = StyleSheet.create({
     height: 22,
   },
   item: {
-    //justifyContent: 'space-evenly',
-    //alignItems: 'center',
     flexDirection: "row",
     padding: 15,
-    // flexWrap: 'wrap',
-    // flexGrow: 1
   },
   textItem: {
     fontSize: RF(11),
     fontFamily: "bold",
   },
   modalContainer: {
-    // backgroundColor: transparent,
-    // backgroundColor: "rgba(0,0,0,0.01)",
-    // opacity:0.5,
-    // height:'100%',
-    // width:'100%',
     flexDirection: 'column',
     justifyContent: 'center',
     alignContent: 'center',
@@ -364,26 +435,15 @@ const styles = StyleSheet.create({
   modalView: {
     backgroundColor: "white",
     justifyContent: "center",
-    //flex:1,
-    //flexDirection:'row'
-    // position: "relative",
-    // width: "70%",
-    // margin: "0 auto",
-    // height: "auto",
-    // maxHeight: "70vh",
-    // marginTop: "calc(100vh - 85vh - 20px)",
     backgroundColor: "#fff",
     width: '60%',
     borderRadius: 10
-    // borderRadius: 4,
-    // padding: 5
   },
   test: {
     height: "1%",
   },
   logoimage: {
     width: 200,
-    // height: "90%",
   },
 });
 export default TopBar;
