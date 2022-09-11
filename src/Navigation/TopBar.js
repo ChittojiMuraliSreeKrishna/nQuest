@@ -353,52 +353,52 @@ export class TopBar extends Component {
             </View>
           </Modal>
           <>
-            <TouchableOpacity
-              style={{ flexDirection: "row", padding: 15 }}
-              onPress={() => this.modalHandle()}
-            >
-              <Image
-                style={styles.icon}
-                source={GetImageBasedOnPrevilageName(
-                  currentSelection === ""
-                    ? this.state.firstDisplayName
-                    : currentSelection,
-                )}
-              />
-              <Text style={styles.textItem}>{I18n.t(displayName)}</Text>
-              <Image
-                style={{ margin: 10 }}
-                source={require("../components/assets/images/list_trangle.png")}
-              />
-            </TouchableOpacity>
+            <View>
+              <TouchableOpacity
+                style={{ flexDirection: "row", padding: 15 }}
+                onPress={() => this.modalHandle()}
+              >
+                <Image
+                  style={styles.icon}
+                  source={GetImageBasedOnPrevilageName(
+                    currentSelection === ""
+                      ? this.state.firstDisplayName
+                      : currentSelection,
+                  )}
+                />
+                <Text style={styles.textItem}>{I18n.t(displayName)}</Text>
+                <Image
+                  style={{ margin: 10 }}
+                  source={require("../components/assets/images/list_trangle.png")}
+                />
+              </TouchableOpacity>
+            </View>
             {this.state.modalVisibleData && (
-              <View>
-                <Modal
-                  style={{ margin: 0, backgroundColor: "rgba(0,0,0,0.7)", }}
-                  transparent={true}
-                  animationType="fade"
-                  visible={this.state.modalVisibleData}
-                  onRequestClose={() => {
-                    this.modalHandle();
-                  }}
-                  onBackButtonPress={() => this.modalHandle()}
-                  onBackdropPress={() => this.modalHandle()}
-                >
-                  <View style={styles.modalContainer}>
-                    <View style={styles.modalView}>
-                      <FlatList
-                        data={data}
-                        renderItem={(item) => this._renderItem(item)}
-                        keyExtractor={(item) => item}
-                        contentContainerStyle={{
-                          flexDirection: "column",
-                          justifyContent: "center",
-                        }}
-                      />
-                    </View>
+              <Modal
+                style={{ margin: 0, backgroundColor: "rgba(0,0,0,0.7)", }}
+                transparent={true}
+                animationType="fade"
+                visible={this.state.modalVisibleData}
+                onRequestClose={() => {
+                  this.modalHandle();
+                }}
+                onBackButtonPress={() => this.modalHandle()}
+                onBackdropPress={() => this.modalHandle()}
+              >
+                <View style={styles.modalContainer}>
+                  <View style={styles.modalView}>
+                    <FlatList
+                      data={data}
+                      renderItem={(item) => this._renderItem(item)}
+                      keyExtractor={(item) => item}
+                      contentContainerStyle={{
+                        flexDirection: "column",
+                        justifyContent: "center",
+                      }}
+                    />
                   </View>
-                </Modal>
-              </View>
+                </View>
+              </Modal>
             )}
           </>
         </View>
