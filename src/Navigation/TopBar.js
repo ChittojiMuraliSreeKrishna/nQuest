@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import I18n from "react-native-i18n";
 import Modal from "react-native-modal";
+import { Text as TEXT } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconMA from 'react-native-vector-icons/MaterialIcons';
 import scss from "../commonUtils/assets/styles/Bars.scss";
@@ -21,6 +22,7 @@ var data = [];
 var currentSelection = "";
 var dataCleared = true;
 var firstDisplayRoute = "";
+var displayName = ""
 export const screenMapping = {
   "Dashboard": "Home",
   "Billing Portal": "CustomerNavigation",
@@ -91,13 +93,18 @@ export class TopBar extends Component {
 
   componentWillUnmount() {
     currentSelection = "";
+    data = []
+    displayName = ""
     console.log("topbar component unmount", this.props.route.name);
   }
 
   // //Before screen render
   async componentWillMount() {
     currentSelection = "";
+    data = []
     var storeStringId = "";
+    displayName = "";
+    this.setState({ firstDisplayName: "" })
     var domainStringId = "";
     // this.props.navigation.navigate('Login')
 
@@ -278,7 +285,7 @@ export class TopBar extends Component {
   }
 
   render() {
-    var displayName =
+    displayName =
       currentSelection === "" ? this.state.firstDisplayName : currentSelection;
     console.log(
       "placeholder data: " +
@@ -311,43 +318,48 @@ export class TopBar extends Component {
               <Text style={scss.heading_subtitle}>{global.storeName}</Text>
             </View>
           </View>
-          {this.state.popupModel && (
-            <Modal isVisible={this.state.popupModel} backdropColor="none"
-              onRequestClose={() => {
-                this.popupHandle();
-              }}
-              style={{ margin: 0 }}
-              onBackButtonPress={() => this.popupHandle()}
-              onBackdropPress={() => this.popupHandle()}
-              animationIn={"slideInDown"} animationOut={"slideOutUp"}>
+          <Modal isVisible={this.state.popupModel}
+            onRequestClose={() => {
+              this.popupHandle();
+            }}
+            style={{ margin: 0 }}
+            onBackButtonPress={() => this.popupHandle()}
+            onBackdropPress={() => this.popupHandle()}
+            animationIn={"slideInUp"} animationOut={"slideOutDown"} animationInTiming={500} animationOutTiming={700}>
+            <View style={scss.popUp}>
+              <Text style={scss.popUp_decorator}>-</Text>
               <View style={scss.popupModelContainer}>
-                <TouchableOpacity onPress={() => this.settingsNavigate()} style={scss.popUpButtons}><Text style={scss.popUpText}>Profile</Text>
+                <TouchableOpacity onPress={() => this.settingsNavigate()} style={scss.popUpButtons}>
                   <IconMA
-                    name="person"
-                    size={20}
+                    name="person-outline"
+                    size={25}
                     style={scss.popUpIcons}
                   ></IconMA>
+                  <TEXT variant="labelMedium" style={scss.popUpText}>Profile</TEXT>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => this.selectStoreNavigate()}
                   disabled={true}
-                  style={[scss.popUpButtons, { backgroundColor: '#EDEDED' }]}><Text style={scss.popUpText}>Select Store</Text>
+                  style={[scss.popUpButtons]}>
                   <IconMA
-                    name="store"
-                    size={20}
+                    name="storefront"
+                    size={25}
+                    color="#d9d9d9"
                     style={scss.popUpIcons}
                   ></IconMA>
+                  <TEXT variant="labelMedium" style={[scss.popUpText, { color: '#d9d9d9' }]}>Select Store</TEXT>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => this.logoutNavigation()} style={[scss.popUpButtons]}><Text style={[scss.popUpText, { color: "#ED1C24" }]}>Logout</Text>
+                <TouchableOpacity onPress={() => this.logoutNavigation()} style={[scss.popUpButtons]}>
                   <IconMA
                     name="logout"
                     color="#ED1C24"
-                    size={20}
+                    size={25}
                     style={scss.popUpIcons}
                   ></IconMA>
+                  <TEXT variant="labelMedium" style={[scss.popUpText, { color: "#ED1C24" }]}>Logout</TEXT>
                 </TouchableOpacity>
               </View>
-            </Modal>
-          )}
+            </View>
+          </Modal>
           <>
             <TouchableOpacity
               style={{ flexDirection: "row", padding: 15 }}
