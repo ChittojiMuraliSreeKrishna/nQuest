@@ -91,17 +91,9 @@ export class TopBar extends Component {
     );
   }
 
-  componentWillUnmount() {
-    currentSelection = "";
-    data = []
-    displayName = ""
-    console.log("topbar component unmount", this.props.route.name);
-  }
-
-  // //Before screen render
+  //Before screen render
   async componentWillMount() {
     currentSelection = "";
-    data = []
     var storeStringId = "";
     displayName = "";
     this.setState({ firstDisplayName: "" })
