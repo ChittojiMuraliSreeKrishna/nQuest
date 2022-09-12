@@ -12,6 +12,10 @@ class LoginService {
     return axios.get(BASE_URL + USER_MANAGEMENT_URL.getAllStores + param);
   }
 
+  getSelectStores(username) {
+    return axios.get(BASE_URL + LOGIN_URL.selcetStore + username)
+  }
+
   getAllClient(userId) {
     const param = '?userId=' + userId
     console.log({ param })

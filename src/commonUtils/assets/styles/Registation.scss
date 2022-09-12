@@ -12,8 +12,7 @@
 
 .logoImg {
 	height: 100px;
-	width: 250px;
-	// mar
+	width: 280px;
 }
 
 .headerText {
@@ -24,4 +23,23 @@
 .subHeaderText {
   font-size: 15px;
   font-weight: lighter;
+}
+
+.login_btn {
+  min-width: 90%;
+  margin: 10px 5%;
+  height: 50px;
+  background-color: $primary-color;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.login_btn_text {
+  text-align: center;
+  color: $white;
+  font-size: 15px;
+  margin-right: 5px;
 }

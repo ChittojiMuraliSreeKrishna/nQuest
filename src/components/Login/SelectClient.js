@@ -54,7 +54,7 @@ export class SelectClient extends Component {
     if (this.state.selectedItem === null) {
       alert("Select Atleast one client")
     } else {
-      this.props.navigation.navigate('BottomBar')
+      this.props.navigation.push("HomeNavigation")
     }
   }
 

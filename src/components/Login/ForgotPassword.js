@@ -1,9 +1,10 @@
 import axios from 'axios';
 import React, { Component } from 'react';
-import { Dimensions, Image, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Dimensions, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Appbar, TextInput } from 'react-native-paper';
 import Loader from '../../commonUtils/loader';
 import { RF, RH, RW } from '../../Responsive';
 import { errorLength, urmErrorMessages } from '../Errors/errors';
@@ -38,7 +39,7 @@ class ForgotPassword extends Component {
   }
 
   handleEmail = (text) => {
-    this.setState({ usserName: text });
+    this.setState({ userName: text });
   };
 
   handleCode = (text) => {
@@ -92,19 +93,11 @@ class ForgotPassword extends Component {
         <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
 
           <View style={styles.container}>
-            <View style={{ flex: 1, marginTop: '0%', backgroundColor: '#FFFFFF' }}>
-              {/* <Image source={require('../assets/images/logo.png')} style={styles.logoImage} /> */}
-              {/* <Text></Text> */}
-              <View style={Device.isTablet ? styles.viewsWidth_tablet : styles.viewsWidth_mobile} >
-                <TouchableOpacity style={Device.isTablet ? styles.backButton_tablet : styles.backButton_mobile} onPress={() => this.handleBackButtonClick()}>
-                  <Image source={require('../assets/images/backButton.png')} />
-                </TouchableOpacity>
-                <Text style={Device.isTablet ? styles.headerTitle_tablet : styles.headerTitle_mobile}>
-                  {I18n.t("Verification Code")}
-                </Text>
-              </View>
-            </View>
 
+            <Appbar mode='center-aligned'>
+              <Appbar.BackAction onPress={() => this.handleBackButtonClick()} />
+              <Appbar.Content title="Verification Code" />
+            </Appbar>
 
 
             <View style={{ flex: 6 }}>
@@ -113,46 +106,17 @@ class ForgotPassword extends Component {
                 style={userValid ? Device.isTablet ? styles.input_tablet : styles.input_mobile : Device.isTablet ? styles.inputError_tablet : styles.inputError_mobile}
                 underlineColorAndroid="transparent"
                 placeholder={I18n.t("USER NAME")}
+                mode="outlined"
                 placeholderTextColor={userValid ? "#6F6F6F" : "#dd0000"}
-                // textAlignVertical="center"
+                outlineColor={userValid ? "#6F6F6F" : "#dd0000"}
+                activeOutlineColor="#d7d7d7"
                 autoCapitalize="none"
                 maxLength={25}
-                onChangeText={this.handleEmail}
+                onChangeText={(value) => this.handleEmail(value)}
                 onBlur={this.handleEmailValid}
                 value={this.state.userName}
-                ref={inputemail => { this.emailValueInput = inputemail; }} />
+              />
               {!userValid && <Message imp={true} message={this.state.errors["username"]} />}
-
-              {/* <Text style={styles.signInFieldStyle}> Password </Text> */}
-              {/* <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                                underlineColorAndroid="transparent"
-                                placeholder="Confirmation Code"
-                                secureTextEntry={true}
-                                placeholderTextColor="#6F6F6F"
-                                autoCapitalize="none"
-                                onChangeText={this.handleCode}
-                                //value={this.state.password}
-                                ref={inputpassword => { this.passwordValueInput = inputpassword }} />
-
-                            <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                                underlineColorAndroid="transparent"
-                                placeholder="New Password"
-                                secureTextEntry={true}
-                                placeholderTextColor="#6F6F6F"
-                                autoCapitalize="none"
-                                onChangeText={this.handleNewPassword}
-                                //value={this.state.password}
-                                ref={inputpassword => { this.passwordValueInput = inputpassword }} />
-
-                            <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                                underlineColorAndroid="transparent"
-                                placeholder="Confirm Password"
-                                secureTextEntry={true}
-                                placeholderTextColor="#6F6F6F"
-                                autoCapitalize="none"
-                                onChangeText={this.handleConfirmPassword}
-                                //value={this.state.password}
-                                ref={inputpassword => { this.passwordValueInput = inputpassword }} /> */}
 
 
               <TouchableOpacity

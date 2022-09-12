@@ -58,6 +58,7 @@ export const LOGIN_URL = {
   getToken: "/user-management/auth/temporary-login",
   registerUser: "/user-management/client/create-client",
   changePassword: "/user-management/auth/auth-challenge",
+  selcetStore: '/user-management/auth/getUserStores/',
 };
 
 export const USER_MANAGEMENT_URL = {

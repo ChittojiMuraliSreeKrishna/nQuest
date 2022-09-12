@@ -6,13 +6,13 @@ import {
   Dimensions,
   Image,
   SafeAreaView,
-  StyleSheet,
-  View
-} from "react-native";
+  StyleSheet, TouchableOpacity, View
+} from 'react-native';
 import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Button, Text, TextInput } from "react-native-paper";
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import scss from "../../commonUtils/assets/styles/Registation.scss";
 import Loader from "../../commonUtils/loader";
 import { RF, RH, RW } from "../../Responsive";
@@ -24,7 +24,7 @@ import {
 import Message from "../Errors/Message";
 import LoginService from "../services/LoginService";
 import UrmService from '../services/UrmService';
-import { inputField, submitBtn, submitBtnText } from "../Styles/FormFields";
+import { inputField } from "../Styles/FormFields";
 
 var deviceheight = Dimensions.get("window").height;
 var deviceheight = Dimensions.get("window").height;
@@ -264,7 +264,7 @@ export default class Login extends Component {
           UrmService.getPrivillagesByRoleName(name).then((res) => {
             if (res) {
               AsyncStorage.setItem("storeName", storeName).then(() => {
-                this.props.navigation.navigate("BottomBar");
+                this.props.navigation.push("HomeNavigation");
               })
             }
           })
@@ -290,7 +290,7 @@ export default class Login extends Component {
         UrmService.getPrivillagesByRoleName(name).then((res) => {
           if (res) {
             AsyncStorage.setItem("storeName", storeName).then(() => {
-              this.props.navigation.navigate("BottomBar");
+              this.props.navigation.push("HomeNavigation");
             })
           }
         })
@@ -346,17 +346,15 @@ export default class Login extends Component {
               </View>
 
               <View style={{ flex: 5 }}>
-              <Text style={styles.headings}>{I18n.t("Username")}</Text>
+                <Text style={styles.headings}>{I18n.t("Username")}</Text>
                 <TextInput
                   activeUnderlineColor="#000"
-                  mode="flat"
-                  underlineColor={userValid ? "#8F9EB7" : "#dd0000"}
+                  mode="outlined"
+                  outlineColor={userValid ? "#8F9EB7" : "#dd0000"}
+                  activeOutlineColor="#d7d7d7"
                   style={[
                     inputField,
                   ]}
-                  underlineColorAndroid="transparent"
-                  label="Username"
-                  placeholder="Username"
                   autoCapitalize="none"
                   onChangeText={this.handleEmail}
                   onBlur={this.handleEmailValid}
@@ -371,14 +369,12 @@ export default class Login extends Component {
                 <Text style={styles.headings}>{I18n.t("Password")}</Text>
                 <TextInput
                   activeUnderlineColor="#000"
-                  mode="flat"
+                  mode="outlined"
                   style={[
                     inputField,
                   ]}
-                  underlineColorAndroid="transparent"
-                  underlineColor={passValid ? "#8F9EB7" : "#dd0000"}
-                  label="Password"
-                  placeholder="Password"
+                  outlineColor={passValid ? "#8F9EB7" : "#dd0000"}
+                  activeOutlineColor="#d7d7d7"
                   secureTextEntry={true}
                   autoCapitalize="none"
                   maxLength={errorLengthMax.password}
@@ -442,14 +438,17 @@ export default class Login extends Component {
                     </View>
                   </View>
                 </View>
-                <Button
-                  // mode="contained-tonal"
-                  mode="elevated"
-                  style={submitBtn}
+                <TouchableOpacity
+                  style={scss.login_btn}
                   onPress={() => this.login()}
                 >
-                  <Text style={submitBtnText}> {I18n.t("SIGN IN")} </Text>
-                </Button>
+                  <Text style={scss.login_btn_text}> {I18n.t("SIGN IN")} </Text>
+                  <Icon
+                    name='login'
+                    size={20}
+                    color="#FFF"
+                  ></Icon>
+                </TouchableOpacity>
               </View>
             </View>
           </SafeAreaView>
