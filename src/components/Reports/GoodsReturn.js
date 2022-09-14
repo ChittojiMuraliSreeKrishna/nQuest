@@ -16,8 +16,6 @@ import { emptyTextStyle } from '../Styles/FormFields';
 import { flatListMainContainer, flatlistSubContainer, highText, loadMoreBtn, loadmoreBtnText, textContainer, textStyleMedium, textStyleSmall } from '../Styles/Styles';
 import Loader from '../../commonUtils/loader';
 import { formatDate } from '../../commonUtils/DateFormate';
-import { reportErrorMessages } from '../Errors/errors';
-import Message from '../Errors/Message';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 
 
@@ -50,9 +48,6 @@ export class GoodsReturn extends Component {
       totalPages: 0,
       pageNo: 0,
       loading: false,
-      barcodeValid: true,
-      returnSlipNumberValid: true,
-      errors: {}
     };
   }
 
@@ -124,33 +119,6 @@ export class GoodsReturn extends Component {
     this.setState({ enddoneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
 
-  validationForm() {
-    let isFormValid = true;
-    let errors = {};
-
-    if (this.state.barCode === '' || this.state.barCode === null) {
-      isFormValid = false;
-      errors["barCode"] = reportErrorMessages.barCode;
-      this.setState({ barcodeValid: false });
-    }
-
-    if (this.state.returnSlipNumber === '' || this.state.returnSlipNumber === null) {
-      isFormValid = false;
-      errors["returnSlipNumber"] = reportErrorMessages.returnSlipNumber;
-      this.setState({ returnSlipNumberValid: false });
-    }
-
-    this.setState({ errors: errors });
-    return isFormValid;
-  }
-
-  applyGoodsReturnValidation(pageNumber) {
-    const isFormValid = this.validationForm()
-    if (isFormValid) {
-      this.applyGoodsReturn(pageNumber)
-    }
-  }
-
   applyGoodsReturn(pageNumber) {
     this.setState({ loading: true, loadMoreActive: false });
     const obj = {
@@ -210,7 +178,7 @@ export class GoodsReturn extends Component {
   // Pagination Function
   loadMoreList = () => {
     this.setState({ pageNo: this.state.pageNo + 1 }, () => {
-      this.applyGoodsReturnValidation();
+      this.applyGoodsReturn();
     });
   };
 
@@ -428,11 +396,6 @@ export class GoodsReturn extends Component {
                     value={this.state.returnSlipNumber}
                     onChangeText={this.handleReturnSlipNumber}
                   />
-                  <Text>
-                    {!this.state.returnSlipNumberValid && (
-                      <Message imp={true} message={this.state.errors["returnSlipNumber"]} />
-                    )}
-                  </Text>
                   <Text style={styles.headings}>{I18n.t("Barcode")}</Text>
                   <TextInput
                     style={[styles.input, { width: deviceWidth - 40 }]}
@@ -444,14 +407,9 @@ export class GoodsReturn extends Component {
                     value={this.state.barCode}
                     onChangeText={this.handleBarCode}
                   />
-                  <Text style={styles.headings}>
-                    {!this.state.barcodeValid && (
-                      <Message imp={true} message={this.state.errors["barCode"]} />
-                    )}
-                  </Text>
                   <View style={forms.action_buttons_container}>
                     <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
-                      onPress={() => this.applyGoodsReturnValidation(this.state.pageNo)}>
+                      onPress={() => this.applyGoodsReturn(this.state.pageNo)}>
                       <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}

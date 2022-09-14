@@ -16,7 +16,8 @@ import LoginService from '../services/LoginService';
 import NewSaleService from '../services/NewSaleService';
 import PromotionsService from '../services/PromotionsService';
 import { Appbar } from 'react-native-paper';
-
+import forms from '../../commonUtils/assets/styles/formFields.scss';
+import I18n from 'react-native-i18n';
 
 var deviceWidth = Dimensions.get('window').width;
 var deviceWidth = Dimensions.get('window').width;
@@ -299,167 +300,7 @@ class TextilePayment extends Component {
             payingAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
         }, () => {
             this.cancelKathaModel();
-            this.pay();
-        });
-    }
-
-    savePayment() {
-        this.state.discType = this.state.dropValue;
-        this.state.dsNumberList = this.removeDuplicates(this.state.dsNumberList, "dsNumber");
-        if (this.state.showDiscReason) {
-            if (this.state.discApprovedBy && this.state.discType) {
-                this.pay();
-            } else {
-                alert("Please select discount type/ discount reason");
-            }
-        } else {
-            this.pay();
-        }
-    }
-
-    createInvoice() {
-        var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
-        if (this.state.isRTApplied) {
-            this.setState({ payingAmount: grandNetAmount + this.state.rtAmount })
-            const obj = {
-                "paymentType": "RTSlip",
-                "paymentAmount": this.state.rtAmount
-            }
-            this.state.paymentType.push(obj);
-
-            if (this.state.rtAmount < grandNetAmount) {
-                if (this.state.isCash) {
-                    const obj = {
-                        "paymentAmountType": [
-                            {
-                                "paymentType": "RTSlip",
-                                "paymentAmount": this.state.rtAmount
-                            },
-                            {
-                                "paymentType": "Cash",
-                                "paymentAmount": this.state.cashAmount
-                            }
-                        ]
-                    }
-                    this.state.paymentType.push(obj);
-                }
-                if (this.state.isKathaModel) {
-                    const obj = {
-                        "paymentAmountType": [
-                            {
-                                "paymentType": "RTSlip",
-                                "paymentAmount": this.state.rtAmount
-                            },
-                            {
-                                "paymentType": "PKTPENDING",
-                                "paymentAmount": grandNetAmount
-                            }
-                        ]
-                    }
-                    this.state.paymentType.push(obj);
-                }
-                if (this.state.isCreditModel) {
-                    const obj = {
-                        "paymentAmountType": [
-                            {
-                                "paymentType": "RTSlip",
-                                "paymentAmount": this.state.rtAmount
-                            },
-                            {
-                                "paymentType": "PKTADVANCE",
-                                "paymentAmount": grandNetAmount
-                            }
-                        ]
-                    }
-                    this.state.paymentType.push(obj);
-                }
-            }
-        }
-        this.setState({ netCardPayment: grandNetAmount })
-        this.state.dsNumberList = this.removeDuplicates(this.state.dsNumberList, "dsNumber");
-        AsyncStorage.removeItem("recentSale");
-        const storeId = AsyncStorage.getItem("storeId");
-        let obj;
-        //  if (this.state.isTextile) {
-        obj = {
-            "natureOfSale": "InStore",
-            "domainId": 1,
-            "storeId": this.state.storeId,
-            "grossAmount": this.state.grossAmount,
-            "totalPromoDisc": this.state.totalPromoDisc,
-            "taxAmount": this.state.taxAmount,
-            "totalManualDisc": parseInt(this.state.manualDisc),
-            "discApprovedBy": this.state.discApprovedBy,
-            "discType": this.state.reasonDiscount,
-            "approvedBy": null,
-            "netPayableAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)),
-            "offlineNumber": null,
-            "userId": this.state.userId,
-            "sgst": this.state.CGST,
-            "cgst": this.state.CGST,
-            "dlSlip": this.state.dsNumberList,
-            "lineItemsReVo": null,
-            "mobileNumber": this.state.customerPhoneNumber,
-            "createdBy": this.state.createdBy,
-            "recievedAmount": this.state.cashAmount,
-            "returnAmount": this.state.returnCash,
-            "paymentAmountType": this.state.paymentType,
-            "returnSlipNumber": this.state.rtNumber
-        }
-
-        if (this.state.isCard) {
-            delete obj.paymentAmountType
-        }
-        console.log("objjj", obj)
-        axios.post(NewSaleService.createOrder(), obj).then((res) => {
-            console.log("resssssss", res)
-            if (res) {
-                if (!this.state.isCard) {
-                    // Printer Service used for Testing
-                    console.log('INVOICE', res.data.result, this.state.barCodeList)
-                }
-                this.setState({ dsNumber: "", upiAmount: this.state.grandNetAmount });
-                this.setState({
-                    customerName: " ",
-                    gender: " ",
-                    dob: " ",
-                    customerGST: " ",
-                    address: " ",
-                    manualDisc: 0,
-                    customerEmail: "",
-                    netPayableAmount: 0.0,
-                    barCodeList: [],
-                    grossAmount: 0.0,
-                    promoDiscount: 0.0,
-                    cashAmount: 0,
-                    taxAmount: 0.0,
-                    grandNetAmount: 0,
-                    payingAmount: 0,
-                    returnCash: 0,
-                    stateGST: 0,
-                    centralGST: 0,
-                    isPayment: true,
-                    isCreditAmount: false,
-                    creditAmount: 0,
-                    payCreditAmount: 0,
-                    totalAmount: 0,
-                    couponAmount: 0,
-                    isCredit: false,
-                    isTagCustomer: false,
-                    rtAmount: 0,
-                    enablePayment: false
-                });
-                this.setState({ showDiscReason: false, isPayment: true });
-                this.setState({ showTable: false });
-                AsyncStorage.setItem("recentSale", res.data.result);
-                alert(res.data.result);
-                this.setState({ newSaleId: res.data.result });
-                if (this.state.isCard || this.state.isUpi) {
-                    this.pay()
-                }
-            } else {
-                alert(res.data.result);
-            }
+            // this.pay();
         });
     }
 
@@ -720,7 +561,7 @@ class TextilePayment extends Component {
                     }
                     this.state.paymentType.push(obj);
                 }
-                if (this.state.isKathaModel) {
+                if (this.state.isKhata) {
                     const obj = {
                         "paymentAmountType": [
                             {
@@ -821,6 +662,13 @@ class TextilePayment extends Component {
             };
             this.state.paymentType.push(obj)
         }
+        else if (this.state.isKhata === true) {
+            const obj = {
+                "paymentType": "PKTPENDING",
+                "paymentAmount": grandNetAmount
+            }
+            this.state.paymentType.push(obj);
+        }
         obj = {
             "natureOfSale": "InStore",
             "domainId": 1,
@@ -854,6 +702,10 @@ class TextilePayment extends Component {
             if (res.data && res.data["isSuccess"] === "true") {
                 // const cardAmount = this.state.isCard || this.state.isCardOrCash ? JSON.stringify(Math.round(this.state.ccCardCash)) : JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString());
                 alert("Order created " + res.data["result"]);
+                if (this.state.isKhata === true) {
+                    this.props.route.params.onGoBack();
+                    this.props.navigation.goBack();
+                }
                 if (this.state.isCash === true && this.state.isCardOrCash === false) {
                     this.props.route.params.onGoBack();
                     this.props.navigation.goBack();
@@ -1714,14 +1566,16 @@ class TextilePayment extends Component {
                                                 value={this.state.upiMobileNumber}
                                                 onChangeText={(text) => this.handleUpiMobileNumber(text)}
                                             />
-                                            <TouchableOpacity style={Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile}
-                                                onPress={() => this.getUPILink()}>
-                                                <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile} >CONFIRM</Text>
-                                            </TouchableOpacity>
-                                            <TouchableOpacity style={Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile}
-                                                onPress={() => this.cancelUpiModel()}>
-                                                <Text style={Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile}>CANCEL</Text>
-                                            </TouchableOpacity>
+                                            <View style={forms.action_buttons_container}>
+                                                <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                                                    onPress={() => this.getUPILink()}>
+                                                    <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
+                                                </TouchableOpacity>
+                                                <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                                                    onPress={() => this.cancelUpiModel()}>
+                                                    <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                                                </TouchableOpacity>
+                                            </View>
                                         </KeyboardAwareScrollView>
                                     </View>
                                 </Modal>
@@ -1735,7 +1589,7 @@ class TextilePayment extends Component {
                                     <View style={styles.filterMainContainer}>
                                         <KeyboardAwareScrollView enableOnAndroid={true} >
                                             <Text style={Device.isTablet ? styles.filterByTitle_tablet : styles.filterByTitle_mobile} > Katha Payment </Text>
-                                            <TouchableOpacity style={Device.isTablet ? styles.filterCloseButton_tablet : styles.filterCloseButton_mobile} onPress={() => this.modelCancel()}>
+                                            <TouchableOpacity style={Device.isTablet ? styles.filterCloseButton_tablet : styles.filterCloseButton_mobile} onPress={() => this.cancelKathaModel()}>
                                                 <Image style={styles.modelCloseImage} source={require('../assets/images/modelcancel.png')} />
                                             </TouchableOpacity>
                                             <Text style={Device.isTablet ? styles.filterByTitleDecoration_tablet : styles.filterByTitleDecoration_mobile}>
@@ -1751,14 +1605,16 @@ class TextilePayment extends Component {
                                                 editable={false} selectTextOnFocus={false}
                                                 value={(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()}
                                             />
-                                            <TouchableOpacity style={Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile}
-                                                onPress={() => this.confirmKathaModel()}>
-                                                <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile} >CONFIRM</Text>
-                                            </TouchableOpacity>
-                                            <TouchableOpacity style={Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile}
-                                                onPress={() => this.cancelKathaModel()}>
-                                                <Text style={Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile}>CANCEL</Text>
-                                            </TouchableOpacity>
+                                            <View style={forms.action_buttons_container}>
+                                                <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                                                    onPress={() => this.confirmKathaModel()}>
+                                                    <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
+                                                </TouchableOpacity>
+                                                <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                                                    onPress={() => this.cancelKathaModel()}>
+                                                    <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                                                </TouchableOpacity>
+                                            </View>
                                         </KeyboardAwareScrollView>
                                     </View>
                                 </Modal>
@@ -1786,14 +1642,16 @@ class TextilePayment extends Component {
                                                 value={this.state.gvNumber}
                                                 onChangeText={this.handleGVNumber}
                                             />
-                                            <TouchableOpacity style={Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile}
-                                                onPress={() => this.applyGVNumber()}>
-                                                <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile} >APPLY</Text>
-                                            </TouchableOpacity>
-                                            <TouchableOpacity style={Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile}
-                                                onPress={() => this.modelCancel()}>
-                                                <Text style={Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile}>CANCEL</Text>
-                                            </TouchableOpacity>
+                                            <View style={forms.action_buttons_container}>
+                                                <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                                                    onPress={() => this.applyGVNumber()}>
+                                                    <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                                                </TouchableOpacity>
+                                                <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                                                    onPress={() => this.modelCancel()}>
+                                                    <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                                                </TouchableOpacity>
+                                            </View>
                                         </KeyboardAwareScrollView>
                                     </View>
                                 </Modal>

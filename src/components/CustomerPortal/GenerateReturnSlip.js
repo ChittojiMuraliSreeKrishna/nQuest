@@ -57,7 +57,8 @@ export default class GenerateReturnSlip extends Component {
       invoiceNumberValid: true,
       customerNumberValid: true,
       reasonValid: true,
-      errors: {}
+      errors: {},
+      isItemSelected: true
     };
   }
 
@@ -124,7 +125,7 @@ export default class GenerateReturnSlip extends Component {
       console.log(res.data.result);
       let items = res.data.result;
       for (let i = 0; i < items.length; i++) {
-        returnInvoiceArray.push({ barCode: items[i].barcode, value: items[i].netValue, quantity: items[i].quantity, isSelected: false });
+        returnInvoiceArray.push({ barCode: items[i].barcode, value: items[i].netValue, quantity: items[i].quantity, isSelected: true });
       }
       this.setState({ returnInvoice: returnInvoiceArray }, () => {
         let costprice = 0;
@@ -185,12 +186,12 @@ export default class GenerateReturnSlip extends Component {
     }
     this.setState({ errors: errors });
     return isFormValid;
-  }
+  } 
 
   generateNewSlip() {
     console.log(this.state.storeId);
     console.log("returnSlipList", this.state.netValueList);
-    const isFormValid = this.validationForReturnSlip()
+    // const isFormValid = this.validationForReturnSlip()
     const saveObj = {
       barcodes: this.state.netValueList,
       mobileNumber: this.state.mobileNumber ? this.state.mobileNumber : null,
@@ -202,7 +203,7 @@ export default class GenerateReturnSlip extends Component {
       createdBy: this.state.createdBy,
       comments: this.state.reasonDesc
     };
-    if (isFormValid) {
+    // if (isFormValid) {
       console.log(saveObj, "params");
       axios.post(CustomerService.saveRetunSlip(), saveObj).then((res) => {
         console.log("return slip data,res", JSON.stringify(res.data))
@@ -240,7 +241,7 @@ export default class GenerateReturnSlip extends Component {
           createdBy: null
         });
       });
-    }
+    // }
   }
 
   handleCutomerTagging = () => {
@@ -429,7 +430,7 @@ export default class GenerateReturnSlip extends Component {
             onEndEditing={() => this.endEditing()}
           />
           <TouchableOpacity style={{ padding: RF(10) }} onPress={() => this.navigateToScanCode()} >
-            <ScanIcon name='barcode-scan' size={30} color={color.black}  />
+            <ScanIcon name='barcode-scan' size={30} color={color.black} />
           </TouchableOpacity>
         </View>
         {!this.state.invoiceNumberValid && (
