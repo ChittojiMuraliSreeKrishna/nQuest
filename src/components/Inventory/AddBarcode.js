@@ -11,6 +11,7 @@ import {
 import DatePicker from "react-native-date-picker";
 import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Appbar, TextInput } from "react-native-paper";
 import RNPickerSelect from "react-native-picker-select";
 import { Chevron } from "react-native-shapes";
@@ -46,6 +47,8 @@ const data1 = [
   { value: "Textile", label: "Textile" },
   { value: "Retail", label: "Retail" },
   { value: "Electronics", label: "Electronics" },
+  { value: "FruitsAndVegetables", label: "FruitsAndVegetables" },
+  { value: "Sanitary", label: "Sanitary" }
 ];
 
 // For Retail Status
@@ -626,7 +629,7 @@ class AddBarcode extends Component {
           />
           <Appbar.Content title="Add Barcode" />
         </Appbar>
-        <ScrollView>
+        <KeyboardAwareScrollView>
           <Text style={inputHeading}>
             {I18n.t("Domian")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
@@ -1137,22 +1140,18 @@ class AddBarcode extends Component {
           {!qtyValid && (
             <Message imp={true} message={this.state.errors["qty"]} />
           )}
-          <View style={forms.form_btn_container}>
-            <TouchableOpacity
-              style={forms.cancel_btn}
-              onPress={() => this.cancel()}
-            >
-              <Text style={cancelBtnText}>{I18n.t("CANCEL")}</Text>
+          <View style={forms.action_buttons_container}>
+            <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+              onPress={() => this.saveBarcode()}>
+              <Text style={forms.submit_btn_text} >{I18n.t("SAVE")}</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={forms.submit_btn}
-              onPress={() => this.saveBarcode()}
-            >
-              <Text style={submitBtnText}>{I18n.t("SAVE")}</Text>
+            <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+              onPress={() => this.cancel()}>
+              <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.bottomContainer}></View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
       </View >
     );
   }

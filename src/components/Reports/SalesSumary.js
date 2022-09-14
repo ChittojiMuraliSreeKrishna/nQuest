@@ -44,7 +44,8 @@ export class SalesSumary extends Component {
       dsList: [],
       totMrp: null,
       totalDiscount: null,
-      billValue: null
+      billValue: null,
+      filterActive: false
     };
   }
 
@@ -155,8 +156,8 @@ export class SalesSumary extends Component {
           a.push(data.salesSummery);
           a.push(data.retunSummery);
           console.log(">>>>>>>>aaaaaaa", a);
-
           this.setState({
+            filterActive: true,
             dsList: a,
             totMrp: data.totalMrp,
             billValue: data.billValue,
@@ -166,6 +167,7 @@ export class SalesSumary extends Component {
             totalIgst: data.totalIgst,
             totalCess: data.totalCess
           })
+          this.setState({ startDate: "", endDate: "" })
           this.modelCancel()
         } else {
           alert("records not found");
@@ -173,10 +175,10 @@ export class SalesSumary extends Component {
         }
       }
       else {
+        this.setState({ startDate: "", endDate: "" })
         alert(res.data.message);
         this.modelCancel()
-        this.setState({ startDate: "", endDate: "" })
-        // this.props.modelCancelCallback();
+         // this.props.modelCancelCallback();
       }
     }
     ).catch(() => {
@@ -195,16 +197,32 @@ export class SalesSumary extends Component {
     this.setState({ flagFilterSalesSumary: false, modalVisible: false })
   }
 
+  clearFilterAction() {
+    this.setState({
+      filterActive: false, flagFilterSalesSumary: false, modalVisible: false, startDate: "", endDate: ""
+    })
+  }
+
   render() {
     return (
       <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
         <Appbar>
           <Appbar.Content title="Sales Summary" />
-          <FilterIcon
-            name="sliders"
-            size={25}
-            onPress={() => this.filterAction()}
-          />
+          {this.state.filterActive ?
+            <FilterIcon
+              name="sliders"
+              size={25}
+              style={{ marginRight: 10 }}
+              color="#ed1c24"
+              onPress={() => this.clearFilterAction()}
+            /> :
+            <FilterIcon
+              name="sliders"
+              size={25}
+              style={{ marginRight: 10 }}
+              onPress={() => this.filterAction()}
+            />
+          }
         </Appbar>
 
         <FlatList
@@ -393,12 +411,9 @@ const styles = StyleSheet.create({
     right: Device.isTablet ? 15 : 30,
   },
   filterMainContainer: {
-    // marginLeft: -40,
-    // marginRight: -40,
-    // paddingLeft: Device.isTablet ? 0 : 20,
     backgroundColor: '#ffffff',
-    marginTop: Device.isTablet ? deviceheight - RH(400) : deviceheight - RH(200),
-    height: Device.isTablet ? RH(350) : RH(250),
+    marginTop: Device.isTablet ? deviceheight - RH(500) : deviceheight - RH(400),
+    height: Device.isTablet ? RH(500) : RH(400),
   },
   filterApplyButton: {
     width: deviceWidth - 40,

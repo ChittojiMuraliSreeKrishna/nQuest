@@ -30,6 +30,10 @@ import {
 	headerTitleContainer,
 	headerTitleSubContainer,
 } from "../Styles/Styles";
+import forms from '../../commonUtils/assets/styles/formFields.scss';
+import I18n from 'react-native-i18n';
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+
 
 var deviceWidth = Dimensions.get("window").width;
 
@@ -59,6 +63,13 @@ export default class AddHsnCode extends Component {
 			isEdit: false,
 			navText: "",
 			taxLabel: "",
+			domainTypes: [
+				{ label: 'Textile', value: 'Textile' },
+				{ label: "Retail", value: 'Retail' },
+				{ label: "Fruits And Vegetables", value: 'FruitsAndVegetables' },
+				{ label: "Sanitary", value: 'Sanitary' }
+			],
+			domainType: ''
 		};
 	}
 
@@ -76,7 +87,7 @@ export default class AddHsnCode extends Component {
 					toPrice,
 					taxAppliedType,
 					taxList,
-					id,
+					id, domainType
 				} = this.props.route.params.item;
 				this.setState({
 					taxAppliesOn: taxAppliesOn,
@@ -90,6 +101,7 @@ export default class AddHsnCode extends Component {
 					toPrice: toPrice,
 					taxType: taxAppliedType,
 					navText: "Edit HSN Code",
+					domainType: domainType
 				});
 			} else {
 				this.setState({ navText: "Add HSN Code" });
@@ -196,6 +208,10 @@ export default class AddHsnCode extends Component {
 		this.setState({ taxType: value });
 	};
 
+	handleDomainType = (value) => {
+		this.setState({ domainType: value })
+	}
+
 	handleDescription = (value) => {
 		this.setState({ description: value });
 	};
@@ -221,7 +237,7 @@ export default class AddHsnCode extends Component {
 			fromPrice,
 			toPrice,
 			isEdit,
-			id,
+			id, domainType
 		} = this.state;
 		const obj = {
 			description: description ? description : "",
@@ -237,7 +253,7 @@ export default class AddHsnCode extends Component {
 		};
 		console.log(obj);
 		if (isEdit) {
-			AccountingService.updateHsnCode(obj).then((res) => {
+			AccountingService.updateHsnCode(domainType, obj).then((res) => {
 				if (res && res.status === 200) {
 					alert("Hsn Updated Sucessfully");
 					this.props.navigation.goBack();
@@ -255,8 +271,9 @@ export default class AddHsnCode extends Component {
 			hsnCode,
 			fromPrice,
 			toPrice,
-			isEdit,
+			isEdit, domainType
 		} = this.state;
+		console.log("hsnCode", this.state);
 		const obj = {
 			description: description ? description : "",
 			hsnCode: hsnCode ? hsnCode : "",
@@ -268,9 +285,9 @@ export default class AddHsnCode extends Component {
 					? [{ priceFrom: fromPrice, priceTo: toPrice, taxId: taxId }]
 					: [],
 		};
-		console.log(obj);
+		console.log(obj, domainType);
 		if (!isEdit) {
-			AccountingService.saveHsnCode(obj).then((res) => {
+			AccountingService.saveHsnCode(domainType, obj).then((res) => {
 				if (res) {
 					console.log({ res });
 					if (res.status === 200) {
@@ -291,11 +308,11 @@ export default class AddHsnCode extends Component {
 	render() {
 		return (
 			<View style={styles.mainContainer}>
-		<Appbar mode="center-aligned">
-          <Appbar.BackAction onPress={() => this.handleBackButtonClick()}  />
-          <Appbar.Content title={this.state.navText} />
-        </Appbar>
-				<ScrollView>
+				<Appbar mode="center-aligned">
+					<Appbar.BackAction onPress={() => this.handleBackButtonClick()} />
+					<Appbar.Content title={this.state.navText} />
+				</Appbar>
+				<KeyboardAwareScrollView>
 					<Text style={inputHeading}>HSN Code</Text>
 					<TextInput
 						style={inputField}
@@ -437,18 +454,36 @@ export default class AddHsnCode extends Component {
 							useNativeAndroidPickerStyle={false}
 						/>
 					</View>
-					<TouchableOpacity
-						style={submitBtn}
-						onPress={() =>
-							this.state.isEdit ? this.updateHsnCode() : this.saveHsnCode()
-						}
-					>
-						<Text style={submitBtnText}>SAVE</Text>
-					</TouchableOpacity>
-					<TouchableOpacity style={cancelBtn} onPress={() => this.cancel()}>
-						<Text style={cancelBtnText}>CANCEL</Text>
-					</TouchableOpacity>
-				</ScrollView>
+					<Text style={inputHeading}>Domain</Text>
+					<View style={rnPickerContainer}>
+						<RNPickerSelect
+							placeholder={{
+								label: "DOMAIN",
+							}}
+							Icon={() => {
+								return (
+									<Chevron style={styles.imagealign} size={1.5} color="gray" />
+								);
+							}}
+							disabled={this.state.isEdit}
+							items={this.state.domainTypes}
+							onValueChange={this.handleDomainType}
+							style={rnPicker}
+							value={this.state.domainType}
+							useNativeAndroidPickerStyle={false}
+						/>
+					</View>
+					<View style={forms.action_buttons_container}>
+						<TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+							onPress={() => this.state.isEdit ? this.updateHsnCode() : this.saveHsnCode()}>
+							<Text style={forms.submit_btn_text} >{I18n.t("SAVE")}</Text>
+						</TouchableOpacity>
+						<TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+							onPress={() => this.cancel()}>
+							<Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+						</TouchableOpacity>
+					</View>
+				</KeyboardAwareScrollView>
 			</View>
 		);
 	}

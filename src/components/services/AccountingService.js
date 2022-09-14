@@ -37,11 +37,13 @@ class AccountingService {
 		return axios.get(BASE_URL + ACCOUNTING_PORTAL.getTaxAppliesOnData);
 	}
 
-	saveHsnCode(saveHsnObj) {
-		return axios.post(BASE_URL + ACCOUNTING_PORTAL.saveHsnCode, saveHsnObj);
+	saveHsnCode(domainType, saveHsnObj) {
+		let param = `?domainType=${domainType}`;
+		return axios.post(BASE_URL + ACCOUNTING_PORTAL.saveHsnCode + param, saveHsnObj);
 	}
-	updateHsnCode(updateHsnObj) {
-		return axios.put(BASE_URL + ACCOUNTING_PORTAL.updateHsnCode, updateHsnObj);
+	updateHsnCode(domainType, updateHsnObj) {
+		let param = `?domainType=${domainType}`;
+		return axios.put(BASE_URL + ACCOUNTING_PORTAL.updateHsnCode + param, updateHsnObj);
 	}
 	saveCredit(saveCredit) {
 		return axios.post(BASE_URL + ACCOUNTING_PORTAL.saveCredit, saveCredit);

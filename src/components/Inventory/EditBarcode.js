@@ -13,6 +13,8 @@ import {
 import DatePicker from "react-native-date-picker";
 import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { Appbar } from "react-native-paper";
 import RNPickerSelect from "react-native-picker-select";
 import { Chevron } from "react-native-shapes";
 import forms from "../../commonUtils/assets/styles/formFields.scss";
@@ -53,6 +55,8 @@ const data1 = [
 	{ value: "Textile", label: "Textile" },
 	{ value: "Retail", label: "Retail" },
 	{ value: "Electronics", label: "Electronics" },
+	{ value: "FruitsAndVegetables", label: "FruitsAndVegetables" },
+	{ value: "Sanitary", label: "Sanitary" }
 ];
 
 // For Retail Status
@@ -641,21 +645,13 @@ class EditBarcode extends Component {
 		return (
 			<View style={styles.mainContainer}>
 				{this.state.loading && <Loader loading={this.state.loading} />}
-				<View style={headerTitleContainer}>
-					<View style={headerTitleSubContainer}>
-						<TouchableOpacity
-							style={[backButton]}
-							onPress={() => this.handleBackButtonClick()}
-						>
-							<Image
-								style={backButtonImage}
-								source={require("../assets/images/backButton.png")}
-							/>
-						</TouchableOpacity>
-						<Text style={headerTitle}> {this.state.navText} </Text>
-					</View>
-				</View>
-				<ScrollView>
+				<Appbar mode="center-aligned" style={styles.mainContainer}>
+					<Appbar.BackAction
+						onPress={() => this.handleBackButtonClick()}
+					/>
+					<Appbar.Content title="Edit Barcode" />
+				</Appbar>
+				<KeyboardAwareScrollView>
 					<Text style={inputHeading}>
 						{I18n.t("Domian")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
 					</Text>
@@ -1168,17 +1164,19 @@ class EditBarcode extends Component {
 					{!qtyValid && (
 						<Message imp={true} message={this.state.errors["qty"]} />
 					)}
-					<TouchableOpacity
-						style={submitBtn}
-						onPress={() => this.saveBarcode()}
-					>
-						<Text style={submitBtnText}>{I18n.t("SAVE")}</Text>
-					</TouchableOpacity>
-					<TouchableOpacity style={cancelBtn} onPress={() => this.cancel()}>
-						<Text style={cancelBtnText}>{I18n.t("CANCEL")}</Text>
-					</TouchableOpacity>
+					<View style={forms.action_buttons_container}>
+						<TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+							onPress={() => this.saveBarcode()}>
+							<Text style={forms.submit_btn_text} >{I18n.t("SAVE")}</Text>
+						</TouchableOpacity>
+						<TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+							onPress={() => this.cancel()}>
+							<Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+						</TouchableOpacity>
+					</View>
+
 					<View style={styles.bottomContainer}></View>
-				</ScrollView>
+				</KeyboardAwareScrollView>
 			</View>
 		);
 	}
