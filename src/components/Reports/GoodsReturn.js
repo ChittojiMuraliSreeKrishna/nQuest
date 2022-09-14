@@ -48,6 +48,7 @@ export class GoodsReturn extends Component {
       totalPages: 0,
       pageNo: 0,
       loading: false,
+      filterActive: false
     };
   }
 
@@ -149,6 +150,7 @@ export class GoodsReturn extends Component {
             prop.barcodeVal = barcodeData;
             prop.review = false;
           })
+          this.setState({ filterActive: true });
           this.setState({
             loading: false,
             goodsReturn: res.data.result.content,
@@ -229,6 +231,14 @@ export class GoodsReturn extends Component {
     this.setState({ rtStatus: value })
   }
 
+  clearFilterAction() {
+    this.setState({
+      filterActive: false, flagFilterGoodsReturn: false, modalVisible: false,
+      startDate: "", endDate: "",
+      returnSlip: "", barCode: "",
+      rtStatus: ""
+    })
+  }
 
 
   render() {
@@ -236,11 +246,21 @@ export class GoodsReturn extends Component {
       <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
         <Appbar>
           <Appbar.Content title="Goods Return" />
-          <FilterIcon
-            name="sliders"
-            size={25}
-            onPress={() => this.filterAction()}
-          />
+          {this.state.filterActive ?
+            <FilterIcon
+              name="sliders"
+              size={25}
+              style={{ marginRight: 10 }}
+              color="#ed1c24"
+              onPress={() => this.clearFilterAction()}
+            /> :
+            <FilterIcon
+              name="sliders"
+              size={25}
+              style={{ marginRight: 10 }}
+              onPress={() => this.filterAction()}
+            />
+          }
         </Appbar>
         {this.state.loading && <Loader loading={this.state.loading} />}
         <FlatList

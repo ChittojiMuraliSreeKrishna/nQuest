@@ -36,7 +36,8 @@ export class ListOfPromotions extends Component {
       loadMoreActive: false,
       totalPages: 0,
       pageNo: 0,
-      loading: false
+      loading: false,
+      filterActive: false
     };
   }
 
@@ -103,16 +104,33 @@ export class ListOfPromotions extends Component {
     this.setState({ promoStatus: value });
   }
 
+  clearFilterAction() {
+    this.setState({
+      filterActive: false, flagFilterListPromotions: false, modalVisible: false, promoType: '', promoStatus: ''
+    })
+  }
+
+
   render() {
     return (
       <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
         <Appbar>
           <Appbar.Content title="List Of Promotions" />
-          <FilterIcon
-            name="sliders"
-            size={25}
-            onPress={() => this.filterAction()}
-          />
+          {this.state.filterActive ?
+            <FilterIcon
+              name="sliders"
+              size={25}
+              style={{ marginRight: 10 }}
+              color="#ed1c24"
+              onPress={() => this.clearFilterAction()}
+            /> :
+            <FilterIcon
+              name="sliders"
+              size={25}
+              style={{ marginRight: 10 }}
+              onPress={() => this.filterAction()}
+            />
+          }
         </Appbar>
         {this.state.loading && <Loader loading={this.state.loading} />}
         <FlatList
