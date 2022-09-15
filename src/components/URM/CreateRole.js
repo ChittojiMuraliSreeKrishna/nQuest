@@ -3,15 +3,14 @@ import React, { Component } from "react";
 import {
 	Dimensions,
 	FlatList,
-	Image,
 	ScrollView,
 	StyleSheet,
 	Text,
-	
+
 	TouchableOpacity,
 	View,
 } from "react-native";
-import {TextInput,} from 'react-native-paper'
+import { TextInput, Appbar } from 'react-native-paper'
 import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
 import Loader from "../../commonUtils/loader";
@@ -20,25 +19,20 @@ import { errorLength, urmErrorMessages } from "../Errors/errors";
 import Message from "../Errors/Message";
 import UrmService from "../services/UrmService";
 import {
-	cancelBtn,
-	cancelBtnText,
 	inputField,
 	inputHeading,
-	submitBtn,
-	submitBtnText,
 } from "../Styles/FormFields";
 import {
-	backButton,
-	backButtonImage,
 	flatListMainContainer,
 	flatlistSubContainer,
-	headerTitle,
-	headerTitleContainer,
-	headerTitleSubContainer,
+	headerTitleSubContainer2,
 	textContainer,
 	textStyleLight,
 	textStyleMedium,
 } from "../Styles/Styles";
+import forms from "../../commonUtils/assets/styles/formFields.scss";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+
 
 var deviceWidth = Dimensions.get("window").width;
 
@@ -161,8 +155,7 @@ export default class CreateRole extends Component {
 					subPrivileges: this.state.childlist,
 				};
 
-				console.log({ saveObj });
-				this.setState({ loading: true });
+				console.log("role saveObj", saveObj);
 				UrmService.saveRole(saveObj)
 					.then((res) => {
 						console.log({ res });
@@ -170,9 +163,9 @@ export default class CreateRole extends Component {
 							let rolesMessage = res;
 							console.log({ rolesMessage });
 							alert("Role Created Successfully");
+							this.props.navigation.goBack();
+							this.props.route.params.onGoBack();
 						}
-						this.props.navigation.goBack();
-						this.props.route.params.onGoBack();
 					})
 					.catch((err) => {
 						console.log({ err });
@@ -283,20 +276,10 @@ export default class CreateRole extends Component {
 		return (
 			<View style={styles.mainContainer}>
 				{this.state.loading && <Loader loading={this.state.loading} />}
-				<View style={headerTitleContainer}>
-					<View style={headerTitleSubContainer}>
-						<TouchableOpacity
-							style={backButton}
-							onPress={() => this.handleBackButtonClick()}
-						>
-							<Image
-								style={backButtonImage}
-								source={require("../assets/images/backButton.png")}
-							/>
-						</TouchableOpacity>
-						<Text style={headerTitle}>{this.state.navtext}</Text>
-					</View>
-				</View>
+				<Appbar mode="center-aligned" >
+					<Appbar.BackAction onPress={() => this.handleBackButtonClick()} />
+					<Appbar.Content title={this.state.navtext} />
+				</Appbar>
 				<ScrollView>
 					<Text style={inputHeading}>
 						{I18n.t("Role")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -391,13 +374,17 @@ export default class CreateRole extends Component {
 							</Text>
 						</View>
 					</ScrollView>
+					<View style={forms.action_buttons_container}>
+						<TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+							onPress={() => this.saveRole()}>
+							<Text style={forms.submit_btn_text} >{I18n.t("SAVE")}</Text>
+						</TouchableOpacity>
+						<TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+							onPress={() => this.cancel()}>
+							<Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+						</TouchableOpacity>
+					</View>
 
-					<TouchableOpacity style={submitBtn} onPress={() => this.saveRole()}>
-						<Text style={submitBtnText}>{I18n.t("SAVE")}</Text>
-					</TouchableOpacity>
-					<TouchableOpacity style={cancelBtn} onPress={() => this.cancel()}>
-						<Text style={cancelBtnText}>{I18n.t("CANCEL")}</Text>
-					</TouchableOpacity>
 					<View style={styles.bottomContainer}></View>
 				</ScrollView>
 			</View>

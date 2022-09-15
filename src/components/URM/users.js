@@ -7,12 +7,12 @@ import {
 	ScrollView,
 	StyleSheet,
 	Text,
-	
+
 	TouchableOpacity,
 	View,
 } from "react-native";
 import Device from "react-native-device-detection";
-import {TextInput,} from 'react-native-paper'
+import { TextInput, } from 'react-native-paper'
 import I18n from "react-native-i18n";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Modal from "react-native-modal";
@@ -37,6 +37,7 @@ import {
 	filterSubContainer,
 } from "../Styles/PopupStyles";
 import { filterBtn } from "../Styles/Styles";
+import { RH } from "../../Responsive";
 
 var deviceheight = Dimensions.get("window").height;
 var deviceWidth = Dimensions.get("window").width;
@@ -106,7 +107,7 @@ export default class Users extends Component {
 		};
 		UrmService.getUserBySearch(searchUser, pageNumber).then((res) => {
 			if (res) {
-				console.log({ res });
+				console.log("user responsee", res.data.result);
 				if (res?.data && res.data.status === 200) {
 					let filteredUserRes = res.data.result.content;
 					console.log({ filteredUserRes });
@@ -115,6 +116,10 @@ export default class Users extends Component {
 						filterActive: true,
 						filterUserList: filteredUserRes,
 					});
+					this.setState({
+						branch: "",
+						role: ""
+					})
 				} else {
 					this.setState({ modalVisible: false });
 					alert(res.data.message);
@@ -293,7 +298,7 @@ export default class Users extends Component {
 				{this.state.flagFilterOpen && (
 					<View>
 						<Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}>
-							<View style={filterMainContainer}>
+							<View style={styles.filterMainContainer}>
 								<View>
 									<View style={filterSubContainer}>
 										<View>
@@ -401,4 +406,9 @@ const styles = StyleSheet.create({
 	flatList: {
 		marginTop: 20,
 	},
+	filterMainContainer: {
+		backgroundColor: '#ffffff',
+		marginTop: Device.isTablet ? deviceheight - RH(500) : deviceheight - RH(400),
+		height: Device.isTablet ? RH(500) : RH(400),
+	}
 });
