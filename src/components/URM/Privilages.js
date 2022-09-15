@@ -1,4 +1,3 @@
-import axios from 'axios';
 import React, { Component } from 'react';
 import { Dimensions, Image, SectionList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
@@ -6,9 +5,10 @@ import Loader from '../../commonUtils/loader';
 import UrmService from '../services/UrmService';
 var deviceWidth = Dimensions.get('window').width;
 import I18n from 'react-native-i18n';
-import { backButton, backButtonImage, headerTitle, headerTitleContainer, headerTitleSubContainer, headerTitleSubContainer2, menuButton, sectionListBtn, sectionListBtnContainer, sectionListHeader } from '../Styles/Styles';
-import { RF, RH } from '../../Responsive';
-import { submitBtn, submitBtnText } from '../Styles/FormFields';
+import { sectionListBtn, sectionListBtnContainer, sectionListHeader } from '../Styles/Styles';
+import { RF } from '../../Responsive';
+import forms from "../../commonUtils/assets/styles/formFields.scss";
+import { Appbar } from 'react-native-paper';
 
 export default class Privilages extends Component {
   constructor(props) {
@@ -179,7 +179,7 @@ export default class Privilages extends Component {
           <Loader
             loading={this.state.loading} />
         }
-        <View style={headerTitleContainer} >
+        {/* <View style={headerTitleContainer} >
           <View style={headerTitleSubContainer}>
             <TouchableOpacity style={[backButton]} onPress={() => this.handleBackButtonClick()}>
               <Image style={backButtonImage} source={require('../assets/images/backButton.png')} />
@@ -190,7 +190,13 @@ export default class Privilages extends Component {
 
           </View>
           <View style={headerTitleSubContainer2}></View>
-        </View>
+        </View> */}
+
+        <Appbar mode="center-aligned" style={styles.mainContainer}>
+          <Appbar.BackAction onPress={() => this.handleBackButtonClick()} />
+          <Appbar.Content title={I18n.t("Privileges")} />
+        </Appbar>
+
 
         <SectionList
           sections={this.state.previlages}
@@ -213,13 +219,23 @@ export default class Privilages extends Component {
             </TouchableOpacity>
           )}
           ListFooterComponent={
-            <View>
-              <TouchableOpacity style={submitBtn}
+            <View style={forms.action_buttons_container}>
+              <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                 onPress={() => this.saveRole()}>
-                <Text style={submitBtnText}>{I18n.t("SAVE")}</Text>
+                <Text style={forms.submit_btn_text} >{I18n.t("SAVE")}</Text>
               </TouchableOpacity>
-              <View style={{ margin: 20 }}></View>
+              <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                onPress={() => this.cancel()}>
+                <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+              </TouchableOpacity>
             </View>
+            // <View>
+            //   <TouchableOpacity style={submitBtn}
+            //     onPress={() => this.saveRole()}>
+            //     <Text style={submitBtnText}>{I18n.t("SAVE")}</Text>
+            //   </TouchableOpacity>
+            //   <View style={{ margin: 20 }}></View>
+            // </View>
           }
         />
 

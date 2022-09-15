@@ -5,6 +5,7 @@ import {
 	FlatList,
 	Image,
 	ScrollView,
+	StyleSheet,
 	Text,
 
 	TouchableOpacity,
@@ -42,6 +43,7 @@ import {
 	filterSubContainer,
 } from "../Styles/PopupStyles";
 import { filterBtn, flatListTitle } from "../Styles/Styles";
+import { RH } from "../../Responsive";
 
 var deviceheight = Dimensions.get("window").height;
 var deviceWidth = Dimensions.get("window").width;
@@ -97,6 +99,7 @@ export default class Roles extends Component {
 	navigateToCreateRoles() {
 		this.props.navigation.navigate("CreateRole", {
 			isEdit: false,
+			navText: "Add Role",
 			onGoBack: () => this.refresh(),
 			goBack: () => this.refresh(),
 		});
@@ -216,6 +219,7 @@ export default class Roles extends Component {
 		this.props.navigation.navigate("CreateRole", {
 			item: item,
 			isEdit: true,
+			navText: "Edit Role",
 			onGoBack: () => this.refresh(),
 			goBack: () => this.refresh(),
 		});
@@ -317,7 +321,7 @@ export default class Roles extends Component {
 				{this.state.flagFilterOpen && (
 					<View>
 						<Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}>
-							<View style={filterMainContainer}>
+							<View style={styles.filterMainContainer}>
 								<View>
 									<View style={filterSubContainer}>
 										<View>
@@ -427,3 +431,11 @@ export default class Roles extends Component {
 		);
 	}
 }
+
+const styles = StyleSheet.create({
+	filterMainContainer: {
+		backgroundColor: '#ffffff',
+		marginTop: Device.isTablet ? deviceheight - RH(500) : deviceheight - RH(400),
+		height: Device.isTablet ? RH(500) : RH(400),
+	  }
+})
