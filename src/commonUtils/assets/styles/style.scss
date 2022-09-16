@@ -212,6 +212,12 @@
   padding: 5px 15px;
 }
 
+.model_subContainer {
+  height: 300px;
+  border: 2px;
+  border-color: $border-box;
+}
+
 .action_icons {
   color: $secondary-color;
 }

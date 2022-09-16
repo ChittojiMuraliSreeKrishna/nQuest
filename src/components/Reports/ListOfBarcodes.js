@@ -8,10 +8,12 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import Modal from 'react-native-modal';
 import { Appbar, TextInput } from 'react-native-paper';
 import IconFA from 'react-native-vector-icons/FontAwesome';
+import IconMA from 'react-native-vector-icons/MaterialCommunityIcons'
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import { RF, RH, RW } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
+import { Text as Txt } from 'react-native-paper';
 
 
 var deviceWidth = Dimensions.get("window").width;
@@ -46,6 +48,7 @@ export class ListOfBarcodes extends Component {
       qty: "",
       listBarcodes: [],
       filterActive: false,
+      viewBarcodeList: [],
     };
   }
 
@@ -215,8 +218,14 @@ export class ListOfBarcodes extends Component {
   }
 
   handleviewBarcode(item, index) {
-    this.setState({ barcode: item.barcode, mrp: item.itemMrp, qty: item.qty });
+    console.log({ item })
+    this.state.viewBarcodeList.push(item)
+    this.setState({ viewBarcodeList: this.state.viewBarcodeList });
     this.setState({ flagViewDetail: true, modalVisible: true, flagdelete: false });
+  }
+
+  closeViewAction() {
+    this.setState({ flagViewDetail: false, viewBarcodeList: [] })
   }
 
   render() {
@@ -261,7 +270,7 @@ export class ListOfBarcodes extends Component {
                   </View>
                   <View style={scss.textContainer}>
                     <Text style={scss.textStyleLight}>QTY: {"\n"} {item.qty}</Text>
-                    <Text style={scss.textStyleLight}>{I18n.t("MRP")}: {"\n"} {item.itemMrp}</Text>
+                    <Text style={scss.textStyleLight}>{I18n.t("MRP")}:{"\n"} {item.itemMrp}</Text>
                   </View>
                   <View style={scss.flatListFooter}>
                     <Text style={scss.footerText}>
@@ -446,61 +455,58 @@ export class ListOfBarcodes extends Component {
         {
           this.state.flagViewDetail && (
             <View>
-              <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
-                <View style={[styles.filterMainContainer, { height: Device.isTablet ? RH(400) : RH(300), marginTop: Device.isTablet ? deviceheight - RH(400) : deviceheight - RH(350), backgroundColor: '#00a9a9' }]}>
-                  <View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: RH(5), height: Device.isTablet ? RH(60) : RH(50) }}>
-                      <View>
-                        <Text style={{ marginTop: RH(15), fontSize: Device.isTablet ? RF(22) : RF(17), marginLeft: Device.isTablet ? 10 : 5, color: '#ffffff' }} > {I18n.t("Barcode Details")} </Text>
+              <Modal style={{ margin: 0 }}
+                isVisible={this.state.flagViewDetail}>
+                <View style={scss.model_container}>
+                  <FlatList
+                    data={this.state.viewBarcodeList}
+                    removeClippedSubviews={false}
+                    keyExtractor={(item, i) => i.toString()}
+                    scrollEnabled={false}
+                    ListHeaderComponent={
+                      <View style={scss.model_header}>
+                        <View>
+                          <Txt variant='titleLarge'>View Barcode</Txt>
+                        </View>
+                        <IconMA
+                          name='close'
+                          size={20}
+                          onPress={() => this.closeViewAction()}
+                        />
                       </View>
-                      <View>
-                        <TouchableOpacity style={{ width: Device.isTablet ? RW(60) : RW(50), height: Device.isTablet ? (60) : 50, marginTop: Device.isTablet ? RH(20) : RH(15), }} onPress={() => this.estimationModelCancel()}>
-                          <Image style={{ margin: 5, height: Device.isTablet ? RH(20) : RH(15), width: Device.isTablet ? RW(20) : RW(15), }} source={require('../assets/images/modalCloseWhite.png')} />
-                        </TouchableOpacity>
+                    }
+                    renderItem={({ item, index }) => (
+                      <View key={index}>
+                        <ScrollView>
+                          <View style={scss.model_subbody}>
+                            <View style={scss.model_text_container}>
+                              <Txt variant='titleMedium' selectable={true} style={{ textAlign: 'left' }}>Barcode:{"\n"}{item.barcode}</Txt>
+                              <Txt variant='bodyMedium' style={{ textAlign: 'right' }}>HsnCode:{"\n"}{item.hsnCode}</Txt>
+                            </View>
+                            <View style={scss.model_text_container}>
+                              <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>BatchNo:{"\n"}{item.batchNo}</Txt>
+                              <Txt variant='bodyMedium' style={{ textAlign: 'right' }}>Category:{"\n"}{item.category}</Txt>
+                            </View>
+                            <View style={scss.model_text_container}>
+                              <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>Division:{"\n"}{item.division}</Txt>
+                              <Txt variant='bodyMedium' style={{ textAlign: 'right' }}>Domain:{"\n"}{item.domainType}</Txt>
+                            </View>
+                            <View style={scss.model_text_container}>
+                              <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>Name:{"\n"}{item.name}</Txt>
+                              <Txt variant='bodyMedium' style={{ textAlign: 'right' }}>EmpId:{"\n"}{item.empId}</Txt>
+                            </View>
+                            <View style={scss.model_text_container}>
+                              <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>CostPrice:{"\n"}{item.costPrice}</Txt>
+                              <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>MRP:{"\n"}{item.itemMrp}</Txt>
+                            </View>
+                            <View style={scss.model_text_container}>
+                              <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>CreatedDate:{"\n"}{item.originalBarcodeCreatedAt}</Txt>
+                            </View>
+                          </View>
+                        </ScrollView>
                       </View>
-                    </View>
-                    <Text style={{
-                      height: Device.isTablet ? 2 : 1,
-                      width: deviceWidth,
-                      backgroundColor: 'lightgray',
-                    }}></Text>
-                  </View>
-                  <View style={{ backgroundColor: '#ffffff', height: Device.isTablet ? RH(350) : RH(300) }}>
-                    <View style={{ flexDirection: 'column', justifyContent: 'space-around', paddingRight: Device.isTablet ? RW(20) : RW(20), paddingLeft: Device.isTablet ? RW(20) : 0, height: Device.isTablet ? RH(310) : RH(250) }}>
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? 0 : RW(10), paddingLeft: Device.isTablet ? 0 : RW(10) }}>
-                        <Text style={styles.viewText} >
-                          {I18n.t("BARCODE")}:  </Text>
-                        <Text style={[styles.viewSubText, { color: '#00a9a9', fontFamily: 'medium' }]} selectable={true}>
-                          {this.state.barcode} </Text>
-                      </View>
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? 0 : RW(10), paddingLeft: Device.isTablet ? 0 : RW(10) }}>
-                        <Text style={styles.viewText} >
-                          MRP:  </Text>
-                        <Text style={styles.viewSubText} >
-                          {this.state.mrp} </Text>
-                      </View>
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? 0 : RW(10), paddingLeft: Device.isTablet ? 0 : RW(10) }}>
-                        <Text style={styles.viewText} >
-                          {I18n.t("STORE")}:  </Text>
-                        <Text style={styles.viewSubText} >
-                          {this.state.storeName} </Text>
-                      </View>
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? 0 : RW(10), paddingLeft: Device.isTablet ? 0 : RW(10) }}>
-                        <Text style={styles.viewText} >
-                          QTY:  </Text>
-                        <Text style={styles.viewSubText} >
-                          ₹ {this.state.qty} </Text>
-                      </View>
-                      <View>
-
-                        <TouchableOpacity
-                          style={[Device.isTablet ? styles.filterCancel_tablet : styles.filterCancel_mobile, { borderColor: '#00a9a9' }]} onPress={() => this.estimationModelCancel()}
-                        >
-                          <Text style={[Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile, { color: '#00a9a9' }]}  > {I18n.t("CANCEL")} </Text>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  </View>
+                    )}
+                  />
                 </View>
               </Modal>
             </View>

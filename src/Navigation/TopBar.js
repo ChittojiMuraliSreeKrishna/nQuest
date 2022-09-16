@@ -2,9 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { Component } from "react";
 import {
   FlatList,
-  Image,
-  StyleSheet,
-  Text,
+  Image, Text,
   TouchableOpacity,
   View
 } from "react-native";
@@ -15,7 +13,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconMA from 'react-native-vector-icons/MaterialIcons';
 import scss from "../commonUtils/assets/styles/Bars.scss";
 import UrmService from "../components/services/UrmService";
-import { RF } from "../Responsive";
 
 
 var data = [];
@@ -70,7 +67,7 @@ export class TopBar extends Component {
   _renderItem(previlage) {
     return (
       <TouchableOpacity
-        style={styles.item}
+        style={scss.dropdown_items}
         onPress={() => {
           currentSelection = previlage.item;
           global.homeButtonClicked = false;
@@ -83,10 +80,10 @@ export class TopBar extends Component {
         }}
       >
         <Image
-          style={styles.icon}
+          style={scss.icon}
           source={GetImageBasedOnPrevilageName(previlage.item)}
         />
-        <Text style={styles.textItem}>{I18n.t(previlage.item)}</Text>
+        <Text style={scss.textItem}>{I18n.t(previlage.item)}</Text>
       </TouchableOpacity>
     );
   }
@@ -310,63 +307,65 @@ export class TopBar extends Component {
               <Text style={scss.heading_subtitle}>{global.storeName}</Text>
             </View>
           </View>
-          <Modal isVisible={this.state.popupModel}
-            onRequestClose={() => {
-              this.popupHandle();
-            }}
-            style={{ margin: 0 }}
-            onBackButtonPress={() => this.popupHandle()}
-            onBackdropPress={() => this.popupHandle()}
-            animationIn={"slideInUp"} animationOut={"slideOutDown"} animationInTiming={500} animationOutTiming={700}>
-            <View style={scss.popUp}>
-              <Text style={scss.popUp_decorator}>-</Text>
-              <View style={scss.popupModelContainer}>
-                <TouchableOpacity onPress={() => this.settingsNavigate()} style={scss.popUpButtons}>
-                  <IconMA
-                    name="person-outline"
-                    size={25}
-                    style={scss.popUpIcons}
-                  ></IconMA>
-                  <TEXT variant="labelMedium" style={scss.popUpText}>Profile</TEXT>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => this.selectStoreNavigate()}
-                  disabled={true}
-                  style={[scss.popUpButtons]}>
-                  <IconMA
-                    name="storefront"
-                    size={25}
-                    color="#d9d9d9"
-                    style={scss.popUpIcons}
-                  ></IconMA>
-                  <TEXT variant="labelMedium" style={[scss.popUpText, { color: '#d9d9d9' }]}>Select Store</TEXT>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => this.logoutNavigation()} style={[scss.popUpButtons]}>
-                  <IconMA
-                    name="logout"
-                    color="#ED1C24"
-                    size={25}
-                    style={scss.popUpIcons}
-                  ></IconMA>
-                  <TEXT variant="labelMedium" style={[scss.popUpText, { color: "#ED1C24" }]}>Logout</TEXT>
-                </TouchableOpacity>
+          {this.state.popupModel &&
+            <Modal isVisible={this.state.popupModel}
+              onRequestClose={() => {
+                this.popupHandle();
+              }}
+              style={{ margin: 0 }}
+              onBackButtonPress={() => this.popupHandle()}
+              onBackdropPress={() => this.popupHandle()}
+              animationIn={"slideInUp"} animationOut={"slideOutDown"} animationInTiming={500} animationOutTiming={700}>
+              <View style={scss.popUp}>
+                <Text style={scss.popUp_decorator}>-</Text>
+                <View style={scss.popupModelContainer}>
+                  <TouchableOpacity onPress={() => this.settingsNavigate()} style={scss.popUpButtons}>
+                    <IconMA
+                      name="person-outline"
+                      size={25}
+                      style={scss.popUpIcons}
+                    ></IconMA>
+                    <TEXT variant="labelMedium" style={scss.popUpText}>Profile</TEXT>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => this.selectStoreNavigate()}
+                    disabled={true}
+                    style={[scss.popUpButtons]}>
+                    <IconMA
+                      name="storefront"
+                      size={25}
+                      color="#d9d9d9"
+                      style={scss.popUpIcons}
+                    ></IconMA>
+                    <TEXT variant="labelMedium" style={[scss.popUpText, { color: '#d9d9d9' }]}>Select Store</TEXT>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => this.logoutNavigation()} style={[scss.popUpButtons]}>
+                    <IconMA
+                      name="logout"
+                      color="#ED1C24"
+                      size={25}
+                      style={scss.popUpIcons}
+                    ></IconMA>
+                    <TEXT variant="labelMedium" style={[scss.popUpText, { color: "#ED1C24" }]}>Logout</TEXT>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
-          </Modal>
+            </Modal>
+          }
           <>
             <View>
               <TouchableOpacity
-                style={{ flexDirection: "row", padding: 15 }}
+                style={{ flexDirection: "row", }}
                 onPress={() => this.modalHandle()}
               >
                 <Image
-                  style={styles.icon}
+                  style={scss.icon}
                   source={GetImageBasedOnPrevilageName(
                     currentSelection === ""
                       ? this.state.firstDisplayName
                       : currentSelection,
                   )}
                 />
-                <Text style={styles.textItem}>{I18n.t(displayName)}</Text>
+                <Text style={scss.textItem}>{I18n.t(displayName)}</Text>
                 <Image
                   style={{ margin: 10 }}
                   source={require("../components/assets/images/list_trangle.png")}
@@ -385,8 +384,8 @@ export class TopBar extends Component {
                 onBackButtonPress={() => this.modalHandle()}
                 onBackdropPress={() => this.modalHandle()}
               >
-                <View style={styles.modalContainer}>
-                  <View style={styles.modalView}>
+                <View style={scss.navigatorContainer}>
+                  <View style={scss.navigatorSubContainer}>
                     <FlatList
                       data={data}
                       renderItem={(item) => this._renderItem(item)}
@@ -407,47 +406,4 @@ export class TopBar extends Component {
   }
 }
 
-const styles = StyleSheet.create({
-  headerContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 1,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderColor: '#000'
-  },
-  icon: {
-    marginRight: 5,
-    width: 22,
-    height: 22,
-  },
-  item: {
-    flexDirection: "row",
-    padding: 15,
-  },
-  textItem: {
-    fontSize: RF(11),
-    fontFamily: "bold",
-  },
-  modalContainer: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignContent: 'center',
-    alignItems: 'center',
-  },
-  modalView: {
-    backgroundColor: "white",
-    justifyContent: "center",
-    backgroundColor: "#fff",
-    width: '60%',
-    borderRadius: 10
-  },
-  test: {
-    height: "1%",
-  },
-  logoimage: {
-    width: 200,
-  },
-});
 export default TopBar;

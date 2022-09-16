@@ -513,6 +513,7 @@ class GenerateInvoiceSlip extends Component {
       grossAmount: this.state.grossAmount,
       totalDiscount: this.state.totalDiscount,
       CGST: this.state.centralGST, totalPromoDisc: this.state.totalPromoDisc,
+      SGST: this.state.stateGST,
       manualDisc: this.state.manualDisc,
       taxAmount: this.state.taxAmount,
       approvedBy: this.state.approvedBy,
@@ -529,7 +530,7 @@ class GenerateInvoiceSlip extends Component {
     };
     this.props.navigation.navigate('TextilePayment', obj);
     this.invoiceUpdate()
-    console.log("data in invoice slip", obj);
+    console.log({ obj });
   }
 
   invoiceUpdate() {
@@ -906,13 +907,13 @@ class GenerateInvoiceSlip extends Component {
                         <View style={scss.flatListSubContainer}>
                           <View style={scss.textContainer}>
                             <View>
-                              <Text style={scss.textStyleLight}>{I18n.t("Item")}
+                              <Text style={[scss.textStyleLight, { textAlign: 'left' }]}>{I18n.t("Item")}
                                 {"\n"}
                                 <Text style={scss.textStyleMedium}>{item.barCode}</Text>
                               </Text>
                             </View>
                             <View>
-                              <Text style={scss.textStyleLight}>{I18n.t("QTY")}
+                              <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("QTY")}
                                 {"\n"}
                                 <Text style={scss.textStyleMedium}>{('0' + item.quantity).slice(-2)}</Text>
                               </Text>
@@ -925,30 +926,30 @@ class GenerateInvoiceSlip extends Component {
                                 <Text style={scss.textStyleMedium}>{item.cgst ? item.cgst : 0}</Text>
                               </Text>
                             </View>
-                            <Text style={scss.textStyleLight}>{I18n.t("SGST")}
+                            <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("SGST")}
                               {"\n"}
-                              <Text style={scss.textStyleMedium}>{item.cgst ? item.cgst : 0}</Text>
+                              <Text style={scss.textStyleMedium}>{item.sgst ? item.sgst : 0}</Text>
                             </Text>
                           </View>
 
 
                           <View style={scss.textContainer}>
-                            <Text style={scss.textStyleLight}>{I18n.t("MRP")}
+                            <Text style={[scss.textStyleLight, { textAlign: 'left' }]}>{I18n.t("MRP")}
                               {"\n"}
                               <Text style={scss.textStyleMedium}>₹ {item.itemPrice + '.00'}</Text>
                             </Text>
-                            <Text style={scss.textStyleLight}>{I18n.t("Discount")}{"\n"} <Text style={[scss.textStyleMedium, { color: '#2ADC09' }]}>₹{item.promoDiscount + '.00'}</Text> </Text>
+                            <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("Discount")}{"\n"}<Text style={[scss.textStyleMedium, { color: '#2ADC09', }]}>₹{item.promoDiscount + '.00'}</Text></Text>
                           </View>
-
-                        </View>
-                      </View>
-                      <View style={scss.flatListFooter}>
-                        <Text style={scss.footerText}>{I18n.t("GROSS")} :  ₹{item.grossValue + '.00'}</Text>
-                        {/* <IconMA
+                          <View style={scss.flatListFooter}>
+                            <Text style={scss.footerText}>{I18n.t("GROSS")} :  ₹{item.grossValue + '.00'}</Text>
+                            {/* <IconMA
                           name='trash-can-outline'
                           size={25}
                           onPress={() => this.removeBarcode(item, index)}
                         ></IconMA> */}
+                          </View>
+
+                        </View>
                       </View>
                     </ScrollView>
 
@@ -1094,17 +1095,17 @@ class GenerateInvoiceSlip extends Component {
 
                     />
                     <View style={forms.action_buttons_container}>
-                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
-                      onPress={() => this.tagCustomer()}>
-                      <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
-                      onPress={() => this.modelCancel()}>
-                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
-                    </TouchableOpacity>
-                  </View>
-                  
-                  
+                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                        onPress={() => this.tagCustomer()}>
+                        <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                        onPress={() => this.modelCancel()}>
+                        <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                      </TouchableOpacity>
+                    </View>
+
+
                   </View>
                 </View>
               </Modal>

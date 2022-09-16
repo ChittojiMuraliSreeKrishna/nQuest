@@ -15,7 +15,7 @@ import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import { RF, RH, RW } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
-
+import { Text as Txt } from 'react-native-paper';
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
 
@@ -25,7 +25,8 @@ export class ListOfEstimationSlip extends Component {
     super(props);
     this.state = {
       deleteEstimationSlip: false,
-      viewEstimationsSlip: false,
+      viewEstimationsSlipList: [],
+      viewEstimationsSlipSubList: [],
       modalVisible: true,
       date: new Date(),
       enddate: new Date(),
@@ -74,9 +75,9 @@ export class ListOfEstimationSlip extends Component {
   }
 
   handleviewEstimationSlip(item, index) {
-    console.log(item);
-    this.setState({ dsnumber: item.dsNumber, qty: item.lineItems[0].quantity, mrp: item.netAmount, promoDisc: item.promoDisc });
-    this.setState({ flagViewDetail: true, modalVisible: true, deleteEstimationSlip: false });
+    console.log({ item });
+    this.state.viewEstimationsSlipList.push(item)
+    this.setState({ viewEstimationsSlipList: this.state.viewEstimationsSlipList, flagViewDetail: true, viewEstimationsSlipSubList: item.lineItems })
   }
 
 
@@ -214,6 +215,9 @@ export class ListOfEstimationSlip extends Component {
     this.setState({ filterActive: false, estimationSlips: [], fromDate: "", toDate: "", dsStatus: "", dsNumber: "", barcode: "", flagViewDetail: false, flagFilterOpen: false })
   }
 
+  closeViewAction() {
+    this.setState({ flagViewDetail: false, viewEstimationsSlipList: [], viewEstimationsSlipSubList: [] })
+  }
 
   render() {
     return (
@@ -490,73 +494,64 @@ export class ListOfEstimationSlip extends Component {
 
         {this.state.flagViewDetail && (
           <View>
-            <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}>
-
-              <View style={[styles.filterMainContainer, { height: Device.isTablet ? 400 : 350, marginTop: Device.isTablet ? deviceheight - 400 : deviceheight - 350, backgroundColor: '#00a9a9' }]}>
-                <View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: RH(5), height: Device.isTablet ? 60 : 50, }}>
+            <Modal isVisible={this.state.flagViewDetail} onBackdropPress={() => this.closeViewAction()} style={{ margin: 0 }}>
+              <View style={scss.model_container}>
+                <FlatList
+                  scrollEnabled={false}
+                  data={this.state.viewEstimationsSlipList}
+                  removeClippedSubviews={false}
+                  ListHeaderComponent={
+                    <View style={scss.model_header}>
+                      <View>
+                        <Txt variant='titleLarge'>View EstimationSlip</Txt>
+                      </View>
+                      <IconMA
+                        name='close'
+                        size={20}
+                        onPress={() => this.closeViewAction()}
+                      />
+                    </View>
+                  }
+                  renderItem={({ item, index }) => (
                     <View>
-                      <Text style={{ marginTop: 15, fontSize: Device.isTablet ? 22 : 17, marginLeft: Device.isTablet ? 10 : 5, color: '#ffffff', }} > {I18n.t("Estimation Slip Details")} </Text>
+                      <View style={{ margin: 10 }}>
+                        <Txt style={{ textAlign: 'center' }} selectable={true} variant="titleMedium">{item.dsNumber}</Txt>
+                      </View>
+                      <View style={scss.model_subContainer}>
+                        <ScrollView>
+                          <FlatList
+                            data={this.state.viewEstimationsSlipSubList}
+                            scrollEnabled={true}
+                            renderItem={({ item, index }) => (
+                              <View id={index} style={scss.model_subbody}>
+                                <View style={scss.model_text_container}>
+                                  <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>Barcode:{"\n"}{item.barCode}</Txt>
+                                  <Txt variant='bodyMedium' style={{ textAlign: 'right' }}>SM:{"\n"}{item.userId}</Txt>
+                                </View>
+                                <View style={scss.model_text_container}>
+                                  <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>QTY:{"\n"}{item.quantity}</Txt>
+                                  <Txt variant='bodyMedium' style={{ textAlign: 'right' }}>Item MRP:{"\n"}{item.netValue}</Txt>
+                                </View>
+                                <View style={scss.model_text_container}>
+                                  <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>Gross Amount:{"\n"}{item.grossValue}</Txt>
+                                  <Txt variant='bodyMedium' style={{ textAlign: 'right' }}>Promo Discount:{"\n"}{item.discount}</Txt>
+                                </View>
+                                <View style={scss.model_text_container}>
+                                  <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>Net Amount:{"\n"}{item.netValue}</Txt>
+                                </View>
+                              </View>
+                            )}
+                          />
+                        </ScrollView>
+                      </View>
+                      <View>
+                        <TouchableOpacity onPress={() => this.closeViewAction()} style={[forms.action_button, forms.cancel_btn]}>
+                          <Text style={forms.cancel_btn_text}>Close</Text>
+                        </TouchableOpacity>
+                      </View>
                     </View>
-                    <View>
-                      <TouchableOpacity style={{ width: Device.isTablet ? 60 : 50, height: Device.isTablet ? 60 : 50, marginTop: Device.isTablet ? 20 : 15, }} onPress={() => this.estimationModelCancel()}>
-                        <Image style={{ margin: 5, height: Device.isTablet ? 20 : 15, width: Device.isTablet ? 20 : 15, }} source={require('../assets/images/modalCloseWhite.png')} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                  <Text style={{
-                    height: Device.isTablet ? 2 : 1,
-                    width: deviceWidth,
-                    backgroundColor: 'lightgray',
-                  }}></Text>
-                </View>
-                <View style={{ backgroundColor: '#ffffff', height: Device.isTablet ? RH(350) : RH(300), width: deviceWidth, margin: 0 }}>
-                  <View style={{ flexDirection: 'column', justifyContent: 'space-around', height: Device.isTablet ? RH(300) : RH(250) }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? RH(20) : RH(10), paddingLeft: Device.isTablet ? RH(20) : RH(10) }}>
-                      <Text style={styles.viewText} >
-                        {I18n.t("Delivery Slip")}:  </Text>
-                      <Text style={[styles.viewSubText, { color: '#00a9a9', fontFamily: 'medium' }]} selectable={true}>
-                        {this.state.dsnumber} </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? RH(20) : RH(10), paddingLeft: Device.isTablet ? RH(20) : RH(10) }}>
-                      <Text style={styles.viewText} >
-                        SM:  </Text>
-                      <Text style={styles.viewSubText} >
-                        - </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? RH(20) : RH(10), paddingLeft: Device.isTablet ? RH(20) : RH(10) }}>
-                      <Text style={styles.viewText} >
-                        QTY:  </Text>
-                      <Text style={styles.viewSubText} >
-                        {this.state.qty} </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? RH(20) : RH(10), paddingLeft: Device.isTablet ? RH(20) : RH(10) }}>
-                      <Text style={styles.viewText} >
-                        {I18n.t("GROSS AMOUNT")}:  </Text>
-                      <Text style={styles.viewSubText} >
-                        ₹ {this.state.mrp} </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? RH(20) : RH(10), paddingLeft: Device.isTablet ? RH(20) : RH(10) }}>
-                      <Text style={styles.viewText} >
-                        {I18n.t("PROMO DISCOUNT")}:  </Text>
-                      <Text style={styles.viewSubText} >
-                        {this.state.promodisc} </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? RH(20) : RH(10), paddingLeft: Device.isTablet ? RH(20) : RH(10) }}>
-                      <Text style={styles.viewText} >
-                        {I18n.t("NET AMOUNT")}:  </Text>
-                      <Text style={styles.viewSubText} >
-                        ₹ {this.state.mrp} </Text>
-                    </View>
-                    <View style={{ paddingRight: Device.isTablet ? RH(20) : RH(10), paddingLeft: Device.isTablet ? RH(20) : RH(10) }}>
-                      <TouchableOpacity
-                        style={[Device.isTablet ? styles.filterCancel_tablet : styles.filterCancel_mobile, { borderColor: '#00a9a9' }]} onPress={() => this.estimationModelCancel()}
-                      >
-                        <Text style={[Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile, { color: '#00a9a9' }]}  > {I18n.t("CANCEL")} </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </View>
+                  )}
+                />
               </View>
             </Modal>
           </View>

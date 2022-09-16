@@ -15,6 +15,7 @@ import { flatListMainContainer, flatlistSubContainer, highText, textContainer, t
 import { color } from '../Styles/colorStyles';
 import { emptyTextStyle } from '../Styles/FormFields';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
+import scss from '../../commonUtils/assets/styles/style.scss'
 
 
 var deviceWidth = Dimensions.get("window").width;
@@ -178,7 +179,7 @@ export class SalesSumary extends Component {
         this.setState({ startDate: "", endDate: "" })
         alert(res.data.message);
         this.modelCancel()
-         // this.props.modelCancelCallback();
+        // this.props.modelCancelCallback();
       }
     }
     ).catch(() => {
@@ -199,7 +200,7 @@ export class SalesSumary extends Component {
 
   clearFilterAction() {
     this.setState({
-      filterActive: false, flagFilterSalesSumary: false, modalVisible: false, startDate: "", endDate: ""
+      filterActive: false, flagFilterSalesSumary: false, modalVisible: false, startDate: "", endDate: "", dsList: []
     })
   }
 
@@ -231,60 +232,46 @@ export class SalesSumary extends Component {
           ListEmptyComponent={<Text style={emptyTextStyle}>&#9888; {I18n.t("Results not loaded")}</Text>}
           renderItem={({ item, index }) => {
             if (index === 0) {
-              return <View style={flatListMainContainer}>
-                <View style={flatlistSubContainer}>
-                  <View style={textContainer}>
-                    <Text style={highText} >{I18n.t("TRANSACTION")}: {"\n"}{item.transction} </Text>
-                    <Text style={textStyleSmall}>{I18n.t("TOTAL MRP")}: {"\n"}₹ {item.totalMrp}</Text>
+              return <View style={scss.flatListContainer}>
+                <View style={scss.flatListSubContainer}>
+                  <View style={scss.textContainer}>
+                    <Text style={[scss.highText, { textAlign: 'left' }]} >{I18n.t("TRANSACTION")}: {"\n"}{item.transction} </Text>
+                    <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("TOTAL MRP")}: {"\n"}<Text style={scss.textStyleMedium}>₹ {item.totalMrp}</Text></Text>
                   </View>
-                  <View style={textContainer}>
-                    <Text style={textStyleSmall}>{I18n.t("PROMO OFFER")}: {"\n"}₹{item.totalDiscount}</Text>
-                    <Text style={textStyleSmall}>{I18n.t("INVOICE AMOUNT")}: {"\n"} ₹{item.billValue}</Text>
+                  <View style={scss.textContainer}>
+                    <Text style={[scss.textStyleLight, { textAlign: 'left' }]}>{I18n.t("PROMO OFFER")}: {"\n"}<Text style={scss.textStyleMedium}>₹ {item.totalDiscount}</Text></Text>
+                    <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("INVOICE AMOUNT")}: {"\n"}<Text style={scss.textStyleMedium}>₹ {item.billValue}</Text></Text>
                   </View>
                 </View>
               </View>;
             }
             if (index === 1) {
-              return <View style={flatListMainContainer} >
-                <View style={flatlistSubContainer}>
-                  <View style={textContainer}>
-                    <Text style={highText} >{I18n.t("TRANSACTION")}: {"\n"}{item.transction} </Text>
-                    <Text style={textStyleSmall}>TOTAL MRP: {"\n"}₹{item.totalMrp}</Text>
+              return <View style={scss.flatListContainer} >
+                <View style={scss.flatListSubContainer}>
+                  <View style={scss.textContainer}>
+                    <Text style={[scss.highText, { textAlign: 'left' }]} >{I18n.t("TRANSACTION")}: {"\n"}{item.transction} </Text>
+                    <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>TOTAL MRP: {"\n"}<Text style={scss.textStyleMedium}>₹ {item.totalMrp}</Text></Text>
                   </View>
-                  <View style={textContainer}>
-                    <Text style={textStyleSmall}>{I18n.t("PROMO OFFER")}: {"\n"}₹{item.totalDiscount}</Text>
-                    <Text style={textStyleSmall}>{I18n.t("INVOICE AMOUNT")}: {"\n"}₹{item.billValue}</Text>
-                  </View>
-                </View>
-              </View>;
-            }
-            if (index === 2) {
-              return <View style={Device.isTablet ? flats.flatlistSubContainerTotal_tablet : flats.flatlistSubContainerTotal_mobile} >
-                <View style={Device.isTablet ? flats.flatlistSubContainerTotal_tablet : flats.flatlistSubContainerTotal_mobile}>
-                  <View style={textContainer}>
-                    <Text style={highText} ></Text>
-                    <Text style={textStyleSmall}>{I18n.t("TOTAL MRP")}: {"\n"}₹{item.totalMrp}
-                    </Text>
-                  </View>
-                  <View style={textContainer}>
-                    <Text style={textStyleSmall}>{I18n.t("PROMO OFFER")}: {"\n"}₹{item.totalDiscount}</Text>
-                    <Text style={textStyleSmall}>{I18n.t("INVOICE AMOUNT")}: {"\n"}₹{item.billValue}</Text>
+                  <View style={scss.textContainer}>
+                    <Text style={[scss.textStyleLight, { textAlign: 'left' }]}>{I18n.t("PROMO OFFER")}: {"\n"}<Text style={scss.textStyleMedium}>₹ {item.totalDiscount}</Text></Text>
+                    <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("INVOICE AMOUNT")}: {"\n"}<Text style={scss.textStyleMedium}>₹ {item.billValue}</Text></Text>
                   </View>
                 </View>
               </View>;
             }
+
           }}
         />
 
         {this.state.totMrp !== null &&
-          <View style={[flatListMainContainer, { backgroundColor: color.accent }]}>
-            <View style={flatlistSubContainer}>
-              <View style={textContainer}>
-                <Text style={[textStyleMedium, { color: color.white }]} >{I18n.t("TOTAL MRP")}: {"\n"}₹ {this.state.totMrp} </Text>
-                <Text style={[textStyleMedium, { color: color.white }]}>{I18n.t("TOTAL PROMO OFFER")}: {"\n"}₹ {this.state.totalDiscount}</Text>
+          <View style={[scss.flatListContainer, { backgroundColor: color.accent }]}>
+            <View style={scss.flatListSubContainer}>
+              <View style={scss.textContainer}>
+                <Text style={[scss.textStyleMedium, { color: color.white, textAlign: 'left' }]} >{I18n.t("TOTAL MRP")}: {"\n"}₹ {this.state.totMrp} </Text>
+                <Text style={[scss.textStyleMedium, { color: color.white, textAlign: 'right' }]}>{I18n.t("TOTAL PROMO OFFER")}:{"\n"}₹ {this.state.totalDiscount}</Text>
               </View>
-              <View style={textContainer}>
-                <Text style={[textStyleMedium, { color: color.white }]}>{I18n.t("GRAND TOTAL")}: {"\n"}₹ {this.state.billValue}</Text>
+              <View style={scss.textContainer}>
+                <Text style={[scss.textStyleMedium, { color: color.white, textAlign: 'left' }]}>{I18n.t("GRAND TOTAL")}: {"\n"}₹ {this.state.billValue}</Text>
               </View>
             </View>
           </View>

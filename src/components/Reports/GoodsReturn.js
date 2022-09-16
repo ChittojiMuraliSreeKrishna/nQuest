@@ -236,7 +236,7 @@ export class GoodsReturn extends Component {
       filterActive: false, flagFilterGoodsReturn: false, modalVisible: false,
       startDate: "", endDate: "",
       returnSlip: "", barCode: "",
-      rtStatus: ""
+      rtStatus: "", goodsReturn: []
     })
   }
 

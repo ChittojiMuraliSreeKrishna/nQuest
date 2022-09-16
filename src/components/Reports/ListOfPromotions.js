@@ -17,6 +17,7 @@ import { flatListMainContainer, flatlistSubContainer, highText, loadMoreBtn, loa
 import { emptyTextStyle } from '../Styles/FormFields';
 import Loader from '../../commonUtils/loader';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
+import scss from '../../commonUtils/assets/styles/style.scss'
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -106,7 +107,7 @@ export class ListOfPromotions extends Component {
 
   clearFilterAction() {
     this.setState({
-      filterActive: false, flagFilterListPromotions: false, modalVisible: false, promoType: '', promoStatus: ''
+      filterActive: false, flagFilterListPromotions: false, modalVisible: false, promoType: '', promoStatus: '', listPromotions: []
     })
   }
 
@@ -142,18 +143,18 @@ export class ListOfPromotions extends Component {
           // onEndReached={this.loadMoreList}
           // onEndReachedThreshold={200}
           renderItem={({ item, index }) => (
-            <View style={[flatListMainContainer, { backgroundColor: "#FFF" }]} >
-              <View style={flatlistSubContainer}>
-                <View style={textContainer}>
-                  <Text style={highText} >PROMO ID: {item.promoId}</Text>
+            <View style={[scss.flatListContainer, { backgroundColor: "#FFF" }]} >
+              <View style={scss.flatListSubContainer}>
+                <View style={scss.textContainer}>
+                  <Text style={[scss.highText, { textAlign: 'left' }]} >PROMO ID: {item.promoId}</Text>
                 </View>
-                <View style={textContainer}>
-                  <Text style={textStyleMedium}>PROMO NAME: {"\n"} {item.promotionName}</Text>
-                  <Text style={textStyleMedium} >DESCRIPTION: {"\n"}{item.description} </Text>
+                <View style={scss.textContainer}>
+                  <Text style={[scss.textStyleMedium, { textAlign: 'left' }]}>PROMO NAME: {"\n"} {item.promotionName}</Text>
+                  <Text style={[scss.textStyleMedium, { textAlign: 'right' }]} >DESCRIPTION: {"\n"}{item.description} </Text>
                 </View>
-                <View style={textContainer}>
-                  <Text style={textStyleMedium}>PROMO APPLY TYPE: {"\n"} {item.promoApplyType}</Text>
-                  <Text style={textStyleMedium}>APPLICABILITY: {"\n"} {item.applicability}</Text>
+                <View style={scss.textContainer}>
+                  <Text style={[scss.textStyleMedium, { textAlign: 'left' }]}>PROMO APPLY TYPE: {"\n"} {item.promoApplyType}</Text>
+                  <Text style={[scss.textStyleMedium, { textAlign: 'right' }]}>APPLICABILITY: {"\n"} {item.applicability}</Text>
                 </View>
               </View>
             </View>

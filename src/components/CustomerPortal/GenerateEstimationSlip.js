@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, TextInput as TextInp } from 'react-native';
 import RNBeep from 'react-native-a-beep';
 import { RNCamera } from 'react-native-camera';
 import Device from 'react-native-device-detection';
@@ -301,27 +301,31 @@ class GenerateEstimationSlip extends Component {
         let totalQty = 0;
         let count = false;
         RNBeep.beep();
-        if (this.state.itemsList.length === 0) {
-          this.state.itemsList.push(res.data);
+        if (res.data.qty === 0) {
+          alert(`this Barcode have ${parseInt(res.data.qty)} Items left`)
         } else {
-          for (let i = 0; i < this.state.itemsList.length; i++) {
-            if (this.state.itemsList[i].barcode === res.data.barcode) {
-              count = true;
-              var items = [...this.state.itemsList];
-              if (parseInt(items[i].quantity) + 1 <= parseInt(items[i].qty)) {
-                let addItem = parseInt(items[i].quantity) + 1;
-                items[i].quantity = addItem.toString();
-                let totalcostMrp = items[i].itemMrp * parseInt(items[i].quantity);
-                items[i].totalMrp = totalcostMrp;
-                break;
-              } else {
-                alert("Barcode reached max");
-                break;
+          if (this.state.itemsList.length === 0) {
+            this.state.itemsList.push(res.data);
+          } else {
+            for (let i = 0; i < this.state.itemsList.length; i++) {
+              if (this.state.itemsList[i].barcode === res.data.barcode) {
+                count = true;
+                var items = [...this.state.itemsList];
+                if (parseInt(items[i].quantity) + 1 <= parseInt(items[i].qty)) {
+                  let addItem = parseInt(items[i].quantity) + 1;
+                  items[i].quantity = addItem.toString();
+                  let totalcostMrp = items[i].itemMrp * parseInt(items[i].quantity);
+                  items[i].totalMrp = totalcostMrp;
+                  break;
+                } else {
+                  alert("Barcode reached max");
+                  break;
+                }
               }
             }
-          }
-          if (count === false) {
-            this.state.itemsList.push(res.data);
+            if (count === false) {
+              this.state.itemsList.push(res.data);
+            }
           }
         }
         this.setState({ barList: this.state.itemsList }, () => {
@@ -384,13 +388,25 @@ class GenerateEstimationSlip extends Component {
     this.setState({ saleQuantity: value });
   };
 
+  updateQuanty = (text, index, item) => {
+    const qtyarr = [...this.state.itemsList];
+    qtyarr[index].quantity = text
+    this.setState({ itemsList: qtyarr }, () => {
+      this.updateQty(text, index, item)
+    })
+  }
+
   updateQty = (text, index, item) => {
     const Qty = /^[0-9\b]+$/;
     const qtyarr = [...this.state.itemsList];
     console.log(qtyarr[index].quantity);
     let addItem = '';
-    let value = text === '' ? 1 : text;
-    if (value !== '' && Qty.test(value) === false) {
+    let value = text
+    if (value === '') {
+      addItem = ''
+      qtyarr[index].quantity = addItem.toString()
+    }
+    else if (value !== '' && Qty.test(value) === false) {
       addItem = 1;
       qtyarr[index].quantity = addItem.toString();
     } else {
@@ -494,7 +510,6 @@ class GenerateEstimationSlip extends Component {
     }).catch(() => {
       this.setState({ loading: false });
       console.log('There is error getting token');
-      //alert('There is error getting token');
     });
     console.log("ES Number", this.state.resultDsNumber);
     return (
@@ -536,8 +551,9 @@ class GenerateEstimationSlip extends Component {
                     mode="flat"
                     activeUnderlineColor='#000'
                     underlineColor='#6f6f6f'
-                    label={I18n.t("SM Number")}
+                    placeholder={I18n.t("SM Number")}
                     maxLength={4}
+                    keyboardType={'number-pad'}
                     value={this.state.smnumber}
                     onChangeText={(text) => this.handleSmCode(text)}
                   />
@@ -552,13 +568,13 @@ class GenerateEstimationSlip extends Component {
                     mode="flat"
                     activeUnderlineColor='#000'
                     underlineColor='#6f6f6f'
-                    label={I18n.t("BARCODE")}
+                    placeholder={I18n.t("BARCODE")}
                     value={this.state.barcodeId}
                     onChangeText={this.handleBarCode}
                     onEndEditing={() => this.endEditing()}
                   />
                   <TouchableOpacity style={{ padding: RF(10) }} onPress={() => this.navigateToScanCode()} >
-                    <ScanIcon name='barcode-scan' size={25} color={color.black}/>
+                    <ScanIcon name='barcode-scan' size={25} color={color.black} />
                   </TouchableOpacity>
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Checkbox
@@ -662,20 +678,15 @@ class GenerateEstimationSlip extends Component {
                               </TouchableOpacity>
                               <TextInput
                                 style={{
-                                  justifyContent: 'center',
-                                  // height: Device.isTablet ? 50 : 30,
-                                  // width: Device.isTablet ? 50 : 30,
                                   color: '#ED1C24',
                                   fontFamily: 'regular',
-                                  fontSize: RF(10)
-                                  // fontSize: Device.isTablet ? 22 : 12,
+                                  fontSize: RF(10),
                                 }}
-                                mode="flat"
-                                activeUnderlineColor='#000'
+                                keyboardType={'number-pad'}
                                 underlineColor='#6f6f6f'
-                                // label={"01"}
-                                value={('0' + item.quantity).slice(-2)}
-                                onChangeText={(text) => this.updateQty(text, index, item)}
+                                value={String(item.quantity)}
+                                textAlign={'center'}
+                                onChangeText={(text) => this.updateQuanty(text, index, item)}
                               />
                               <TouchableOpacity
                                 onPress={() => this.decreamentForTable(item, index)}>

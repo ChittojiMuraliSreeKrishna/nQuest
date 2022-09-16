@@ -16,7 +16,7 @@ import scss from '../../commonUtils/assets/styles/style.scss';
 import ReportsService from '../services/ReportsService';
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
-
+import { Text as Txt } from 'react-native-paper';
 export default class NewSaleReport extends Component {
 
   constructor(props) {
@@ -60,7 +60,9 @@ export default class NewSaleReport extends Component {
       customername: "",
       mobile: "",
       createdate: "",
-      newSale: []
+      newSale: [],
+      viewNewsSaleList: [],
+      viewNewSaleSubList: [],
     };
   }
 
@@ -149,9 +151,11 @@ export default class NewSaleReport extends Component {
   }
 
   handleviewNewSale(item, index) {
-    console.log(item);
-    this.setState({ memono: item.invoiceNumber, barcode: item.lineItemsReVo[0].barCode, hsncode: item.lineItemsReVo[0].hsnCode, empId: item.lineItemsReVo[0].empId, qty: item.totalqQty, mrp: item.netPayableAmount, taxableaount: item.totaltaxableAmount, cgst: item.totalCgst, sgst: item.totalSgst, igst: item.totalIgst, customername: item.customerName, mobile: item.mobileNumber, createdate: item.createdDate });
-    this.setState({ flagViewDetail: true, modalVisible: true, flagDeleteNewSale: false });
+    console.log({ item });
+    console.log(item.lineItemsReVo)
+    // this.setState({ memono: item.invoiceNumber, barcode: item.lineItemsReVo[0].barCode, hsncode: item.lineItemsReVo[0].hsnCode, empId: item.lineItemsReVo[0].empId, qty: item.totalqQty, mrp: item.netPayableAmount, taxableaount: item.totaltaxableAmount, cgst: item.totalCgst, sgst: item.totalSgst, igst: item.totalIgst, customername: item.customerName, mobile: item.mobileNumber, createdate: item.createdDate });
+    this.state.viewNewsSaleList.push(item)
+    this.setState({ flagViewDetail: true, modalVisible: true, flagDeleteNewSale: false, viewNewsSaleList: this.state.viewNewsSaleList, viewNewSaleSubList: item.lineItemsReVo });
   }
 
   estimationModelCancel() {
@@ -225,6 +229,10 @@ export default class NewSaleReport extends Component {
 
   clearFilterAction() {
     this.setState({ filterActive: false, newSale: [], fromDate: "", toDate: "", billPosition: "", invoiceNumber: "", mobileNumber: "", empId: "" })
+  }
+
+  closeViewAction() {
+    this.setState({ flagViewDetail: !this.state.flagViewDetail, viewNewSaleSubList: [], viewNewsSaleList: [] })
   }
 
 
@@ -512,142 +520,89 @@ export default class NewSaleReport extends Component {
 
         {this.state.flagViewDetail && (
           <View>
-            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
-
-              <View style={[styles.filterMainContainer, { height: Device.isTablet ? 740 : 620, marginTop: Device.isTablet ? deviceheight - 740 : deviceheight - 620, backgroundColor: '#00a9a9' }]}>
-                <View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
-                    <View>
-                      <Text style={{ marginTop: 15, fontSize: Device.isTablet ? 22 : 17, marginLeft: 20, color: '#ffffff' }} > {I18n.t("New Sale Report Details")} </Text>
+            <Modal style={{ margin: 0 }} isVisible={this.state.flagViewDetail} onBackdropPress={() => this.closeViewAction()}>
+              <View style={scss.model_container}>
+                <FlatList
+                  scrollEnabled={false}
+                  data={this.state.viewNewsSaleList}
+                  keyExtractor={(item, i) => i.toString()}
+                  ListHeaderComponent={
+                    <View style={scss.model_header}>
+                      <View>
+                        <Txt variant='titleLarge'>View NewSale</Txt>
+                      </View>
+                      <View>
+                        <IconMA
+                          name='close'
+                          size={20}
+                          onPress={() => this.closeViewAction()}
+                        />
+                      </View>
                     </View>
-                    <View>
-                      <TouchableOpacity style={{ width: Device.isTablet ? 60 : 50, height: Device.isTablet ? 60 : 50, marginTop: Device.isTablet ? 20 : 15, }} onPress={() => this.estimationModelCancel()}>
-                        <Image style={{ margin: 5, height: Device.isTablet ? 20 : 15, width: Device.isTablet ? 20 : 15, }} source={require('../assets/images/modalCloseWhite.png')} />
-                      </TouchableOpacity>
+                  }
+                  removeClippedSubviews={false}
+                  renderItem={({ item, index }) => (
+                    <View style={{ backgroundColor: '#FFF' }}>
+                      <View style={scss.model_text_container}>
+                        <Txt style={{ textAlign: 'left' }} variant='titleMedium' selectable={true} key={Math.random()}>Memo.no: {"\n"}{item.invoiceNumber}</Txt>
+                        <Txt style={{ textAlign: 'right' }} variant='bodyLarge'>Customer: {"\n"}{item.customerName}</Txt>
+                      </View>
+                      <View style={scss.model_text_container}>
+                        <Txt style={{ textAlign: 'left' }} variant='bodyLarge'>Mobile: {"\n"}{item.mobileNumber}</Txt>
+                        <Txt style={{ textAlign: 'right' }} variant='bodyLarge'>Date: {"\n"}{item.createdDate ? item.createdDate.toString().split(/T/)[0]
+                          : item.createdDate}</Txt>
+                      </View>
+                      <View style={scss.model_subContainer}>
+                        <ScrollView>
+                          <FlatList
+                            scrollEnabled={true}
+                            data={this.state.viewNewSaleSubList}
+                            renderItem={({ item, index }) => (
+                              <View id={index} style={scss.model_subbody}>
+                                <View style={scss.model_text_container}>
+                                  <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>Barcode: {"\n"}{item.barCode}</Txt>
+                                  <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Section: {item.section}</Txt>
+                                </View>
+                                <View style={scss.model_text_container}>
+                                  <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>HsnCode: {item.hsnCode}</Txt>
+                                  <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>EmpId: {item.empId}</Txt>
+                                </View>
+                                <View style={scss.model_text_container}>
+                                  <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>QTY: {item.quantity}</Txt>
+                                  <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>MRP: {item.itemPrice}</Txt>
+                                </View>
+                                <View style={scss.model_text_container}>
+                                  <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>DISC: {item.discount}</Txt>
+                                  <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Approved By: {item.approvedBy}</Txt>
+                                </View>
+                                <View style={scss.model_text_container}>
+                                  <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>Reason: {item.reason}</Txt>
+                                  <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Tax Amount: {item.taxValue}</Txt>
+                                </View>
+                                <View style={scss.model_text_container}>
+                                  <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>CGST: {item.cgst}</Txt>
+                                  <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>SGST: {item.sgst}</Txt>
+                                </View>
+                                <View style={scss.model_text_container}>
+                                  <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>IGST: {item.igst}</Txt>
+                                  <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>NET: {item.netValue}</Txt>
+                                </View>
+                              </View>
+                            )}
+                          />
+                        </ScrollView>
+                      </View>
+                      <View>
+                        <TouchableOpacity onPress={() => this.closeViewAction()} style={[forms.action_button, forms.cancel_btn]}>
+                          <Text style={forms.cancel_btn_text}>Close</Text>
+                        </TouchableOpacity>
+                      </View>
                     </View>
-                  </View>
-                  <Text style={{
-                    height: Device.isTablet ? 2 : 1,
-                    width: deviceWidth,
-                    backgroundColor: 'lightgray',
-                  }}></Text>
-                </View>
-                <View style={{ backgroundColor: '#ffffff', height: Device.isTablet ? 670 : 570 }}>
-                  <View style={{ flexDirection: 'column', justifyContent: 'space-around', paddingRight: Device.isTablet ? 20 : 20, paddingLeft: Device.isTablet ? 20 : 20, height: Device.isTablet ? 650 : 550 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? 0 : 10, paddingLeft: Device.isTablet ? 0 : 10 }}>
-                      <Text style={styles.viewText} >
-                        {I18n.t("Memo No")}:  </Text>
-                      <Text style={[styles.viewSubText, { color: '#00a9a9', fontFamily: 'medium' }]} selectable={true}>
-                        {this.state.memono} </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? 0 : 10, paddingLeft: Device.isTablet ? 0 : 10 }}>
-                      <Text style={styles.viewText} >
-                        {I18n.t("BARCODE")}:  </Text>
-                      <Text style={styles.viewSubText} selectable={true}>
-                        {this.state.barcode} </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? 0 : 10, paddingLeft: Device.isTablet ? 0 : 10 }}>
-                      <Text style={styles.viewText} >
-                        {I18n.t("Section")}:  </Text>
-                      <Text style={styles.viewSubText} >
-                        - </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? 0 : 10, paddingLeft: Device.isTablet ? 0 : 10 }}>
-                      <Text style={styles.viewText} >
-                        {I18n.t("EMP ID")}:  </Text>
-                      <Text style={styles.viewSubText} >
-                        {this.state.empId} </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? 0 : 10, paddingLeft: Device.isTablet ? 0 : 10 }}>
-                      <Text style={styles.viewText} >
-                        {I18n.t("HSN Code")}:  </Text>
-                      <Text style={styles.viewSubText} >
-                        {'HSN12345'} </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? 0 : 10, paddingLeft: Device.isTablet ? 0 : 10 }}>
-                      <Text style={styles.viewText} >
-                        QTY:  </Text>
-                      <Text style={styles.viewSubText} >
-                        {this.state.qty} </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? 0 : 10, paddingLeft: Device.isTablet ? 0 : 10 }}>
-                      <Text style={styles.viewText} >
-                        MRP:  </Text>
-                      <Text style={styles.viewSubText} >
-                        ₹ {this.state.mrp} </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? 0 : 10, paddingLeft: Device.isTablet ? 0 : 10 }}>
-                      <Text style={styles.viewText} >
-                        DISC:  </Text>
-                      <Text style={styles.viewSubText} >
-                        - </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? 0 : 10, paddingLeft: Device.isTablet ? 0 : 10 }}>
-                      <Text style={styles.viewText} >
-                        {I18n.t("Taxable Amount")}:  </Text>
-                      <Text style={styles.viewSubText} >
-                        ₹ {this.state.taxableaount} </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? 0 : 10, paddingLeft: Device.isTablet ? 0 : 10 }}>
-                      <Text style={styles.viewText} >
-                        CGST:  </Text>
-                      <Text style={styles.viewSubText} >
-                        ₹ {this.state.cgst} </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? 0 : 10, paddingLeft: Device.isTablet ? 0 : 10 }}>
-                      <Text style={styles.viewText} >
-                        SGST:  </Text>
-                      <Text style={styles.viewSubText} >
-                        ₹ {this.state.sgst} </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? 0 : 10, paddingLeft: Device.isTablet ? 0 : 10 }}>
-                      <Text style={styles.viewText} >
-                        IGST:  </Text>
-                      <Text style={styles.viewSubText} >
-                        ₹ {this.state.igst} </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? 0 : 10, paddingLeft: Device.isTablet ? 0 : 10 }}>
-                      <Text style={styles.viewText} >
-                        {I18n.t("NET AMOUNT")}:  </Text>
-                      <Text style={styles.viewSubText} >
-                        ₹ {this.state.mrp} </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? 0 : 10, paddingLeft: Device.isTablet ? 0 : 10 }}>
-                      <Text style={styles.viewText} >
-                        GST%:  </Text>
-                      <Text style={styles.viewSubText} >
-                        {'gst10%'} </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? 0 : 10, paddingLeft: Device.isTablet ? 0 : 10 }}>
-                      <Text style={styles.viewText} >
-                        {I18n.t("Customer")}:  </Text>
-                      <Text style={styles.viewSubText} >
-                        {this.state.customername} </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? 0 : 10, paddingLeft: Device.isTablet ? 0 : 10 }}>
-                      <Text style={styles.viewText} >
-                        {I18n.t("Mobile")}:  </Text>
-                      <Text style={styles.viewSubText} >
-                        {this.state.mobile} </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: Device.isTablet ? 0 : 10, paddingLeft: Device.isTablet ? 0 : 10 }}>
-                      <Text style={styles.viewText} >
-                        {I18n.t("DATE")}:  </Text>
-                      <Text style={styles.viewSubText} >
-                        {this.state.createdate} </Text>
-                    </View>
-                    <View style={{}}>
-                      <TouchableOpacity
-                        style={[Device.isTablet ? styles.filterCancel_tablet : styles.filterCancel_mobile, { marginTop: Device.isTablet ? 20 : 10, borderColor: '#00a9a9' }]} onPress={() => this.estimationModelCancel()}
-                      >
-                        <Text style={[Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile, { color: '#00a9a9' }]}  > {I18n.t("CANCEL")} </Text>
-                      </TouchableOpacity>
-                    </View>
-
-                  </View>
-                </View>
+                  )}
+                />
               </View>
             </Modal>
+
           </View>
         )}
 

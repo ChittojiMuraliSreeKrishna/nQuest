@@ -1,9 +1,7 @@
-import React, { Component } from 'react';
+import React from 'react';
 import {
-  StyleSheet,
-  View,
-  Modal,
-  ActivityIndicator
+  ActivityIndicator, Modal, StyleSheet,
+  View
 } from 'react-native';
 import Device from "react-native-device-detection";
 
