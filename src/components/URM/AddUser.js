@@ -16,6 +16,7 @@ import { cancelBtn, cancelBtnText, datePicker, datePickerBtnText, datePickerButt
 import { RW, RF, RH } from '../../Responsive';
 import { backButton, backButtonImage, headerTitle, headerTitleContainer, headerTitleSubContainer, menuButton } from '../Styles/Styles';
 import { color } from '../Styles/colorStyles';
+import { Appbar } from 'react-native-paper';
 
 var deviceWidth = Dimensions.get('window').width;
 
@@ -74,7 +75,7 @@ export default class AddUser extends Component {
     if (this.state.isEdit === true) {
       let userDetails = this.props.route.params.item;
       console.log({ userDetails });
-    let newStoresArray = [];
+      let newStoresArray = [];
       newStoresArray = userDetails.stores;
       console.log({ newStoresArray });
       this.setState({
@@ -447,16 +448,10 @@ export default class AddUser extends Component {
           <Loader
             loading={this.state.loading} />
         }
-        <View style={headerTitleContainer} >
-          <View style={headerTitleSubContainer}>
-            <TouchableOpacity style={backButton} onPress={() => this.handleBackButtonClick()}>
-              <Image style={backButtonImage} source={require('../assets/images/backButton.png')} />
-            </TouchableOpacity>
-            <Text style={headerTitle}>
-              {this.state.navtext}
-            </Text>
-          </View>
-        </View>
+        <Appbar mode="center-aligned" >
+          <Appbar.BackAction onPress={() => this.handleBackButtonClick()} />
+          <Appbar.Content title={this.state.navtext} />
+        </Appbar>
         <ScrollView>
           <Text style={inputHeading}>
             {I18n.t("User Details")}

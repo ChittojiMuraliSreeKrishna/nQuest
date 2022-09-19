@@ -308,7 +308,9 @@ export default class NewSaleReport extends Component {
         />
         {this.state.flagDeleteNewSale && (
           <View>
-            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
+            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
+              onBackButtonPress={() => this.estimationModelCancel()}
+              onBackdropPress={() => this.estimationModelCancel()} >
 
               <View style={[styles.deleteMainContainer, { backgroundColor: '#ED1C24' }]}>
                 <View>
@@ -357,7 +359,9 @@ export default class NewSaleReport extends Component {
         )}
         {this.state.flagFilterNewSale && (
           <View>
-            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
+            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
+              onBackButtonPress={() => this.modelCancel()}
+              onBackdropPress={() => this.modelCancel()} >
               <View style={styles.filterMainContainer} >
                 <View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>

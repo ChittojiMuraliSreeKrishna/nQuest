@@ -258,7 +258,9 @@ class GiftVocher extends Component {
       <View style={{ backgroundColor: "#FFFFFF" }}>
         {this.state.flagFilterOpen &&
           <View>
-            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
+            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
+              onBackButtonPress={() => this.modelCancel()}
+              onBackdropPress={() => this.modelCancel()} >
               <View style={[filterMainContainer, { minHeight: Device.isTablet ? RH(400) : RH(300), maxHeight: Device.isTablet ? RH(600) : RH(500), }]}>
                 <View style={filterSubContainer}>
                   <View>

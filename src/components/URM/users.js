@@ -38,6 +38,8 @@ import {
 } from "../Styles/PopupStyles";
 import { filterBtn } from "../Styles/Styles";
 import { RH } from "../../Responsive";
+import forms from '../../commonUtils/assets/styles/formFields.scss';
+
 
 var deviceheight = Dimensions.get("window").height;
 var deviceWidth = Dimensions.get("window").width;
@@ -297,7 +299,9 @@ export default class Users extends Component {
 				/>
 				{this.state.flagFilterOpen && (
 					<View>
-						<Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}>
+						<Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}
+							onBackButtonPress={() => this.modelCancel()}
+							onBackdropPress={() => this.modelCancel()} >
 							<View style={styles.filterMainContainer}>
 								<View>
 									<View style={filterSubContainer}>
@@ -369,18 +373,16 @@ export default class Users extends Component {
 										value={this.state.branch}
 										onChangeText={this.handleBranch}
 									/>
-									<TouchableOpacity
-										style={submitBtn}
-										onPress={() => this.applyUserFilter()}
-									>
-										<Text style={submitBtnText}>{I18n.t("APPLY")}</Text>
-									</TouchableOpacity>
-									<TouchableOpacity
-										style={cancelBtn}
-										onPress={() => this.modelCancel()}
-									>
-										<Text style={cancelBtnText}>{I18n.t("CANCEL")}</Text>
-									</TouchableOpacity>
+									<View style={forms.action_buttons_container}>
+										<TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+											onPress={() => this.applyUserFilter()}>
+											<Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+										</TouchableOpacity>
+										<TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+											onPress={() => this.modelCancel()}>
+											<Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+										</TouchableOpacity>
+									</View>
 								</KeyboardAwareScrollView>
 							</View>
 						</Modal>

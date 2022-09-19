@@ -1439,7 +1439,9 @@ class TextilePayment extends Component {
 
             {this.state.flagredeem && (
               <View>
-                <Modal isVisible={this.state.modalVisible}>
+                <Modal isVisible={this.state.modalVisible}
+                  onBackButtonPress={() => this.modelCancel()}
+                  onBackdropPress={() => this.modelCancel()} >
 
                   <View style={{
                     width: deviceWidth,
@@ -1534,7 +1536,9 @@ class TextilePayment extends Component {
 
             {this.state.upiToCustomerModel && (
               <View>
-                <Modal isVisible={this.state.upiModelVisible}>
+                <Modal isVisible={this.state.upiModelVisible}
+                  onBackButtonPress={() => this.cancelUpiModel()}
+                  onBackdropPress={() => this.cancelUpiModel()} >
                   <View style={styles.filterMainContainer}>
                     <KeyboardAwareScrollView enableOnAndroid={true} >
                       <View style={{ backgroundColor: '#F4F6FA' }}>
@@ -1587,7 +1591,9 @@ class TextilePayment extends Component {
 
             {this.state.khataToCustomerModel && (
               <View>
-                <Modal isVisible={this.state.kathaModelVisible}>
+                <Modal isVisible={this.state.kathaModelVisible}
+                  onBackButtonPress={() => this.cancelKathaModel()}
+                  onBackdropPress={() => this.cancelKathaModel()} >
                   <View style={styles.filterMainContainer}>
                     <KeyboardAwareScrollView enableOnAndroid={true} >
                       <Text style={Device.isTablet ? styles.filterByTitle_tablet : styles.filterByTitle_mobile} > Katha Payment </Text>
@@ -1624,7 +1630,9 @@ class TextilePayment extends Component {
 
             {this.state.gvToCustomerModel && (
               <View>
-                <Modal isVisible={this.state.modelVisible}>
+                <Modal isVisible={this.state.modelVisible}
+                  onBackButtonPress={() => this.modelCancel()}
+                  onBackdropPress={() => this.modelCancel()} >
                   <View style={styles.filterMainContainer}>
                     <KeyboardAwareScrollView enableOnAndroid={true} >
                       <Text style={Device.isTablet ? styles.filterByTitle_tablet : styles.filterByTitle_mobile} > Issue GV Number </Text>

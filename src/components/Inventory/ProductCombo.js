@@ -41,6 +41,8 @@ import {
   filterSubContainer
 } from "../Styles/PopupStyles";
 import { flatListTitle, listEmptyMessage } from "../Styles/Styles";
+import forms from '../../commonUtils/assets/styles/formFields.scss';
+
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
 
@@ -57,6 +59,7 @@ export default class ProductCombo extends Component {
       filterActive: false,
       flagFilterOpen: false,
       modalVisible: true,
+      modalVisibleView: true,
       startDate: "",
       endDate: "",
       date: new Date(),
@@ -261,12 +264,27 @@ export default class ProductCombo extends Component {
     this.state.viewProductData.push({ data })
     this.setState({
       viewProductData: this.state.viewProductData,
-      modalVisible: true,
+      modalVisibleView: true,
       flagViewProduct: true,
     })
     // console.log({ item }, item.barcode)
     console.log(this.state.viewProductData[0].data.productTextiles)
   }
+
+  modalHandleForClose = () => {
+    this.setState({
+      modalVisible: !this.state.modalVisible
+    })
+  }
+
+  modalHandleForViewClose = () => {
+    this.setState({
+      modalVisibleView: !this.state.modalVisibleView,
+      flagViewProduct: false,
+      viewProductData: []
+    })
+  }
+
 
   render() {
     return (
@@ -358,7 +376,10 @@ export default class ProductCombo extends Component {
         />
         {this.state.flagViewProduct && (
           <View>
-            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
+            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisibleView}
+              onBackButtonPress={() => this.modalHandleForViewClose()}
+              onBackdropPress={() => this.modalHandleForViewClose()}
+            >
               <View style={scss.model_container}>
                 <View>
                   <View style={scss.model_header}>
@@ -369,7 +390,7 @@ export default class ProductCombo extends Component {
                       <IconMa
                         name="close"
                         size={20}
-                        onPress={() => this.modelCancel()}
+                        onPress={() => this.modalHandleForViewClose()}
                       ></IconMa>
                     </View>
                   </View>
@@ -420,7 +441,9 @@ export default class ProductCombo extends Component {
         )}
         {this.state.flagFilterOpen && (
           <View>
-            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
+            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
+              onBackButtonPress={() => this.modalHandleForClose()}
+              onBackdropPress={() => this.modalHandleForClose()}>
               <View style={filterMainContainer}>
                 <View>
                   <View style={filterSubContainer}>
@@ -525,18 +548,16 @@ export default class ProductCombo extends Component {
                       />
                     </View>
                   )}
-                  <TouchableOpacity
-                    style={submitBtn}
-                    onPress={() => this.applyBarcodeFilter()}
-                  >
-                    <Text style={submitBtnText}>{I18n.t("APPLY")}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={cancelBtn}
-                    onPress={() => this.modelCancel()}
-                  >
-                    <Text style={cancelBtnText}>{I18n.t("CANCEL")}</Text>
-                  </TouchableOpacity>
+                  <View style={forms.action_buttons_container}>
+                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                      onPress={() => this.applyBarcodeFilter()}>
+                      <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                      onPress={() => this.modelCancel()}>
+                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </KeyboardAwareScrollView>
               </View>
             </Modal>

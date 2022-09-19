@@ -420,7 +420,9 @@ class AddPool extends Component {
                         </ScrollView>
                         {this.state.flagCustomerOpen && (
                             <View>
-                                <Modal isVisible={this.state.modalVisible}>
+                                <Modal isVisible={this.state.modalVisible}
+                                 onBackButtonPress={() => this.modelCancel()}
+                                 onBackdropPress={() => this.modelCancel()} >                   
 
                                     <View style={[Device.isTablet ? styles.filterMainContainer_tablet : styles.filterMainContainer_mobile, { height: Device.isTablet ? 500 : 400 }]}>
                                         <KeyboardAwareScrollView KeyboardAwareScrollView

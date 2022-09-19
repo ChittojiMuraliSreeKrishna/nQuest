@@ -14,6 +14,9 @@ import AccountingService from '../services/AccountingService';
 import { cancelBtn, cancelBtnText, datePickerBtnText, datePickerButton1, datePickerButton2, dateSelector, dateText, inputField, submitBtn, submitBtnText } from '../Styles/FormFields';
 import { filterCloseImage, filterHeading, filterMainContainer, filterSubContainer } from '../Styles/PopupStyles';
 import { flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleLight, textStyleMedium } from '../Styles/Styles';
+import forms from '../../commonUtils/assets/styles/formFields.scss';
+import I18n from 'react-native-i18n';
+
 var deviceWidth = Dimensions.get("window").width;
 
 export default class DebitNotes extends Component {
@@ -277,7 +280,9 @@ export default class DebitNotes extends Component {
         />
         {this.state.flagFilterOpen && (
           <View>
-            <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}>
+            <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}
+              onBackButtonPress={() => this.modelCancel()}
+              onBackdropPress={() => this.modelCancel()} >
               <View style={filterMainContainer} >
                 <KeyboardAwareScrollView enableOnAndroid={true} >
                   <View style={filterSubContainer}>
@@ -363,16 +368,16 @@ export default class DebitNotes extends Component {
                     value={this.state.mobile}
                     onChangeText={this.handleMobile}
                   />
-
-                  <TouchableOpacity style={submitBtn}
-                    onPress={() => this.applyDebitNotesFilter()}>
-                    <Text style={submitBtnText} >APPLY</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={cancelBtn}
-                    onPress={() => this.modelCancel()}>
-                    <Text style={cancelBtnText}>CANCEL</Text>
-                  </TouchableOpacity>
-
+                  <View style={forms.action_buttons_container}>
+                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                      onPress={() => this.applyDebitNotesFilter()}>
+                      <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                      onPress={() => this.modelCancel()}>
+                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </KeyboardAwareScrollView>
               </View>
             </Modal>
@@ -381,7 +386,9 @@ export default class DebitNotes extends Component {
         )}
         {this.state.isShowAllTransactions && (
           <View>
-            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
+            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
+              onBackButtonPress={() => this.modalViewCancel()}
+              onBackdropPress={() => this.modalViewCancel()} >
               <View style={filterMainContainer}>
                 <View>
                   <View style={filterSubContainer}>

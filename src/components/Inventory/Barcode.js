@@ -52,6 +52,8 @@ import {
   loadMoreBtn,
   loadmoreBtnText
 } from "../Styles/Styles";
+import forms from '../../commonUtils/assets/styles/formFields.scss';
+
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -537,7 +539,10 @@ export default class Barcode extends Component {
         </View>
         {this.state.flagFilterOpen && (
           <View>
-            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
+            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
+              onBackButtonPress={() => this.modelCancel()}
+              onBackdropPress={() => this.modelCancel()}
+            >
               <View style={filterMainContainer}>
                 <View>
                   <View style={filterSubContainer}>
@@ -650,18 +655,16 @@ export default class Barcode extends Component {
                     value={this.state.barCodeId}
                     onChangeText={this.handlebarCodeId}
                   />
-                  <TouchableOpacity
-                    style={submitBtn}
-                    onPress={() => this.applyBarcodeFilter(0)}
-                  >
-                    <Text style={submitBtnText}>{I18n.t("APPLY")}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={cancelBtn}
-                    onPress={() => this.modelCancel()}
-                  >
-                    <Text style={cancelBtnText}>{I18n.t("CANCEL")}</Text>
-                  </TouchableOpacity>
+                  <View style={forms.action_buttons_container}>
+                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                      onPress={() => this.applyBarcodeFilter(0)}>
+                      <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                      onPress={() => this.modelCancel()}>
+                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </KeyboardAwareScrollView>
               </View>
             </Modal>
@@ -669,7 +672,9 @@ export default class Barcode extends Component {
         )}
         {this.state.inventoryDelete && (
           <View>
-            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
+            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
+              onBackButtonPress={() => this.modelCancel()}
+              onBackdropPress={() => this.modelCancel()} >
               <View style={deleteContainer}>
                 <View>
                   <View style={deleteHeader}>

@@ -948,7 +948,9 @@ class GenerateEstimationSlip extends Component {
         {
           this.state.resultModel && (
             <View>
-              <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
+              <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
+                onBackButtonPress={() => this.modelCancel()}
+                onBackdropPress={() => this.modelCancel()} >
                 <View style={sucessContainer}>
                   <View>
                     <View style={sucessHeader}>
