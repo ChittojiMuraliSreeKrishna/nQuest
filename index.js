@@ -12,22 +12,22 @@ axios.interceptors.request.use(
   (req) => {
     AsyncStorage.getItem("tokenkey").then((value) => {
       var finalToken = value.replace('"', '');
-      console.log({ finalToken })
+      console.log({ finalToken });
       AsyncStorage.getItem("custom:clientId1").then((value) => {
-        console.log({ value })
+        console.log({ value });
         axios.defaults.headers.common = { 'Authorization': 'Bearer' + ' ' + finalToken, 'clientId': value ? value : 0 };
-      })
+      });
     });
     if (ENCRYPTION) {
-      var text = JSON.stringify(req.data)
-      const key = '23KAVfsyYqk+hxye3/LDM59Ts8hTiAs='
-      const iv = '0000000000000000 '
+      var text = JSON.stringify(req.data);
+      const key = '23KAVfsyYqk+hxye3/LDM59Ts8hTiAs=';
+      const iv = '0000000000000000 ';
       const cipher = CryptoJS.AES.encrypt(text, CryptoJS.enc.Utf8.parse(key), {
         iv: CryptoJS.enc.Utf8.parse(iv),
         padding: CryptoJS.pad.Pkcs7,
         mode: CryptoJS.mode.CBC
-      })
-      var encryptedBytes = cipher.toString()
+      });
+      var encryptedBytes = cipher.toString();
       req.data = encryptedBytes;
     }
     return req;
@@ -52,11 +52,11 @@ axios.interceptors.response.use((response) => response, (error) => {
     alert('Please login to access this resource');
   }
   if (error.response.status === 400) {
-    error.response.data && error.response.data.message && alert(error.response.data.message)
+    error.response.data && error.response.data.message && alert(error.response.data.message);
   }
 
   if (error.response.status === 500) {
-    error.response.data && error.response.data.error && alert(error.response.data.error)
+    error.response.data && error.response.data.error && alert(error.response.data.error);
   }
 
 });

@@ -6,7 +6,7 @@ import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
-import { Appbar, TextInput } from 'react-native-paper';
+import { Appbar, Text as Txt, TextInput } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
 import IconFA from 'react-native-vector-icons/FontAwesome';
@@ -16,7 +16,6 @@ import scss from '../../commonUtils/assets/styles/style.scss';
 import ReportsService from '../services/ReportsService';
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
-import { Text as Txt } from 'react-native-paper';
 export default class NewSaleReport extends Component {
 
   constructor(props) {
@@ -37,8 +36,8 @@ export default class NewSaleReport extends Component {
       invoiceNumber: null,
       mobile: null,
       empId: null,
-      sbList: [1, 2],
-      sbDetailsList: [1, 2],
+      sbList: [ 1, 2 ],
+      sbDetailsList: [ 1, 2 ],
       isView: false,
       domainId: 0,
       storeId: 0,
@@ -66,7 +65,7 @@ export default class NewSaleReport extends Component {
     };
   }
 
-  componentDidMount() {
+  componentDidMount () {
 
     AsyncStorage.getItem("storeId").then((value) => {
       storeStringId = value;
@@ -81,12 +80,12 @@ export default class NewSaleReport extends Component {
     });
   }
 
-  filterAction() {
-    this.setState({ flagFilterNewSale: true, modalVisible: true })
+  filterAction () {
+    this.setState({ flagFilterNewSale: true, modalVisible: true });
   }
 
 
-  getSaleBills() {
+  getSaleBills () {
     if (this.state.startDate === "") {
       this.state.startDate = null;
     }
@@ -116,14 +115,14 @@ export default class NewSaleReport extends Component {
         domainId: this.state.domainId
       };
       console.log('params are' + JSON.stringify(obj));
-      let pageNumber = 0
+      let pageNumber = 0;
       ReportsService.newSaleReports(obj, pageNumber).then((res) => {
         console.log(res.data.result);
-        if (res.data && res.data["isSuccess"] === "true") {
+        if (res.data && res.data[ "isSuccess" ] === "true") {
           if (res.data.result.length !== 0) {
-            this.setState({ newSale: res.data.result.newSale.content, filterActive: true })
-            this.modelCancel()
-            console.log(this.state.newSale)
+            this.setState({ newSale: res.data.result.newSale.content, filterActive: true });
+            this.modelCancel();
+            console.log(this.state.newSale);
           } else {
             alert("records not found");
           }
@@ -146,31 +145,30 @@ export default class NewSaleReport extends Component {
   }
 
 
-  handledeleteNewSale() {
+  handledeleteNewSale () {
     this.setState({ flagDeleteNewSale: true, modalVisible: true, flagViewDetail: false });
   }
 
-  handleviewNewSale(item, index) {
+  handleviewNewSale (item, index) {
     console.log({ item });
-    console.log(item.lineItemsReVo)
-    // this.setState({ memono: item.invoiceNumber, barcode: item.lineItemsReVo[0].barCode, hsncode: item.lineItemsReVo[0].hsnCode, empId: item.lineItemsReVo[0].empId, qty: item.totalqQty, mrp: item.netPayableAmount, taxableaount: item.totaltaxableAmount, cgst: item.totalCgst, sgst: item.totalSgst, igst: item.totalIgst, customername: item.customerName, mobile: item.mobileNumber, createdate: item.createdDate });
-    this.state.viewNewsSaleList.push(item)
-    this.setState({ flagViewDetail: true, modalVisible: true, flagDeleteNewSale: false, viewNewsSaleList: this.state.viewNewsSaleList, viewNewSaleSubList: item.lineItemsReVo });
+    console.log(item.lineItemsReVo);
+    this.state.viewNewsSaleList.push(item);
+    this.setState({ flagViewDetail: true, modalVisible: true, flagDeleteNewSale: false, viewNewsSaleList: this.state.viewNewsSaleList });
   }
 
-  estimationModelCancel() {
+  estimationModelCancel () {
     this.setState({ modalVisible: false });
   }
 
-  datepickerClicked() {
+  datepickerClicked () {
     this.setState({ datepickerOpen: true });
   }
 
-  enddatepickerClicked() {
+  enddatepickerClicked () {
     this.setState({ datepickerendOpen: true });
   }
 
-  datepickerDoneClicked() {
+  datepickerDoneClicked () {
     if (parseInt(this.state.date.getDate()) < 10 && (parseInt(this.state.date.getMonth()) < 10)) {
       this.setState({ startDate: this.state.date.getFullYear() + "-0" + (this.state.date.getMonth() + 1) + "-" + "0" + this.state.date.getDate() });
     }
@@ -186,7 +184,7 @@ export default class NewSaleReport extends Component {
     this.setState({ doneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
 
-  datepickerendDoneClicked() {
+  datepickerendDoneClicked () {
     if (parseInt(this.state.enddate.getDate()) < 10 && (parseInt(this.state.enddate.getMonth()) < 10)) {
       this.setState({ endDate: this.state.enddate.getFullYear() + "-0" + (this.state.enddate.getMonth() + 1) + "-" + "0" + this.state.enddate.getDate() });
     }
@@ -203,7 +201,7 @@ export default class NewSaleReport extends Component {
     this.setState({ enddoneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
 
-  datepickerCancelClicked() {
+  datepickerCancelClicked () {
     this.setState({ date: new Date(), enddate: new Date(), datepickerOpen: false, datepickerendOpen: false });
   }
 
@@ -223,20 +221,20 @@ export default class NewSaleReport extends Component {
     this.setState({ empId: value });
   };
 
-  modelCancel() {
-    this.setState({ modalVisible: false, flagFilterNewSale: false })
+  modelCancel () {
+    this.setState({ modalVisible: false, flagFilterNewSale: false });
   }
 
-  clearFilterAction() {
-    this.setState({ filterActive: false, newSale: [], fromDate: "", toDate: "", billPosition: "", invoiceNumber: "", mobileNumber: "", empId: "" })
+  clearFilterAction () {
+    this.setState({ filterActive: false, newSale: [], fromDate: "", toDate: "", billPosition: "", invoiceNumber: "", mobileNumber: "", empId: "" });
   }
 
-  closeViewAction() {
-    this.setState({ flagViewDetail: !this.state.flagViewDetail, viewNewSaleSubList: [], viewNewsSaleList: [] })
+  closeViewAction () {
+    this.setState({ flagViewDetail: !this.state.flagViewDetail, viewNewSaleSubList: [], viewNewsSaleList: [] });
   }
 
 
-  render() {
+  render () {
     return (
       <View>
         <Appbar>
@@ -282,7 +280,7 @@ export default class NewSaleReport extends Component {
                   <View style={scss.flatListFooter}>
                     <Text style={scss.footerText}>
                       {I18n.t("DATE")}:
-                      {item.createdDate ? item.createdDate.toString().split(/T/)[0]
+                      {item.createdDate ? item.createdDate.toString().split(/T/)[ 0 ]
                         : item.createdDate}
                     </Text>
                     <View style={scss.buttonContainer}>
@@ -312,7 +310,7 @@ export default class NewSaleReport extends Component {
               onBackButtonPress={() => this.estimationModelCancel()}
               onBackdropPress={() => this.estimationModelCancel()} >
 
-              <View style={[styles.deleteMainContainer, { backgroundColor: '#ED1C24' }]}>
+              <View style={[ styles.deleteMainContainer, { backgroundColor: '#ED1C24' } ]}>
                 <View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
                     <View>
@@ -340,16 +338,16 @@ export default class NewSaleReport extends Component {
                     marginTop: 10
                   }}> {I18n.t("Are you sure want to delete New Sale Report")} ?  </Text>
                   <TouchableOpacity
-                    style={[Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile, { marginTop: Device.isTablet ? 55 : 25 }]} onPress={() => this.deleteEstimationSlip(item, index)}
+                    style={[ Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile, { marginTop: Device.isTablet ? 55 : 25 } ]} onPress={() => this.deleteEstimationSlip(item, index)}
                   >
                     <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile}  > {I18n.t("DELETE")} </Text>
 
                   </TouchableOpacity>
 
                   <TouchableOpacity
-                    style={[Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile, { borderColor: '#ED1C24' }]} onPress={() => this.estimationModelCancel()}
+                    style={[ Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile, { borderColor: '#ED1C24' } ]} onPress={() => this.estimationModelCancel()}
                   >
-                    <Text style={[Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile, { color: '#ED1C24' }]}  > {I18n.t("CANCEL")} </Text>
+                    <Text style={[ Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile, { color: '#ED1C24' } ]}  > {I18n.t("CANCEL")} </Text>
 
                   </TouchableOpacity>
                 </View>
@@ -445,7 +443,7 @@ export default class NewSaleReport extends Component {
                       />
                     </View>
                   )}
-                  <View style={[styles.rnSelectContainer_mobile, { width: deviceWidth - 30 }]}>
+                  <View style={[ styles.rnSelectContainer_mobile, { width: deviceWidth - 30 } ]}>
                     <RNPickerSelect
                       placeholder={{
                         label: 'BILL POSITION'
@@ -507,11 +505,11 @@ export default class NewSaleReport extends Component {
                     onChangeText={this.handleEmpId}
                   />
                   <View style={forms.action_buttons_container}>
-                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                    <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
                       onPress={() => this.getSaleBills()}>
                       <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                    <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
                       onPress={() => this.modelCancel()}>
                       <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                     </TouchableOpacity>
@@ -553,15 +551,13 @@ export default class NewSaleReport extends Component {
                       </View>
                       <View style={scss.model_text_container}>
                         <Txt style={{ textAlign: 'left' }} variant='bodyLarge'>Mobile: {"\n"}{item.mobileNumber}</Txt>
-                        <Txt style={{ textAlign: 'right' }} variant='bodyLarge'>Date: {"\n"}{item.createdDate ? item.createdDate.toString().split(/T/)[0]
+                        <Txt style={{ textAlign: 'right' }} variant='bodyLarge'>Date: {"\n"}{item.createdDate ? item.createdDate.toString().split(/T/)[ 0 ]
                           : item.createdDate}</Txt>
                       </View>
                       <View style={scss.model_subContainer}>
                         <ScrollView>
-                          <FlatList
-                            scrollEnabled={true}
-                            data={this.state.viewNewSaleSubList}
-                            renderItem={({ item, index }) => (
+                          {item.lineItemsReVo.map((item, index) => {
+                            return (
                               <View id={index} style={scss.model_subbody}>
                                 <View style={scss.model_text_container}>
                                   <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>Barcode: {"\n"}{item.barCode}</Txt>
@@ -592,12 +588,12 @@ export default class NewSaleReport extends Component {
                                   <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>NET: {item.netValue}</Txt>
                                 </View>
                               </View>
-                            )}
-                          />
+                            );
+                          })}
                         </ScrollView>
                       </View>
                       <View>
-                        <TouchableOpacity onPress={() => this.closeViewAction()} style={[forms.action_button, forms.cancel_btn]}>
+                        <TouchableOpacity onPress={() => this.closeViewAction()} style={[ forms.action_button, forms.cancel_btn ]}>
                           <Text style={forms.cancel_btn_text}>Close</Text>
                         </TouchableOpacity>
                       </View>

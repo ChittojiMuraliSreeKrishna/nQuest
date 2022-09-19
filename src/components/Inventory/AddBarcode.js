@@ -2,9 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { Component } from "react";
 import {
   Dimensions,
-  Image,
-  ScrollView,
-  StyleSheet,
+  Image, StyleSheet,
   Text, TouchableOpacity,
   View
 } from "react-native";
@@ -26,7 +24,6 @@ import {
 import Message from "../Errors/Message";
 import InventoryService from "../services/InventoryService";
 import {
-  cancelBtnText,
   datePicker,
   datePickerBtnText,
   datePickerButton1,
@@ -35,8 +32,7 @@ import {
   dateText,
   inputHeading,
   rnPicker,
-  rnPickerError,
-  submitBtnText
+  rnPickerError
 } from "../Styles/FormFields";
 
 var deviceWidth = Dimensions.get("window").width;
@@ -123,7 +119,7 @@ class AddBarcode extends Component {
     };
   }
 
-  async componentDidMount() {
+  async componentDidMount () {
     var domainStringId = "";
     var storeStringId = "";
     this.setState({ isEdit: this.props.route.params.isEdit });
@@ -136,7 +132,7 @@ class AddBarcode extends Component {
   }
 
   // Go Back Actions
-  handleBackButtonClick() {
+  handleBackButtonClick () {
     this.props.navigation.goBack(null);
     return true;
   }
@@ -160,14 +156,14 @@ class AddBarcode extends Component {
   };
 
   // Division Actions
-  getAllDivisions(data) {
+  getAllDivisions (data) {
     let divisions = [];
     InventoryService.getAllDivisions(data).then((res) => {
       if (res?.data) {
         for (let i = 0; i < res.data.length; i++) {
           divisions.push({
-            value: res.data[i].id,
-            label: res.data[i].name,
+            value: res.data[ i ].id,
+            label: res.data[ i ].name,
           });
         }
         console.log({ divisions });
@@ -186,15 +182,15 @@ class AddBarcode extends Component {
   };
 
   // Section Actions
-  getAllSections(id, data) {
+  getAllSections (id, data) {
     this.setState({ sectionsList: [] });
     let section = [];
     InventoryService.getAllSections(id, data).then((res) => {
       if (res?.data) {
         for (let i = 0; i < res.data.length; i++) {
           section.push({
-            value: res.data[i].id,
-            label: res.data[i].name,
+            value: res.data[ i ].id,
+            label: res.data[ i ].name,
           });
         }
         console.log({ section });
@@ -212,16 +208,16 @@ class AddBarcode extends Component {
   };
 
   // SubSection Actions
-  getAllSubsections(id, data) {
+  getAllSubsections (id, data) {
     this.setState({ subSectionsList: [] });
     let subSection = [];
     InventoryService.getAllSections(id, data).then((res) => {
       if (res?.data) {
         for (let i = 0; i < res.data.length; i++) {
           subSection.push({
-            value: res.data[i].id,
-            label: res.data[i].name,
-            id: res.data[i].id,
+            value: res.data[ i ].id,
+            label: res.data[ i ].name,
+            id: res.data[ i ].id,
           });
         }
         console.log({ subSection });
@@ -237,16 +233,16 @@ class AddBarcode extends Component {
   };
 
   // Category Actions
-  getAllCatogiries(data) {
+  getAllCatogiries (data) {
     this.setState({ categoriesList: [] });
     let categories = [];
     InventoryService.getAllCategories(data).then((res) => {
       if (res?.data) {
         for (let i = 0; i < res.data.length; i++) {
           categories.push({
-            value: res.data[i].id,
-            label: res.data[i].name,
-            id: res.data[i].id,
+            value: res.data[ i ].id,
+            label: res.data[ i ].name,
+            id: res.data[ i ].id,
           });
         }
         console.log({ categories });
@@ -262,7 +258,7 @@ class AddBarcode extends Component {
   };
 
   // UOM Actions
-  getAllUOM() {
+  getAllUOM () {
     this.setState({ uomList: [] });
     let uomList = [];
     InventoryService.getUOM().then((res) => {
@@ -270,8 +266,8 @@ class AddBarcode extends Component {
         console.log("UOMS", res.data);
         for (let i = 0; i < res.data.length; i++) {
           uomList.push({
-            value: res.data[i].id,
-            label: res.data[i].uomName,
+            value: res.data[ i ].id,
+            label: res.data[ i ].uomName,
           });
         }
         console.log({ uomList });
@@ -287,7 +283,7 @@ class AddBarcode extends Component {
   };
 
   // HSNCodes Actions
-  getAllHSNCodes() {
+  getAllHSNCodes () {
     this.setState({ hsnCodesList: [] });
     let hsnList = [];
     InventoryService.getAllHsnList().then((res) => {
@@ -295,8 +291,8 @@ class AddBarcode extends Component {
         console.log("HSNS", res.data);
         for (let i = 0; i < res.data.result.length; i++) {
           hsnList.push({
-            value: res.data.result[i].id,
-            label: res.data.result[i].hsnCode,
+            value: res.data.result[ i ].hsnCode,
+            label: res.data.result[ i ].hsnCode,
           });
         }
         console.log({ hsnList });
@@ -305,6 +301,7 @@ class AddBarcode extends Component {
     });
   }
   handleHSNCode = (value) => {
+    // alert(value);
     this.setState({ hsnId: value, hsnCode: value });
     if (this.state.hsnId !== null) {
       this.setState({ hsnValid: true });
@@ -312,7 +309,7 @@ class AddBarcode extends Component {
   };
 
   // Store Actions
-  async getAllstores() {
+  async getAllstores () {
     this.setState({ storesList: [] });
     let storesList = [];
     const { clientId } = this.state;
@@ -321,8 +318,8 @@ class AddBarcode extends Component {
       if (res?.data) {
         for (let i = 0; i < res.data.length; i++) {
           storesList.push({
-            value: res.data[i].id,
-            label: res.data[i].name,
+            value: res.data[ i ].id,
+            label: res.data[ i ].name,
           });
         }
         console.log({ storesList });
@@ -406,10 +403,10 @@ class AddBarcode extends Component {
   };
 
   // Date Actions
-  datepickerClicked() {
+  datepickerClicked () {
     this.setState({ datepickerOpen: true });
   }
-  datepickerDoneClicked() {
+  datepickerDoneClicked () {
     if (
       parseInt(this.state.date.getDate()) < 10 &&
       parseInt(this.state.date.getMonth()) < 10
@@ -458,7 +455,7 @@ class AddBarcode extends Component {
       datepickerendOpen: false,
     });
   }
-  datepickerCancelClicked() {
+  datepickerCancelClicked () {
     this.setState({
       date: new Date(),
       datepickerOpen: false,
@@ -467,79 +464,79 @@ class AddBarcode extends Component {
   }
 
   // Validations For Barcode Fields
-  validationForm() {
+  validationForm () {
     let isFormValid = true;
     let errors = {};
     if (this.state.name.length < errorLength.name) {
       isFormValid = false;
-      errors["name"] = inventoryErrorMessages.name;
+      errors[ "name" ] = inventoryErrorMessages.name;
       this.setState({ nameValid: false });
     }
     if (this.selectedDomain === "Textile") {
       if (this.state.divisionId === null) {
         isFormValid = false;
-        errors["divison"] = inventoryErrorMessages.divisionId;
+        errors[ "divison" ] = inventoryErrorMessages.divisionId;
         this.setState({ divisionValid: false });
       }
       if (this.state.sectionId === null) {
         isFormValid = false;
-        errors["section"] = inventoryErrorMessages.sectionId;
+        errors[ "section" ] = inventoryErrorMessages.sectionId;
         this.setState({ sectionValid: false });
       }
       if (this.state.subSectionId === null) {
         isFormValid = false;
-        errors["subSection"] = inventoryErrorMessages.subSectionId;
+        errors[ "subSection" ] = inventoryErrorMessages.subSectionId;
         this.setState({ subSectionValid: false });
       }
       if (this.state.catogirieId === null) {
         isFormValid = false;
-        errors["category"] = inventoryErrorMessages.category;
+        errors[ "category" ] = inventoryErrorMessages.category;
         this.setState({ categoryValid: false });
       }
     }
     if (String(this.state.colour).length < errorLength.colour) {
       isFormValid = false;
-      errors["color"] = inventoryErrorMessages.colour;
+      errors[ "color" ] = inventoryErrorMessages.colour;
       this.setState({ colorValid: false });
     }
     if (String(this.state.batchNo).length === 0) {
       isFormValid = false;
-      errors["batchNo"] = inventoryErrorMessages.batchNo;
+      errors[ "batchNo" ] = inventoryErrorMessages.batchNo;
       this.setState({ batchNoValid: false });
     }
     if (this.state.costPrice === null) {
       isFormValid = false;
-      errors["costPrice"] = inventoryErrorMessages.costPrice;
+      errors[ "costPrice" ] = inventoryErrorMessages.costPrice;
       this.setState({ costPriceValid: false });
     }
     if (this.state.listPrice === null) {
       isFormValid = false;
-      errors["listPrice"] = inventoryErrorMessages.listPrice;
+      errors[ "listPrice" ] = inventoryErrorMessages.listPrice;
       this.setState({ listPriceValid: false });
     }
     if (this.state.uomId === null) {
       isFormValid = false;
-      errors["uom"] = inventoryErrorMessages.uom;
+      errors[ "uom" ] = inventoryErrorMessages.uom;
       this.setState({ uomValid: false });
     }
     if (this.state.hsnId === null) {
       isFormValid = false;
-      errors["hsn"] = inventoryErrorMessages.hsnCode;
+      errors[ "hsn" ] = inventoryErrorMessages.hsnCode;
       this.setState({ hsnValid: false });
     }
     if (String(this.state.empId).length < errorLength.empId) {
       isFormValid = false;
-      errors["emp"] = inventoryErrorMessages.empId;
+      errors[ "emp" ] = inventoryErrorMessages.empId;
       this.setState({ empValid: false });
     }
     if (this.state.store === undefined) {
       isFormValid = false;
-      errors["store"] = accountingErrorMessages.store;
+      errors[ "store" ] = accountingErrorMessages.store;
       this.setState({ storeValid: false });
     }
     if (String(this.state.quantity).length === 0) {
       isFormValid = false;
-      errors["qty"] = inventoryErrorMessages.qty;
+      errors[ "qty" ] = inventoryErrorMessages.qty;
       this.setState({ qtyValid: false });
     }
     this.setState({ errors: errors });
@@ -547,7 +544,7 @@ class AddBarcode extends Component {
   }
 
   // Saving Barcode
-  saveBarcode() {
+  saveBarcode () {
     // console.log(this.state.store);
     // this.setState({ loading: true });
     const { selectedDomain, isEdit } = this.state;
@@ -568,7 +565,7 @@ class AddBarcode extends Component {
         colour: this.state.colour,
         costPrice: this.state.costPrice,
         empId: this.state.empId,
-        hsnCode: parseInt(this.state.hsnId),
+        hsnCode: this.state.hsnCode,
         itemMrp: this.state.listPrice,
         qty: this.state.quantity,
         storeId: this.state.storeId,
@@ -599,11 +596,11 @@ class AddBarcode extends Component {
   }
 
   // Cancel Add Barcode
-  cancel() {
+  cancel () {
     this.props.navigation.goBack(null);
   }
 
-  render() {
+  render () {
     const {
       divisionValid,
       sectionValid,
@@ -693,7 +690,7 @@ class AddBarcode extends Component {
               />
             </View>
             {!divisionValid && (
-              <Message imp={true} message={this.state.errors["divison"]} />
+              <Message imp={true} message={this.state.errors[ "divison" ]} />
             )}
             <Text style={inputHeading}>
               {I18n.t("Section")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -725,7 +722,7 @@ class AddBarcode extends Component {
               />
             </View>
             {!sectionValid && (
-              <Message imp={true} message={this.state.errors["section"]} />
+              <Message imp={true} message={this.state.errors[ "section" ]} />
             )}
             <Text style={inputHeading}>
               {I18n.t("Sub Section")}{" "}
@@ -758,7 +755,7 @@ class AddBarcode extends Component {
               />
             </View>
             {!subSectionValid && (
-              <Message imp={true} message={this.state.errors["subSection"]} />
+              <Message imp={true} message={this.state.errors[ "subSection" ]} />
             )}
             <Text style={inputHeading}>
               {I18n.t("Category")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -790,7 +787,7 @@ class AddBarcode extends Component {
               />
             </View>
             {!categoryValid && (
-              <Message imp={true} message={this.state.errors["category"]} />
+              <Message imp={true} message={this.state.errors[ "category" ]} />
             )}
           </View>
           {this.state.selectedDomain === "Retail" && ( // For Retail Domain only
@@ -892,7 +889,7 @@ class AddBarcode extends Component {
             onChangeText={this.handleColour}
           />
           {!colorValid && (
-            <Message imp={true} message={this.state.errors["color"]} />
+            <Message imp={true} message={this.state.errors[ "color" ]} />
           )}
           <Text style={inputHeading}>
             {I18n.t("Name")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -916,7 +913,7 @@ class AddBarcode extends Component {
             onChangeText={this.handleName}
           />
           {!nameValid && (
-            <Message imp={true} message={this.state.errors["name"]} />
+            <Message imp={true} message={this.state.errors[ "name" ]} />
           )}
           <Text style={inputHeading}>
             {I18n.t("Batch No")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -940,7 +937,7 @@ class AddBarcode extends Component {
             onChangeText={this.handleBatchNo}
           />
           {!batchNoValid && (
-            <Message imp={true} message={this.state.errors["batchNo"]} />
+            <Message imp={true} message={this.state.errors[ "batchNo" ]} />
           )}
           <Text style={inputHeading}>
             {I18n.t("Cost Price")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -966,7 +963,7 @@ class AddBarcode extends Component {
             onChangeText={this.handleCostPrice}
           />
           {!costPriceValid && (
-            <Message imp={true} message={this.state.errors["costPrice"]} />
+            <Message imp={true} message={this.state.errors[ "costPrice" ]} />
           )}
           <Text style={inputHeading}>
             {I18n.t("List Price")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -992,7 +989,7 @@ class AddBarcode extends Component {
             onBlur={this.handleListPriceValid}
           />
           {!listPriceValid && (
-            <Message imp={true} message={this.state.errors["listPrice"]} />
+            <Message imp={true} message={this.state.errors[ "listPrice" ]} />
           )}
           <Text style={inputHeading}>
             {I18n.t("UOM")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -1024,7 +1021,7 @@ class AddBarcode extends Component {
             />
           </View>
           {!uomValid && (
-            <Message imp={true} message={this.state.errors["uom"]} />
+            <Message imp={true} message={this.state.errors[ "uom" ]} />
           )}
           <Text style={inputHeading}>
             {I18n.t("HSN Code")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -1056,7 +1053,7 @@ class AddBarcode extends Component {
             />
           </View>
           {!hsnValid && (
-            <Message imp={true} message={this.state.errors["hsn"]} />
+            <Message imp={true} message={this.state.errors[ "hsn" ]} />
           )}
           <Text style={inputHeading}>
             {I18n.t("EMP ID")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -1082,7 +1079,7 @@ class AddBarcode extends Component {
             onChangeText={this.handleEMPId}
           />
           {!empValid && (
-            <Message imp={true} message={this.state.errors["emp"]} />
+            <Message imp={true} message={this.state.errors[ "emp" ]} />
           )}
           <Text style={inputHeading}>
             {I18n.t("Store")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -1114,7 +1111,7 @@ class AddBarcode extends Component {
             />
           </View>
           {!storeValid && (
-            <Message imp={true} message={this.state.errors["store"]} />
+            <Message imp={true} message={this.state.errors[ "store" ]} />
           )}
           <Text style={inputHeading}>
             QTY <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -1138,14 +1135,14 @@ class AddBarcode extends Component {
             onChangeText={this.handleQuantity}
           />
           {!qtyValid && (
-            <Message imp={true} message={this.state.errors["qty"]} />
+            <Message imp={true} message={this.state.errors[ "qty" ]} />
           )}
           <View style={forms.action_buttons_container}>
-            <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+            <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
               onPress={() => this.saveBarcode()}>
               <Text style={forms.submit_btn_text} >{I18n.t("SAVE")}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+            <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
               onPress={() => this.cancel()}>
               <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
             </TouchableOpacity>

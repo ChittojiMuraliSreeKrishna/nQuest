@@ -1,5 +1,6 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import React, { Component } from "react";
+import Blank from "../components/Home/Blank";
 import Home from "../components/Home/Home";
 import Settings from "../components/Profile/Settings";
 import AccountingNaviagtion from "./AccountingNavigation";
@@ -14,11 +15,16 @@ import UrmNavigation from "./UrmNavigation";
 const Stack = createStackNavigator();
 
 export default class TopBarNavigation extends Component {
-  render() {
+  render () {
     return (
       <>
         <TopBar {...this.props} />
         <Stack.Navigator>
+          <Stack.Screen
+            name="Blank"
+            options={{ headerShown: false }}
+            component={Blank}
+          />
           <Stack.Screen
             name="Home"
             options={{ headerShown: false }}

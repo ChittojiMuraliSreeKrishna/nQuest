@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import { Dimensions, Image, SectionList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
-import Loader from '../../commonUtils/loader';
-import UrmService from '../services/UrmService';
-var deviceWidth = Dimensions.get('window').width;
 import I18n from 'react-native-i18n';
-import { sectionListBtn, sectionListBtnContainer, sectionListHeader } from '../Styles/Styles';
-import { RF } from '../../Responsive';
-import forms from "../../commonUtils/assets/styles/formFields.scss";
 import { Appbar } from 'react-native-paper';
+import forms from "../../commonUtils/assets/styles/formFields.scss";
+import Loader from '../../commonUtils/loader';
+import { RF } from '../../Responsive';
+import UrmService from '../services/UrmService';
+import { sectionListBtn, sectionListBtnContainer, sectionListHeader } from '../Styles/Styles';
+var deviceWidth = Dimensions.get('window').width;
 
 export default class Privilages extends Component {
   constructor(props) {
@@ -25,12 +25,12 @@ export default class Privilages extends Component {
     };
   }
 
-  handleBackButtonClick() {
+  handleBackButtonClick () {
     this.props.navigation.goBack(null);
     return true;
   }
 
-  async componentDidMount() {
+  async componentDidMount () {
     const editPriv = this.props.route.params;
     console.log({ editPriv });
     this.setState({
@@ -41,25 +41,26 @@ export default class Privilages extends Component {
   }
 
 
-  getPrivilages() {
+  getPrivilages () {
     global.privilages = [];
     this.setState({ loading: true });
     UrmService.getAllPrivillages().then((res) => {
       if (res) {
+        console.log(res.data);
         if (res.data) {
-          let privilegesRes = res.data.result.mobilePrivileges;
+          let privilegesRes = res.data.mobilePrivileges;
           console.log({ privilegesRes });
           let len = privilegesRes.length;
           console.log({ len });
           if (len > 0) {
             this.setState({ loading: false });
             for (let i = 0; i < len; i++) {
-              let privilege = privilegesRes[i];
-              let previlagename = privilegesRes[i].name;
+              let privilege = privilegesRes[ i ];
+              let previlagename = privilegesRes[ i ].name;
               console.log({ previlagename });
               // Sub Privileges
-              if (privilege.subPrivilege !== null) {
-                let subPrivilegeRes = privilege.subPrivilege;
+              if (privilege.subPrivileges !== null) {
+                let subPrivilegeRes = privilege.subPrivileges;
                 let subLen = subPrivilegeRes.length;
                 console.log({ subPrivilegeRes });
                 var subprivilagesArray = [];
@@ -68,10 +69,10 @@ export default class Privilages extends Component {
                 var parentArray = [];
                 if (subLen > 0) {
                   for (let j = 0; j < subLen; j++) {
-                    if (privilege.id === subPrivilegeRes[j].parentPrivilegeId) {
-                      let subPrivilege = subPrivilegeRes[j];
+                    if (privilege.id === subPrivilegeRes[ j ].parentPrivilegeId) {
+                      let subPrivilege = subPrivilegeRes[ j ];
                       for (let k = 0; k < this.state.parentlist.length; k++) {
-                        if (this.state.parentlist[k].name === privilege.name) {
+                        if (this.state.parentlist[ k ].name === privilege.name) {
                           if (this.state.parentlist.includes(privilege.name)) { }
                           else {
                             parentArray.push(privilege.name);
@@ -82,7 +83,7 @@ export default class Privilages extends Component {
                       // SubParent Privileges
                       if (parentArray.includes(privilege.name)) {
                         for (let m = 0; m < this.state.child.length; m++) {
-                          if (subPrivilege.name === this.state.child[m].name) {
+                          if (subPrivilege.name === this.state.child[ m ].name) {
                             if (namesArray.includes(subPrivilege.name)) { }
                             else {
                               this.state.subList.push({ title: subPrivilege.name, description: subPrivilege.description, parent: privilege.name, id: privilege.id, subPrivileges: subPrivilege });
@@ -97,8 +98,8 @@ export default class Privilages extends Component {
                       if (privilege.childPrivillages !== null) {
                         let childLen = privilege.childPrivillages.length;
                         for (let p = 0; p < childLen; p++) {
-                          if (subPrivilegeRes[j].id === privilege.childPrivillages[p].subPrivillageId) {
-                            childPrivillagesArray.push(privilege.childPrivillages[p]);
+                          if (subPrivilegeRes[ j ].id === privilege.childPrivillages[ p ].subPrivillageId) {
+                            childPrivillagesArray.push(privilege.childPrivillages[ p ]);
                           }
                         }
                       }
@@ -127,23 +128,23 @@ export default class Privilages extends Component {
     });
   }
 
-  saveRole() {
+  saveRole () {
     global.privilages = [];
     this.state.subList = [];
     let privileges = this.state.previlages;
     let len = privileges.length;
     console.log({ privileges, len });
     for (let i = 0; i < len; i++) {
-      let sublen = privileges[i].data.length;
+      let sublen = privileges[ i ].data.length;
       console.log({ sublen });
       for (let j = 0; j < sublen; j++) {
-        if (this.state.previlages[i].data[j].selectedindex === 1) {
+        if (this.state.previlages[ i ].data[ j ].selectedindex === 1) {
           this.state.subList.push({
-            title: this.state.previlages[i].data[j].name,
-            description: this.state.previlages[i].data[j].description,
-            parent: this.state.previlages[i].title,
-            id: this.state.previlages[i].id,
-            subPrivillages: this.state.previlages[i].data[j].subPrivilege
+            title: this.state.previlages[ i ].data[ j ].name,
+            description: this.state.previlages[ i ].data[ j ].description,
+            parent: this.state.previlages[ i ].title,
+            id: this.state.previlages[ i ].id,
+            subPrivillages: this.state.previlages[ i ].data[ j ].subPrivilege
           });
           let subList = this.state.subList;
           console.log({ subList });
@@ -172,27 +173,14 @@ export default class Privilages extends Component {
 
 
 
-  render() {
+  render () {
     return (
       <View style={styles.mainContainer}>
         {this.state.loading &&
           <Loader
             loading={this.state.loading} />
         }
-        {/* <View style={headerTitleContainer} >
-          <View style={headerTitleSubContainer}>
-            <TouchableOpacity style={[backButton]} onPress={() => this.handleBackButtonClick()}>
-              <Image style={backButtonImage} source={require('../assets/images/backButton.png')} />
-            </TouchableOpacity>
-            <Text style={headerTitle}>
-              {I18n.t("Privileges")}
-            </Text>
-
-          </View>
-          <View style={headerTitleSubContainer2}></View>
-        </View> */}
-
-        <Appbar mode="center-aligned" style={styles.mainContainer}>
+        <Appbar mode="center-aligned">
           <Appbar.BackAction onPress={() => this.handleBackButtonClick()} />
           <Appbar.Content title={I18n.t("Privileges")} />
         </Appbar>
@@ -214,28 +202,19 @@ export default class Privilages extends Component {
                   <Image source={require('../assets/images/langunselect.png')} />
                 )}
               </View>
-
-
             </TouchableOpacity>
           )}
           ListFooterComponent={
             <View style={forms.action_buttons_container}>
-              <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+              <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
                 onPress={() => this.saveRole()}>
                 <Text style={forms.submit_btn_text} >{I18n.t("SAVE")}</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
-                onPress={() => this.cancel()}>
+              <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                onPress={() => this.handleBackButtonClick()}>
                 <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
               </TouchableOpacity>
             </View>
-            // <View>
-            //   <TouchableOpacity style={submitBtn}
-            //     onPress={() => this.saveRole()}>
-            //     <Text style={submitBtnText}>{I18n.t("SAVE")}</Text>
-            //   </TouchableOpacity>
-            //   <View style={{ margin: 20 }}></View>
-            // </View>
           }
         />
 

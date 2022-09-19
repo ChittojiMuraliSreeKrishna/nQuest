@@ -23,6 +23,7 @@ export const NEW_SALE_URL = {
   getPromoDiscount: "/connection-pool/promo/checkPromtionTextile",
   getDslipData: "/new-sale/newsale/getdeliveryslip",
   getDsAsbarcode: "/inventory/inventory-management/scan-barcode",
+  getRetailBarcode: "inventory/inventoryRetail/getBarcodeId",
 };
 
 export const INVENTORY_PORTAL = {
@@ -79,7 +80,7 @@ export const USER_MANAGEMENT_URL = {
   // Roles
   getAllRoles: "/user-management/roles/client",
   saveRole: "/user-management/roles/create-role",
-  getAllPrivileges: "/user-management/roles/getAllPrivilages",
+  getAllPrivileges: "/user-management/roles/privileges",
   editRole: "/user-management/roles/updateRole",
   getRolesBySearch: "/user-management/roles/rolesWithFilter",
   getPrivilegesByRoleName: "/user-management/roles/privilagesByName/",
@@ -114,4 +115,4 @@ export const REPORTS_URL = {
   topFiveSales: "/new-sale/reports/getTopfiveSalesByStore",
   activeIactivePromos: "/connection-pool/promo/activeVSinactivepromos",
   saleSummary: "/new-sale/reports/getsaleSummery"
-}
+};

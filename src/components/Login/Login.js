@@ -77,37 +77,37 @@ export default class Login extends Component {
     this.setState({ store: value });
   };
 
-  registerClient() {
+  registerClient () {
     // console.log('adsadasdd');
     this.props.navigation.navigate("RegisterClient");
   }
 
-  validationForm() {
+  validationForm () {
     let isFormValid = true;
     let errors = {};
 
     if (this.state.userName.length < 1) {
       isFormValid = false;
-      errors["userName"] = urmErrorMessages.loginUserName;
+      errors[ "userName" ] = urmErrorMessages.loginUserName;
       this.setState({ userValid: false });
     }
     if (this.state.password.length < 1) {
       isFormValid = false;
-      errors["password"] = urmErrorMessages.password;
+      errors[ "password" ] = urmErrorMessages.password;
       this.setState({ passwordValid: false });
     }
 
     this.setState({ errors: errors });
     return isFormValid;
   }
-  clearAllData() {
-    AsyncStorage.clear()
+  clearAllData () {
+    AsyncStorage.clear();
     AsyncStorage.getAllKeys()
-      .then(keys => AsyncStorage.multiRemove(keys))
+      .then(keys => AsyncStorage.multiRemove(keys));
 
   }
 
-  async login() {
+  async login () {
     const isFormValid = this.validationForm();
     const { userName, password } = this.state;
     if (isFormValid) {
@@ -125,7 +125,7 @@ export default class Login extends Component {
             if (res.data.authenticationResult) {
               // Token
               const token = res.data.authenticationResult.idToken;
-              AsyncStorage.setItem("username", jwt_decode(token)["name"]);
+              AsyncStorage.setItem("username", jwt_decode(token)[ "name" ]);
               console.log("Token", jwt_decode(token));
               AsyncStorage.setItem("tokenkey", JSON.stringify(token)).catch(
                 (err) => {
@@ -139,7 +139,7 @@ export default class Login extends Component {
                   Authorization: "Bearer" + " " + finalToken,
                 };
               });
-              AsyncStorage.setItem("userId", jwt_decode(token)["custom:userId"])
+              AsyncStorage.setItem("userId", jwt_decode(token)[ "custom:userId" ])
                 .then(() => { })
                 .catch(() => {
                   this.setState({ loading: false });
@@ -147,7 +147,7 @@ export default class Login extends Component {
                 });
               AsyncStorage.setItem(
                 "rolename",
-                jwt_decode(token)["custom:roleName"],
+                jwt_decode(token)[ "custom:roleName" ],
               )
                 .then(() => { })
                 .catch(() => {
@@ -156,7 +156,7 @@ export default class Login extends Component {
                 });
               AsyncStorage.setItem(
                 "phone_number",
-                jwt_decode(token)["phone_number"],
+                jwt_decode(token)[ "phone_number" ],
               )
                 .then(() => { })
                 .catch((err) => {
@@ -165,7 +165,7 @@ export default class Login extends Component {
                 });
               AsyncStorage.setItem(
                 "custom:clientId1",
-                jwt_decode(token)["custom:clientId1"],
+                jwt_decode(token)[ "custom:clientId1" ],
               )
                 .then(() => {
                   // console.log
@@ -183,7 +183,7 @@ export default class Login extends Component {
               });
               AsyncStorage.setItem(
                 "custom:isEsSlipEnabled",
-                jwt_decode(token)["custom:isEsSlipEnabled"],
+                jwt_decode(token)[ "custom:isEsSlipEnabled" ],
               )
                 .then(() => { })
                 .catch(() => {
@@ -192,9 +192,9 @@ export default class Login extends Component {
                 });
               AsyncStorage.setItem(
                 "roleType",
-                jwt_decode(token)["custom:roleName"],
+                jwt_decode(token)[ "custom:roleName" ],
               );
-              let storesAssigned = jwt_decode(token)["custom:assignedStores"];
+              let storesAssigned = jwt_decode(token)[ "custom:assignedStores" ];
 
               AsyncStorage.getItem("roleType").then((value) => {
                 console.log("Roles", value);
@@ -209,10 +209,10 @@ export default class Login extends Component {
                       .map((pair) => pair.split(":"));
                     let store = [];
                     table.forEach((ele, index) => {
-                      if ((ele[0], ele[1])) {
+                      if ((ele[ 0 ], ele[ 1 ])) {
                         const obj = {
-                          name: ele[0],
-                          id: ele[1],
+                          name: ele[ 0 ],
+                          id: ele[ 1 ],
                         };
                         store.push(obj);
                       }
@@ -235,7 +235,7 @@ export default class Login extends Component {
                   : "";
                 this.props.navigation.navigate("ManagePassword", {
                   session: res.data.session,
-                  roleName: roleData["custom:roleName"],
+                  roleName: roleData[ "custom:roleName" ],
                   userName: this.state.userName,
                   password: this.state.password,
                 });
@@ -243,7 +243,7 @@ export default class Login extends Component {
                 console.log(this.state.roleName);
               }
             }
-            this.setState({ userName: "", password: "" })
+            this.setState({ userName: "", password: "" });
           } else {
             alert(res && res.data && res.data.message ? res.data.message : "Please Enter UserName and Password");
             this.setState({ loading: false, userName: "", password: "" });
@@ -256,17 +256,17 @@ export default class Login extends Component {
     }
   }
 
-  getAdminStores() {
+  getAdminStores () {
     LoginService.getUserStores().then((res) => {
       console.log("getting Stores", res);
       if (res.data.length > 1) {
         this.props.navigation.navigate("SelectStore");
       } else {
-        AsyncStorage.setItem("storeId", String(res.data[0].id)).catch(
+        AsyncStorage.setItem("storeId", String(res.data[ 0 ].id)).catch(
           (err) => { },
         );
-        global.storeName = String(res.data[0].name);
-        AsyncStorage.setItem("storeName", String(res.data[0].name)).catch(
+        global.storeName = String(res.data[ 0 ].name);
+        AsyncStorage.setItem("storeName", String(res.data[ 0 ].name)).catch(
           (err) => { },
         );
         AsyncStorage.getItem("rolename").then((name) => {
@@ -274,23 +274,23 @@ export default class Login extends Component {
             if (res) {
               AsyncStorage.setItem("storeName", storeName).then(() => {
                 this.props.navigation.push("HomeNavigation");
-              })
+              });
             }
-          })
-        })
+          });
+        });
       }
     });
   }
 
-  async getStores() {
+  async getStores () {
     const { assignedStores } = this.state;
     console.log({ assignedStores }, assignedStores.length);
     await AsyncStorage.setItem("storesList", assignedStores).catch((err) => { });
     if (assignedStores && assignedStores.length > 1) {
       this.props.navigation.navigate("SelectStore", { items: assignedStores });
     } else {
-      let storeName = String(assignedStores[0].name);
-      let storeId = String(assignedStores[0].id);
+      let storeName = String(assignedStores[ 0 ].name);
+      let storeId = String(assignedStores[ 0 ].id);
       console.log({ storeName });
       console.log("storeId", storeId);
       AsyncStorage.setItem("storeId", storeId);
@@ -300,62 +300,62 @@ export default class Login extends Component {
           if (res) {
             AsyncStorage.setItem("storeName", storeName).then(() => {
               this.props.navigation.push("HomeNavigation");
-            })
+            });
           }
-        })
-      })
+        });
+      });
     }
   }
 
-  forgotPassword() {
+  forgotPassword () {
     this.props.navigation.navigate("ForgotPassword", {
       username: this.state.userName,
     });
   }
 
-  componentDidMount() {
+  componentDidMount () {
     // this.refresh()
-    this.clearAllData()
+    this.clearAllData();
   }
 
   refresh = async () => {
     try {
       await AsyncStorage.removeItem("phone_number");
-      await AsyncStorage.clear().then(() => console.log('Cleared'))
+      await AsyncStorage.clear().then(() => console.log('Cleared'));
       return true;
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return true;
     }
-  }
+  };
 
 
-  render() {
+  render () {
     const userValid = this.state.userValid;
     const passValid = this.state.passwordValid;
     return (
-      <KeyboardAwareScrollView KeyboardAwareScrollView enableOnAndroid={true}>
-        <View style={styles.container}>
-          {this.state.loading && <Loader loading={this.state.loading} />}
-          <SafeAreaView>
-            <View style={scss.mainContainer}>
-              <View>
-                <Image
-                  source={require("../../commonUtils/assets/Images/retail_logo_head3x.png")}
-                  style={scss.logoImg}
-                />
-              </View>
-              <View
-                style={{ flex: 1 }}
-              >
-                <Text style={scss.headerText}>
-                  Login Now
-                </Text>
-                <Text style={scss.subHeaderText}>Let's explore the best</Text>
-              </View>
+      <View style={styles.container}>
+        {this.state.loading && <Loader loading={this.state.loading} />}
+        <SafeAreaView>
+          <View style={scss.mainContainer}>
+            <View>
+              <Image
+                source={require("../../commonUtils/assets/Images/retail_logo_head3x.png")}
+                style={scss.logoImg}
+              />
+            </View>
+            <View
+              style={{ flex: 1 }}
+            >
+              <Text style={scss.headerText}>
+                Login Now
+              </Text>
+              <Text style={scss.subHeaderText}>Let's explore the best</Text>
+            </View>
 
-              <View style={{ flex: 5 }}>
-                <Text style={styles.headings}>{I18n.t("Username")}</Text>
+            <View style={{ flex: 5 }}>
+              <KeyboardAwareScrollView KeyboardAwareScrollView enableOnAndroid={true}>
+                <Text style={scss.input_heading}>{I18n.t("Username")}</Text>
                 <TextInput
                   activeUnderlineColor="#000"
                   mode="outlined"
@@ -373,9 +373,9 @@ export default class Login extends Component {
                   }}
                 />
                 {!userValid && (
-                  <Message imp={true} message={this.state.errors["userName"]} />
+                  <Message imp={true} message={this.state.errors[ "userName" ]} />
                 )}
-                <Text style={styles.headings}>{I18n.t("Password")}</Text>
+                <Text style={scss.input_heading}>{I18n.t("Password")}</Text>
                 <TextInput
                   activeUnderlineColor="#000"
                   mode="outlined"
@@ -395,57 +395,10 @@ export default class Login extends Component {
                   }}
                 />
                 {!passValid && (
-                  <Message imp={true} message={this.state.errors["password"]} />
+                  <Message imp={true} message={this.state.errors[ "password" ]} />
                 )}
 
                 <View>
-                  <View
-                    style={{
-                      flexDirection: Device.isTablet ? "row" : "column",
-                      justifyContent: Device.isTablet
-                        ? "space-around"
-                        : "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <View
-                      style={{
-                        alignItems: "center",
-                        flexDirection: "row",
-                      }}
-                    >
-                    </View>
-
-                    <View
-                      style={{
-                        alignItems: "center",
-                        flexDirection: "row",
-                      }}
-                    >
-                      <Text
-                        style={
-                          Device.isTablet
-                            ? styles.navigationText_tablet
-                            : styles.navigationText_mobile
-                        }
-                      >
-                        {" "}
-                        {I18n.t("Forgot password")}{" "}
-                      </Text>
-                      <Button onPress={() => this.forgotPassword()} mode="text">
-                        <Text
-                          style={
-                            Device.isTablet
-                              ? styles.navigationButtonText_tablet
-                              : styles.navigationButtonText_mobile
-                          }
-                        >
-                          {" "}
-                          {I18n.t("Reset")}{" "}
-                        </Text>
-                      </Button>
-                    </View>
-                  </View>
                 </View>
                 <TouchableOpacity
                   style={scss.login_btn}
@@ -458,11 +411,29 @@ export default class Login extends Component {
                     color="#FFF"
                   ></Icon>
                 </TouchableOpacity>
-              </View>
+
+                <View
+                  style={scss.forget_pass_container}
+                >
+                  <Text
+                    style={scss.forget_pass_text}>
+                    {" "}
+                    {I18n.t("Forgot password")}{" "}
+                  </Text>
+                  <Button onPress={() => this.forgotPassword()} mode="text">
+                    <Text
+                      style={scss.forget_pass_btn}
+                    >
+                      {" "}
+                      {I18n.t("Reset")}{" "}
+                    </Text>
+                  </Button>
+                </View>
+              </KeyboardAwareScrollView>
             </View>
-          </SafeAreaView>
-        </View>
-      </KeyboardAwareScrollView>
+          </View>
+        </SafeAreaView >
+      </View >
     );
   }
 }

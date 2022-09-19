@@ -6,7 +6,7 @@ import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
-import { Appbar, TextInput } from 'react-native-paper';
+import { Appbar, Text as Txt, TextInput } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -15,7 +15,6 @@ import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import { RF, RH, RW } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
-import { Text as Txt } from 'react-native-paper';
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
 
@@ -52,7 +51,7 @@ export class ListOfEstimationSlip extends Component {
     };
   }
 
-  componentDidMount() {
+  componentDidMount () {
     AsyncStorage.getItem("storeId").then((value) => {
       storeStringId = value;
       this.setState({ storeId: parseInt(storeStringId) });
@@ -65,19 +64,19 @@ export class ListOfEstimationSlip extends Component {
 
   }
 
-  filterAction() {
-    this.setState({ flagFilterOpen: true, modalVisible: true })
+  filterAction () {
+    this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
 
-  handledeleteEstimationSlip(item, index) {
+  handledeleteEstimationSlip (item, index) {
     this.setState({ deleteEstimationSlip: true, modalVisible: true, flagViewDetail: false });
   }
 
-  handleviewEstimationSlip(item, index) {
+  handleviewEstimationSlip (item, index) {
     console.log({ item });
-    this.state.viewEstimationsSlipList.push(item)
-    this.setState({ viewEstimationsSlipList: this.state.viewEstimationsSlipList, flagViewDetail: true, viewEstimationsSlipSubList: item.lineItems })
+    this.state.viewEstimationsSlipList.push(item);
+    this.setState({ viewEstimationsSlipList: this.state.viewEstimationsSlipList, flagViewDetail: true });
   }
 
 
@@ -86,19 +85,19 @@ export class ListOfEstimationSlip extends Component {
     alert("you have deleted", index);
   };
 
-  estimationModelCancel() {
+  estimationModelCancel () {
     this.setState({ modalVisible: false });
   }
 
-  datepickerClicked() {
+  datepickerClicked () {
     this.setState({ datepickerOpen: true });
   }
 
-  enddatepickerClicked() {
+  enddatepickerClicked () {
     this.setState({ datepickerendOpen: true });
   }
 
-  datepickerDoneClicked() {
+  datepickerDoneClicked () {
     if (parseInt(this.state.date.getDate()) < 10 && (parseInt(this.state.date.getMonth()) < 10)) {
       this.setState({ startDate: this.state.date.getFullYear() + "-0" + (this.state.date.getMonth() + 1) + "-" + "0" + this.state.date.getDate() });
     }
@@ -116,7 +115,7 @@ export class ListOfEstimationSlip extends Component {
     this.setState({ doneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
 
-  datepickerendDoneClicked() {
+  datepickerendDoneClicked () {
     if (parseInt(this.state.enddate.getDate()) < 10 && (parseInt(this.state.enddate.getMonth()) < 10)) {
       this.setState({ endDate: this.state.enddate.getFullYear() + "-0" + (this.state.enddate.getMonth() + 1) + "-" + "0" + this.state.enddate.getDate() });
     }
@@ -144,11 +143,11 @@ export class ListOfEstimationSlip extends Component {
     this.setState({ barcode: value });
   };
 
-  datepickerCancelClicked() {
+  datepickerCancelClicked () {
     this.setState({ date: new Date(), enddate: new Date(), datepickerOpen: false, datepickerendOpen: false });
   }
 
-  applyEstimationSlipFilter() {
+  applyEstimationSlipFilter () {
     if (this.state.startDate === "") {
       this.state.startDate = null;
     }
@@ -181,45 +180,45 @@ export class ListOfEstimationSlip extends Component {
     console.log(ReportsService.estimationSlips());
     ReportsService.estimationSlips(obj, pageNumber).then((res) => {
       console.log(res.data.result.deliverySlip);
-      if (res.data && res.data["isSuccess"] === "true") {
+      if (res.data && res.data[ "isSuccess" ] === "true") {
         if (res.data.result.length !== 0) {
           this.setState({ filterActive: true });
           this.setState({ estimationSlips: res.data.result.deliverySlip.content });
-          this.setState({ modalVisible: false, flagFilterOpen: false })
+          this.setState({ modalVisible: false, flagFilterOpen: false });
         } else {
           alert("records not found");
         }
-        this.setState({ startDate: "", endDate: "", dsStatus: "", barcode: "", dsNumber: "" })
+        this.setState({ startDate: "", endDate: "", dsStatus: "", barcode: "", dsNumber: "" });
         console.log(this.props.estimationSlip);
       }
       else {
         alert(res.data.message);
         this.props.modelCancelCallback();
-        this.setState({ startDate: "", endDate: "", dsStatus: "", barcode: "", dsNumber: "" })
+        this.setState({ startDate: "", endDate: "", dsStatus: "", barcode: "", dsNumber: "" });
       }
     }
     ).catch(() => {
       this.setState({ loading: false });
       alert('No Results Found');
       this.props.modelCancelCallback();
-      this.setState({ startDate: "", endDate: "", dsStatus: "", barcode: "", dsNumber: "" })
+      this.setState({ startDate: "", endDate: "", dsStatus: "", barcode: "", dsNumber: "" });
     });
 
   }
 
-  modelCancel() {
-    this.setState({ modalVisible: false, flagFilterOpen: false, deleteEstimationSlip: false, flagViewDetail: false })
+  modelCancel () {
+    this.setState({ modalVisible: false, flagFilterOpen: false, deleteEstimationSlip: false, flagViewDetail: false });
   }
 
-  clearFilterAction() {
-    this.setState({ filterActive: false, estimationSlips: [], fromDate: "", toDate: "", dsStatus: "", dsNumber: "", barcode: "", flagViewDetail: false, flagFilterOpen: false })
+  clearFilterAction () {
+    this.setState({ filterActive: false, estimationSlips: [], fromDate: "", toDate: "", dsStatus: "", dsNumber: "", barcode: "", flagViewDetail: false, flagFilterOpen: false });
   }
 
-  closeViewAction() {
-    this.setState({ flagViewDetail: false, viewEstimationsSlipList: [], viewEstimationsSlipSubList: [] })
+  closeViewAction () {
+    this.setState({ flagViewDetail: false, viewEstimationsSlipList: [], viewEstimationsSlipSubList: [] });
   }
 
-  render() {
+  render () {
     return (
       <View>
         <FlatList
@@ -269,7 +268,7 @@ export class ListOfEstimationSlip extends Component {
                   <View style={scss.flatListFooter}>
                     <Text style={scss.footerText}>
                       {I18n.t("DATE")}:
-                      {item.lastModifiedDate ? item.lastModifiedDate.toString().split(/T/)[0]
+                      {item.lastModifiedDate ? item.lastModifiedDate.toString().split(/T/)[ 0 ]
                         : item.lastModifiedDate}
                     </Text>
                     <View style={scss.buttonContainer}>
@@ -296,7 +295,7 @@ export class ListOfEstimationSlip extends Component {
             <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}
               onBackButtonPress={() => this.estimationModelCancel()}
               onBackdropPress={() => this.estimationModelCancel()} >
-              <View style={[styles.deleteMainContainer, { backgroundColor: "#ED1C24" }]}>
+              <View style={[ styles.deleteMainContainer, { backgroundColor: "#ED1C24" } ]}>
                 <View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: RH(5), height: Device.isTablet ? RH(60) : RH(50) }}>
                     <View>
@@ -324,16 +323,16 @@ export class ListOfEstimationSlip extends Component {
                     color: '#353C40'
                   }}> {I18n.t("Are you sure want to delete Estimation Slip")} ?  </Text>
                   <TouchableOpacity
-                    style={[Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile, { marginTop: Device.isTablet ? RH(40) : RH(30) }]} onPress={() => this.deleteEstimationSlip(item, index)}
+                    style={[ Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile, { marginTop: Device.isTablet ? RH(40) : RH(30) } ]} onPress={() => this.deleteEstimationSlip(item, index)}
                   >
                     <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile}  > {I18n.t("DELETE")} </Text>
 
                   </TouchableOpacity>
 
                   <TouchableOpacity
-                    style={[Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile, { borderColor: '#ED1C24', }]} onPress={() => this.estimationModelCancel()}
+                    style={[ Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile, { borderColor: '#ED1C24', } ]} onPress={() => this.estimationModelCancel()}
                   >
-                    <Text style={[Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile, { color: '#ED1C24' }]}  > {I18n.t("CANCEL")} </Text>
+                    <Text style={[ Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile, { color: '#ED1C24' } ]}  > {I18n.t("CANCEL")} </Text>
 
                   </TouchableOpacity>
                 </View>
@@ -432,7 +431,7 @@ export class ListOfEstimationSlip extends Component {
                       />
                     </View>
                   )}
-                  <View style={[styles.rnSelectContainer_mobile, { width: deviceWidth - 30 }]}>
+                  <View style={[ styles.rnSelectContainer_mobile, { width: deviceWidth - 30 } ]}>
                     <RNPickerSelect
                       // style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
                       placeholder={{
@@ -481,11 +480,11 @@ export class ListOfEstimationSlip extends Component {
                     onChangeText={this.handleBarCode}
                   />
                   <View style={forms.action_buttons_container}>
-                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                    <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
                       onPress={() => this.applyEstimationSlipFilter()}>
                       <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                    <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
                       onPress={() => this.modelCancel()}>
                       <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                     </TouchableOpacity>
@@ -523,10 +522,8 @@ export class ListOfEstimationSlip extends Component {
                       </View>
                       <View style={scss.model_subContainer}>
                         <ScrollView>
-                          <FlatList
-                            data={this.state.viewEstimationsSlipSubList}
-                            scrollEnabled={true}
-                            renderItem={({ item, index }) => (
+                          {item.lineItems.map((item, index) => {
+                            return (
                               <View id={index} style={scss.model_subbody}>
                                 <View style={scss.model_text_container}>
                                   <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>Barcode:{"\n"}{item.barCode}</Txt>
@@ -544,12 +541,12 @@ export class ListOfEstimationSlip extends Component {
                                   <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>Net Amount:{"\n"}{item.netValue}</Txt>
                                 </View>
                               </View>
-                            )}
-                          />
+                            );
+                          })}
                         </ScrollView>
                       </View>
                       <View>
-                        <TouchableOpacity onPress={() => this.closeViewAction()} style={[forms.action_button, forms.cancel_btn]}>
+                        <TouchableOpacity onPress={() => this.closeViewAction()} style={[ forms.action_button, forms.cancel_btn ]}>
                           <Text style={forms.cancel_btn_text}>Close</Text>
                         </TouchableOpacity>
                       </View>

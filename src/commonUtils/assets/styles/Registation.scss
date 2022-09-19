@@ -27,7 +27,7 @@
 
 .login_btn {
   min-width: 90%;
-  margin: 10px 5%;
+  margin: 20px 5%;
   height: 50px;
   background-color: $primary-color;
   border-radius: 5px;
@@ -42,4 +42,35 @@
   color: $white;
   font-size: 15px;
   margin-right: 5px;
+}
+
+.input_field {
+  max-width: 90%;
+  margin: 0 5%;
+  max-height: 50px;
+}
+
+.input_heading {
+  color: $grey-dark;
+  margin-left: 20px;
+  margin-top: 10px;
+  font-size: 15px;
+}
+
+.forget_pass_container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.forget_pass_text {
+  font-size: 20px;
+  color: $grey-dark,
+}
+
+.forget_pass_btn {
+  font-size: 20px;
+  font-weight: bold;
+  color: $black;
 }

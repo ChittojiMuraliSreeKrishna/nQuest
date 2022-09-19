@@ -18,21 +18,18 @@ import { Text } from 'react-native-paper';
 import IconFA from 'react-native-vector-icons/FontAwesome';
 import IconMa from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconMAA from 'react-native-vector-icons/MaterialIcons';
+import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from "../../commonUtils/assets/styles/style.scss";
 import Loader from "../../commonUtils/loader";
 import { RH, RW } from "../../Responsive";
 import InventoryService from "../services/InventoryService";
 import {
-  cancelBtn,
-  cancelBtnText,
   datePicker,
   datePickerBtnText,
   datePickerButton1,
   datePickerButton2,
   dateSelector,
-  dateText,
-  submitBtn,
-  submitBtnText
+  dateText
 } from "../Styles/FormFields";
 import {
   filterCloseImage,
@@ -41,7 +38,6 @@ import {
   filterSubContainer
 } from "../Styles/PopupStyles";
 import { flatListTitle, listEmptyMessage } from "../Styles/Styles";
-import forms from '../../commonUtils/assets/styles/formFields.scss';
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -69,20 +65,20 @@ export default class ProductCombo extends Component {
     };
   }
 
-  async componentDidMount() {
+  async componentDidMount () {
     const storeId = await AsyncStorage.getItem("storeId");
     this.setState({ storeId: parseInt(storeId) });
     this.getAllProductsCombo();
   }
 
   // Refreshing the codes
-  refresh() {
+  refresh () {
     this.setState({ productComboList: [] }, () => {
       this.getAllProductsCombo();
     });
   }
 
-  async getAllProductsCombo() {
+  async getAllProductsCombo () {
     this.setState({ loading: true });
     const { storeId, fromDate, toDate } = this.state;
     let params = `?storeId=${storeId}`;
@@ -100,27 +96,27 @@ export default class ProductCombo extends Component {
       });
   }
 
-  filterAction() {
+  filterAction () {
     this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
-  clearFilterAction() {
+  clearFilterAction () {
     this.setState({ filterActive: false, flagFilterOpen: false, filteredProductsList: [], startDate: "", endDate: "" });
   }
 
-  modelCancel() {
+  modelCancel () {
     this.setState({ modalVisible: false, flagViewProduct: false, flagFilterOpen: false, viewProductData: [] });
   }
 
   // Date Actions
-  datepickerClicked() {
+  datepickerClicked () {
     this.setState({ datepickerOpen: true });
   }
 
-  enddatepickerClicked() {
+  enddatepickerClicked () {
     this.setState({ datepickerendOpen: true });
   }
-  datepickerDoneClicked() {
+  datepickerDoneClicked () {
     if (
       parseInt(this.state.date.getDate()) < 10 &&
       parseInt(this.state.date.getMonth()) < 10
@@ -170,7 +166,7 @@ export default class ProductCombo extends Component {
     });
   }
 
-  datepickerendDoneClicked() {
+  datepickerendDoneClicked () {
     if (
       parseInt(this.state.enddate.getDate()) < 10 &&
       parseInt(this.state.enddate.getMonth()) < 10
@@ -220,7 +216,7 @@ export default class ProductCombo extends Component {
     });
   }
 
-  datepickerCancelClicked() {
+  datepickerCancelClicked () {
     this.setState({
       date: new Date(),
       enddate: new Date(),
@@ -229,7 +225,7 @@ export default class ProductCombo extends Component {
     });
   }
 
-  handleAddProductCombo() {
+  handleAddProductCombo () {
     this.props.navigation.navigate("AddProduct", {
       isEdit: false,
       goBack: () => this.refresh(),
@@ -237,11 +233,11 @@ export default class ProductCombo extends Component {
     });
   }
 
-  applyBarcodeFilter() {
+  applyBarcodeFilter () {
     const { startDate, endDate, storeId } = this.state;
-    let pageNumber = 0
-    const filParams = `?storeId=${storeId}&fromDate=${startDate ? startDate : null}&page=0&size=10`
-    console.log({ filParams })
+    let pageNumber = 0;
+    const filParams = `?storeId=${storeId}&fromDate=${startDate ? startDate : null}&page=0&size=10`;
+    console.log({ filParams });
     InventoryService.getProductCombo(filParams).then(
       (res) => {
         console.log({ res });
@@ -255,38 +251,38 @@ export default class ProductCombo extends Component {
           this.setState({ modalVisible: false });
           alert(res.data.message);
         }
-        console.log(this.state.filteredProductsList, "Filter")
+        console.log(this.state.filteredProductsList, "Filter");
       },
     );
   }
 
-  viewProductActon(data, index) {
-    this.state.viewProductData.push({ data })
+  viewProductActon (data, index) {
+    this.state.viewProductData.push({ data });
     this.setState({
       viewProductData: this.state.viewProductData,
       modalVisibleView: true,
       flagViewProduct: true,
-    })
+    });
     // console.log({ item }, item.barcode)
-    console.log(this.state.viewProductData[0].data.productTextiles)
+    console.log(this.state.viewProductData[ 0 ].data.productTextiles);
   }
 
   modalHandleForClose = () => {
     this.setState({
       modalVisible: !this.state.modalVisible
-    })
-  }
+    });
+  };
 
   modalHandleForViewClose = () => {
     this.setState({
       modalVisibleView: !this.state.modalVisibleView,
       flagViewProduct: false,
       viewProductData: []
-    })
-  }
+    });
+  };
 
 
-  render() {
+  render () {
     return (
       <View>
         {this.state.loading && <Loader loading={this.state.loading} />}
@@ -395,22 +391,22 @@ export default class ProductCombo extends Component {
                     </View>
                   </View>
                 </View>
-                <ScrollView enableOnAndroid={true}>
-                  <View style={scss.model_body}>
-                    <FlatList
-                      removeClippedSubviews={false}
-                      data={this.state.viewProductData}
-                      renderItem={({ item, index }) => (
-                        <View>
-                          <View style={scss.model_text_container}>
-                            <Text variant="titleMedium" selectable={true} key={Math.random()}>{item.data.barcode}</Text>
-                            <Text variant="bodyLarge">Qty: {item.data.bundleQuantity}</Text>
-                          </View>
-                          <View style={scss.model_text_container}>
-                            <Text variant="bodyLarge">Name: {item.data.name}</Text>
-                            <Text variant="bodyLarge">Price: {item.data.itemMrp}</Text>
-                          </View>
-                          <View>
+                <View style={scss.model_body}>
+                  <FlatList
+                    removeClippedSubviews={false}
+                    data={this.state.viewProductData}
+                    renderItem={({ item, index }) => (
+                      <View>
+                        <View style={scss.model_text_container}>
+                          <Text variant="titleMedium" selectable={true} key={Math.random()}>{item.data.barcode}</Text>
+                          <Text variant="bodyLarge">Qty: {item.data.bundleQuantity}</Text>
+                        </View>
+                        <View style={scss.model_text_container}>
+                          <Text variant="bodyLarge">Name: {item.data.name}</Text>
+                          <Text variant="bodyLarge">Price: {item.data.itemMrp}</Text>
+                        </View>
+                        <View style={scss.model_subContainer}>
+                          <ScrollView enableOnAndroid={true}>
                             {item.data.productTextiles.map((data, index) => {
                               return (
                                 <View id={index} style={scss.model_subbody}>
@@ -427,14 +423,14 @@ export default class ProductCombo extends Component {
                                     <Text></Text>
                                   </View>
                                 </View>
-                              )
+                              );
                             })}
-                          </View>
+                          </ScrollView>
                         </View>
-                      )}
-                    />
-                  </View>
-                </ScrollView>
+                      </View>
+                    )}
+                  />
+                </View>
               </View>
             </Modal>
           </View>
@@ -549,11 +545,11 @@ export default class ProductCombo extends Component {
                     </View>
                   )}
                   <View style={forms.action_buttons_container}>
-                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                    <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
                       onPress={() => this.applyBarcodeFilter()}>
                       <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                    <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
                       onPress={() => this.modelCancel()}>
                       <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                     </TouchableOpacity>
