@@ -293,7 +293,9 @@ export class ListOfEstimationSlip extends Component {
         />
         {this.state.deleteEstimationSlip && (
           <View>
-            <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}>
+            <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}
+              onBackButtonPress={() => this.estimationModelCancel()}
+              onBackdropPress={() => this.estimationModelCancel()} >
               <View style={[styles.deleteMainContainer, { backgroundColor: "#ED1C24" }]}>
                 <View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: RH(5), height: Device.isTablet ? RH(60) : RH(50) }}>
@@ -343,7 +345,9 @@ export class ListOfEstimationSlip extends Component {
 
         {this.state.flagFilterOpen && (
           <View>
-            <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}>
+            <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}
+              onBackButtonPress={() => this.modelCancel()}
+              onBackdropPress={() => this.modelCancel()} >
               <View style={styles.filterMainContainer} >
                 <View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: RH(5), height: Device.isTablet ? RH(60) : RH(50) }}>

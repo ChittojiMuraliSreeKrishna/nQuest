@@ -37,6 +37,8 @@ import {
   filterMainContainer,
   filterSubContainer
 } from "../Styles/PopupStyles";
+import forms from '../../commonUtils/assets/styles/formFields.scss';
+
 var deviceWidth = Dimensions.get("window").width;
 var deviceHeight = Dimensions.get("window").height;
 
@@ -379,7 +381,9 @@ export default class Stores extends Component {
         />
         {this.state.flagFilterOpen && (
           <View>
-            <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}>
+            <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}
+              onBackButtonPress={() => this.modelCancel()}
+              onBackdropPress={() => this.modelCancel()} >
               <View style={filterMainContainer}>
                 <View>
                   <View style={filterSubContainer}>
@@ -462,18 +466,16 @@ export default class Stores extends Component {
                     value={this.state.storeName}
                     onChangeText={this.handleStoreName}
                   />
-                  <TouchableOpacity
-                    style={submitBtn}
-                    onPress={() => this.applyStoreFilter()}
-                  >
-                    <Text style={submitBtnText}>{I18n.t("APPLY")}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={cancelBtn}
-                    onPress={() => this.modelCancel()}
-                  >
-                    <Text style={cancelBtnText}>{I18n.t("CANCEL")}</Text>
-                  </TouchableOpacity>
+                  <View style={forms.action_buttons_container}>
+                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                      onPress={() => this.applyStoreFilter()}>
+                      <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                      onPress={() => this.modelCancel()}>
+                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </KeyboardAwareScrollView>
               </View>
             </Modal>

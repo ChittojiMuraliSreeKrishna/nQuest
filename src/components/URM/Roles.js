@@ -320,7 +320,9 @@ export default class Roles extends Component {
 				/>
 				{this.state.flagFilterOpen && (
 					<View>
-						<Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}>
+						<Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}
+							onBackButtonPress={() => this.modelCancel()}
+							onBackdropPress={() => this.modelCancel()} >
 							<View style={styles.filterMainContainer}>
 								<View>
 									<View style={filterSubContainer}>
@@ -437,5 +439,5 @@ const styles = StyleSheet.create({
 		backgroundColor: '#ffffff',
 		marginTop: Device.isTablet ? deviceheight - RH(500) : deviceheight - RH(400),
 		height: Device.isTablet ? RH(500) : RH(400),
-	  }
+	}
 })

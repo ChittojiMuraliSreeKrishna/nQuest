@@ -482,7 +482,9 @@ class EditPool extends Component {
 
                             {this.state.flagCustomerOpen && (
                                 <View>
-                                    <Modal isVisible={this.state.modalVisible}>
+                                    <Modal isVisible={this.state.modalVisible}
+                                      onBackButtonPress={() => this.modelCancel()}
+                                      onBackdropPress={() => this.modelCancel()} >
 
                                         <View style={{
                                             width: deviceWidth,

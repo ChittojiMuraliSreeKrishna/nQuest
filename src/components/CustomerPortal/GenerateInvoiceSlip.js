@@ -821,7 +821,9 @@ class GenerateInvoiceSlip extends Component {
 
               {this.state.lineItemDelete && (
                 <View>
-                  <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}>
+                  <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}
+                    onBackButtonPress={() => this.modelCancel()}
+                    onBackdropPress={() => this.modelCancel()} >
                     <View style={[styles.filterMainContainer, { height: Device.isTablet ? 350 : 300, marginTop: Device.isTablet ? deviceHeight - 350 : deviceHeight - 300, backgroundColor: '#ED1C24' }]}>
                       <View>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
@@ -1051,7 +1053,8 @@ class GenerateInvoiceSlip extends Component {
         {
           this.state.customerTagging && (
             <View style={{ backgroundColor: color.white }}>
-              <Modal isVisible={this.state.modalVisible}>
+              <Modal isVisible={this.state.modalVisible} onBackButtonPress={() => this.modelCancel()}
+                onBackdropPress={() => this.modelCancel()} >
                 <View style={[Device.isTablet ? styles.filterMainContainer_tablet : styles.filterMainContainer_mobile, { height: Device.isTablet ? 400 : 300 }]}>
 
                   <View>
@@ -1115,7 +1118,8 @@ class GenerateInvoiceSlip extends Component {
         {
           this.state.handleBillDiscount && (
             <View style={{ backgroundColor: color.white }}>
-              <Modal isVisible={this.state.modalVisible}>
+              <Modal isVisible={this.state.modalVisible} onBackButtonPress={() => this.modelCancel()}
+                onBackdropPress={() => this.modelCancel()} >
                 <View style={[Device.isTablet ? styles.filterMainContainer_tablet : styles.filterMainContainer_mobile, { height: Device.isTablet ? 500 : 400 }]}>
                   <View>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
@@ -1209,7 +1213,8 @@ class GenerateInvoiceSlip extends Component {
         {
           this.state.flagCustomerOpen && (
             <View style={{ backgroundColor: color.white }}>
-              <Modal isVisible={this.state.modalVisible}>
+              <Modal isVisible={this.state.modalVisible} onBackButtonPress={() => this.modelCancel()}
+                onBackdropPress={() => this.modelCancel()} >
                 <KeyboardAwareScrollView KeyboardAwareScrollView
                   enableOnAndroid={true}>
 

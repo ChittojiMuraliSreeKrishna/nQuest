@@ -296,7 +296,9 @@ export class ListOfBarcodes extends Component {
         {
           this.state.flagFilterOpen && (
             <View>
-              <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}>
+              <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
+                onBackButtonPress={() => this.modelCancel()}
+                onBackdropPress={() => this.modelCancel()} >
                 <View style={styles.filterMainContainer} >
                   <View>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: RH(5), height: Device.isTablet ? RW(60) : RW(50) }}>
@@ -456,7 +458,9 @@ export class ListOfBarcodes extends Component {
           this.state.flagViewDetail && (
             <View>
               <Modal style={{ margin: 0 }}
-                isVisible={this.state.flagViewDetail}>
+                isVisible={this.state.flagViewDetail}
+                onBackButtonPress={() => this.closeViewAction()}
+                onBackdropPress={() => this.closeViewAction()} >
                 <View style={scss.model_container}>
                   <FlatList
                     data={this.state.viewBarcodeList}

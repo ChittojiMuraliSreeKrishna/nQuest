@@ -18,6 +18,7 @@ import { customerErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
 import PlusIcon from 'react-native-vector-icons/MaterialCommunityIcons'
 import MinusIcon from 'react-native-vector-icons/MaterialCommunityIcons'
+import forms from '../../commonUtils/assets/styles/formFields.scss';
 
 
 var deviceheight = Dimensions.get('window').height;
@@ -186,7 +187,7 @@ export default class GenerateReturnSlip extends Component {
     }
     this.setState({ errors: errors });
     return isFormValid;
-  } 
+  }
 
   generateNewSlip() {
     console.log(this.state.storeId);
@@ -204,31 +205,15 @@ export default class GenerateReturnSlip extends Component {
       comments: this.state.reasonDesc
     };
     // if (isFormValid) {
-      console.log(saveObj, "params");
-      axios.post(CustomerService.saveRetunSlip(), saveObj).then((res) => {
-        console.log("return slip data,res", JSON.stringify(res.data))
-        if (res) {
-          alert(res.data.message)
-          this.setState({
-            resultData: res.data.message,
-            resultModel: true, modelVisible: true,
-            netValueList: [],
-            returnSlipTotal: 0,
-            returnInvoice: [],
-            mobileNumber: '',
-            invoiceNumber: "",
-            netValue: 0,
-            quantity: 0,
-            reason: "",
-            customerNumber: "",
-            createdBy: null
-          });
-
-        }
-        this.setState({ returnModel: false, modelVisible: false, loading: false });
-      }).catch((err) => {
+    console.log(saveObj, "params");
+    axios.post(CustomerService.saveRetunSlip(), saveObj).then((res) => {
+      console.log("return slip data,res", JSON.stringify(res.data))
+      if (res) {
+        alert(res.data.message)
         this.setState({
-          returnModel: false, modelVisible: false, loading: false,
+          resultData: res.data.message,
+          // resultModel: true,
+          modelVisible: true,
           netValueList: [],
           returnSlipTotal: 0,
           returnInvoice: [],
@@ -240,7 +225,24 @@ export default class GenerateReturnSlip extends Component {
           customerNumber: "",
           createdBy: null
         });
+
+      }
+      this.setState({ returnModel: false, modelVisible: false, loading: false });
+    }).catch((err) => {
+      this.setState({
+        returnModel: false, modelVisible: false, loading: false,
+        netValueList: [],
+        returnSlipTotal: 0,
+        returnInvoice: [],
+        mobileNumber: '',
+        invoiceNumber: "",
+        netValue: 0,
+        quantity: 0,
+        reason: "",
+        customerNumber: "",
+        createdBy: null
       });
+    });
     // }
   }
 
@@ -474,7 +476,9 @@ export default class GenerateReturnSlip extends Component {
         </View>
         {this.state.customerTagging && (
           <View>
-            <Modal style={{ margin: 0 }} isVisible={this.state.modelVisible}>
+            <Modal style={{ margin: 0 }} isVisible={this.state.modelVisible}
+              onBackButtonPress={() => this.modelCancel()}
+              onBackdropPress={() => this.modelCancel()} >
               <View style={[Device.isTablet ? styles.filterMainContainer_tablet : styles.filterMainContainer_mobile, { height: Device.isTablet ? 400 : 320, marginTop: Device.isTablet ? deviceheight - 400 : deviceheight - 320, paddingBottom: Device.isTablet ? 0 : 20 }]}>
                 <View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
@@ -518,19 +522,16 @@ export default class GenerateReturnSlip extends Component {
                   {!this.state.customerNumberValid && (
                     <Message imp={true} message={this.state.errors["customerNumber"]} />
                   )}
-                  <TouchableOpacity
-                    style={[Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile]}
-                    onPress={() => this.customerTag()}
-                  >
-                    <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile}  > {I18n.t("CONFIRM")} </Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile}
-                    onPress={() => this.modelCancel()}
-                  >
-                    <Text style={Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile}  > {I18n.t("CANCEL")} </Text>
-                  </TouchableOpacity>
+                  <View style={forms.action_buttons_container}>
+                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                      onPress={() => this.customerTag()}>
+                      <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                      onPress={() => this.modelCancel()}>
+                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
             </Modal>
@@ -741,7 +742,9 @@ export default class GenerateReturnSlip extends Component {
         )} */}
         {this.state.resultModel && (
           <View>
-            <Modal style={{ margin: 0 }} isVisible={this.state.modelVisible}>
+            <Modal style={{ margin: 0 }} isVisible={this.state.modelVisible}
+              onBackButtonPress={() => this.modelCancel()}
+              onBackdropPress={() => this.modelCancel()} >
               <View style={[Device.isTablet ? styles.filterMainContainer_tablet : styles.filterMainContainer_mobile, { height: Device.isTablet ? 300 : 250, backgroundColor: '#00aa00', marginTop: Device.isTablet ? deviceheight - 300 : deviceheight - 250 }]}>
                 <View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
