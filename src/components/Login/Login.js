@@ -182,6 +182,15 @@ export default class Login extends Component {
                 console.error("Error Getting User =>", err);
               });
               AsyncStorage.setItem(
+                "custom:isEsSlipEnabled",
+                jwt_decode(token)["custom:isEsSlipEnabled"],
+              )
+                .then(() => { })
+                .catch(() => {
+                  this.setState({ loading: false });
+                  console.log("There is error saving isEsSlipEnabled");
+                });
+              AsyncStorage.setItem(
                 "roleType",
                 jwt_decode(token)["custom:roleName"],
               );

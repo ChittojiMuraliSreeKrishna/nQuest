@@ -187,7 +187,9 @@ class GenerateInvoiceSlip extends Component {
       disableButton: false,
       discountAmountValid: true,
       errors: {},
-      dsNumberValid: true
+      dsNumberValid: true,
+      isEstimationEnable: false,
+      dayCloseDates: [],
     };
   }
 
@@ -196,6 +198,11 @@ class GenerateInvoiceSlip extends Component {
     this.setState({ storeId: storeId });
     this.getDiscountReasons();
     this.getHsnDetails();
+  }
+
+
+  componentWillMount() {
+    this.getallDates();
   }
 
   handleMenuButtonClick() {
@@ -211,6 +218,13 @@ class GenerateInvoiceSlip extends Component {
     this.setState({
       modalVisible: false, mobileNumber: ""
     });
+  }
+
+  billDiscountModelCancel() {
+    this.setState({
+      reasonDiscount: '', discApprovedBy: '', discountAmount: '',
+      discountAmountValid: true, modalVisible: false, handleBillDiscount: false
+    })
   }
 
   handlenewsaledeleteaction() {
@@ -310,7 +324,7 @@ class GenerateInvoiceSlip extends Component {
     });
   }
 
-  getDeliverySlipDetails() {
+  async getDeliverySlipDetails() {
     let costPrice = 0;
     let total = 0;
     let netTotal = 0;
@@ -320,72 +334,194 @@ class GenerateInvoiceSlip extends Component {
     this.state.rBarCodeList = [];
     this.state.dsNumberList = [];
     let esNumber = this.state.dsNumber;
-    let flag = true;
-    const { storeId } = this.state;
+    let isEstimationEnable = '';
+    let discount
+    const { storeId, dayCloseDates } = this.state;
     const obj = {
       "dsNumber": this.state.dsNumber.trim(),
     }
     this.state.dsNumberList.push(obj);
-    console.log("data in getDeliverySlipDetails", esNumber, flag, storeId);
-    CustomerService.getDsSlip(esNumber, flag, storeId).then((res) => {
-      var response = JSON.stringify(res)
-      console.log("getInvoiceSlip", JSON.stringify(res.data));
-      if (res.data) {
-        console.log(res.data);
-        this.state.dlslips.push(res.data);
-        this.setState({ dsNumber: "" })
-        if (this.state.dlslips.length > 1) {
-          const barList = this.state.dlslips.filter(
-            (test, index, array) =>
-              index ===
-              array.findIndex((findTest) => findTest.dsNumber === test.dsNumber)
-          );
-          console.log({ barList })
+    if (dayCloseDates.length !== 0) {
+      const isEsSlipEnabled = await AsyncStorage.getItem('custom:isEsSlipEnabled')
+      if (isEsSlipEnabled === "true") {
+        isEstimationEnable = true;
+        this.setState({ isEstimationEnable: true })
+      } else {
+        isEstimationEnable = false;
+        this.setState({ isEstimationEnable: false })
+      }
+      CustomerService.getDsSlip(esNumber.trim(), isEstimationEnable, storeId).then((res) => {
+        console.log("data in getDeliverySlipDetails", esNumber, isEstimationEnable, storeId);
+        console.log("getInvoiceSlip", JSON.stringify(res.data))
+        //   if (res.data) {
+        //     console.log(res.data);
+        if (isEstimationEnable) {
+          this.state.dlslips.push(res.data);
+          this.setState({ dsNumber: "" })
+          if (this.state.dlslips.length > 1) {
+            const barList = this.state.dlslips.filter(
+              (test, index, array) =>
+                index ===
+                array.findIndex((findTest) => findTest.dsNumber === test.dsNumber)
+            );
+            console.log({ barList })
 
-          if (barList.length > 1) {
-            let lineStorage = [];
-            barList.forEach((element, index) => {
-              let lineItems = element.lineItems;
-              lineStorage = [...lineStorage, ...lineItems];
-            });
+            var combineList = {};
 
-            this.setState({ barCodeList: lineStorage });
-
+            barList.forEach((itm) => {
+              var barCode = itm.barCode;
+              itm.quantity = parseInt(itm.quantity)
+              itm.netValue = parseInt(itm.netValue)
+              itm.grossValue = parseInt(itm.grossValue)
+              if (!combineList[barCode]) {
+                return combineList[barCode] = itm
+              }
+              return combineList[barCode].quantity = combineList[barCode].quantity + itm.quantity,
+                combineList[barCode].netValue = combineList[barCode].netValue + itm.netValue,
+                combineList[barCode].grossValue = combineList[barCode].grossValue + itm.grossValue
+            })
+            var combineList2 = []
+            Object.keys(combineList).forEach((key) => {
+              combineList2.push(combineList[key])
+            })
+            const clearList = [...combineList2]
+            if (barList.length > 1) {
+              this.setState({ barCodeList: clearList, dsNumber: '' });
+            } else {
+              this.setState({ barCodeList: clearList, dsNumber: '' });
+            }
           } else {
-            this.setState({ barCodeList: barList[0].lineItems });
+            if (isEstimationEnable) {
+              this.setState({ barCodeList: res.data.lineItems, dsNumber: '' });
+            } else {
+              this.setState({ barCodeList: res.data.barcode, dsNumber: '' });
+            }
           }
 
+          this.state.barCodeList.forEach((barCode, index) => {
+            console.log("valueeee", barCode)
+            costPrice = costPrice + barCode.itemPrice;
+            promoDiscValue = promoDiscValue + barCode.promoDiscount;
+            total = total + barCode.grossValue;
+            netTotal = netTotal + barCode.grossValue;
+          });
+
+          discount = discount + this.state.manualDisc;
+
+          console.log("datdatdat", costPrice, total, netTotal);
+          this.setState({
+            netPayableAmount: total,
+            grandNetAmount: netTotal,
+            totalPromoDisc: promoDiscValue,
+            grossAmount: costPrice,
+          });
+
+          //     if (this.state.barCodeList.length > 0) {
+          //       this.setState({ enablePayment: true, disableButton: false });
+          //     }
         } else {
-          this.setState({ barCodeList: this.state.dlslips[0].lineItems });
+          let count = false;
+          if (this.state.dlslips.length === 0) {
+            this.state.dlslips.push(res.data.lineItems);
+            const flattened = this.state.dlslips.flatMap(barCode => barCode);
+            this.setState({ barCodeList: flattened })
+          }
+
+          else {
+            for (let i = 0; i < this.state.barCodeList.length; i++) {
+              if (
+                this.state.barCodeList[i].barCode ===
+                res.data.lineItems[0].barCode
+              ) {
+                count = true;
+                count = true;
+                var items = [...this.state.barCodeList]
+                if (parseInt(items[i].qty) + 1 <= parseInt(items[i].quantity)) {
+                  let addItem = parseInt(items[i].qty) + 1;
+                  items[i].qty = addItem.toString()
+                  let totalcostMrp = items[i].itemPrice * parseInt(items[i].qty)
+                  items[i].totalMrp = totalcostMrp
+                  break;
+                } else {
+                  toast.info("Insufficient Quantity");
+                }
+              }
+              else {
+                this.state.dlslips.push(res.data.lineItems);
+                const flattened = this.state.dlslips.flatMap(barCode => barCode);
+                this.setState({ barCodeList: flattened })
+                const barList = this.state.barCodeList.filter(
+                  (test, index, array) =>
+                    index ===
+                    array.findIndex((findTest) => findTest.barCode === test.barCode)
+                );
+                this.setState({ barCodeList: barList })
+              }
+            }
+          }
+
+
+          this.setState({ barCodeList: this.state.barCodeList, dsNumber: '' });
+          // this.state.barCodeList = this.state.dlslips.lineItems;
+
+          this.state.barCodeList.forEach((barCode, index) => {
+            costPrice = costPrice + barCode.itemPrice;
+            // barCode.grossValue = barCode.itemPrice * parseInt(barCode.qty);
+            promoDiscValue = promoDiscValue + barCode.promoDiscount
+            // total = total + barCode.grossValue;
+            netTotal = netTotal + barCode.grossValue;
+            if (barCode.qty > 1) {
+              barCode.grossValue = barCode.itemPrice * barCode.qty;
+              total = total + barCode.grossValue;
+            } else {
+              barCode.grossValue = barCode.itemPrice;
+              barCode.qty = parseInt("1");
+              total = total + barCode.grossValue;
+            }
+
+          });
+
+          discount = discount + this.state.manualDisc;
+
+          this.setState({
+            netPayableAmount: total,
+            grandNetAmount: netTotal,
+            totalPromoDisc: promoDiscValue,
+            grossAmount: costPrice,
+          });
+          // const grandTotal = this.state.netPayableAmount;
+          // this.setState({ grandNetAmount: grandTotal, totalAmount: grandTotal });
+
+          if (this.state.barCodeList.length > 0) {
+            this.setState({ enablePayment: true });
+          }
+
         }
-
-        this.state.barCodeList.forEach((barCode, index) => {
-          console.log("valueeee", barCode)
-          costPrice = costPrice + barCode.itemPrice;
-          promoDiscValue = promoDiscValue + barCode.promoDiscount;
-          total = total + barCode.grossValue;
-          netTotal = netTotal + barCode.grossValue;
-        });
-
-
-        this.setState({
-          netPayableAmount: total,
-          totalPromoDisc: promoDiscValue,
-          grossAmount: costPrice,
-        });
-
-        if (this.state.barCodeList.length > 0) {
-          this.setState({ enablePayment: true, disableButton: false });
-        }
-
         this.getTaxAmount();
-      }
-      else {
-        alert(res.data.body);
-      }
-    }).catch(() => {
+        //   }
+        //   else {
+        //     alert(res.data.body);
+        //   }
+      })
+      // .catch(() => {
+      //   this.setState({ loading: false, dsNumber: "" });
+      //   alert('Invalid estimation slip number');
+      // });
+    } else {
       this.setState({ loading: false, dsNumber: "" });
-      alert('Invalid estimation slip number');
+      alert("Unable To Sale Today Daycloser Is Done")
+    }
+  }
+
+  getallDates() {
+    const { storeId } = this.state;
+    CustomerService.getDates(storeId).then(res => {
+      console.log("responseee", res);
+      if (res) {
+        if (res.data.length > 0) {
+          this.setState({ dayCloseDates: res.data });
+        }
+      }
     });
 
   }
@@ -758,7 +894,6 @@ class GenerateInvoiceSlip extends Component {
       this.setState({ loading: false });
       console.log('There is error getting token');
     });
-
     return (
       <View style={{ flex: 1 }}>
         {this.state.flagone && (
@@ -1118,8 +1253,8 @@ class GenerateInvoiceSlip extends Component {
         {
           this.state.handleBillDiscount && (
             <View style={{ backgroundColor: color.white }}>
-              <Modal isVisible={this.state.modalVisible} onBackButtonPress={() => this.modelCancel()}
-                onBackdropPress={() => this.modelCancel()} >
+              <Modal isVisible={this.state.modalVisible} onBackButtonPress={() => this.billDiscountModelCancel()}
+                onBackdropPress={() => this.billDiscountModelCancel()} >
                 <View style={[Device.isTablet ? styles.filterMainContainer_tablet : styles.filterMainContainer_mobile, { height: Device.isTablet ? 500 : 400 }]}>
                   <View>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
@@ -1127,7 +1262,7 @@ class GenerateInvoiceSlip extends Component {
                         <Text style={{ marginTop: 15, fontSize: Device.isTablet ? 22 : 17, marginLeft: 20 }} > {I18n.t("Bill level Discount")} </Text>
                       </View>
                       <View>
-                        <TouchableOpacity style={{ width: Device.isTablet ? 60 : 50, height: Device.isTablet ? 60 : 50, marginTop: Device.isTablet ? 20 : 15, }} onPress={() => this.modelCancel()}>
+                        <TouchableOpacity style={{ width: Device.isTablet ? 60 : 50, height: Device.isTablet ? 60 : 50, marginTop: Device.isTablet ? 20 : 15, }} onPress={() => this.billDiscountModelCancel()}>
                           <Image style={{ margin: 5 }} source={require('../assets/images/modelcancel.png')} />
                         </TouchableOpacity>
                       </View>
@@ -1187,7 +1322,7 @@ class GenerateInvoiceSlip extends Component {
                         <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
                       </TouchableOpacity>
                       <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
-                        onPress={() => this.modelCancel()}>
+                        onPress={() => this.billDiscountModelCancel()}>
                         <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>
                     </View>
