@@ -46,7 +46,7 @@ class CustomerService {
       const param = '?dsNumber=' + esnumber;
       return axios.get(BASE_URL + NEW_SALE_URL.getDslipData + param);
     } else {
-      const param = '?barcode=' + obj + '&storeId=' + storeId;
+      const param = '?barcode=' + esnumber + '&storeId=' + storeId;
       return axios.get(BASE_URL + NEW_SALE_URL.getDsAsbarcode + param);
     }
   }
@@ -103,6 +103,10 @@ class CustomerService {
     return axios.post(BASE_URL + BILLING_PORTAL.searchGiftVoucher, obj);
   }
 
+  getDates(storeId) {
+    const param = '?storeId=' + storeId;
+    return axios.get(BASE_URL + "/new-sale/newsale/getDates" + param);
+  }
 
 }
 export default new CustomerService();
