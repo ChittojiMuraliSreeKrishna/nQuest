@@ -237,7 +237,7 @@ export class ListOfEstimationSlip extends Component {
                 <Icon
                   name="sliders"
                   size={25}
-                  style={{ marginRight: 10 }}
+                  style={[ { marginRight: 10 }, scss.action_icons ]}
                   onPress={() => this.filterAction()}
                 ></Icon>
               }
@@ -275,10 +275,11 @@ export class ListOfEstimationSlip extends Component {
                       <Icon
                         name="eye"
                         size={25}
-                        style={{ paddingRight: 10 }}
+                        style={[ { paddingRight: 10 }, scss.action_icons ]}
                         onPress={() => this.handleviewEstimationSlip(item, index)}
                       ></Icon>
                       <IconMA
+                        style={scss.action_icons}
                         name="trash-can-outline"
                         size={25}
                         onPress={() => this.handledeleteEstimationSlip(item, index)}
@@ -509,6 +510,7 @@ export class ListOfEstimationSlip extends Component {
                         <Txt variant='titleLarge'>View EstimationSlip</Txt>
                       </View>
                       <IconMA
+                        style={scss.action_icons}
                         name='close'
                         size={20}
                         onPress={() => this.closeViewAction()}

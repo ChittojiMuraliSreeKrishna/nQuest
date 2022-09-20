@@ -6,14 +6,13 @@ import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
-import { Appbar, TextInput } from 'react-native-paper';
+import { Appbar, Text as Txt, TextInput } from 'react-native-paper';
 import IconFA from 'react-native-vector-icons/FontAwesome';
-import IconMA from 'react-native-vector-icons/MaterialCommunityIcons'
+import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import { RF, RH, RW } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
-import { Text as Txt } from 'react-native-paper';
 
 
 var deviceWidth = Dimensions.get("window").width;
@@ -52,7 +51,7 @@ export class ListOfBarcodes extends Component {
     };
   }
 
-  componentDidMount() {
+  componentDidMount () {
     AsyncStorage.getItem("storeId").then((value) => {
       storeStringId = value;
       this.setState({ storeId: parseInt(storeStringId) });
@@ -75,26 +74,26 @@ export class ListOfBarcodes extends Component {
     });
   }
 
-  filterAction() {
-    this.setState({ flagFilterOpen: true, modalVisible: true })
+  filterAction () {
+    this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
-  clearFilterAction() {
+  clearFilterAction () {
     this.setState({
       filterActive: false, listBarcodes: [], startDate: "", endDate: "", empId: "", fromPrice: "", toPrice: "", barCode: "", flagFilterOpen: false, flagViewDetail: false
-    })
+    });
   }
 
 
-  datepickerClicked() {
+  datepickerClicked () {
     this.setState({ datepickerOpen: true });
   }
 
-  enddatepickerClicked() {
+  enddatepickerClicked () {
     this.setState({ datepickerendOpen: true });
   }
 
-  datepickerDoneClicked() {
+  datepickerDoneClicked () {
     if (parseInt(this.state.date.getDate()) < 10 && (parseInt(this.state.date.getMonth()) < 10)) {
       this.setState({ startDate: this.state.date.getFullYear() + "-0" + (this.state.date.getMonth() + 1) + "-" + "0" + this.state.date.getDate() });
     }
@@ -112,7 +111,7 @@ export class ListOfBarcodes extends Component {
     this.setState({ doneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
 
-  datepickerendDoneClicked() {
+  datepickerendDoneClicked () {
     if (parseInt(this.state.enddate.getDate()) < 10 && (parseInt(this.state.enddate.getMonth()) < 10)) {
       this.setState({ endDate: this.state.enddate.getFullYear() + "-0" + (this.state.enddate.getMonth() + 1) + "-" + "0" + this.state.enddate.getDate() });
     }
@@ -128,7 +127,7 @@ export class ListOfBarcodes extends Component {
     this.setState({ enddoneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
 
-  datepickerCancelClicked() {
+  datepickerCancelClicked () {
     this.setState({ date: new Date(), enddate: new Date(), datepickerOpen: false, datepickerendOpen: false });
   }
 
@@ -152,7 +151,7 @@ export class ListOfBarcodes extends Component {
     this.setState({ toPrice: value });
   };
 
-  applyListBarcodes() {
+  applyListBarcodes () {
     if (this.state.startDate === "") {
       this.state.startDate = null;
     }
@@ -183,12 +182,12 @@ export class ListOfBarcodes extends Component {
       itemMrpGreaterThan: this.state.toPrice,
     };
     console.log('params are' + JSON.stringify(obj));
-    let pageNumber = 0
+    let pageNumber = 0;
     ReportsService.getListOfBarcodes(obj, pageNumber).then((res) => {
       console.log(res.data.result);
-      if (res.data && res.data["isSuccess"] === "true") {
+      if (res.data && res.data[ "isSuccess" ] === "true") {
         if (res.data.result.length !== 0) {
-          this.setState({ listBarcodes: res.data.result.content, filterActive: true, modalVisible: false, flagFilterOpen: false })
+          this.setState({ listBarcodes: res.data.result.content, filterActive: true, modalVisible: false, flagFilterOpen: false });
         } else {
           alert("records not found");
         }
@@ -205,30 +204,30 @@ export class ListOfBarcodes extends Component {
     });
   }
 
-  modelCancel() {
-    this.setState({ flagFilterOpen: false, modalVisible: false })
+  modelCancel () {
+    this.setState({ flagFilterOpen: false, modalVisible: false });
   }
 
-  estimationModelCancel() {
+  estimationModelCancel () {
     this.setState({ modalVisible: false });
   }
 
-  handledeleteBarcode() {
+  handledeleteBarcode () {
     this.setState({ flagdelete: true, modalVisible: true, flagViewDetail: false });
   }
 
-  handleviewBarcode(item, index) {
-    console.log({ item })
-    this.state.viewBarcodeList.push(item)
+  handleviewBarcode (item, index) {
+    console.log({ item });
+    this.state.viewBarcodeList.push(item);
     this.setState({ viewBarcodeList: this.state.viewBarcodeList });
     this.setState({ flagViewDetail: true, modalVisible: true, flagdelete: false });
   }
 
-  closeViewAction() {
-    this.setState({ flagViewDetail: false, viewBarcodeList: [] })
+  closeViewAction () {
+    this.setState({ flagViewDetail: false, viewBarcodeList: [] });
   }
 
-  render() {
+  render () {
     return (
       <View>
         <FlatList
@@ -244,9 +243,9 @@ export class ListOfBarcodes extends Component {
                   onPress={() => this.clearFilterAction()}
                 ></IconFA> :
                 <IconFA
+                  style={[ scss.action_icons, { marginRight: 10 } ]}
                   name="sliders"
                   size={25}
-                  style={{ marginRight: 10 }}
                   onPress={() => this.filterAction()}
                 ></IconFA>
               }
@@ -275,11 +274,12 @@ export class ListOfBarcodes extends Component {
                   <View style={scss.flatListFooter}>
                     <Text style={scss.footerText}>
                       {I18n.t("DATE")}:
-                      {item.lastModifiedDate ? item.lastModifiedDate.toString().split(/T/)[0]
+                      {item.lastModifiedDate ? item.lastModifiedDate.toString().split(/T/)[ 0 ]
                         : item.lastModifiedDate}
                     </Text>
                     <View style={{ marginRight: Device.isTablet ? RW(30) : RW(20) }}>
                       <IconFA
+                        style={scss.action_icons}
                         name='eye'
                         size={25}
                         onPress={() => this.handleviewBarcode(item, index)}
@@ -438,11 +438,11 @@ export class ListOfBarcodes extends Component {
                     />
                     <View style={forms.action_buttons_container}>
 
-                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
                         onPress={() => this.applyListBarcodes()}>
                         <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
                         onPress={() => this.modelCancel()}>
                         <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>
@@ -473,6 +473,7 @@ export class ListOfBarcodes extends Component {
                           <Txt variant='titleLarge'>View Barcode</Txt>
                         </View>
                         <IconMA
+                          style={scss.action_icons}
                           name='close'
                           size={20}
                           onPress={() => this.closeViewAction()}

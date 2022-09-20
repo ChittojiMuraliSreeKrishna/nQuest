@@ -249,7 +249,7 @@ export default class NewSaleReport extends Component {
             ></IconFA> :
             <IconFA
               name="sliders"
-              style={{ marginRight: 10 }}
+              style={[ { marginRight: 10 }, scss.action_icons ]}
               size={25}
               onPress={() => this.filterAction()}
             ></IconFA>
@@ -287,11 +287,12 @@ export default class NewSaleReport extends Component {
                       <IconFA
                         name='eye'
                         size={25}
-                        style={{ marginRight: 10 }}
+                        style={[ { marginRight: 10 }, scss.action_icons ]}
                         onPress={() => this.handleviewNewSale(item, index)}
                       >
                       </IconFA>
                       <IconMA
+                        style={scss.action_icons}
                         name='trash-can-outline'
                         size={25}
                         onPress={() => this.handledeleteNewSale(item, index)}
@@ -535,6 +536,7 @@ export default class NewSaleReport extends Component {
                       </View>
                       <View>
                         <IconMA
+                          style={scss.action_icons}
                           name='close'
                           size={20}
                           onPress={() => this.closeViewAction()}

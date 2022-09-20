@@ -18,6 +18,7 @@ import { Badge, Text, TextInput } from "react-native-paper";
 import IconFA from 'react-native-vector-icons/FontAwesome';
 import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconMAA from 'react-native-vector-icons/MaterialIcons';
+import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from "../../commonUtils/assets/styles/style.scss";
 import Loader from "../../commonUtils/loader";
 import { RH, RW } from "../../Responsive";
@@ -52,7 +53,6 @@ import {
   loadMoreBtn,
   loadmoreBtnText
 } from "../Styles/Styles";
-import forms from '../../commonUtils/assets/styles/formFields.scss';
 
 
 var deviceWidth = Dimensions.get("window").width;
@@ -89,38 +89,36 @@ export default class Barcode extends Component {
     };
   }
 
-  async componentDidMount() {
+  async componentDidMount () {
     const storeId = await AsyncStorage.getItem("storeId");
     const newstoreId = await AsyncStorage.getItem("newstoreId");
-    console.log({ newstoreId });
-    console.log({ storeId });
     this.setState({ storeId: storeId });
     this.getAllBarcodes(0);
-    console.log({ scss });
+    // this.setState({ pageNo: 0 });
     window.setTimeout(() => {
       this.setState({ loading: false });
     }, 11000);
   }
 
   // Filter Action
-  filterAction() {
+  filterAction () {
     this.setState({ flagFilterOpen: true, modalVisible: true, filterBarcodesList: [] });
   }
 
-  clearFilterAction() {
+  clearFilterAction () {
     this.setState({ flagFilterOpen: false, filterActive: false, barcodesList: [], startDate: "", endDate: "", barCodeId: "", filterBarcodesList: [] });
     this.getAllBarcodes();
   }
 
   // Refresh Barcodes
-  refresh() {
+  refresh () {
     this.setState({ barcodesList: [], filterBarcodesList: [] }, () => {
       this.getAllBarcodes();
     });
   }
 
   // Getting Barcodes Functions
-  getAllBarcodes(pageNumber) {
+  getAllBarcodes (pageNumber) {
     this.setState({ loading: true, loadMoreActive: false });
     const params = {
       fromDate: "",
@@ -129,7 +127,7 @@ export default class Barcode extends Component {
       storeId: parseInt(this.state.storeId),
     };
     console.log("getBarcodes", params);
-    InventoryService.getTextileBarcodes(params, pageNumber)
+    InventoryService.getTextileBarcodes(params, this.state.pageNo)
       .then((res) => {
         if (res.data) {
           let response = res.data.content;
@@ -152,7 +150,7 @@ export default class Barcode extends Component {
   }
 
   // Edit Barcodes Function
-  handleeditbarcode(item, index, value) {
+  handleeditbarcode (item, index, value) {
     this.props.navigation.navigate("EditBarcode", {
       item: item,
       isEdit: true,
@@ -163,7 +161,7 @@ export default class Barcode extends Component {
   }
 
   // Delete Barcode Function
-  handlebarcodedeleteaction(item, index) {
+  handlebarcodedeleteaction (item, index) {
     this.setState({
       inventoryDelete: true,
       modalVisible: true,
@@ -174,29 +172,55 @@ export default class Barcode extends Component {
   // Pagination Function
   loadMoreList = () => {
     if (this.state.filterActive) {
-      this.setState({ filterPageNo: this.state.filterPageNo + 1 }, () => {
-        this.applyBarcodeFilter();
-      });
+      this.applyBarcodeFilter();
     } else {
-      this.setState({ pageNo: this.state.pageNo + 1 }, () => {
-        this.getAllBarcodes();
-      });
+      this.getAllBarcodes();
     }
   };
 
+  continuePagination () {
+    if (this.state.filterActive) {
+      if (this.state.totalPages > 1) {
+        this.setState({ loadMoreActive: true, pageNo: parseInt(this.state.filterPageNo) + 1 });
+      }
+      if (
+        parseInt(this.state.totalPages) ===
+        parseInt(this.state.filterPageNo)
+      ) {
+        this.setState({ loadMoreActive: false });
+      } else {
+        this.setState({ loadMoreActive: false });
+      }
+    } else {
+      // alert(this.state.totalPages);
+      // alert(this.state.pageNo);
+      if (this.state.totalPages > 1) {
+        this.setState({ loadMoreActive: true, pageNo: parseInt(this.state.pageNo) + 1 });
+      }
+      else if (
+        parseInt(this.state.totalPages) ===
+        parseInt(this.state.pageNo)
+      ) {
+        this.setState({ loadMoreActive: false });
+      } else {
+        this.setState({ loadMoreActive: false });
+      }
+    }
+  }
+
   // Filter Functions
-  modelCancel() {
+  modelCancel () {
     this.setState({ modalVisible: false, flagFilterOpen: false });
   }
 
-  datepickerClicked() {
+  datepickerClicked () {
     this.setState({ datepickerOpen: true });
   }
-  enddatepickerClicked() {
+  enddatepickerClicked () {
     this.setState({ datepickerendOpen: true });
   }
 
-  datepickerDoneClicked() {
+  datepickerDoneClicked () {
     if (
       parseInt(this.state.date.getDate()) < 10 &&
       parseInt(this.state.date.getMonth()) < 10
@@ -246,7 +270,7 @@ export default class Barcode extends Component {
     });
   }
 
-  datepickerendDoneClicked() {
+  datepickerendDoneClicked () {
     if (
       parseInt(this.state.enddate.getDate()) < 10 &&
       parseInt(this.state.enddate.getMonth()) < 10
@@ -296,7 +320,7 @@ export default class Barcode extends Component {
     });
   }
 
-  datepickerCancelClicked() {
+  datepickerCancelClicked () {
     this.setState({
       date: new Date(),
       enddate: new Date(),
@@ -309,7 +333,7 @@ export default class Barcode extends Component {
     this.setState({ barCodeId: value.trim() });
   };
 
-  applyBarcodeFilter(pageNumber) {
+  applyBarcodeFilter (pageNumber) {
     console.log(this.state.filterActive, this.state.filterPageNo);
     this.setState({ loading: true, loadMoreActive: false });
     let list = {};
@@ -349,34 +373,9 @@ export default class Barcode extends Component {
     this.setState({ modalVisible: false });
   }
 
-  continuePagination() {
-    if (this.state.filterActive) {
-      if (this.state.totalPages > 2) {
-        this.setState({ loadMoreActive: true });
-      } else if (
-        parseInt(this.state.totalPages) ===
-        parseInt(this.state.filterPageNo) + 1
-      ) {
-        this.setState({ loadMoreActive: false });
-      } else {
-        this.setState({ loadMoreActive: false });
-      }
-    } else {
-      if (this.state.totalPages > 2) {
-        this.setState({ loadMoreActive: true });
-      } else if (
-        parseInt(this.state.totalPages) ===
-        parseInt(this.state.pageNo) + 1
-      ) {
-        this.setState({ loadMoreActive: false });
-      } else {
-        this.setState({ loadMoreActive: false });
-      }
-    }
-  }
 
   // Add Barcode
-  handleAddBarcode() {
+  handleAddBarcode () {
     this.props.navigation.navigate("AddBarcode", {
       isEdit: false,
       onGoBack: () => this.refresh(),
@@ -384,17 +383,17 @@ export default class Barcode extends Component {
     });
   }
 
-  deleteInventory(id) {
+  deleteInventory (id) {
     InventoryService.deleteBarcode(id).then((res) => {
       if (res?.data) {
-        alert(res.data.result)
-        this.setState({ barcodesList: [] })
-        this.getAllBarcodes()
+        alert(res.data.result);
+        this.setState({ barcodesList: [] });
+        this.getAllBarcodes();
       }
-    })
+    });
   }
 
-  render() {
+  render () {
     return (
       <View>
         {this.state.loading && <Loader loading={this.state.loading} />}
@@ -422,6 +421,7 @@ export default class Barcode extends Component {
                     <IconFA
                       name="sliders"
                       size={25}
+                      style={scss.action_icons}
                       onPress={() => this.filterAction()}
                     >
                     </IconFA>
@@ -482,7 +482,7 @@ export default class Barcode extends Component {
                         <Text style={scss.footerText}>
                           CreatedDate:{" "}
                           {item.createdDate
-                            ? item.createdDate.toString().split(/T/)[0]
+                            ? item.createdDate.toString().split(/T/)[ 0 ]
                             : item.createdDate}
                         </Text>
                         <View style={scss.buttonContainer}>
@@ -498,7 +498,7 @@ export default class Barcode extends Component {
                           </IconMA>
                           <IconFA
                             name="edit"
-                            style={[scss.action_icons, { paddingRight: 5 }]}
+                            style={[ scss.action_icons, { paddingRight: 5 } ]}
                             size={25}
                             color="#000"
                             onPress={() =>
@@ -656,11 +656,11 @@ export default class Barcode extends Component {
                     onChangeText={this.handlebarCodeId}
                   />
                   <View style={forms.action_buttons_container}>
-                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                    <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
                       onPress={() => this.applyBarcodeFilter(0)}>
                       <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                    <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
                       onPress={() => this.modelCancel()}>
                       <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                     </TouchableOpacity>
@@ -705,7 +705,7 @@ export default class Barcode extends Component {
                 </Text>
 
                 <TouchableOpacity
-                  style={[submitBtn]}
+                  style={[ submitBtn ]}
                   onPress={() => this.deleteInventory(item?.id)}
                 >
                   <Text style={submitBtnText}> {I18n.t("DELETE")} </Text>

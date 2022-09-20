@@ -10,55 +10,55 @@ var deviceHeight = Dimensions.get('window').height;
 
 export class SelectClient extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       selectedClient: "",
       clientsList: [],
       selectedItem: null
-    }
+    };
   }
 
-  async componentDidMount() {
-    let userId = await AsyncStorage.getItem("userId")
-    console.log({ userId })
-    this.getAllClients(userId)
+  async componentDidMount () {
+    let userId = await AsyncStorage.getItem("userId");
+    console.log({ userId });
+    this.getAllClients(userId);
   }
 
-  getAllClients(userId) {
+  getAllClients (userId) {
     LoginService.getAllClient(userId).then(res => {
-      let response = res?.data
-      let clientsRes = []
+      let response = res?.data;
+      let clientsRes = [];
       if (response) {
-        console.log("clients", response.result)
+        console.log("clients", response.result);
         for (let i = 0; i < response.result.length; i++) {
           clientsRes.push({
-            id: response.result[i].id,
-            name: response.result[i].name,
+            id: response.result[ i ].id,
+            name: response.result[ i ].name,
             checked: false
-          })
+          });
         }
-        this.setState({ clientsList: clientsRes })
+        this.setState({ clientsList: clientsRes });
       }
-      console.log(this.state.clientsList)
-    })
+      console.log(this.state.clientsList);
+    });
   }
 
   handleChecked = (item, index) => {
-    this.setState({ selectedItem: index })
-    AsyncStorage.setItem("custom:clientId1", String(item.id)).then((value) => { console.log({ value }) }).catch(() => { alert('There is an error saving clientId') })
+    this.setState({ selectedItem: index });
+    AsyncStorage.setItem("custom:clientId1", String(item.id)).then((value) => { console.log({ value }); }).catch(() => { alert('There is an error saving clientId'); });
 
-  }
+  };
 
 
-  continueAction() {
+  continueAction () {
     if (this.state.selectedItem === null) {
-      alert("Select Atleast one client")
+      alert("Select Atleast one client");
     } else {
-      this.props.navigation.push("HomeNavigation")
+      this.props.navigation.push("HomeNavigation");
     }
   }
 
-  render() {
+  render () {
     return (
       <View>
         <FlatList
@@ -83,11 +83,11 @@ export class SelectClient extends Component {
           <Text style={submitBtnText}>Continue</Text>
         </Button>
       </View>
-    )
+    );
   }
 }
 
-export default SelectClient
+export default SelectClient;
 
 const styles = StyleSheet.create({
   container: {
@@ -122,4 +122,4 @@ const styles = StyleSheet.create({
     margin: 0,
     padding: 0,
   }
-})
+});
