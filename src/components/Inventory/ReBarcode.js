@@ -37,7 +37,7 @@ import {
   filterMainContainer,
   filterSubContainer
 } from "../Styles/PopupStyles";
-import { flatListTitle, listEmptyMessage } from "../Styles/Styles";
+import { flatListTitle, listEmptyMessage, loadMoreBtn, loadmoreBtnText } from "../Styles/Styles";
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 
 
@@ -64,7 +64,9 @@ export default class ReBarcode extends Component {
       endDate: "",
       barCodeId: "",
       viewBarcode: false,
-      viewBarcodeData: []
+      viewBarcodeData: [],
+      loadMoreActive: false,
+      totalPages: 0
     };
   }
 
@@ -83,7 +85,7 @@ export default class ReBarcode extends Component {
       storeId: this.state.storeId,
     };
     console.log(params);
-    this.setState({ loading: true });
+    this.setState({ loading: true, loadMoreActive: false });
     const request = "?page=" + parseInt(this.state.pageNo) + "&size=10";
     axios
       .post(InventoryService.getbarcodeTexttileAdjustments() + request, params)
@@ -92,11 +94,12 @@ export default class ReBarcode extends Component {
           this.setState({
             loading: false,
             reBarcodesData: this.state.reBarcodesData.concat(res.data.content),
+            totalPages: res.data.totalPages
           });
-          console.log("rebarcodesData", this.state.reBarcodesData);
           if (res.data.length === 0) {
             this.setState({ error: "Records Not Found" });
           }
+          this.continuePagination();
         }
       })
       .catch(() => {
@@ -123,6 +126,7 @@ export default class ReBarcode extends Component {
 
   // Filter ReBarcode Api
   applyReBarcodeFilter() {
+    this.setState({ loadMoreActive: false })
     let list = {};
     list = {
       fromDate: this.state.startDate,
@@ -145,11 +149,13 @@ export default class ReBarcode extends Component {
             filterRebarcodesData: this.state.filterRebarcodesData.concat(
               res.data.content,
             ),
+            totalPages: res.data.totalPages,
             barCodeId: "",
             startDate: "",
             endDate: "",
             filterActive: true,
           });
+          this.continuePagination();
         }
       })
       .catch((err) => {
@@ -325,6 +331,14 @@ export default class ReBarcode extends Component {
     }
   };
 
+  continuePagination() {
+    if (this.state.pageNo < this.state.totalPages - 1) {
+      this.setState({ loadMoreActive: true });
+    } else {
+      this.setState({ loadMoreActive: false });
+    }
+  }
+
   modalHandleForClose = () => {
     this.setState({
       modalVisible: !this.state.modalVisible
@@ -407,6 +421,16 @@ export default class ReBarcode extends Component {
               </View>
             </ScrollView>
           )}
+          ListFooterComponent={
+            this.state.loadMoreActive && (
+              <TouchableOpacity
+                style={loadMoreBtn}
+                onPress={() => this.isLoadMoreList()}
+              >
+                <Text style={loadmoreBtnText}>Load More ?</Text>
+              </TouchableOpacity>
+            )
+          }
         />
 
         {this.state.viewBarcode && (
@@ -524,11 +548,8 @@ export default class ReBarcode extends Component {
                     mode="outlined"
                     activeOutlineColor="#6F6F6F"
                     style={inputField}
-                    underlineColorAndroid="transparent"
                     placeholder={I18n.t("BARCODE ID")}
                     placeholderTextColor="#6F6F6F"
-                    textAlignVertical="center"
-                    autoCapitalize="none"
                     value={this.state.barCodeId}
                     onChangeText={this.handlebarCodeId}
                   />
