@@ -7,7 +7,7 @@ import { BASE_URL } from "../../commonUtils/Base";
 
 class InventoryService {
   // Getting all barcode -> Barcode.js
-  getTextileBarcodes (list, pageNumber) {
+  getTextileBarcodes(list, pageNumber) {
     const barcodeParam = "?page=" + pageNumber + "&size=10";
     console.log({ barcodeParam });
     return axios.post(
@@ -17,18 +17,18 @@ class InventoryService {
   }
 
   // Get all Productcombo -> ProductCombo.js
-  getProductCombo (params) {
+  getProductCombo(params) {
     console.log({ params });
     return axios.post(BASE_URL + INVENTORY_PORTAL.getAllProductBundleList + params);
   }
 
   // Get all divisions for -> AddBarcodes.js, EditBarcodes.js
-  getUOM () {
+  getUOM() {
     return axios.get(BASE_URL + INVENTORY_PORTAL.getAllUOMs);
   }
 
   // Get all divisions for -> AddBarcodes.js, EditBarcodes.js
-  getAllDivisions (domainType) {
+  getAllDivisions(domainType) {
     const divisionParam = "?domainType=" + domainType;
     console.log({ divisionParam });
     return axios.get(
@@ -37,14 +37,14 @@ class InventoryService {
   }
 
   // Get all sections, subSections for -> addbarcode, EditBarcodes.js
-  getAllSections (id, domainType) {
+  getAllSections(id, domainType) {
     const sectionParam = "?id=" + id + "&domainType=" + domainType;
     console.log({ sectionParam });
     return axios.get(BASE_URL + INVENTORY_PORTAL.getAllSections + sectionParam);
   }
 
   // Get all Categories for -> AddBarcode.js, EditBarcode.js
-  getAllCategories (domainType) {
+  getAllCategories(domainType) {
     const categoriesParam = "?domainType=" + domainType;
     console.log({ categoriesParam });
     return axios.get(
@@ -52,19 +52,19 @@ class InventoryService {
     );
   }
   // Get all stores for -> AddBarcodes.js, AddProductCombo.js, EditBarcodes.js
-  getAllStores (clientId) {
+  getAllStores(clientId) {
     const storesParam = "?clientId=" + clientId + "&isActive=true";
     console.log({ storesParam });
     return axios.get(BASE_URL + USER_MANAGEMENT_URL.getAllStores + storesParam);
   }
 
   // Get all hsns 
-  getAllHsnList () {
+  getAllHsnList() {
     return axios.get(BASE_URL + INVENTORY_PORTAL.getAllHsnList);
   }
 
   // Save Barocodes
-  saveBarCode (list, domain, isEdit, value) {
+  saveBarCode(list, domain, isEdit, value) {
     console.log({ list, domain, isEdit, value });
 
     if (isEdit) {
@@ -92,7 +92,7 @@ class InventoryService {
   }
 
   // Getting Barcode Details -> AddProductCombo.js
-  getBarcodesDetails (storesId, domain, barcodeId) {
+  getBarcodesDetails(storesId, domain, barcodeId) {
     if (domain && domain.label === "Retail") {
       const RetailDetails = "?barcode=" + barcodeId + "&storeId=" + storesId;
       console.log({ RetailDetails });
@@ -110,46 +110,46 @@ class InventoryService {
 
 
   // Saving Product Combo -> AddProductCombo.js
-  addProductCombo (obj) {
+  addProductCombo(obj) {
     return axios.post(BASE_URL + INVENTORY_PORTAL.addProductBundle, obj);
   }
 
   // Delete Barcodes
-  deleteBarcode (id) {
+  deleteBarcode(id) {
     const param = '?id=' + id;
     return axios.delete(BASE_URL + INVENTORY_PORTAL.deleteTextileBarcode + param);
   }
 
   /* --- UNUSED CALLS --- */
 
-  updatTextileBarcodes () {
+  updatTextileBarcodes() {
     return BASE_URL + "/inventory/inventoryTextile/updateBarcode_Textile";
   }
 
-  deleteTextileBarcode () {
+  deleteTextileBarcode() {
     return BASE_URL + "/inventory/inventoryTextile/deleteBarcode_Textile";
   }
 
-  getbarcodeTexttileAdjustments () {
+  getbarcodeTexttileAdjustments() {
     return BASE_URL + "/inventory/inventory-management/adjustments/filter";
   }
 
-  getStoreNameById () {
+  getStoreNameById() {
     return BASE_URL + "/user-management/store/storeList";
   }
 
-  createProduct () {
+  createProduct() {
     return BASE_URL + "/inventory/inventoryRetail/createBarcode";
   }
 
-  updateBarcode () {
+  updateBarcode() {
     return BASE_URL + "/inventory/inventoryRetail/updateBarcode";
   }
 
-  getAllBarcodes () {
+  getAllBarcodes() {
     return BASE_URL + "/inventory/inventoryRetail/getAllBarcodes";
   }
-  saveUOM () {
+  saveUOM() {
     return BASE_URL + "/uom/saveUom";
   }
 }

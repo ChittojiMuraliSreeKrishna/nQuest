@@ -37,7 +37,7 @@ import {
   filterMainContainer,
   filterSubContainer
 } from "../Styles/PopupStyles";
-import { flatListTitle, listEmptyMessage } from "../Styles/Styles";
+import { flatListTitle, listEmptyMessage, loadMoreBtn, loadmoreBtnText } from "../Styles/Styles";
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -62,33 +62,41 @@ export default class ProductCombo extends Component {
       enddate: new Date(),
       flagViewProduct: false,
       viewProductData: [],
+      loadMoreActive: false,
+      totalPages: 0,
+      pageNo: 0,
+      filterPageNo: 0
     };
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     const storeId = await AsyncStorage.getItem("storeId");
     this.setState({ storeId: parseInt(storeId) });
     this.getAllProductsCombo();
   }
 
   // Refreshing the codes
-  refresh () {
+  refresh() {
     this.setState({ productComboList: [] }, () => {
       this.getAllProductsCombo();
     });
   }
 
-  async getAllProductsCombo () {
-    this.setState({ loading: true });
-    const { storeId, fromDate, toDate } = this.state;
-    let params = `?storeId=${storeId}`;
+  async getAllProductsCombo() {
+    this.setState({ loading: true, loadMoreActive: false });
+    const { storeId, fromDate, toDate, pageNo } = this.state;
+    let params = "?storeId=" + (storeId) + "&page=" + (pageNo) + "&size=10";
     console.log({ params });
     InventoryService.getProductCombo(params)
       .then((res) => {
-        console.log({ res });
         let productComboList = res.data.result.content;
         console.log({ productComboList });
-        this.setState({ productComboList: productComboList, loading: false });
+        this.setState({
+          productComboList: this.state.productComboList.concat(res.data.result.content),
+          loading: false,
+          totalPages: res.data.result.totalPages
+        });
+        this.continuePagination()
       })
       .catch((err) => {
         console.log({ err });
@@ -96,27 +104,27 @@ export default class ProductCombo extends Component {
       });
   }
 
-  filterAction () {
+  filterAction() {
     this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
-  clearFilterAction () {
+  clearFilterAction() {
     this.setState({ filterActive: false, flagFilterOpen: false, filteredProductsList: [], startDate: "", endDate: "" });
   }
 
-  modelCancel () {
+  modelCancel() {
     this.setState({ modalVisible: false, flagViewProduct: false, flagFilterOpen: false, viewProductData: [] });
   }
 
   // Date Actions
-  datepickerClicked () {
+  datepickerClicked() {
     this.setState({ datepickerOpen: true });
   }
 
-  enddatepickerClicked () {
+  enddatepickerClicked() {
     this.setState({ datepickerendOpen: true });
   }
-  datepickerDoneClicked () {
+  datepickerDoneClicked() {
     if (
       parseInt(this.state.date.getDate()) < 10 &&
       parseInt(this.state.date.getMonth()) < 10
@@ -166,7 +174,7 @@ export default class ProductCombo extends Component {
     });
   }
 
-  datepickerendDoneClicked () {
+  datepickerendDoneClicked() {
     if (
       parseInt(this.state.enddate.getDate()) < 10 &&
       parseInt(this.state.enddate.getMonth()) < 10
@@ -216,7 +224,7 @@ export default class ProductCombo extends Component {
     });
   }
 
-  datepickerCancelClicked () {
+  datepickerCancelClicked() {
     this.setState({
       date: new Date(),
       enddate: new Date(),
@@ -225,7 +233,7 @@ export default class ProductCombo extends Component {
     });
   }
 
-  handleAddProductCombo () {
+  handleAddProductCombo() {
     this.props.navigation.navigate("AddProduct", {
       isEdit: false,
       goBack: () => this.refresh(),
@@ -233,10 +241,10 @@ export default class ProductCombo extends Component {
     });
   }
 
-  applyBarcodeFilter () {
-    const { startDate, endDate, storeId } = this.state;
-    let pageNumber = 0;
-    const filParams = `?storeId=${storeId}&fromDate=${startDate ? startDate : null}&page=0&size=10`;
+  applyBarcodeFilter() {
+    const { startDate, endDate, storeId, filterPageNo } = this.state;
+    this.setState({ loadMoreActive: false })
+    const filParams = `?storeId=${storeId}&fromDate=${startDate ? startDate : null}&page=${parseInt(filterPageNo)}&size=10`;
     console.log({ filParams });
     InventoryService.getProductCombo(filParams).then(
       (res) => {
@@ -246,7 +254,9 @@ export default class ProductCombo extends Component {
             filteredProductsList: res.data.result.content,
             filterActive: true,
             modalVisible: false,
+            totalPages: res.data.result.totalPages
           });
+          this.continuePagination()
         } else {
           this.setState({ modalVisible: false });
           alert(res.data.message);
@@ -256,7 +266,7 @@ export default class ProductCombo extends Component {
     );
   }
 
-  viewProductActon (data, index) {
+  viewProductActon(data, index) {
     this.state.viewProductData.push({ data });
     this.setState({
       viewProductData: this.state.viewProductData,
@@ -264,7 +274,7 @@ export default class ProductCombo extends Component {
       flagViewProduct: true,
     });
     // console.log({ item }, item.barcode)
-    console.log(this.state.viewProductData[ 0 ].data.productTextiles);
+    console.log(this.state.viewProductData[0].data.productTextiles);
   }
 
   modalHandleForClose = () => {
@@ -281,8 +291,28 @@ export default class ProductCombo extends Component {
     });
   };
 
+  continuePagination() {
+    console.log("in logg", this.state.pageNo, this.state.totalPages);
+    if (this.state.pageNo < this.state.totalPages - 1) {
+      this.setState({ loadMoreActive: true });
+    } else {
+      this.setState({ loadMoreActive: false });
+    }
+  }
 
-  render () {
+  isLoadMoreList = () => {
+    if (this.state.filterActive) {
+      this.setState({ filterPageNo: this.state.filterPageNo + 1 }, () => {
+        this.applyBarcodeFilter();
+      });
+    } else {
+      this.setState({ pageNo: this.state.pageNo + 1 }, () => {
+        this.getAllProductsCombo();
+      });
+    }
+  };
+
+  render() {
     return (
       <View>
         {this.state.loading && <Loader loading={this.state.loading} />}
@@ -369,6 +399,16 @@ export default class ProductCombo extends Component {
               </ScrollView>
             </View>
           )}
+          ListFooterComponent={
+            this.state.loadMoreActive && (
+              <TouchableOpacity
+                style={loadMoreBtn}
+                onPress={() => this.isLoadMoreList()}
+              >
+                <Text style={loadmoreBtnText}>Load More ?</Text>
+              </TouchableOpacity>
+            )
+          }
         />
         {this.state.flagViewProduct && (
           <View>
@@ -545,11 +585,11 @@ export default class ProductCombo extends Component {
                     </View>
                   )}
                   <View style={forms.action_buttons_container}>
-                    <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                       onPress={() => this.applyBarcodeFilter()}>
                       <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
                       onPress={() => this.modelCancel()}>
                       <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                     </TouchableOpacity>
