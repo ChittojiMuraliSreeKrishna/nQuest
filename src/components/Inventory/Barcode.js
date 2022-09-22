@@ -24,24 +24,15 @@ import Loader from "../../commonUtils/loader";
 import { RH, RW } from "../../Responsive";
 import InventoryService from "../services/InventoryService";
 import {
-  cancelBtn,
-  cancelBtnText,
   datePicker,
   datePickerBtnText,
   datePickerButton1,
   datePickerButton2,
   dateSelector,
   dateText,
-  inputField,
-  submitBtn,
-  submitBtnText
+  inputField
 } from "../Styles/FormFields";
 import {
-  deleteCloseBtn,
-  deleteContainer,
-  deleteHeader,
-  deleteHeading,
-  deleteText,
   filterCloseImage,
   filterHeading,
   filterMainContainer,
@@ -689,7 +680,7 @@ export default class Barcode extends Component {
                   />
                   <View style={forms.action_buttons_container}>
                     <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
-                      onPress={() => { this.applyBarcodeFilter(0), this.setState({ pageNo: 0 }); }}>
+                      onPress={() => { this.setState({ pageNo: 0, loadPrevActive: false, loadNextActive: true }, () => this.applyBarcodeFilter(0)); }}>
                       <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
@@ -698,57 +689,6 @@ export default class Barcode extends Component {
                     </TouchableOpacity>
                   </View>
                 </KeyboardAwareScrollView>
-              </View>
-            </Modal>
-          </View>
-        )}
-        {this.state.inventoryDelete && (
-          <View>
-            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
-              onBackButtonPress={() => this.modelCancel()}
-              onBackdropPress={() => this.modelCancel()} >
-              <View style={deleteContainer}>
-                <View>
-                  <View style={deleteHeader}>
-                    <View>
-                      <Text style={deleteHeading}>
-                        {" "}
-                        {I18n.t("Delete Barcode")}{" "}
-                      </Text>
-                    </View>
-                    <View>
-                      <TouchableOpacity
-                        style={deleteCloseBtn}
-                        onPress={() => this.modelCancel()}
-                      >
-                        <Image
-                          style={{ margin: 5 }}
-                          source={require("../assets/images/modelcancel.png")}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                  <Text style={filter.spaceText}></Text>
-                </View>
-
-                <Text style={deleteText}>
-                  {" "}
-                  {I18n.t("Are you sure want to delete Barcode")} ?{" "}
-                </Text>
-
-                <TouchableOpacity
-                  style={[ submitBtn ]}
-                  onPress={() => this.deleteInventory(item?.id)}
-                >
-                  <Text style={submitBtnText}> {I18n.t("DELETE")} </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={cancelBtn}
-                  onPress={() => this.modelCancel()}
-                >
-                  <Text style={cancelBtnText}> {I18n.t("CANCEL")} </Text>
-                </TouchableOpacity>
               </View>
             </Modal>
           </View>

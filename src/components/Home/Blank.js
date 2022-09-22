@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View } from 'react-native';
+import { BackHandler, ToastAndroid, View } from 'react-native';
 import Loader from '../../commonUtils/loader';
 
 const Blank = () => {
@@ -8,14 +8,19 @@ const Blank = () => {
   useEffect(() => {
     setTimeout(() => {
       setLoading(false);
-      setMessage("Servers are loading please wait or restart the App");
     }, 10000);
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+    return () => backHandler.remove();
   });
+
+  const backAction = (e) => {
+    ToastAndroid.showWithGravity('Back button is pressed', ToastAndroid.SHORT, ToastAndroid.TOP);
+    return true;
+  };
 
   return (
     <View>
       {loading && <Loader loading={loading} />}
-      <Text>{message}</Text>
     </View>
   );
 };

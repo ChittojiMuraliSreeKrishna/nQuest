@@ -10,13 +10,12 @@ import ManagePassword from '../components/URM/ManagePassword';
 import RegisterClient from '../components/URM/RegisterClient';
 import LanguageSelection from '../components/Welcome/LanguageSelection';
 import Welcome from '../components/Welcome/Welcome';
-import BottomTabBar from './BottomTabBar';
 import HomeNavigation from './HomeNavigation';
 
 
 const Stack = createStackNavigator();
 export default class AuthNavigation extends React.Component {
-  render() {
+  render () {
     return (
 
       <Stack.Navigator>
@@ -24,16 +23,10 @@ export default class AuthNavigation extends React.Component {
         <Stack.Screen name="Welcome" options={{ headerShown: false }} component={Welcome} />
         <Stack.Screen name="Login" options={{ headerShown: false }} component={Login} />
         <Stack.Screen name="RegisterClient" options={{ headerShown: false }} component={RegisterClient} />
-
         <Stack.Screen name="SignUp" options={{ headerShown: false }} component={SignUp} />
         <Stack.Screen name="HomeNavigation" options={{ headerShown: false }} component={HomeNavigation} />
         <Stack.Screen name="SelectStore" options={{ headerShown: false }} component={SelectStore} />
         <Stack.Screen name="ForgotPassword" options={{ headerShown: false }} component={ForgotPassword} />
-        <Stack.Screen
-          name="BottomBar"
-          options={{ headerShown: false }}
-          component={BottomTabBar}
-        />
         <Stack.Screen name="UpdateNewpassword" options={{ headerShown: false }} component={UpdateNewpassword} />
         <Stack.Screen name="ManagePassword" options={{ headerShown: false }} component={ManagePassword} />
         <Stack.Screen name="SelectClient" options={{ headersShown: false }} component={SelectClient} />

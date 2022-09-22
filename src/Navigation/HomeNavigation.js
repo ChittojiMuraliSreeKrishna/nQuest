@@ -12,17 +12,17 @@ import TopBarNavigation from "./TopBarNavigation";
 
 const Stack = createStackNavigator();
 export default class HomeNavigation extends React.Component {
-  render() {
+  render () {
     return (
       <Stack.Navigator initialRouteName="TopBarNavigation">
         <Stack.Screen
           name="TopBarNavigation"
-          options={{ headerShown: false }}
+          options={{ headerShown: false, gestureEnabled: false, }}
           component={TopBarNavigation}
         />
         <Stack.Screen
           name="Login"
-          options={{ headerShown: false }}
+          options={{ headerShown: false, gestureEnabled: false }}
           component={Login}
         />
         <Stack.Screen
