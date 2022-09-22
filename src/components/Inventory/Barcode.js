@@ -49,9 +49,7 @@ import {
 } from "../Styles/PopupStyles";
 import {
   flatListTitle,
-  listEmptyMessage,
-  loadMoreBtn,
-  loadmoreBtnText
+  listEmptyMessage
 } from "../Styles/Styles";
 
 
@@ -84,8 +82,9 @@ export default class Barcode extends Component {
       enddoneButtonClicked: false,
       loadMoreActive: false,
       totalPages: 0,
-      filterActive: false,
       flagFilterOpen: false,
+      loadPrevActive: false,
+      loadNextActive: true,
     };
   }
 
@@ -94,7 +93,7 @@ export default class Barcode extends Component {
     const newstoreId = await AsyncStorage.getItem("newstoreId");
     this.setState({ storeId: storeId });
     this.getAllBarcodes(0);
-    // this.setState({ pageNo: 0 });
+
     window.setTimeout(() => {
       this.setState({ loading: false });
     }, 11000);
@@ -106,13 +105,13 @@ export default class Barcode extends Component {
   }
 
   clearFilterAction () {
-    this.setState({ flagFilterOpen: false, filterActive: false, barcodesList: [], startDate: "", endDate: "", barCodeId: "", filterBarcodesList: [] });
+    this.setState({ flagFilterOpen: false, filterActive: false, barcodesList: [], startDate: "", endDate: "", barCodeId: "", filterBarcodesList: [], pageNo: 0, filterPageNo: 0 });
     this.getAllBarcodes();
   }
 
   // Refresh Barcodes
   refresh () {
-    this.setState({ barcodesList: [], filterBarcodesList: [] }, () => {
+    this.setState({ barcodesList: [], filterBarcodesList: [], pageNo: 0, filterPageNo: 0 }, () => {
       this.getAllBarcodes();
     });
   }
@@ -133,7 +132,7 @@ export default class Barcode extends Component {
           let response = res.data.content;
           console.log({ response });
           this.setState({
-            barcodesList: this.state.barcodesList.concat(response),
+            barcodesList: response,
             error: "",
             totalPages: res.data.totalPages,
             loading: false,
@@ -170,40 +169,41 @@ export default class Barcode extends Component {
   }
 
   // Pagination Function
-  loadMoreList = () => {
-    if (this.state.filterActive) {
-      this.applyBarcodeFilter();
-    } else {
-      this.getAllBarcodes();
+  loadMoreList = (value) => {
+    if (value >= 0 && value < this.state.totalPages) {
+      this.setState({ pageNo: value }, () => {
+        if (this.state.filterActive) {
+          this.applyBarcodeFilter();
+        } else {
+          this.getAllBarcodes();
+        }
+        if (this.state.pageNo === (this.state.totalPages - 1)) {
+          this.setState({ loadNextActive: false });
+        } else {
+          this.setState({ loadNextActive: true });
+        }
+        if (this.state.pageNo === 0) {
+          this.setState({ loadPrevActive: false });
+        } else {
+          this.setState({ loadPrevActive: true });
+        }
+      });
     }
   };
 
   continuePagination () {
     if (this.state.filterActive) {
       if (this.state.totalPages > 1) {
-        this.setState({ loadMoreActive: true, pageNo: parseInt(this.state.filterPageNo) + 1 });
-      }
-      if (
-        parseInt(this.state.totalPages) ===
-        parseInt(this.state.filterPageNo)
-      ) {
-        this.setState({ loadMoreActive: false });
+        this.setState({ loadMoreActive: true });
       } else {
-        this.setState({ loadMoreActive: false });
+        this.setState({ loadMoreActive: false, loadNextActive: false });
       }
     } else {
-      // alert(this.state.totalPages);
-      // alert(this.state.pageNo);
       if (this.state.totalPages > 1) {
-        this.setState({ loadMoreActive: true, pageNo: parseInt(this.state.pageNo) + 1 });
+        this.setState({ loadMoreActive: true });
       }
-      else if (
-        parseInt(this.state.totalPages) ===
-        parseInt(this.state.pageNo)
-      ) {
-        this.setState({ loadMoreActive: false });
-      } else {
-        this.setState({ loadMoreActive: false });
+      else {
+        this.setState({ loadMoreActive: false, loadNextActive: false });
       }
     }
   }
@@ -334,7 +334,6 @@ export default class Barcode extends Component {
   };
 
   applyBarcodeFilter (pageNumber) {
-    console.log(this.state.filterActive, this.state.filterPageNo);
     this.setState({ loading: true, loadMoreActive: false });
     let list = {};
     list = {
@@ -344,7 +343,7 @@ export default class Barcode extends Component {
       storeId: parseInt(this.state.storeId),
     };
     console.log(list);
-    InventoryService.getTextileBarcodes(list, pageNumber)
+    InventoryService.getTextileBarcodes(list, this.state.pageNo)
       .then((res) => {
         console.log(res);
         if (res) {
@@ -353,8 +352,7 @@ export default class Barcode extends Component {
             console.log({ filResponse });
             this.setState({
               loading: false,
-              filterBarcodesList:
-                this.state.filterBarcodesList.concat(filResponse),
+              filterBarcodesList: filResponse,
               error: "",
               filterActive: true,
               loading: false,
@@ -392,6 +390,7 @@ export default class Barcode extends Component {
       }
     });
   }
+
 
   render () {
     return (
@@ -522,17 +521,50 @@ export default class Barcode extends Component {
                 </ScrollView>
               </View>
             )}
-            // onEndReached={() => { this.loadMoreList() }}
-            // onEndReachedThreshold={10}
-            // ListFooterComponent={() => { return this.state.barcodesList.length > 10 || this.state.filterBarcodesList > 10 ? <ActivityIndicator size={"small"} /> : null }}
             ListFooterComponent={
               this.state.loadMoreActive && (
-                <TouchableOpacity
-                  style={loadMoreBtn}
-                  onPress={() => this.loadMoreList()}
-                >
-                  <Text style={loadmoreBtnText}>Load More ?</Text>
-                </TouchableOpacity>
+                <View style={scss.page_navigation_container}>
+                  <View style={scss.page_navigation_subcontainer}>
+                    <Text style={scss.page_nav_text}>{`Page: ${this.state.pageNo + 1} - ${this.state.totalPages}`}</Text>
+                  </View>
+                  <View style={scss.page_navigation_subcontainer}>
+                    {this.state.loadPrevActive && (
+                      <View style={scss.page_navigation_subcontainer}>
+                        <IconMA
+                          style={[ scss.pag_nav_btn ]}
+                          color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
+                          onPress={() => this.loadMoreList(0)}
+                          name="chevron-double-left"
+                          size={25}
+                        />
+                        <IconMA
+                          style={[ scss.pag_nav_btn ]}
+                          color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
+                          onPress={() => this.loadMoreList(this.state.pageNo - 1)}
+                          name="chevron-left"
+                          size={25}
+                        />
+                      </View>
+                    )}
+                    <Text style={scss.page_nav_pageno}>{this.state.pageNo + 1}</Text>
+                    {this.state.loadNextActive && (
+                      <View style={scss.page_navigation_subcontainer}>
+                        <IconMA
+                          style={[ scss.pag_nav_btn ]}
+                          onPress={() => this.loadMoreList(this.state.pageNo + 1)}
+                          name="chevron-right"
+                          size={25}
+                        />
+                        <IconMA
+                          style={[ scss.pag_nav_btn ]}
+                          onPress={() => this.loadMoreList(this.state.totalPages - 1)}
+                          name="chevron-double-right"
+                          size={25}
+                        />
+                      </View>
+                    )}
+                  </View>
+                </View>
               )
             }
           />
@@ -657,7 +689,7 @@ export default class Barcode extends Component {
                   />
                   <View style={forms.action_buttons_container}>
                     <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
-                      onPress={() => this.applyBarcodeFilter(0)}>
+                      onPress={() => { this.applyBarcodeFilter(0), this.setState({ pageNo: 0 }); }}>
                       <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
