@@ -257,7 +257,7 @@ class GenerateInvoiceSlip extends Component {
       }
     }).catch(() => {
       this.setState({ loading: false });
-      alert('Error with getting discount reasons');
+      // alert('Error with getting discount reasons');
     });
   }
 
