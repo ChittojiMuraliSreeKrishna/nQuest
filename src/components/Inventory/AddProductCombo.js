@@ -316,7 +316,7 @@ export default class AddProductCombo extends Component {
               mode="outlined"
               style={inputField}
               underlineColorAndroid="transparent"
-              placeholder="Combo Name"
+              placeholder="Combo Price"
               placeholderTextColor={"#6f6f6f"}
               textAlignVertical="center"
               autoCapitalize="none"
