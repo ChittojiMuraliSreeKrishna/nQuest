@@ -16,6 +16,7 @@ import UrmService from "../components/services/UrmService";
 
 
 var data = [];
+var subData = [];
 var currentSelection = "";
 var dataCleared = true;
 var firstDisplayRoute = "";
@@ -61,6 +62,8 @@ export class TopBar extends Component {
       firstDisplayNameScreen: "",
       modalVisibleData: false,
       refresh: true,
+      privilages: [],
+      headerNames: []
     };
   }
 
@@ -76,6 +79,7 @@ export class TopBar extends Component {
             screenMapping[ currentSelection ],
             this.refresh(),
           );
+          this.renderSubHeadings(previlage.item);
           this.setState({ modalVisibleData: false });
         }}
       >
@@ -88,6 +92,54 @@ export class TopBar extends Component {
     );
   }
 
+  renderSubHeadings (privilegeName) {
+    this.setState({ headerNames: [], privilages: [] });
+    AsyncStorage.getItem("rolename").then((value) => {
+      console.log({ value });
+      UrmService.getPrivillagesByRoleName(value).then((res) => {
+        console.log(res.data, "TopPrev");
+        if (res) {
+          if (res.data) {
+            let len = res.data.parentPrivileges.length;
+            for (let i = 0; i < len; i++) {
+              let privilege = res.data.parentPrivileges[ i ];
+              if (privilege.name === String(privilegeName)) {
+                let privilegeId = privilege.id;
+                let sublen = privilege.subPrivileges.length;
+                let subPrivileges = privilege.subPrivileges;
+                console.log(subPrivileges, "TopSubPrev");
+                for (let i = 0; i < sublen; i++) {
+                  if (privilegeId === subPrivileges[ i ].parentPrivilegeId) {
+                    let routes = subPrivileges[ i ].name;
+
+                    this.state.headerNames.push({ name: routes });
+                    console.log("Header Names", this.state.headerNames);
+                  }
+                }
+                this.setState({ headerNames: this.state.headerNames }, () => {
+                  for (let j = 0; j < this.state.headerNames.length; j++) {
+                    if (j === 0) {
+                      this.state.privilages.push({
+                        bool: true,
+                        name: this.state.headerNames[ j ].name,
+                      });
+                    } else {
+                      this.state.privilages.push({
+                        bool: false,
+                        name: this.state.headerNames[ j ].name,
+                      });
+                    }
+                  }
+                });
+                this.setState({ privilages: this.state.privilages });
+                console.log(this.state.privilages, "TopPtiv");
+              }
+            }
+          }
+        }
+      });
+    });
+  }
   //Before screen render
   async componentWillMount () {
     currentSelection = "";
@@ -398,6 +450,17 @@ export class TopBar extends Component {
               </Modal>
             )}
           </>
+        </View>
+        <View style={{ backgroundColor: '#d6d6d6', height: 40, width: '100%' }}>
+          <FlatList
+            horizontal
+            data={this.state.privilages}
+            renderItem={({ item, index }) => (
+              <View>
+                <Text style={{ margin: 5 }}>{item.name}</Text>
+              </View>
+            )}
+          />
         </View>
       </>
     );
