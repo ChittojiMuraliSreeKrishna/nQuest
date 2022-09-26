@@ -224,6 +224,7 @@ export class TopBar extends Component {
                   const firstDisplayName = this.state.firstDisplayName;
                   console.log({ firstDisplayName });
                   firstDisplayRoute = res.data.parentPrivileges[ 0 ].name;
+                  this.renderSubHeadings(firstDisplayName);
                   var privilegesSet = new Set();
                   for (let i = 0; i < len; i++) {
                     let previlage = res.data.parentPrivileges[ i ];
