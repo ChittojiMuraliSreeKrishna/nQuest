@@ -84,7 +84,7 @@ export default class Barcode extends Component {
     const newstoreId = await AsyncStorage.getItem("newstoreId");
     this.setState({ storeId: storeId });
     this.getAllBarcodes(0);
-
+    this.setState({ pageNo: 0 });
     window.setTimeout(() => {
       this.setState({ loading: false });
     }, 11000);
@@ -102,7 +102,7 @@ export default class Barcode extends Component {
 
   // Refresh Barcodes
   refresh () {
-    this.setState({ barcodesList: [], filterBarcodesList: [], pageNo: 0, filterPageNo: 0 }, () => {
+    this.setState({ barcodesList: [], filterBarcodesList: [], pageNo: 0, filterPageNo: 0, loadPrevActive: false }, () => {
       this.getAllBarcodes();
     });
   }

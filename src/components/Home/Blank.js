@@ -14,7 +14,7 @@ const Blank = () => {
   });
 
   const backAction = (e) => {
-    ToastAndroid.showWithGravity('Back button is pressed', ToastAndroid.SHORT, ToastAndroid.TOP);
+    ToastAndroid.showWithGravity("Back button is pressed", ToastAndroid.SHORT, ToastAndroid.TOP);
     return true;
   };
 

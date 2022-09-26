@@ -19,7 +19,7 @@ var data = [];
 var currentSelection = "";
 var dataCleared = true;
 var firstDisplayRoute = "";
-var displayName = ""
+var displayName = "";
 export const screenMapping = {
   "Dashboard": "Home",
   "Billing Portal": "CustomerNavigation",
@@ -64,7 +64,7 @@ export class TopBar extends Component {
     };
   }
 
-  _renderItem(previlage) {
+  _renderItem (previlage) {
     return (
       <TouchableOpacity
         style={scss.dropdown_items}
@@ -73,7 +73,7 @@ export class TopBar extends Component {
           global.homeButtonClicked = false;
           global.profileButtonClicked = false;
           this.props.navigation.navigate(
-            screenMapping[currentSelection],
+            screenMapping[ currentSelection ],
             this.refresh(),
           );
           this.setState({ modalVisibleData: false });
@@ -89,11 +89,11 @@ export class TopBar extends Component {
   }
 
   //Before screen render
-  async componentWillMount() {
+  async componentWillMount () {
     currentSelection = "";
     var storeStringId = "";
     displayName = "";
-    this.setState({ firstDisplayName: "" })
+    this.setState({ firstDisplayName: "" });
     var domainStringId = "";
     // this.props.navigation.navigate('Login')
 
@@ -134,7 +134,7 @@ export class TopBar extends Component {
     this.getPrivileges();
   }
 
-  async getPrivileges() {
+  async getPrivileges () {
     await AsyncStorage.getItem("roleType").then((value) => {
       if (value === "config_user") {
         let privilegesSet = new Set();
@@ -167,14 +167,14 @@ export class TopBar extends Component {
                 let len = res.data.parentPrivileges.length;
                 if (len > 0) {
                   this.setState({
-                    firstDisplayName: res.data.parentPrivileges[0].name,
+                    firstDisplayName: res.data.parentPrivileges[ 0 ].name,
                   });
                   const firstDisplayName = this.state.firstDisplayName;
                   console.log({ firstDisplayName });
-                  firstDisplayRoute = res.data.parentPrivileges[0].name;
+                  firstDisplayRoute = res.data.parentPrivileges[ 0 ].name;
                   var privilegesSet = new Set();
                   for (let i = 0; i < len; i++) {
-                    let previlage = res.data.parentPrivileges[i];
+                    let previlage = res.data.parentPrivileges[ i ];
                     if (previlage.name === "Dashboard") {
                       global.previlage1 = "Dashboard";
                     }
@@ -212,13 +212,13 @@ export class TopBar extends Component {
       }
     });
   }
-  async getData() {
+  async getData () {
     const { firstDisplayName, firstDisplayNameScreen } = this.state;
     console.log("data in get data", firstDisplayName, currentSelection);
     if (currentSelection === "") {
       currentSelection = firstDisplayName;
       this.setState({
-        firstDisplayNameScreen: screenMapping[firstDisplayName],
+        firstDisplayNameScreen: screenMapping[ firstDisplayName ],
       });
       this.props.navigation.navigate(
         this.state.firstDisplayNameScreen,
@@ -226,54 +226,54 @@ export class TopBar extends Component {
       );
     } else if (firstDisplayRoute === currentSelection) {
       this.props.navigation.navigate(
-        screenMapping[firstDisplayRoute],
+        screenMapping[ firstDisplayRoute ],
         this.refresh(),
       );
     }
   }
 
-  modalHandle() {
+  modalHandle () {
     this.setState({ modalVisibleData: !this.state.modalVisibleData });
   }
 
-  refresh() {
+  refresh () {
     console.log("inside refresh");
     this.setState({ refresh: !this.state.refresh });
   }
 
-  modalHandle() {
+  modalHandle () {
     this.setState({ modalVisibleData: !this.state.modalVisibleData });
   }
 
-  popupHandle() {
-    this.setState({ popupModel: !this.state.popupModel })
+  popupHandle () {
+    this.setState({ popupModel: !this.state.popupModel });
   }
 
-  refresh() {
+  refresh () {
     console.log("inside refresh");
     this.setState({ refresh: !this.state.refresh });
   }
 
-  openProfilePopup() {
-    this.setState({ popupModel: true })
+  openProfilePopup () {
+    this.setState({ popupModel: true });
   }
 
-  settingsNavigate() {
-    this.props.navigation.navigate("Settings")
-    this.setState({ popupModel: false })
+  settingsNavigate () {
+    this.props.navigation.navigate("Settings");
+    this.setState({ popupModel: false });
   }
 
-  selectStoreNavigate() {
-    this.props.navigation.navigate("SelectStore")
-    this.setState({ popupModel: false })
+  selectStoreNavigate () {
+    this.props.navigation.navigate("SelectStore");
+    this.setState({ popupModel: false });
   }
 
-  logoutNavigation() {
-    this.props.navigation.push("Login")
-    this.setState({ popupModel: false })
+  logoutNavigation () {
+    this.props.navigation.push("Login");
+    this.setState({ popupModel: false });
   }
 
-  render() {
+  render () {
     displayName =
       currentSelection === "" ? this.state.firstDisplayName : currentSelection;
     console.log(
@@ -295,7 +295,7 @@ export class TopBar extends Component {
             <View style={scss.titleSubContainer}>
               <TouchableOpacity onPress={() => this.openProfilePopup()}
                 style={scss.profileToggleBtn}>
-                <Text style={[scss.heading_title, { fontWeight: "bold" }]}>
+                <Text style={[ scss.heading_title, { fontWeight: "bold" } ]}>
                   {global.username}
                 </Text>
                 <Icon
@@ -328,24 +328,22 @@ export class TopBar extends Component {
                     <TEXT variant="labelMedium" style={scss.popUpText}>Profile</TEXT>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => this.selectStoreNavigate()}
-                    disabled={true}
-                    style={[scss.popUpButtons]}>
+                    style={[ scss.popUpButtons ]}>
                     <IconMA
                       name="storefront"
                       size={25}
-                      color="#d9d9d9"
                       style={scss.popUpIcons}
                     ></IconMA>
-                    <TEXT variant="labelMedium" style={[scss.popUpText, { color: '#d9d9d9' }]}>Select Store</TEXT>
+                    <TEXT variant="labelMedium" style={[ scss.popUpText ]}>Select Store</TEXT>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => this.logoutNavigation()} style={[scss.popUpButtons]}>
+                  <TouchableOpacity onPress={() => this.logoutNavigation()} style={[ scss.popUpButtons ]}>
                     <IconMA
                       name="logout"
                       color="#ED1C24"
                       size={25}
                       style={scss.popUpIcons}
                     ></IconMA>
-                    <TEXT variant="labelMedium" style={[scss.popUpText, { color: "#ED1C24" }]}>Logout</TEXT>
+                    <TEXT variant="labelMedium" style={[ scss.popUpText, { color: "#ED1C24" } ]}>Logout</TEXT>
                   </TouchableOpacity>
                 </View>
               </View>

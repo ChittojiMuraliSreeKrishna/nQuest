@@ -5,10 +5,11 @@ import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { Appbar } from 'react-native-paper';
 import { RF, RH, RW } from '../../Responsive';
+import LoginService from '../services/LoginService';
 var deviceWidth = Dimensions.get('window').width;
 I18n.fallbacks = true;
 I18n.defaultLocale = 'english';
-const data = [{ key: "Vijayawada" }, { key: "Kakinada" }, { key: "Anakapalli" }];
+const data = [ { key: "Vijayawada" }, { key: "Kakinada" }, { key: "Anakapalli" } ];
 
 export default class SelectStore extends React.Component {
   constructor(props) {
@@ -20,40 +21,41 @@ export default class SelectStore extends React.Component {
       selectedItem: null,
       storeNames: [],
       storesData: [],
-      isFromDomain: false
+      isFromDomain: false,
+      userId: 0
     };
   }
 
-  handleBackButtonClick() {
+  handleBackButtonClick () {
     this.props.navigation.goBack();
     return true;
   }
 
-  async componentDidMount() {
-    // this.getstores();
-    let userType = await AsyncStorage.getItem("roleType")
-    console.log({ userType })
-    if (userType[0] === "super_admin") {
+  async componentDidMount () {
+    const userId = await AsyncStorage.getItem("userId");
+    this.setState({ userId: userId }, () => {
       this.getstores();
-    } else {
-      let storesParams = this.props.route.params.items
-      console.log({ storesParams })
-      AsyncStorage.setItem("storesList", storesParams)
-      this.setState({ storesData: storesParams }, () => console.log("stores Data", this.state.storesData))
-    }
+    });
   }
 
-  async getstores() {
-    const role = JSON.parse(AsyncStorage.getItem("user"))
-    await AsyncStorage.getItem("storesList").then(value => {
-      console.log({ value })
-      this.setState({ storesData: value })
-    })
+  async getstores () {
+    LoginService.getSelectStores(this.state.userId).then(res => {
+      if (res?.data) {
+        let stores = [];
+        res?.data.forEach((item) => {
+          const obj = {
+            id: item.id,
+            name: item.name,
+          };
+        });
+        this.setState({ storesData: res.data });
+      }
+    });
   }
 
-  letsGoButtonAction() {
+  letsGoButtonAction () {
     if (this.state.selectedItem === null) {
-      alert("Select Atleast one Store")
+      alert("Select Atleast one Store");
     } else {
       this.props.navigation.push("HomeNavigation");
     }
@@ -67,9 +69,9 @@ export default class SelectStore extends React.Component {
       this.setState({ loading: false });
       console.log('There is error saving storeId');
     });
-    global.storeId = String(item.id)
-    global.storeName = String(item.name)
-    console.log("selected Store:", global.storeId, global.storeName)
+    global.storeId = String(item.id);
+    global.storeName = String(item.name);
+    console.log("selected Store:", global.storeId, global.storeName);
     AsyncStorage.setItem("storeName", item.name).then(() => {
     }).catch(() => {
       this.setState({ loading: false });
@@ -79,8 +81,8 @@ export default class SelectStore extends React.Component {
   };
 
 
-  render() {
-    console.log(this.state.storesData, "StoreData")
+  render () {
+    console.log(this.state.storesData);
     return (
       <View style={styles.container}>
         <View>
@@ -102,9 +104,9 @@ export default class SelectStore extends React.Component {
                   borderBottomColor: 'lightgray', borderBottomWidth: 0.6, marginLeft: this.state.selectedItem === index ? 0 : 0, marginRight: this.state.selectedItem === index ? 0 : 0, backgroundColor: this.state.selectedItem === index ? '#ED1C24' : '#ffffff'
                 }}>
                   <View style={Device.isTablet ? styles.domainButton_tablet : styles.domainButton_mobile}>
-                    <Text style={[Device.isTablet ? styles.domainButtonText_tablet : styles.domainButtonText_mobile, {
+                    <Text style={[ Device.isTablet ? styles.domainButtonText_tablet : styles.domainButtonText_mobile, {
                       color: this.state.selectedItem === index ? '#ffffff' : '#353C40'
-                    }]}>
+                    } ]}>
                       {item.name}
                     </Text>
                     <Image source={this.state.selectedItem === index ? require('../assets/images/langselect.png') : require('../assets/images/langunselect.png')} style={{ position: 'absolute', right: 20, top: 30 }} />

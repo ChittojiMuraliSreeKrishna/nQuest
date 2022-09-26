@@ -16,7 +16,7 @@ export const urmErrorMessages = {
   verificationCode: '/ Please enter the verification code',
   userStatus: '/Please Select The User Status',
   selectedStores: '/Please Select Atleast One Store',
-  city:'/Please enter city name'
+  city: '/Please enter city name'
 };
 
 export const inventoryErrorMessages = {
@@ -36,7 +36,8 @@ export const inventoryErrorMessages = {
   products: "/ Please add atleast one barcode",
   comboName: "/ Please enter a valid comboName",
   comboQty: "/please enter a valid comboQty",
-  comboPrice: "/please enter the price"
+  comboPrice: "/please enter the price",
+  vendorTax: "/please enter the vendor tax"
 };
 
 export const accountingErrorMessages = {
@@ -87,4 +88,4 @@ export const customerErrorMessages = {
   invoiceNumber: " /Please enter the invoice number",
   customerNumber: " /Please enter a valid 10 digit mobile number",
   reason: " /Please select reason for return"
-}
+};

@@ -14,22 +14,19 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import Modal from "react-native-modal";
 import { Text, TextInput } from "react-native-paper";
 import IconFA from 'react-native-vector-icons/FontAwesome';
+import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from "../../commonUtils/assets/styles/style.scss";
 import Loader from "../../commonUtils/loader";
 import { RH, RW } from "../../Responsive";
 import InventoryService from "../services/InventoryService";
 import {
-  cancelBtn,
-  cancelBtnText,
   datePicker,
   datePickerBtnText,
   datePickerButton1,
   datePickerButton2,
   dateSelector,
   dateText,
-  inputField,
-  submitBtn,
-  submitBtnText
+  inputField
 } from "../Styles/FormFields";
 import {
   filterCloseImage,
@@ -38,7 +35,6 @@ import {
   filterSubContainer
 } from "../Styles/PopupStyles";
 import { flatListTitle, listEmptyMessage, loadMoreBtn, loadmoreBtnText } from "../Styles/Styles";
-import forms from '../../commonUtils/assets/styles/formFields.scss';
 
 
 var deviceWidth = Dimensions.get("window").width;
@@ -70,14 +66,14 @@ export default class ReBarcode extends Component {
     };
   }
 
-  async componentDidMount() {
+  async componentDidMount () {
     const storeId = await AsyncStorage.getItem("storeId");
     this.setState({ storeId: storeId });
     this.getAllReBarcodes();
   }
 
   // Rebarcode Data
-  getAllReBarcodes() {
+  getAllReBarcodes () {
     const params = {
       fromDate: this.state.startDate,
       toDate: this.state.endDate,
@@ -108,25 +104,25 @@ export default class ReBarcode extends Component {
   }
 
   // Filter Actions
-  filterAction() {
+  filterAction () {
     this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
-  clearFilterAction() {
+  clearFilterAction () {
     this.setState({ filterActive: false, reBarcodesData: [], filterRebarcodesData: [], startDate: "", endDate: "", barCodeId: "" });
     this.getAllReBarcodes();
   }
 
-  modelCancel() {
+  modelCancel () {
     this.setState({ flagFilterOpen: false, modalVisible: false });
   }
 
   // Print
-  print() { }
+  print () { }
 
   // Filter ReBarcode Api
-  applyReBarcodeFilter() {
-    this.setState({ loadMoreActive: false })
+  applyReBarcodeFilter () {
+    this.setState({ loadMoreActive: false });
     let list = {};
     list = {
       fromDate: this.state.startDate,
@@ -167,15 +163,15 @@ export default class ReBarcode extends Component {
   }
 
   // Date Actions
-  datepickerClicked() {
+  datepickerClicked () {
     this.setState({ datepickerOpen: true });
   }
 
-  enddatepickerClicked() {
+  enddatepickerClicked () {
     this.setState({ datepickerendOpen: true });
   }
 
-  datepickerDoneClicked() {
+  datepickerDoneClicked () {
     if (
       parseInt(this.state.date.getDate()) < 10 &&
       parseInt(this.state.date.getMonth()) < 10
@@ -226,7 +222,7 @@ export default class ReBarcode extends Component {
     });
   }
 
-  datepickerendDoneClicked() {
+  datepickerendDoneClicked () {
     if (
       parseInt(this.state.enddate.getDate()) < 10 &&
       parseInt(this.state.enddate.getMonth()) < 10
@@ -276,7 +272,7 @@ export default class ReBarcode extends Component {
     });
   }
 
-  datepickerCancelClicked() {
+  datepickerCancelClicked () {
     this.setState({
       date: new Date(),
       endDate: new Date(),
@@ -298,25 +294,25 @@ export default class ReBarcode extends Component {
       storeId: this.state.storeId,
     };
     console.log({ params });
-    let domainDetails = {}
+    let domainDetails = {};
     InventoryService.getBarcodesDetails(this.state.storeId, domainDetails, item.currentBarcodeId).then(res => {
       if (res?.data) {
-        console.log({ res })
-        let viewBarcode = res.data
-        console.log({ viewBarcode })
+        console.log({ res });
+        let viewBarcode = res.data;
+        console.log({ viewBarcode });
         if (res.status === 200) {
           this.props.navigation.navigate('ViewReBarcode', {
             item: viewBarcode, isEdit: true,
             onGoBack: () => {
-              this.setState({ reBarcodesData: [] })
-              this.getAllReBarcodes()
+              this.setState({ reBarcodesData: [] });
+              this.getAllReBarcodes();
             }
-          })
+          });
         }
       }
     }).catch((err) => {
-      console.log({ err })
-    })
+      console.log({ err });
+    });
   };
 
   isLoadMoreList = () => {
@@ -331,7 +327,7 @@ export default class ReBarcode extends Component {
     }
   };
 
-  continuePagination() {
+  continuePagination () {
     if (this.state.pageNo < this.state.totalPages - 1) {
       this.setState({ loadMoreActive: true });
     } else {
@@ -342,10 +338,10 @@ export default class ReBarcode extends Component {
   modalHandleForClose = () => {
     this.setState({
       modalVisible: !this.state.modalVisible
-    })
-  }
+    });
+  };
 
-  render() {
+  render () {
     return (
       <View>
         {this.state.loading && <Loader loading={this.state.loading} />}
@@ -406,7 +402,7 @@ export default class ReBarcode extends Component {
                   <View style={scss.flatListFooter}>
                     <Text style={scss.footerText}>
                       {I18n.t("DATE")}:
-                      {item.lastModifiedDate ? item.lastModifiedDate.toString().split(/T/)[0]
+                      {item.lastModifiedDate ? item.lastModifiedDate.toString().split(/T/)[ 0 ]
                         : item.lastModifiedDate}
                     </Text>
                     <IconFA
@@ -554,11 +550,11 @@ export default class ReBarcode extends Component {
                     onChangeText={this.handlebarCodeId}
                   />
                   <View style={forms.action_buttons_container}>
-                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                    <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
                       onPress={() => this.applyReBarcodeFilter(0)}>
                       <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                    <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
                       onPress={() => this.modelCancel()}>
                       <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                     </TouchableOpacity>

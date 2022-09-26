@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import {
   Dimensions,
   Image, StyleSheet,
-  Text, TouchableOpacity,
+  Text, ToastAndroid, TouchableOpacity,
   View
 } from "react-native";
 import DatePicker from "react-native-date-picker";
@@ -116,6 +116,8 @@ class AddBarcode extends Component {
       date: new Date(),
       datepickerOpen: false,
       doneButtonClicked: false,
+      vendorTax: "",
+      vendorTaxValid: true
     };
   }
 
@@ -301,7 +303,6 @@ class AddBarcode extends Component {
     });
   }
   handleHSNCode = (value) => {
-    // alert(value);
     this.setState({ hsnId: value, hsnCode: value });
     if (this.state.hsnId !== null) {
       this.setState({ hsnValid: true });
@@ -379,6 +380,16 @@ class AddBarcode extends Component {
   handleListPriceValid = () => {
     if (String(this.state.listPrice).length > 0) {
       this.setState({ listPriceValid: true });
+    }
+  };
+
+  // Vendor Tax Actions
+  handleVendorTax = (value) => {
+    this.setState({ vendorTax: value });
+  };
+  handleVendorTaxValid = () => {
+    if (String(this.state.vendorTax).length > 0) {
+      this.setState({ vendorTaxValid: true });
     }
   };
 
@@ -571,6 +582,7 @@ class AddBarcode extends Component {
         storeId: this.state.storeId,
         uom: this.state.uomName,
         domainType: this.state.selectedDomain,
+        vendorTax: this.state.vendorTax
       };
       console.log({ params });
       this.setState({ loading: true });
@@ -581,16 +593,16 @@ class AddBarcode extends Component {
             console.log({ response });
             this.props.route.params.onGoBack();
             this.props.navigation.goBack();
-            alert("Barcode Created Successfully");
+            ToastAndroid.show(`Barcode Created Successfully`, ToastAndroid.LONG);
           } else {
-            alert(response.message);
+            ToastAndroid.show(response.message, ToastAndroid.LONG);
           }
           console.log({ res });
           this.setState({ loading: false });
         })
         .catch((err) => {
           this.setState({ loading: false });
-          alert(err);
+          ToastAndroid.show(err, ToastAndroid.SHORT);
         });
     }
   }
@@ -990,6 +1002,32 @@ class AddBarcode extends Component {
           />
           {!listPriceValid && (
             <Message imp={true} message={this.state.errors[ "listPrice" ]} />
+          )}
+          <Text style={inputHeading}>
+            {I18n.t("Vendor Tax")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
+          </Text>
+          <TextInput
+            activeOutlineColor="#000"
+            mode="outlined"
+            outlineColor={listPriceValid ? "#8F9EB7" : "#dd0000"}
+            style={[
+              forms.input_fld,
+              forms.active_fld,
+            ]}
+            underlineColorAndroid="transparent"
+            placeholder={I18n.t("Vendor Tax")}
+            keyboardType={"numeric"}
+            textContentType="telephoneNumber"
+            placeholderTextColor={listPriceValid ? "#676767" : "#dd0000"}
+            textAlignVertical="center"
+            autoCapitalize="none"
+            maxLength={10}
+            value={this.state.vendorTax}
+            onChangeText={this.handleVendorTax}
+            onBlur={this.handleVendorTaxValid}
+          />
+          {!listPriceValid && (
+            <Message imp={true} message={this.state.errors[ "vendorTax" ]} />
           )}
           <Text style={inputHeading}>
             {I18n.t("UOM")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
