@@ -1,5 +1,5 @@
 import { BASE_URL } from '../../commonUtils/Base'
-import {  NEW_SALE_URL } from '../../commonUtils/ApiConstants'
+import { NEW_SALE_URL } from '../../commonUtils/ApiConstants'
 import axios from 'axios'
 
 class NewSaleService {
@@ -7,10 +7,10 @@ class NewSaleService {
     return BASE_URL + '/paymentgateway/paymentgateway/create_order'
   }
 
-  upiPayment(){
+  upiPayment() {
     return BASE_URL + '/paymentgateway/razorpay/create-payment-link'
   }
-  
+
   getAllBarcodes() {
     return BASE_URL + '/new-sale/newsale/getAllBarcodes'
   }
@@ -27,8 +27,9 @@ class NewSaleService {
     return BASE_URL + '/user-management/auth/imageScanning'
   }
 
-  getCoupons() {
-    return BASE_URL + "/new-sale/newsale/getGv"
+  getCoupons(clientId, couponCode) {
+    const param = '/' + clientId;
+    return axios.post(BASE_URL + "/new-sale/newsale/getGv" + param, couponCode);
   }
 
   saveCoupons() {

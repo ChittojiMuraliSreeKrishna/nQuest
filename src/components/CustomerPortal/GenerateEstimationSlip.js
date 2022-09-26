@@ -350,7 +350,7 @@ class GenerateEstimationSlip extends Component {
       }
     }).catch((err) => {
       console.log({ err });
-      this.setState({ loading: false });
+      this.setState({ loading: false ,barcodeId:'',smnumber:""});
       alert("please enter a valid Barcode / smNumber");
     });
     console.log("BarListst", this.state.barList);

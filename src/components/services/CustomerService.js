@@ -76,9 +76,9 @@ class CustomerService {
   getGiftVocher() {
     return BASE_URL + "/new-sale/newsale/getlistofgv";
   }
-
-  saveGiftVocher() {
-    return BASE_URL + "/new-sale/newsale/saveGv";
+  
+  saveGiftVoucher(saveobj) {
+    return axios.post(BASE_URL + "/new-sale/newsale/saveGv", saveobj);
   }
 
   getReturnSlip() {
@@ -106,6 +106,11 @@ class CustomerService {
   getDates(storeId) {
     const param = '?storeId=' + storeId;
     return axios.get(BASE_URL + "/new-sale/newsale/getDates" + param);
+  }
+
+  saveGvNumber(gvObj, status) {
+    const param = '?flag=' + status
+    return axios.put(BASE_URL + "/new-sale/newsale/changeflaggv" + param, gvObj)
   }
 
 }

@@ -233,49 +233,51 @@ export default class DebitNotes extends Component {
               ></IconFA>}
           </View>}
           renderItem={({ item, index }) => (
-            <View style={scss.flatListContainer} >
-              <View style={scss.flatListSubContainer}>
-                <View style={scss.textContainer}>
-                  <Text style={scss.highText}>#CRM ID: {item.customerId}</Text>
-                  <Text style={scss.textStyleLight}>Customer Name:
-                    <Text style={scss.textStyleMedium}> {"\n"}{item.customerName}</Text>
-                  </Text>
-                </View>
-                <View style={scss.textContainer}>
-                  <Text style={scss.textStyleLight}>STORE:
-                    <Text style={scss.textStyleMedium}>{item.storeId}</Text>
-                  </Text>
-                  {/* <Text style={textStyleLight}>PAID AMOUNT: {item.amount}</Text> */}
-                </View>
-                <View style={scss.textContainer}>
-                  <Text style={scss.textStyleLight}>BALANCE: {item.amount}</Text>
-                  <Text style={scss.textStyleLight}>APPROVED BY: {"\n"}{item.apporvedBy}</Text>
-                </View>
-                <View style={scss.flatListFooter}>
-                  <Text style={scss.footerText}>
-                    Date:{" "}
-                    {item.createdDate
-                      ? item.createdDate.toString().split(/T/)[0]
-                      : item.createdDate}
-                  </Text>
-                  <View style={scss.buttonContainer}>
-                    <IconFA
-                      name='eye'
-                      onPress={() => this.handleViewDebit(item, index)}
-                      size={25}
-                      style={scss.action_icons}
-                    >
-                    </IconFA>
-                    <IconIA
-                      name='add-circle-outline'
-                      size={25}
-                      style={[scss.action_icons, { marginLeft: 10 }]}
-                      onPress={() => this.handleAddDebit(item, index)}
-                    ></IconIA>
+            <ScrollView>
+              <View style={scss.flatListContainer} >
+                <View style={scss.flatListSubContainer}>
+                  <View style={scss.textContainer}>
+                    <Text style={scss.highText}>#CRM ID: {item.customerId}</Text>
+                    <Text style={scss.textStyleLight}>Customer Name:
+                      <Text style={scss.textStyleMedium}> {"\n"}{item.customerName}</Text>
+                    </Text>
+                  </View>
+                  <View style={scss.textContainer}>
+                    <Text style={scss.textStyleLight}>STORE:
+                      <Text style={scss.textStyleMedium}>{item.storeId}</Text>
+                    </Text>
+                    {/* <Text style={textStyleLight}>PAID AMOUNT: {item.amount}</Text> */}
+                  </View>
+                  <View style={scss.textContainer}>
+                    <Text style={scss.textStyleLight}>BALANCE: {item.amount}</Text>
+                    <Text style={scss.textStyleLight}>APPROVED BY: {"\n"}{item.apporvedBy}</Text>
+                  </View>
+                  <View style={scss.flatListFooter}>
+                    <Text style={scss.footerText}>
+                      Date:{" "}
+                      {item.createdDate
+                        ? item.createdDate.toString().split(/T/)[0]
+                        : item.createdDate}
+                    </Text>
+                    <View style={scss.buttonContainer}>
+                      <IconFA
+                        name='eye'
+                        onPress={() => this.handleViewDebit(item, index)}
+                        size={25}
+                        style={scss.action_icons}
+                      >
+                      </IconFA>
+                      <IconIA
+                        name='add-circle-outline'
+                        size={25}
+                        style={[scss.action_icons, { marginLeft: 10 }]}
+                        onPress={() => this.handleAddDebit(item, index)}
+                      ></IconIA>
+                    </View>
                   </View>
                 </View>
               </View>
-            </View>
+            </ScrollView>
           )}
         />
         {this.state.flagFilterOpen && (
