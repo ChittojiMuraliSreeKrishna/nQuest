@@ -17,11 +17,8 @@ import forms from "../../commonUtils/assets/styles/formFields.scss";
 import Loader from "../../commonUtils/loader";
 import { RF, RH, RW } from "../../Responsive";
 import {
-  accountingErrorMessages,
-  errorLength,
-  inventoryErrorMessages
+  errorLength
 } from "../Errors/errors";
-import Message from "../Errors/Message";
 import InventoryService from "../services/InventoryService";
 import {
   datePicker,
@@ -32,7 +29,7 @@ import {
   dateText,
   inputHeading,
   rnPicker,
-  rnPickerError
+  rnPickerContainer
 } from "../Styles/FormFields";
 
 var deviceWidth = Dimensions.get("window").width;
@@ -94,30 +91,6 @@ class AddBarcode extends Component {
       storeId: "",
       domainId: 1,
       isEdit: false,
-      errors: {},
-      divisionValid: true,
-      sectionValid: true,
-      subSectionValid: true,
-      categoryValid: true,
-      colorValid: true,
-      nameValid: true,
-      batchNoValid: true,
-      costPriceValid: true,
-      listPriceValid: true,
-      uomValid: true,
-      hsnValid: true,
-      empValid: true,
-      storeValid: true,
-      qtyValid: true,
-      selectedDomain: "",
-      clientId: "",
-      selectedStatus: "",
-      productValidity: "",
-      date: new Date(),
-      datepickerOpen: false,
-      doneButtonClicked: false,
-      vendorTax: "",
-      vendorTaxValid: true
     };
   }
 
@@ -480,75 +453,47 @@ class AddBarcode extends Component {
     let errors = {};
     if (this.state.name.length < errorLength.name) {
       isFormValid = false;
-      errors[ "name" ] = inventoryErrorMessages.name;
-      this.setState({ nameValid: false });
     }
     if (this.selectedDomain === "Textile") {
       if (this.state.divisionId === null) {
         isFormValid = false;
-        errors[ "divison" ] = inventoryErrorMessages.divisionId;
-        this.setState({ divisionValid: false });
       }
       if (this.state.sectionId === null) {
         isFormValid = false;
-        errors[ "section" ] = inventoryErrorMessages.sectionId;
-        this.setState({ sectionValid: false });
       }
       if (this.state.subSectionId === null) {
         isFormValid = false;
-        errors[ "subSection" ] = inventoryErrorMessages.subSectionId;
-        this.setState({ subSectionValid: false });
       }
       if (this.state.catogirieId === null) {
         isFormValid = false;
-        errors[ "category" ] = inventoryErrorMessages.category;
-        this.setState({ categoryValid: false });
       }
     }
     if (String(this.state.colour).length < errorLength.colour) {
       isFormValid = false;
-      errors[ "color" ] = inventoryErrorMessages.colour;
-      this.setState({ colorValid: false });
     }
     if (String(this.state.batchNo).length === 0) {
       isFormValid = false;
-      errors[ "batchNo" ] = inventoryErrorMessages.batchNo;
-      this.setState({ batchNoValid: false });
     }
     if (this.state.costPrice === null) {
       isFormValid = false;
-      errors[ "costPrice" ] = inventoryErrorMessages.costPrice;
-      this.setState({ costPriceValid: false });
     }
     if (this.state.listPrice === null) {
       isFormValid = false;
-      errors[ "listPrice" ] = inventoryErrorMessages.listPrice;
-      this.setState({ listPriceValid: false });
     }
     if (this.state.uomId === null) {
       isFormValid = false;
-      errors[ "uom" ] = inventoryErrorMessages.uom;
-      this.setState({ uomValid: false });
     }
     if (this.state.hsnId === null) {
       isFormValid = false;
-      errors[ "hsn" ] = inventoryErrorMessages.hsnCode;
-      this.setState({ hsnValid: false });
     }
     if (String(this.state.empId).length < errorLength.empId) {
       isFormValid = false;
-      errors[ "emp" ] = inventoryErrorMessages.empId;
-      this.setState({ empValid: false });
     }
     if (this.state.store === undefined) {
       isFormValid = false;
-      errors[ "store" ] = accountingErrorMessages.store;
-      this.setState({ storeValid: false });
     }
     if (String(this.state.quantity).length === 0) {
       isFormValid = false;
-      errors[ "qty" ] = inventoryErrorMessages.qty;
-      this.setState({ qtyValid: false });
     }
     this.setState({ errors: errors });
     return isFormValid;
@@ -604,6 +549,8 @@ class AddBarcode extends Component {
           this.setState({ loading: false });
           ToastAndroid.show(err, ToastAndroid.SHORT);
         });
+    } else {
+      alert("Fill All Mandatory Fields");
     }
   }
 
@@ -613,22 +560,6 @@ class AddBarcode extends Component {
   }
 
   render () {
-    const {
-      divisionValid,
-      sectionValid,
-      subSectionValid,
-      categoryValid,
-      colorValid,
-      nameValid,
-      batchNoValid,
-      costPriceValid,
-      listPriceValid,
-      uomValid,
-      hsnValid,
-      empValid,
-      storeValid,
-      qtyValid,
-    } = this.state;
     return (
       <View>
         {this.state.loading && <Loader loading={this.state.loading} />}
@@ -644,8 +575,7 @@ class AddBarcode extends Component {
           </Text>
           <View
             style={[
-              forms.rnp_container,
-              { borderColor: divisionValid ? "#8F9EB7" : "#dd0000" },
+              rnPickerContainer,
             ]}
           >
             <RNPickerSelect
@@ -657,7 +587,7 @@ class AddBarcode extends Component {
                   <Chevron
                     style={styles.imagealign}
                     size={1.5}
-                    color={divisionValid ? "gray" : "#dd0000"}
+                    color="grey"
                   />
                 );
               }}
@@ -666,7 +596,7 @@ class AddBarcode extends Component {
                 this.handleDomain(value);
               }}
               on
-              style={divisionValid ? rnPicker : rnPickerError}
+              style={rnPicker}
               value={this.state.selectedDomain}
               useNativeAndroidPickerStyle={false}
             />
@@ -677,8 +607,7 @@ class AddBarcode extends Component {
             </Text>
             <View
               style={[
-                forms.rnp_container,
-                { borderColor: divisionValid ? "#8F9EB7" : "#dd0000" },
+                rnPickerContainer,
               ]}
             >
               <RNPickerSelect
@@ -690,27 +619,23 @@ class AddBarcode extends Component {
                     <Chevron
                       style={styles.imagealign}
                       size={1.5}
-                      color={divisionValid ? "gray" : "#dd0000"}
+                      color="grey"
                     />
                   );
                 }}
                 items={this.state.divisionsList}
                 onValueChange={(value) => this.handleDivision(value)}
-                style={divisionValid ? rnPicker : rnPickerError}
+                style={rnPicker}
                 value={this.state.selectedDivision}
                 useNativeAndroidPickerStyle={false}
               />
             </View>
-            {!divisionValid && (
-              <Message imp={true} message={this.state.errors[ "divison" ]} />
-            )}
             <Text style={inputHeading}>
               {I18n.t("Section")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
             </Text>
             <View
               style={[
-                forms.rnp_container,
-                { borderColor: sectionValid ? "#8F9EB7" : "#dd0000" },
+                rnPickerContainer,
               ]}
             >
               <RNPickerSelect
@@ -722,28 +647,24 @@ class AddBarcode extends Component {
                     <Chevron
                       style={styles.imagealign}
                       size={1.5}
-                      color={sectionValid ? "gray" : "#dd0000"}
+                      color="grey"
                     />
                   );
                 }}
                 items={this.state.sectionsList}
                 onValueChange={this.handleSection}
-                style={sectionValid ? rnPicker : rnPickerError}
+                style={rnPicker}
                 value={this.state.section}
                 useNativeAndroidPickerStyle={false}
               />
             </View>
-            {!sectionValid && (
-              <Message imp={true} message={this.state.errors[ "section" ]} />
-            )}
             <Text style={inputHeading}>
               {I18n.t("Sub Section")}{" "}
               <Text style={{ color: "#aa0000" }}>*</Text>{" "}
             </Text>
             <View
               style={[
-                forms.rnp_container,
-                { borderColor: subSectionValid ? "#8F9EB7" : "#dd0000" },
+                rnPickerContainer,
               ]}
             >
               <RNPickerSelect
@@ -755,27 +676,23 @@ class AddBarcode extends Component {
                     <Chevron
                       style={styles.imagealign}
                       size={1.5}
-                      color={subSectionValid ? "gray" : "#dd0000"}
+                      color="grey"
                     />
                   );
                 }}
                 items={this.state.subSectionsList}
                 onValueChange={this.handleSubSection}
-                style={subSectionValid ? rnPicker : rnPickerError}
+                style={rnPicker}
                 value={this.state.subSection}
                 useNativeAndroidPickerStyle={false}
               />
             </View>
-            {!subSectionValid && (
-              <Message imp={true} message={this.state.errors[ "subSection" ]} />
-            )}
             <Text style={inputHeading}>
               {I18n.t("Category")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
             </Text>
             <View
               style={[
-                forms.rnp_container,
-                { borderColor: categoryValid ? "#8F9EB7" : "#dd0000" },
+                rnPickerContainer,
               ]}
             >
               <RNPickerSelect
@@ -787,20 +704,17 @@ class AddBarcode extends Component {
                     <Chevron
                       style={styles.imagealign}
                       size={1.5}
-                      color={categoryValid ? "gray" : "#dd0000"}
+                      color="grey"
                     />
                   );
                 }}
                 items={this.state.categoriesList}
                 onValueChange={this.handleCateory}
-                style={categoryValid ? rnPicker : rnPickerError}
+                style={rnPicker}
                 value={this.state.category}
                 useNativeAndroidPickerStyle={false}
               />
             </View>
-            {!categoryValid && (
-              <Message imp={true} message={this.state.errors[ "category" ]} />
-            )}
           </View>
           {this.state.selectedDomain === "Retail" && ( // For Retail Domain only
             <View>
@@ -809,8 +723,7 @@ class AddBarcode extends Component {
               </Text>
               <View
                 style={[
-                  forms.rnp_container,
-                  { borderColor: divisionValid ? "#8F9EB7" : "#dd0000" },
+                  rnPickerContainer,
                 ]}
               >
                 <RNPickerSelect
@@ -822,13 +735,13 @@ class AddBarcode extends Component {
                       <Chevron
                         style={styles.imagealign}
                         size={1.5}
-                        color={divisionValid ? "gray" : "#dd0000"}
+                        color="grey"
                       />
                     );
                   }}
                   items={status1}
                   onValueChange={this.handleStatus}
-                  style={divisionValid ? rnPicker : rnPickerError}
+                  style={rnPicker}
                   value={this.state.selectedStatus}
                   useNativeAndroidPickerStyle={false}
                 />
@@ -882,7 +795,7 @@ class AddBarcode extends Component {
             {I18n.t("Colour")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
-            activeOutlineColor="#000"
+            activeOutlineColor="#d6d6d6"
             mode="outlined"
             style={[
               forms.input_fld,
@@ -891,32 +804,29 @@ class AddBarcode extends Component {
             ]}
             underlineColorAndroid="transparent"
             placeholder={I18n.t("Colour")}
-            placeholderTextColor={colorValid ? "#676767" : "#dd0000"}
+            placeholderTextColor={"#6f6f6f"}
             textAlignVertical="center"
             maxLength={12}
-            outlineColor={colorValid ? "#8F9EB7" : "#dd0000"}
+            outlineColor={"#d6d6d6"}
             autoCapitalize="none"
             onBlur={this.handleColourValid}
             value={this.state.colour}
             onChangeText={this.handleColour}
           />
-          {!colorValid && (
-            <Message imp={true} message={this.state.errors[ "color" ]} />
-          )}
           <Text style={inputHeading}>
             {I18n.t("Name")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
-            activeOutlineColor="#000"
+            activeOutlineColor="#d6d6d6"
             mode="outlined"
-            outlineColor={nameValid ? "#8F9EB7" : "#dd0000"}
+            outlineColor={"#d6d6d6"}
             style={[
               forms.input_fld,
               forms.active_fld,
             ]}
             underlineColorAndroid="transparent"
             placeholder={I18n.t("Name")}
-            placeholderTextColor={nameValid ? "#676767" : "#dd0000"}
+            placeholderTextColor={"#676767"}
             maxLength={25}
             textAlignVertical="center"
             autoCapitalize="none"
@@ -924,23 +834,20 @@ class AddBarcode extends Component {
             onBlur={this.handleNameValid}
             onChangeText={this.handleName}
           />
-          {!nameValid && (
-            <Message imp={true} message={this.state.errors[ "name" ]} />
-          )}
           <Text style={inputHeading}>
             {I18n.t("Batch No")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
-            activeOutlineColor="#000"
+            activeOutlineColor="#d6d6d6"
             mode="outlined"
-            outlineColor={batchNoValid ? "#8F9EB7" : "#dd0000"}
+            outlineColor={"#d6d6d6"}
             style={[
               forms.input_fld,
               forms.active_fld,
             ]}
             underlineColorAndroid="transparent"
             placeholder={I18n.t("Batch No")}
-            placeholderTextColor={batchNoValid ? "#676767" : "#dd0000"}
+            placeholderTextColor={"#676767"}
             textAlignVertical="center"
             maxLength={12}
             autoCapitalize="none"
@@ -948,16 +855,13 @@ class AddBarcode extends Component {
             onBlur={this.handleBatchNoValid}
             onChangeText={this.handleBatchNo}
           />
-          {!batchNoValid && (
-            <Message imp={true} message={this.state.errors[ "batchNo" ]} />
-          )}
           <Text style={inputHeading}>
             {I18n.t("Cost Price")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
-            activeOutlineColor="#000"
+            activeOutlineColor="#d6d6d6"
             mode="outlined"
-            outlineColor={costPriceValid ? "#8F9EB7" : "#dd0000"}
+            outlineColor={"#d6d6d6"}
             style={[
               forms.input_fld,
               forms.active_fld,
@@ -966,7 +870,7 @@ class AddBarcode extends Component {
             placeholder={I18n.t("Cost Price")}
             keyboardType={"numeric"}
             textContentType="telephoneNumber"
-            placeholderTextColor={costPriceValid ? "#676767" : "#dd0000"}
+            placeholderTextColor={"#676767"}
             textAlignVertical="center"
             autoCapitalize="none"
             maxLength={10}
@@ -974,16 +878,13 @@ class AddBarcode extends Component {
             onBlur={this.handleCostPriceValid}
             onChangeText={this.handleCostPrice}
           />
-          {!costPriceValid && (
-            <Message imp={true} message={this.state.errors[ "costPrice" ]} />
-          )}
           <Text style={inputHeading}>
             {I18n.t("List Price")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
-            activeOutlineColor="#000"
+            activeOutlineColor="#d6d6d6"
             mode="outlined"
-            outlineColor={listPriceValid ? "#8F9EB7" : "#dd0000"}
+            outlineColor={"#d6d6d6"}
             style={[
               forms.input_fld,
               forms.active_fld,
@@ -992,7 +893,7 @@ class AddBarcode extends Component {
             placeholder={I18n.t("List Price")}
             keyboardType={"numeric"}
             textContentType="telephoneNumber"
-            placeholderTextColor={listPriceValid ? "#676767" : "#dd0000"}
+            placeholderTextColor={"#676767"}
             textAlignVertical="center"
             autoCapitalize="none"
             maxLength={10}
@@ -1000,16 +901,13 @@ class AddBarcode extends Component {
             onChangeText={this.handleListPrice}
             onBlur={this.handleListPriceValid}
           />
-          {!listPriceValid && (
-            <Message imp={true} message={this.state.errors[ "listPrice" ]} />
-          )}
           <Text style={inputHeading}>
             {I18n.t("Vendor Tax")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
-            activeOutlineColor="#000"
+            activeOutlineColor="#d6d6d6"
             mode="outlined"
-            outlineColor={listPriceValid ? "#8F9EB7" : "#dd0000"}
+            outlineColor={"#d6d6d6"}
             style={[
               forms.input_fld,
               forms.active_fld,
@@ -1018,7 +916,7 @@ class AddBarcode extends Component {
             placeholder={I18n.t("Vendor Tax")}
             keyboardType={"numeric"}
             textContentType="telephoneNumber"
-            placeholderTextColor={listPriceValid ? "#676767" : "#dd0000"}
+            placeholderTextColor={"#676767"}
             textAlignVertical="center"
             autoCapitalize="none"
             maxLength={10}
@@ -1026,16 +924,13 @@ class AddBarcode extends Component {
             onChangeText={this.handleVendorTax}
             onBlur={this.handleVendorTaxValid}
           />
-          {!listPriceValid && (
-            <Message imp={true} message={this.state.errors[ "vendorTax" ]} />
-          )}
           <Text style={inputHeading}>
             {I18n.t("UOM")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <View
             style={[
-              forms.rnp_container,
-              { borderColor: uomValid ? "#8F9EB7" : "#dd0000" },
+              rnPickerContainer,
+              { borderColor: "#d6d6d6" },
             ]}
           >
             <RNPickerSelect
@@ -1047,27 +942,24 @@ class AddBarcode extends Component {
                   <Chevron
                     style={styles.imagealign}
                     size={1.5}
-                    color={uomValid ? "gray" : "#dd0000"}
+                    color={"gray"}
                   />
                 );
               }}
               items={this.state.uomList}
               onValueChange={this.handleUOM}
-              style={uomValid ? rnPicker : rnPickerError}
+              style={rnPicker}
               value={this.state.uomName}
               useNativeAndroidPickerStyle={false}
             />
           </View>
-          {!uomValid && (
-            <Message imp={true} message={this.state.errors[ "uom" ]} />
-          )}
           <Text style={inputHeading}>
             {I18n.t("HSN Code")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <View
             style={[
-              forms.rnp_container,
-              { borderColor: hsnValid ? "#8F9EB7" : "#dd0000" },
+              rnPickerContainer,
+              { borderColor: "#d6d6d6" },
             ]}
           >
             <RNPickerSelect
@@ -1079,36 +971,33 @@ class AddBarcode extends Component {
                   <Chevron
                     style={styles.imagealign}
                     size={1.5}
-                    color={hsnValid ? "gray" : "#dd0000"}
+                    color={"gray"}
                   />
                 );
               }}
               items={this.state.hsnCodesList}
               onValueChange={this.handleHSNCode}
-              style={hsnValid ? rnPicker : rnPickerError}
+              style={rnPicker}
               value={this.state.hsnCode}
               useNativeAndroidPickerStyle={false}
             />
           </View>
-          {!hsnValid && (
-            <Message imp={true} message={this.state.errors[ "hsn" ]} />
-          )}
           <Text style={inputHeading}>
             {I18n.t("EMP ID")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
             activeOutlineColor="#000"
             mode="outlined"
-            outlineColor={empValid ? "#8F9EB7" : "#dd0000"}
+            outlineColor={"#d6d6d6"}
             keyboardType="numeric"
             style={[
               forms.input_fld,
               forms.active_fld,
-              { borderColor: empValid ? "#8F9EB7" : "#dd0000" },
+              { borderColor: "#d6d6d6" },
             ]}
             underlineColorAndroid="transparent"
             placeholder="EMP ID"
-            placeholderTextColor={empValid ? "#676767" : "#dd0000"}
+            placeholderTextColor={"#676767"}
             textAlignVertical="center"
             maxLength={10}
             autoCapitalize="none"
@@ -1116,16 +1005,13 @@ class AddBarcode extends Component {
             onBlur={this.handleEMPIdValid}
             onChangeText={this.handleEMPId}
           />
-          {!empValid && (
-            <Message imp={true} message={this.state.errors[ "emp" ]} />
-          )}
           <Text style={inputHeading}>
             {I18n.t("Store")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <View
             style={[
-              forms.rnp_container,
-              { borderColor: storeValid ? "#8F9EB7" : "#dd0000" },
+              rnPickerContainer,
+              { borderColor: "#d6d6d6" },
             ]}
           >
             <RNPickerSelect
@@ -1137,34 +1023,31 @@ class AddBarcode extends Component {
                   <Chevron
                     style={styles.imagealign}
                     size={1.5}
-                    color={storeValid ? "gray" : "#dd0000"}
+                    color={"gray"}
                   />
                 );
               }}
               items={this.state.storesList}
               onValueChange={this.handleStore}
-              style={storeValid ? rnPicker : rnPickerError}
+              style={rnPicker}
               value={this.state.store}
               useNativeAndroidPickerStyle={false}
             />
           </View>
-          {!storeValid && (
-            <Message imp={true} message={this.state.errors[ "store" ]} />
-          )}
           <Text style={inputHeading}>
             QTY <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
             activeOutlineColor="#000"
             mode="outlined"
-            outlineColor={qtyValid ? "#8F9EB7" : "#dd0000"}
+            outlineColor={"#d6d6d6"}
             style={[
               forms.input_fld,
               forms.active_fld,
             ]}
             underlineColorAndroid="transparent"
             placeholder="QTY"
-            placeholderTextColor={qtyValid ? "#676767" : "#dd0000"}
+            placeholderTextColor={"#676767"}
             textAlignVertical="center"
             maxLength={12}
             autoCapitalize="none"
@@ -1172,9 +1055,6 @@ class AddBarcode extends Component {
             onBlur={this.handleQuantityValid}
             onChangeText={this.handleQuantity}
           />
-          {!qtyValid && (
-            <Message imp={true} message={this.state.errors[ "qty" ]} />
-          )}
           <View style={forms.action_buttons_container}>
             <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
               onPress={() => this.saveBarcode()}>
@@ -1243,7 +1123,7 @@ const styles = StyleSheet.create({
     height: RH(44),
     marginTop: RH(5),
     marginBottom: RH(10),
-    borderColor: "#8F9EB717",
+    borderColor: "#d6d6d617",
     borderRadius: 3,
     backgroundColor: "#FBFBFB",
     borderWidth: 1,
@@ -1267,7 +1147,7 @@ const styles = StyleSheet.create({
     fontSize: RF(14),
   },
   rnSelect_mobile: {
-    color: "#8F9EB7",
+    color: "#d6d6d6",
     fontSize: RF(15),
   },
   rnSelectContainer_mobile: {
@@ -1276,7 +1156,7 @@ const styles = StyleSheet.create({
     height: RH(44),
     marginTop: RH(5),
     marginBottom: RH(10),
-    borderColor: "#8F9EB717",
+    borderColor: "#d6d6d617",
     borderRadius: 3,
     backgroundColor: "#FBFBFB",
     borderWidth: 1,
@@ -1359,7 +1239,7 @@ const styles = StyleSheet.create({
     height: RH(54),
     marginTop: 5,
     marginBottom: RH(10),
-    borderColor: "#8F9EB717",
+    borderColor: "#d6d6d617",
     borderRadius: 3,
     backgroundColor: "#FBFBFB",
     borderWidth: 1,
@@ -1383,7 +1263,7 @@ const styles = StyleSheet.create({
     fontSize: RF(20),
   },
   rnSelect_tablet: {
-    color: "#8F9EB7",
+    color: "#d6d6d6",
     fontSize: 20,
   },
   rnSelectContainer_tablet: {
@@ -1392,7 +1272,7 @@ const styles = StyleSheet.create({
     height: RH(54),
     marginTop: 5,
     marginBottom: RH(10),
-    borderColor: "#8F9EB717",
+    borderColor: "#d6d6d617",
     borderRadius: 3,
     backgroundColor: "#FBFBFB",
     borderWidth: 1,
