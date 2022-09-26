@@ -833,11 +833,8 @@ class GenerateInvoiceSlip extends Component {
         () => {
           this.setState({ disableButton: true, reasonDiscount: "" });
           this.state.privilages[1].bool = false;
-
         });
-
     }
-
   }
 
   navigateToScan() {
