@@ -2,9 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { Component } from "react";
 import {
   Dimensions,
-  FlatList,
-  Image,
-  ScrollView,
+  FlatList, ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -24,16 +22,9 @@ import scss from "../../commonUtils/assets/styles/style.scss";
 import Loader from "../../commonUtils/loader";
 import UrmService from "../services/UrmService";
 import {
-  inputField,
   rnPicker,
   rnPickerContainer
 } from "../Styles/FormFields";
-import {
-  filterCloseImage,
-  filterHeading,
-  filterMainContainer,
-  filterSubContainer
-} from "../Styles/PopupStyles";
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceHeight = Dimensions.get("window").height;
@@ -380,99 +371,77 @@ export default class Stores extends Component {
             <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}
               onBackButtonPress={() => this.modelCancel()}
               onBackdropPress={() => this.modelCancel()} >
-              <View style={filterMainContainer}>
-                <View>
-                  <View style={filterSubContainer}>
-                    <View>
-                      <Text style={filterHeading}> {I18n.t("Filter By")} </Text>
+              <View style={forms.filterModelContainer}>
+                <Text style={forms.popUp_decorator}>-</Text>
+                <View style={forms.filterModelSub}>
+                  <KeyboardAwareScrollView>
+                    <View style={rnPickerContainer}>
+                      <RNPickerSelect
+                        placeholder={{
+                          label: "STATE",
+                        }}
+                        Icon={() => {
+                          return (
+                            <Chevron
+                              style={styles.imagealign}
+                              size={1.5}
+                              color="gray"
+                            />
+                          );
+                        }}
+                        items={this.state.states}
+                        onValueChange={(value) => this.handleStoreState(value)}
+                        style={rnPicker}
+                        value={this.state.storeState}
+                        useNativeAndroidPickerStyle={false}
+                      />
                     </View>
-                    <View>
-                      <TouchableOpacity
-                        style={filterCloseImage}
-                        onPress={() => this.modelCancel()}
-                      >
-                        <Image
-                          style={{ margin: 5 }}
-                          source={require("../assets/images/modelcancel.png")}
-                        />
+                    <View style={rnPickerContainer}>
+                      <RNPickerSelect
+                        placeholder={{
+                          label: "DISTRICT",
+                        }}
+                        Icon={() => {
+                          return (
+                            <Chevron
+                              style={styles.imagealign}
+                              size={1.5}
+                              color="gray"
+                            />
+                          );
+                        }}
+                        items={this.state.dictricts}
+                        onValueChange={(value) => this.handleDistrict(value)}
+                        style={rnPicker}
+                        value={this.state.storeDistrict}
+                        useNativeAndroidPickerStyle={false}
+                      />
+                    </View>
+                    <TextInput
+                      mode="outlined"
+                      outlineColor="#dfdfdf"
+                      activeOutlineColor="dfdfdf"
+                      style={forms.input_fld}
+                      underlineColorAndroid="transparent"
+                      placeholder={I18n.t("STORE NAME")}
+                      placeholderTextColor="#6F6F6F"
+                      textAlignVertical="center"
+                      autoCapitalize="none"
+                      value={this.state.storeName}
+                      onChangeText={this.handleStoreName}
+                    />
+                    <View style={forms.action_buttons_container}>
+                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                        onPress={() => this.applyStoreFilter()}>
+                        <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                        onPress={() => this.modelCancel()}>
+                        <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>
                     </View>
-                  </View>
-                  <Text
-                    style={{
-                      height: Device.isTablet ? 2 : 1,
-                      width: deviceWidth,
-                      backgroundColor: "lightgray",
-                    }}
-                  ></Text>
+                  </KeyboardAwareScrollView>
                 </View>
-                <KeyboardAwareScrollView enableOnAndroid={true}>
-                  <View style={rnPickerContainer}>
-                    <RNPickerSelect
-                      placeholder={{
-                        label: "STATE",
-                      }}
-                      Icon={() => {
-                        return (
-                          <Chevron
-                            style={styles.imagealign}
-                            size={1.5}
-                            color="gray"
-                          />
-                        );
-                      }}
-                      items={this.state.states}
-                      onValueChange={(value) => this.handleStoreState(value)}
-                      style={rnPicker}
-                      value={this.state.storeState}
-                      useNativeAndroidPickerStyle={false}
-                    />
-                  </View>
-                  <View style={rnPickerContainer}>
-                    <RNPickerSelect
-                      placeholder={{
-                        label: "DISTRICT",
-                      }}
-                      Icon={() => {
-                        return (
-                          <Chevron
-                            style={styles.imagealign}
-                            size={1.5}
-                            color="gray"
-                          />
-                        );
-                      }}
-                      items={this.state.dictricts}
-                      onValueChange={(value) => this.handleDistrict(value)}
-                      style={rnPicker}
-                      value={this.state.storeDistrict}
-                      useNativeAndroidPickerStyle={false}
-                    />
-                  </View>
-                  <TextInput
-                    mode="outlined"
-                    outlineColor="#dfdfdf"
-                    activeOutlineColor="dfdfdf"
-                    style={inputField}
-                    underlineColorAndroid="transparent"
-                    placeholder={I18n.t("STORE NAME")}
-                    placeholderTextColor="#6F6F6F"
-                    textAlignVertical="center"
-                    autoCapitalize="none"
-                    value={this.state.storeName}
-                    onChangeText={this.handleStoreName}
-                  />
-                  <View style={forms.action_buttons_container}>
-                    <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
-                      onPress={() => this.applyStoreFilter()}>
-                      <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
-                      onPress={() => this.modelCancel()}>
-                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
-                    </TouchableOpacity>
-                  </View>
-                </KeyboardAwareScrollView>
               </View>
             </Modal>
           </View>

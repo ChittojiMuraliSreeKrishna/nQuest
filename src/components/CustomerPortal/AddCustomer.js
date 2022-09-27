@@ -1,21 +1,21 @@
-import axios from 'axios';
 import React, { Component } from 'react';
-import { Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
+import { TextInput } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
-import { urmErrorMessages, errorLength } from '../Errors/errors';
-import CreateCustomerService from '../services/CreateCustomerService';
+import { RF } from '../../Responsive';
+import { errorLength, urmErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
 import CreateDeliverySlip from '../services/CreateDeliverySlip';
-import { RF } from '../../Responsive';
+import { rnPicker, rnPickerContainer } from '../Styles/FormFields';
 
 var deviceheight = Dimensions.get('window').height;
 var deviceheight = Dimensions.get('window').height;
 var deviceWidth = Dimensions.get("window").width;
 
-var mobileNumber = ''
+var mobileNumber = '';
 
 export default class AddCustomer extends Component {
 
@@ -54,39 +54,39 @@ export default class AddCustomer extends Component {
     };
   }
 
-  async componentDidMount() {
+  async componentDidMount () {
     this.addCustomer = this.addCustomer.bind(this);
   }
 
-  validationCheck() {
+  validationCheck () {
     let errors = {};
     let isFormValid = true;
     const mobReg = /^[0-9\b]+$/;
     const emailReg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
 
-    if (this.state.name.length <3) {
+    if (this.state.name.length < 3) {
       isFormValid = false;
-      errors["name"] = urmErrorMessages.customerName;
+      errors[ "name" ] = urmErrorMessages.customerName;
       this.setState({ nameValid: false });
     }
 
     if (mobReg.test(this.state.phoneNumber) === false || this.state.phoneNumber.length < errorLength.mobile) {
       isFormValid = false;
-      errors["mobile"] = urmErrorMessages.mobile;
+      errors[ "mobile" ] = urmErrorMessages.mobile;
       this.setState({ mobileValid: false });
     }
 
     if (this.state.email.length > 0 && emailReg.test(this.state.email) === false) {
       isFormValid = false;
-      errors["email"] = urmErrorMessages.email;
+      errors[ "email" ] = urmErrorMessages.email;
       this.setState({ emailValid: false });
     }
 
 
     if (this.state.gstNumber.length > 0 && this.state.gstNumber.length < errorLength.gstNumber) {
       isFormValid = false;
-      errors["gst"] = urmErrorMessages.gstNumber;
+      errors[ "gst" ] = urmErrorMessages.gstNumber;
       this.setState({ gstValid: false });
     }
 
@@ -96,7 +96,7 @@ export default class AddCustomer extends Component {
     return isFormValid;
   }
 
-  addCustomer() {
+  addCustomer () {
     const isFormValid = this.validationCheck();
     if (isFormValid) {
       this.state.phoneNumber = "+91" + this.state.phoneNumber;
@@ -108,7 +108,7 @@ export default class AddCustomer extends Component {
             alert(res.data.message);
           } else {
             alert("Customer Added Successfully");
-            mobileNumber = ''
+            mobileNumber = '';
           }
           this.setState({
             username: "",
@@ -141,7 +141,7 @@ export default class AddCustomer extends Component {
     }
   }
 
-  handleCustomerName(text) {
+  handleCustomerName (text) {
     this.setState({ username: text, name: text });
   }
 
@@ -151,9 +151,9 @@ export default class AddCustomer extends Component {
     }
   };
 
-  handleMobileNumber(text) {
+  handleMobileNumber (text) {
     this.setState({ phoneNumber: text });
-    mobileNumber = text
+    mobileNumber = text;
   }
 
   handleMobileValid = () => {
@@ -162,7 +162,7 @@ export default class AddCustomer extends Component {
     }
   };
 
-  handleEmail(text) {
+  handleEmail (text) {
     this.setState({ email: text });
   }
 
@@ -170,38 +170,38 @@ export default class AddCustomer extends Component {
     this.setState({ gender: value });
   };
 
-  handleAddress(text) {
+  handleAddress (text) {
     this.setState({ address: text });
   }
 
-  handleCompanyName(text) {
+  handleCompanyName (text) {
     this.setState({ companyName: text });
   }
 
-  handleGstNumber(text) {
+  handleGstNumber (text) {
     this.setState({ gstNumber: text });
   }
 
-  handleGstNumberValid(text) {
+  handleGstNumberValid (text) {
     if (this.state.gstNumber.length >= errorLength.gstNumber) {
       this.setState({ gstValid: true });
     }
   }
 
-  handleBusinessAddress(text) {
+  handleBusinessAddress (text) {
     this.setState({ gstaddress: text });
   }
 
-  handleBusinessEmail(text) {
+  handleBusinessEmail (text) {
     this.setState({ gstemail: text });
   }
 
-  handleBusinessPhone(text) {
+  handleBusinessPhone (text) {
     this.setState({ gstmobile: text });
   }
 
 
-  render() {
+  render () {
     const { nameValid, mobileValid, emailValid, gstValid } = this.state;
 
     return (
@@ -210,22 +210,22 @@ export default class AddCustomer extends Component {
         <Text style={styles.headings}>{I18n.t("Customer Name")} <Text style={{ color: 'red' }}>*</Text></Text>
         <TextInput
           style={nameValid ? Device.isTablet ? styles.input_tablet : styles.input_mobile : Device.isTablet ? styles.inputError_tablet : styles.inputError_mobile}
-          mode="flat"
-          activeUnderlineColor='#000'
-          underlineColor={nameValid ? '#6f6f6f' : "#dd0000"}
+          mode="outlined"
+          activeOutlineColor='#d6d6d6'
+          outlineColor={nameValid ? '#d6d6d6' : "#dd0000"}
           label={I18n.t('CUSTOMER NAME')}
           maxLength={25}
           // onBlur={this.handleNameValid}
           value={this.state.name}
           onChangeText={(text) => this.handleCustomerName(text)}
         />
-        {!nameValid && <Message imp={true} message={this.state.errors["name"]} />}
+        {!nameValid && <Message imp={true} message={this.state.errors[ "name" ]} />}
         <Text style={styles.headings}>{I18n.t("Mobile Number")} <Text style={{ color: 'red' }}>*</Text></Text>
         <TextInput
           style={mobileValid ? Device.isTablet ? styles.input_tablet : styles.input_mobile : Device.isTablet ? styles.inputError_tablet : styles.inputError_mobile}
-          mode="flat"
-          activeUnderlineColor='#000'
-          underlineColor={mobileValid ? '#6f6f6f' : "#dd0000"}
+          mode="outlined"
+          activeOutlineColor='#d6d6d6'
+          outlineColor={mobileValid ? '#d6d6d6' : "#dd0000"}
           label={I18n.t('MOBILE NUMBER')}
           maxLength={10}
           keyboardType='phone-pad'
@@ -234,41 +234,41 @@ export default class AddCustomer extends Component {
           value={mobileNumber}
           onChangeText={(text) => this.handleMobileNumber(text)}
         />
-        {!mobileValid && <Message imp={true} message={this.state.errors["mobile"]} />}
+        {!mobileValid && <Message imp={true} message={this.state.errors[ "mobile" ]} />}
         <Text style={styles.headings}>{I18n.t("Email")}</Text>
         <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-          mode="flat"
-          activeUnderlineColor='#000'
-          underlineColor={emailValid ? '#6f6f6f' : "#dd0000"}
+          mode="outlined"
+          activeOutlineColor='#d6d6d6'
+          outlineColor={emailValid ? '#d6d6d6' : "#dd0000"}
           label={I18n.t('EMAIL')}
           keyboardType='email-address'
           autoCapitalize='none'
           value={this.state.email}
           onChangeText={(text) => this.handleEmail(text)}
         />
-        {!emailValid && <Message imp={false} message={this.state.errors["email"]} />}
+        {!emailValid && <Message imp={false} message={this.state.errors[ "email" ]} />}
         <Text style={styles.headings}>{I18n.t("Address")}</Text>
         <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-          mode="flat"
-          activeUnderlineColor='#000'
-          underlineColor={'#6f6f6f'}
+          mode="outlined"
+          activeOutlineColor='#d6d6d6'
+          outlineColor='#d6d6d6'
           label={I18n.t('ADDRESS')}
           value={this.state.address}
           onChangeText={(text) => this.handleAddress(text)}
         />
         <Text style={styles.headings}>{I18n.t("GST Number")}</Text>
         <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-          mode="flat"
-          activeUnderlineColor='#000'
-          underlineColor={gstValid ? '#6f6f6f' : '#dd0000'}
+          mode="outlined"
+          activeOutlineColor='#d6d6d6'
+          outlineColor='#d6d6d6'
           label={I18n.t('GST Number')}
           value={this.state.gstNumber}
           onBlur={(text) => this.handleGstNumberValid(text)}
           onChangeText={(text) => this.handleGstNumber(text)}
         />
-        {!gstValid && <Message imp={false} message={this.state.errors["gst"]} />}
+        {!gstValid && <Message imp={false} message={this.state.errors[ "gst" ]} />}
         <Text style={styles.headings}>{I18n.t("Gender")}</Text>
-        <View style={Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile}>
+        <View style={rnPickerContainer}>
           <RNPickerSelect
             // style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
             placeholder={{ label: 'GENDER', value: '' }}
@@ -280,64 +280,11 @@ export default class AddCustomer extends Component {
               { label: 'Female', value: 'female' },
             ]}
             onValueChange={this.handlegender}
-            style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
+            style={rnPicker}
             value={this.state.gender}
             useNativeAndroidPickerStyle={false}
           />
         </View>
-        {/*
-                <Text style={Device.isTablet ? styles.headerText_tablet : styles.hederText_mobile}>{I18n.t("Business Information")}</Text>
-                <Text style={styles.headings}>{I18n.t("GST Number")}</Text>
-                <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                    placeholder={I18n.t('GST NUMBER')}
-                    placeholderTextColor="#6f6f6f60"
-                    textAlignVertical="center"
-                    keyboardType={'default'}
-                    autoCapitalize='none'
-                    value={this.state.gstNumber}
-                    onChangeText={(text) => this.handleGstNumber(text)}
-                />
-                <Text style={styles.headings}>{I18n.t("Company Name")}</Text>
-                <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                    placeholder={I18n.t('COMPANY NAME')}
-                    placeholderTextColor="#6f6f6f60"
-                    textAlignVertical="center"
-                    keyboardType={'default'}
-                    autoCapitalize='none'
-                    value={this.state.companyName}
-                    onChangeText={(text) => this.handleCompanyName(text)}
-                />
-                <Text style={styles.headings}>{I18n.t("Email")}</Text>
-                <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                    placeholder={I18n.t('EMAIL')}
-                    placeholderTextColor="#6f6f6f60"
-                    textAlignVertical="center"
-                    keyboardType={'default'}
-                    autoCapitalize='none'
-                    value={this.state.gstemail}
-                    onChangeText={(text) => this.handleBusinessEmail(text)}
-                />
-                <Text style={styles.headings}>{I18n.t("Phone Number")}</Text>
-                <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                    placeholder={I18n.t('PHONE NUMBER')}
-                    placeholderTextColor="#6f6f6f60"
-                    textAlignVertical="center"
-                    keyboardType={'default'}
-                    autoCapitalize='none'
-                    value={this.state.gstmobile}
-                    onChangeText={(text) => this.handleBusinessPhone(text)}
-                />
-                <Text style={styles.headings}>{I18n.t("Address")}</Text>
-                <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                    placeholder={I18n.t('ADDRESS')}
-                    placeholderTextColor="#6f6f6f60"
-                    textAlignVertical="center"
-                    keyboardType={'default'}
-                    autoCapitalize='none'
-                    value={this.state.gstaddress}
-                    onChangeText={(text) => this.handleBusinessAddress(text)}
-                /> */}
-
         <TouchableOpacity
           style={Device.isTablet ? styles.signInButton_tablet : styles.signInButton_mobile}
           onPress={() => this.addCustomer()}

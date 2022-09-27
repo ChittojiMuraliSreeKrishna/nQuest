@@ -68,13 +68,14 @@ axios.interceptors.request.use(
       //   "Authorization": "Bearer" + " " + finalToken,
       //   "clientId": clientId ? clientId : "0"
       // };
-      req.headers["Content-Type"] = "application/json";
-      req.headers["enc-key"] = encryptedKey;
-      req.headers["Authorization"] = "Bearer" + " " + finalToken;
-      req.headers["clientId"] = clientId ? clientId : "0";
+      req.headers[ "Content-Type" ] = "application/json";
+      req.headers[ "enc-key" ] = encryptedKey;
+      req.headers[ "Authorization" ] = "Bearer" + " " + finalToken;
+      req.headers[ "clientId" ] = clientId ? clientId : "0";
 
       req.data = encryptedBytes;
     }
+    console.log(req.headers);
     console.log({ req });
     return req;
   },
@@ -88,7 +89,7 @@ axios.interceptors.request.use(
 axios.interceptors.response.use((response) => response, (error) => {
   // if(error.)
   // whatever you want to do with the error
-  console.log(error.response);
+  console.log(error.response.status);
   if (error.response.status === 404) {
     // alert('The requested resource does not exist or has been deleted')
   }
@@ -106,6 +107,7 @@ axios.interceptors.response.use((response) => response, (error) => {
       ||
       error.response.data && error.response.data.message && alert(error.response.data.message);
   }
+
 
 });
 AppRegistry.registerComponent('main', () => App);

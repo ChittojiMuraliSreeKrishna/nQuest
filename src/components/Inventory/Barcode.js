@@ -27,17 +27,8 @@ import {
   datePicker,
   datePickerBtnText,
   datePickerButton1,
-  datePickerButton2,
-  dateSelector,
-  dateText,
-  inputField
+  datePickerButton2
 } from "../Styles/FormFields";
-import {
-  filterCloseImage,
-  filterHeading,
-  filterMainContainer,
-  filterSubContainer
-} from "../Styles/PopupStyles";
 import {
   flatListTitle,
   listEmptyMessage
@@ -566,129 +557,122 @@ export default class Barcode extends Component {
               onBackButtonPress={() => this.modelCancel()}
               onBackdropPress={() => this.modelCancel()}
             >
-              <View style={filterMainContainer}>
-                <View>
-                  <View style={filterSubContainer}>
-                    <Text style={filterHeading}> {I18n.t("Filter By")} </Text>
-                    <TouchableOpacity
-                      style={filterCloseImage}
-                      onPress={() => this.modelCancel()}
-                    >
-                      <Image
-                        style={{ margin: RH(5) }}
-                        source={require("../assets/images/modelcancel.png")}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                <KeyboardAwareScrollView enableOnAndroid={true}>
-                  <TouchableOpacity
-                    style={dateSelector}
-                    testID="openModal"
-                    onPress={() => this.datepickerClicked()}
-                  >
-                    <Text style={dateText}>
-                      {this.state.startDate === ""
-                        ? "Start Date"
-                        : this.state.startDate}
-                    </Text>
-                    <Image
-                      style={filter.calenderpng}
-                      source={require("../assets/images/calender.png")}
-                    />
-                  </TouchableOpacity>
-                  {this.state.datepickerOpen && (
-                    <View style={filter.dateTopView}>
-                      <View style={filter.dateTop2}>
-                        <TouchableOpacity
-                          style={datePickerButton1}
-                          onPress={() => this.datepickerCancelClicked()}
-                        >
-                          <Text style={datePickerBtnText}> Cancel </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                          style={datePickerButton2}
-                          onPress={() => this.datepickerDoneClicked()}
-                        >
-                          <Text style={datePickerBtnText}> Done </Text>
-                        </TouchableOpacity>
-                      </View>
-                      <DatePicker
-                        style={datePicker}
-                        date={this.state.date}
-                        mode={"date"}
-                        onDateChange={(date) => this.setState({ date })}
-                      />
+              <View style={forms.filterModelContainer}>
+                <Text style={forms.popUp_decorator}>-</Text>
+                <View style={forms.filterModelSub}>
+                  <KeyboardAwareScrollView>
+                    <View style={forms.filter_dates_container}>
+                      <TouchableOpacity
+                        style={forms.filter_dates}
+                        testID="openModal"
+                        onPress={() => this.datepickerClicked()}
+                      >
+                        <Text style={forms.filter_dates_text}>
+                          {this.state.startDate === ""
+                            ? "Start Date"
+                            : this.state.startDate}
+                        </Text>
+                        <Image
+                          style={forms.calender_image}
+                          source={require("../assets/images/calender.png")}
+                        />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={forms.filter_dates}
+                        testID="openModal"
+                        onPress={() => this.enddatepickerClicked()}
+                      >
+                        <Text style={forms.filter_dates_text}>
+                          {this.state.endDate === ""
+                            ? "End Date"
+                            : this.state.endDate}
+                        </Text>
+                        <Image
+                          style={forms.calender_image}
+                          source={require("../assets/images/calender.png")}
+                        />
+                      </TouchableOpacity>
                     </View>
-                  )}
-                  <TouchableOpacity
-                    style={dateSelector}
-                    testID="openModal"
-                    onPress={() => this.enddatepickerClicked()}
-                  >
-                    <Text style={dateText}>
-                      {this.state.endDate === ""
-                        ? "End Date"
-                        : this.state.endDate}
-                    </Text>
-                    <Image
-                      style={filter.calenderpng}
-                      source={require("../assets/images/calender.png")}
-                    />
-                  </TouchableOpacity>
-
-                  {this.state.datepickerendOpen && (
-                    <View style={filter.dateTopView}>
-                      <View style={filter.dateTop2}>
-                        <View>
+                    {this.state.datepickerOpen && (
+                      <View style={filter.dateTopView}>
+                        <View style={filter.dateTop2}>
                           <TouchableOpacity
                             style={datePickerButton1}
                             onPress={() => this.datepickerCancelClicked()}
                           >
                             <Text style={datePickerBtnText}> Cancel </Text>
                           </TouchableOpacity>
-                        </View>
-                        <View>
+
                           <TouchableOpacity
                             style={datePickerButton2}
-                            onPress={() => this.datepickerendDoneClicked()}
+                            onPress={() => this.datepickerDoneClicked()}
                           >
                             <Text style={datePickerBtnText}> Done </Text>
                           </TouchableOpacity>
                         </View>
+                        <DatePicker
+                          style={datePicker}
+                          date={this.state.date}
+                          mode={"date"}
+                          onDateChange={(date) => this.setState({ date })}
+                        />
                       </View>
-                      <DatePicker
-                        style={datePicker}
-                        date={this.state.enddate}
-                        mode={"date"}
-                        onDateChange={(enddate) => this.setState({ enddate })}
-                      />
+                    )}
+
+
+                    {this.state.datepickerendOpen && (
+                      <View style={filter.dateTopView}>
+                        <View style={filter.dateTop2}>
+                          <View>
+                            <TouchableOpacity
+                              style={datePickerButton1}
+                              onPress={() => this.datepickerCancelClicked()}
+                            >
+                              <Text style={datePickerBtnText}> Cancel </Text>
+                            </TouchableOpacity>
+                          </View>
+                          <View>
+                            <TouchableOpacity
+                              style={datePickerButton2}
+                              onPress={() => this.datepickerendDoneClicked()}
+                            >
+                              <Text style={datePickerBtnText}> Done </Text>
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                        <DatePicker
+                          style={datePicker}
+                          date={this.state.enddate}
+                          mode={"date"}
+                          onDateChange={(enddate) => this.setState({ enddate })}
+                        />
+                      </View>
+                    )}
+                    <TextInput
+                      mode="outlined"
+                      activeOutlineColor="#b9b9b9"
+                      outlineColor="#b9b9b9"
+                      style={forms.input_fld}
+                      underlineColorAndroid="transparent"
+                      placeholder={I18n.t("BARCODE ID")}
+                      placeholderTextColor="#6f6f6f"
+                      textAlignVertical="center"
+                      autoCapitalize="none"
+                      value={this.state.barCodeId}
+                      onChangeText={this.handlebarCodeId}
+                    />
+                    <View style={forms.action_buttons_container}>
+                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                        onPress={() => { this.setState({ pageNo: 0, loadPrevActive: false, loadNextActive: true }, () => this.applyBarcodeFilter(0)); }}>
+                        <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                        onPress={() => this.modelCancel()}>
+                        <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                      </TouchableOpacity>
                     </View>
-                  )}
-                  <TextInput
-                    mode="outlined"
-                    activeOutlineColor="#6F6F6F"
-                    style={inputField}
-                    underlineColorAndroid="transparent"
-                    placeholder={I18n.t("BARCODE ID")}
-                    placeholderTextColor="#6F6F6F"
-                    textAlignVertical="center"
-                    autoCapitalize="none"
-                    value={this.state.barCodeId}
-                    onChangeText={this.handlebarCodeId}
-                  />
-                  <View style={forms.action_buttons_container}>
-                    <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
-                      onPress={() => { this.setState({ pageNo: 0, loadPrevActive: false, loadNextActive: true }, () => this.applyBarcodeFilter(0)); }}>
-                      <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
-                      onPress={() => this.modelCancel()}>
-                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
-                    </TouchableOpacity>
-                  </View>
-                </KeyboardAwareScrollView>
+                  </KeyboardAwareScrollView>
+                </View>
               </View>
             </Modal>
           </View>
