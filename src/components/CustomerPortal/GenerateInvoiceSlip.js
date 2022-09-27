@@ -23,7 +23,6 @@ import { inputField } from '../Styles/FormFields';
 import { listEmptyMessage } from '../Styles/Styles';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 
-
 var deviceWidth = Dimensions.get('window').width;
 var deviceHeight = Dimensions.get('window').height;
 // Connction to access the pre-populated db
@@ -1185,62 +1184,45 @@ class GenerateInvoiceSlip extends Component {
         {
           this.state.customerTagging && (
             <View style={{ backgroundColor: color.white }}>
-              <Modal isVisible={this.state.modalVisible} onBackButtonPress={() => this.modelCancel()}
+              <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible} onBackButtonPress={() => this.modelCancel()}
                 onBackdropPress={() => this.modelCancel()} >
-                <View style={[Device.isTablet ? styles.filterMainContainer_tablet : styles.filterMainContainer_mobile, { height: Device.isTablet ? 400 : 300 }]}>
+                <View style={forms.filterModelContainer}>
+                  <Text style={forms.popUp_decorator}>-</Text>
+                  <View style={forms.filterModelSub}>
+                    <View>
+                      <Text style={{
+                        height: Device.isTablet ? 40 : 20,
+                        textAlign: 'center',
+                        fontFamily: 'regular',
+                        fontSize: Device.isTablet ? 23 : 18,
+                        marginBottom: Device.isTablet ? 25 : 15,
+                        color: '#353C40'
+                      }}> {I18n.t("Please provide customer phone number")}  </Text>
+                      <TextInput
+                        style={forms.inputfld}
+                        mode="flat"
+                        activeUnderlineColor='#000'
+                        underlineColor={'#6f6f6f'}
+                        label={I18n.t("MOBILE NUMBER")}
+                        keyboardType='phone-pad'
+                        maxLength={10}
+                        value={this.state.mobileNumber}
+                        onChangeText={(text) => this.handleMobileNumber(text)}
 
-                  <View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
-                      <View>
-                        <Text style={{ marginTop: 15, fontSize: Device.isTablet ? 22 : 17, marginLeft: 20 }} > {I18n.t("Tag Customer")} </Text>
-                      </View>
-                      <View>
-                        <TouchableOpacity style={{ width: Device.isTablet ? 60 : 50, height: Device.isTablet ? 60 : 50, marginTop: Device.isTablet ? 20 : 15, }} onPress={() => this.modelCancel()}>
-                          <Image style={{ margin: 5 }} source={require('../assets/images/modelcancel.png')} />
+                      />
+                      <View style={forms.action_buttons_container}>
+                        <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                          onPress={() => this.tagCustomer()}>
+                          <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                          onPress={() => this.modelCancel()}>
+                          <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                         </TouchableOpacity>
                       </View>
+
+
                     </View>
-                    <Text style={{
-                      height: Device.isTablet ? 2 : 1,
-                      width: deviceWidth,
-                      backgroundColor: 'lightgray',
-                    }}></Text>
-                  </View>
-
-
-                  <View>
-                    <Text style={{
-                      height: Device.isTablet ? 40 : 20,
-                      textAlign: 'center',
-                      fontFamily: 'regular',
-                      fontSize: Device.isTablet ? 23 : 18,
-                      marginBottom: Device.isTablet ? 25 : 15,
-                      color: '#353C40'
-                    }}> {I18n.t("Please provide customer phone number")}  </Text>
-                    <TextInput
-                      style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                      mode="flat"
-                      activeUnderlineColor='#000'
-                      underlineColor={'#6f6f6f'}
-                      label={I18n.t("MOBILE NUMBER")}
-                      keyboardType='phone-pad'
-                      maxLength={10}
-                      value={this.state.mobileNumber}
-                      onChangeText={(text) => this.handleMobileNumber(text)}
-
-                    />
-                    <View style={forms.action_buttons_container}>
-                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
-                        onPress={() => this.tagCustomer()}>
-                        <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
-                        onPress={() => this.modelCancel()}>
-                        <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
-                      </TouchableOpacity>
-                    </View>
-
-
                   </View>
                 </View>
               </Modal>
@@ -1249,31 +1231,14 @@ class GenerateInvoiceSlip extends Component {
         }
         {
           this.state.handleBillDiscount && (
-            <View style={{ backgroundColor: color.white }}>
-              <Modal isVisible={this.state.modalVisible} onBackButtonPress={() => this.billDiscountModelCancel()}
+            <View>
+              <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible} onBackButtonPress={() => this.billDiscountModelCancel()}
                 onBackdropPress={() => this.billDiscountModelCancel()} >
-                <View style={[Device.isTablet ? styles.filterMainContainer_tablet : styles.filterMainContainer_mobile, { height: Device.isTablet ? 500 : 400 }]}>
-                  <View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
-                      <View>
-                        <Text style={{ marginTop: 15, fontSize: Device.isTablet ? 22 : 17, marginLeft: 20 }} > {I18n.t("Bill level Discount")} </Text>
-                      </View>
-                      <View>
-                        <TouchableOpacity style={{ width: Device.isTablet ? 60 : 50, height: Device.isTablet ? 60 : 50, marginTop: Device.isTablet ? 20 : 15, }} onPress={() => this.billDiscountModelCancel()}>
-                          <Image style={{ margin: 5 }} source={require('../assets/images/modelcancel.png')} />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                    <Text style={{
-                      height: Device.isTablet ? 2 : 1,
-                      width: deviceWidth,
-                      backgroundColor: 'lightgray',
-                    }}></Text>
-                  </View>
-
-                  <View>
+                <View style={[forms.filterModelContainer,{width:'100%'}]}>
+                  <Text style={forms.popUp_decorator}>-</Text>
+                  <View style={forms.filterModelSub}>
                     <TextInput
-                      style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
+                      style={forms.inputfld}
                       mode="flat"
                       activeUnderlineColor='#000'
                       underlineColor={'#6f6f6f'}
@@ -1290,16 +1255,15 @@ class GenerateInvoiceSlip extends Component {
                     )}
 
                     <TextInput
-                      style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
+                      style={forms.inputfld}
                       mode="flat"
                       activeUnderlineColor='#000'
                       underlineColor={'#6f6f6f'}
                       label={I18n.t("APPROVED BY *")}
                       onChangeText={(text) => this.handleApprovedBy(text)}
                     />
-                    <View style={Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile}>
+                    <View style={[Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile, { width: "92%" }]}>
                       <RNPickerSelect
-                        // style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
                         placeholder={{ label: 'REASON *', value: '' }}
                         Icon={() => {
                           return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
@@ -1339,18 +1303,15 @@ class GenerateInvoiceSlip extends Component {
                   </View>
                 </View>
               </Modal>
-            </View>
+            </View >
           )
         }
         {
           this.state.flagCustomerOpen && (
             <View style={{ backgroundColor: color.white }}>
-              <Modal isVisible={this.state.modalVisible} onBackButtonPress={() => this.modelCancel()}
+              <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible} onBackButtonPress={() => this.modelCancel()}
                 onBackdropPress={() => this.modelCancel()} >
-                <KeyboardAwareScrollView KeyboardAwareScrollView
-                  enableOnAndroid={true}>
-
-
+                <KeyboardAwareScrollView >
                   <View style={{
                     flex: 1, justifyContent: 'center', //Centered horizontally
                     alignItems: 'center', color: '#ffffff',

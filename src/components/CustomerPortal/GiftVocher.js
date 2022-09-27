@@ -320,108 +320,100 @@ class GiftVocher extends Component {
             <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
               onBackButtonPress={() => this.modelCancel()}
               onBackdropPress={() => this.modelCancel()} >
-              <View style={[filterMainContainer, { minHeight: Device.isTablet ? RH(400) : RH(300), maxHeight: Device.isTablet ? RH(600) : RH(500), }]}>
-                <View style={filterSubContainer}>
-                  <View>
-                    <Text style={filterHeading}>Filter By</Text>
-                  </View>
-                  <View>
-                    <TouchableOpacity style={filterCloseImage} onPress={() => this.modelCancel()}>
-                      <Image style={{ margin: RH(5) }} source={require('../assets/images/modelcancel.png')} />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                <Text style={styles.spaceText}></Text>
-                <KeyboardAwareScrollView enableOnAndroid={true}>
-                  <View style={forms.filter_dates_container}>
-                    <TouchableOpacity
-                      style={forms.filter_dates}
-                      testID="openModal"
-                      onPress={() => this.datepickerClicked()}
-                    >
-                      <Text
-                        style={forms.filter_dates_text}
-                      >{this.state.filterStartDate == "" ? 'START DATE' : this.state.filterStartDate}</Text>
-                      <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={forms.filter_dates}
-                      testID="openModal"
-                      onPress={() => this.enddatepickerClicked()}
-                    >
-                      <Text
-                        style={forms.filter_dates_text}
-                      >{this.state.filterEndDate == "" ? 'END DATE' : this.state.filterEndDate}</Text>
-                      <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
-                    </TouchableOpacity>
-                  </View>
-                  {this.state.filterStartPickerOpen && (
-                    <View style={styles.dateTopView}>
-                      <View style={styles.dateTop2}>
-                        <TouchableOpacity
-                          style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
-                        >
-                          <Text style={datePickerBtnText}  > Cancel </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                          style={datePickerButton2} onPress={() => this.filterStartDatePickerDoneClicked()}
-                        >
-                          <Text style={datePickerBtnText}  > Done </Text>
-                        </TouchableOpacity>
-                      </View>
-                      <DatePicker style={datePicker}
-                        date={this.state.date}
-                        mode={'date'}
-                        onDateChange={(date) => this.setState({ date })}
-                      />
+              <View style={forms.filterModelContainer}>
+                <Text style={forms.popUp_decorator}>-</Text>
+                <View style={forms.filterModelSub}>
+                  <KeyboardAwareScrollView >
+                    <View style={forms.filter_dates_container}>
+                      <TouchableOpacity
+                        style={forms.filter_dates}
+                        testID="openModal"
+                        onPress={() => this.datepickerClicked()}
+                      >
+                        <Text
+                          style={forms.filter_dates_text}
+                        >{this.state.filterStartDate == "" ? 'START DATE' : this.state.filterStartDate}</Text>
+                        <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={forms.filter_dates}
+                        testID="openModal"
+                        onPress={() => this.enddatepickerClicked()}
+                      >
+                        <Text
+                          style={forms.filter_dates_text}
+                        >{this.state.filterEndDate == "" ? 'END DATE' : this.state.filterEndDate}</Text>
+                        <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                      </TouchableOpacity>
                     </View>
-                  )}
-
-                  {this.state.datepickerendOpen && (
-                    <View style={styles.dateTopView}>
-                      <View style={styles.dateTop2}>
-                        <View>
+                    {this.state.filterStartPickerOpen && (
+                      <View style={styles.dateTopView}>
+                        <View style={styles.dateTop2}>
                           <TouchableOpacity
                             style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
                           >
                             <Text style={datePickerBtnText}  > Cancel </Text>
                           </TouchableOpacity>
-                        </View>
-                        <View>
+
                           <TouchableOpacity
-                            style={datePickerButton2} onPress={() => this.filterEndDatePickerDoneClicked()}
+                            style={datePickerButton2} onPress={() => this.filterStartDatePickerDoneClicked()}
                           >
                             <Text style={datePickerBtnText}  > Done </Text>
                           </TouchableOpacity>
                         </View>
+                        <DatePicker style={datePicker}
+                          date={this.state.date}
+                          mode={'date'}
+                          onDateChange={(date) => this.setState({ date })}
+                        />
                       </View>
-                      <DatePicker style={datePicker}
-                        date={this.state.enddate}
-                        mode={'date'}
-                        onDateChange={(enddate) => this.setState({ enddate })}
-                      />
-                    </View>
-                  )}
-                  <TextInput
-                    mode="flat"
-                    activeUnderlineColor='#000'
-                    underlineColor={'#6f6f6f'}
-                    label={('GV Number')}
-                    style={[inputField, { borderColor: '#8F9EB717' }]}
-                    value={this.state.gvNumber}
-                    onChangeText={(text) => this.handleGvNumber(text)}
-                  />
-                </KeyboardAwareScrollView>
-                <View style={forms.action_buttons_container}>
-                  <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
-                    onPress={() => this.applyVoucherFilter()}>
-                    <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
-                    onPress={() => this.modelCancel()}>
-                    <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
-                  </TouchableOpacity>
+                    )}
+
+                    {this.state.datepickerendOpen && (
+                      <View style={styles.dateTopView}>
+                        <View style={styles.dateTop2}>
+                          <View>
+                            <TouchableOpacity
+                              style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
+                            >
+                              <Text style={datePickerBtnText}  > Cancel </Text>
+                            </TouchableOpacity>
+                          </View>
+                          <View>
+                            <TouchableOpacity
+                              style={datePickerButton2} onPress={() => this.filterEndDatePickerDoneClicked()}
+                            >
+                              <Text style={datePickerBtnText}  > Done </Text>
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                        <DatePicker style={datePicker}
+                          date={this.state.enddate}
+                          mode={'date'}
+                          onDateChange={(enddate) => this.setState({ enddate })}
+                        />
+                      </View>
+                    )}
+                    <TextInput
+                      mode="flat"
+                      activeUnderlineColor='#000'
+                      underlineColor={'#6f6f6f'}
+                      label={('GV Number')}
+                      style={[inputField, { borderColor: '#8F9EB717' }]}
+                      value={this.state.gvNumber}
+                      onChangeText={(text) => this.handleGvNumber(text)}
+                    />
+                  </KeyboardAwareScrollView>
+                  <View style={forms.action_buttons_container}>
+                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                      onPress={() => this.applyVoucherFilter()}>
+                      <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                      onPress={() => this.modelCancel()}>
+                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
             </Modal>
@@ -616,19 +608,10 @@ class GiftVocher extends Component {
             <Modal style={{ margin: 0 }} isVisible={this.state.gvModelVisible}
               onBackButtonPress={() => this.hideGVModel()}
               onBackdropPress={() => this.hideGVModel()} >
-              <View style={[filterMainContainer, { minHeight: Device.isTablet ? RH(200) : RH(100), maxHeight: Device.isTablet ? RH(400) : RH(200) }]}>
-                <View style={filterSubContainer}>
-                  <View>
-                    <Text style={filterHeading}>Issue GV Number </Text>
-                  </View>
-                  <View>
-                    <TouchableOpacity style={filterCloseImage} onPress={() => this.hideGVModel()}>
-                      <Image style={{ margin: RH(5) }} source={require('../assets/images/modelcancel.png')} />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                <Text style={styles.spaceText}></Text>
-                <KeyboardAwareScrollView enableOnAndroid={true}>
+              <View style={forms.filterModelContainer}>
+                <Text style={forms.popUp_decorator}>-</Text>
+                <View style={forms.filterModelSub}>
+                <KeyboardAwareScrollView >
                   <TextInput
                     mode="flat"
                     activeUnderlineColor='#000'
@@ -650,8 +633,9 @@ class GiftVocher extends Component {
                   </TouchableOpacity>
                 </View>
               </View>
-            </Modal>
           </View>
+            </Modal>
+          </View >
         )}
       </View >
 
