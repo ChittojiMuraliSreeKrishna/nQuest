@@ -58,25 +58,25 @@ export const inputHeading = {
 
 export const rnPickerContainer = {
   justifyContent: "center",
-  margin: RH(20),
+  margin: '4%',
   height: RH(50),
-  marginTop: RH(0),
-  marginBottom: RH(10),
-  borderColor: color.border,
+  marginTop: RH(5),
+  marginBottom: RH(5),
+  borderColor: "#d6d6d6",
   borderRadius: 3,
   backgroundColor: color.light,
   borderWidth: 1,
   fontFamily: "regular",
-  paddingLeft: RW(15),
+  paddingLeft: RW(13),
   fontSize: RF(14),
-  width: deviceWidth - RW(40),
+  width: '92%',
 };
 
 export const rnPicker = {
   placeholder: {
     color: color.grey,
     fontFamily: "regular",
-    fontSize: RF(14),
+    fontSize: RF(12),
   },
   inputIOS: {
     justifyContent: "center",

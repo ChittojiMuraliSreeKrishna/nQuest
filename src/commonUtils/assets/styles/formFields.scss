@@ -3,7 +3,7 @@
 .input_fld {
 	justify-content: center;
 	height: 45px;
-	margin: 5px 20px;
+	margin: 5px 4%;
 	width: 92%;
 	font-weight: normal;
 	padding-left: 10px;
@@ -19,7 +19,7 @@
 }
 
 .filterModelContainer {
-  min-height: 300px;
+  min-height: 200px;
   width: 100%;
   background-color: $white;
   padding-top: 30px;
@@ -31,6 +31,7 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
+  padding-bottom: 20px;
 }
 
 .filterModelSub {
@@ -78,12 +79,12 @@
 
 .rnp_container {
 	justify-content: center;
-	margin: 0 20px;
-	width: 93%;
+	margin: 0 4%;
+	width: 92%;
 	height: 50px;
 	border-color: $border;
 	border-radius: 5px;
-	border-width: 2px;
+	border-width: 1px;
 }
 
 
@@ -92,14 +93,14 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-	margin: 5px 20px;
+	margin: 5px 4%;
 	width: 92%;
 
 }
 
 .filter_dates {
-  width: 45%;
-  border-color: #d8d8d8;
+  width: 48%;
+  border-color: $grey;
   background-color: #F6F6F6;
   border-width: 1px;
   max-height: 45px;
@@ -111,6 +112,11 @@
   justify-content: space-around;
 }
 
+.datePicker {
+  height: 200px;
+  width: 100%;
+  margin-top: 30px;
+}
 .calender_image {
   margin-top: 5px;
 }
@@ -118,6 +124,7 @@
 .filter_dates_text {
   font-size: 14px;
   text-align: center;
+  color: $grey-darker
 }
 
 .action_buttons {
@@ -173,5 +180,4 @@
   text-align: center;
   font-size: 16px;
   padding: 10px 0;
-
 }

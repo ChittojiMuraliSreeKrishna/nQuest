@@ -16,7 +16,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import Modal from "react-native-modal";
 import { Text } from 'react-native-paper';
 import IconFA from 'react-native-vector-icons/FontAwesome';
-import IconMa from 'react-native-vector-icons/MaterialCommunityIcons';
+import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconMAA from 'react-native-vector-icons/MaterialIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from "../../commonUtils/assets/styles/style.scss";
@@ -27,17 +27,9 @@ import {
   datePicker,
   datePickerBtnText,
   datePickerButton1,
-  datePickerButton2,
-  dateSelector,
-  dateText
+  datePickerButton2
 } from "../Styles/FormFields";
-import {
-  filterCloseImage,
-  filterHeading,
-  filterMainContainer,
-  filterSubContainer
-} from "../Styles/PopupStyles";
-import { flatListTitle, listEmptyMessage, loadMoreBtn, loadmoreBtnText } from "../Styles/Styles";
+import { flatListTitle, listEmptyMessage } from "../Styles/Styles";
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -65,24 +57,26 @@ export default class ProductCombo extends Component {
       loadMoreActive: false,
       totalPages: 0,
       pageNo: 0,
-      filterPageNo: 0
+      filterPageNo: 0,
+      loadPrevActive: false,
+      loadNextActive: true,
     };
   }
 
-  async componentDidMount() {
+  async componentDidMount () {
     const storeId = await AsyncStorage.getItem("storeId");
     this.setState({ storeId: parseInt(storeId) });
     this.getAllProductsCombo();
   }
 
   // Refreshing the codes
-  refresh() {
+  refresh () {
     this.setState({ productComboList: [] }, () => {
       this.getAllProductsCombo();
     });
   }
 
-  async getAllProductsCombo() {
+  async getAllProductsCombo () {
     this.setState({ loading: true, loadMoreActive: false });
     const { storeId, fromDate, toDate, pageNo } = this.state;
     let params = "?storeId=" + (storeId) + "&page=" + (pageNo) + "&size=10";
@@ -92,11 +86,11 @@ export default class ProductCombo extends Component {
         let productComboList = res.data.result.content;
         console.log({ productComboList });
         this.setState({
-          productComboList: this.state.productComboList.concat(res.data.result.content),
+          productComboList: res?.data.result.content,
           loading: false,
           totalPages: res.data.result.totalPages
         });
-        this.continuePagination()
+        this.continuePagination();
       })
       .catch((err) => {
         console.log({ err });
@@ -104,27 +98,27 @@ export default class ProductCombo extends Component {
       });
   }
 
-  filterAction() {
+  filterAction () {
     this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
-  clearFilterAction() {
+  clearFilterAction () {
     this.setState({ filterActive: false, flagFilterOpen: false, filteredProductsList: [], startDate: "", endDate: "" });
   }
 
-  modelCancel() {
+  modelCancel () {
     this.setState({ modalVisible: false, flagViewProduct: false, flagFilterOpen: false, viewProductData: [] });
   }
 
   // Date Actions
-  datepickerClicked() {
+  datepickerClicked () {
     this.setState({ datepickerOpen: true });
   }
 
-  enddatepickerClicked() {
+  enddatepickerClicked () {
     this.setState({ datepickerendOpen: true });
   }
-  datepickerDoneClicked() {
+  datepickerDoneClicked () {
     if (
       parseInt(this.state.date.getDate()) < 10 &&
       parseInt(this.state.date.getMonth()) < 10
@@ -174,7 +168,7 @@ export default class ProductCombo extends Component {
     });
   }
 
-  datepickerendDoneClicked() {
+  datepickerendDoneClicked () {
     if (
       parseInt(this.state.enddate.getDate()) < 10 &&
       parseInt(this.state.enddate.getMonth()) < 10
@@ -224,7 +218,7 @@ export default class ProductCombo extends Component {
     });
   }
 
-  datepickerCancelClicked() {
+  datepickerCancelClicked () {
     this.setState({
       date: new Date(),
       enddate: new Date(),
@@ -233,7 +227,7 @@ export default class ProductCombo extends Component {
     });
   }
 
-  handleAddProductCombo() {
+  handleAddProductCombo () {
     this.props.navigation.navigate("AddProduct", {
       isEdit: false,
       goBack: () => this.refresh(),
@@ -241,9 +235,9 @@ export default class ProductCombo extends Component {
     });
   }
 
-  applyBarcodeFilter() {
+  applyBarcodeFilter () {
     const { startDate, endDate, storeId, filterPageNo } = this.state;
-    this.setState({ loadMoreActive: false })
+    this.setState({ loadMoreActive: false });
     const filParams = `?storeId=${storeId}&fromDate=${startDate ? startDate : null}&page=${parseInt(filterPageNo)}&size=10`;
     console.log({ filParams });
     InventoryService.getProductCombo(filParams).then(
@@ -251,12 +245,12 @@ export default class ProductCombo extends Component {
         console.log({ res });
         if (res?.data && res.data.status === 200) {
           this.setState({
-            filteredProductsList: res.data.result.content,
+            filteredProductsList: res?.data.result.content,
             filterActive: true,
             modalVisible: false,
             totalPages: res.data.result.totalPages
           });
-          this.continuePagination()
+          this.continuePagination();
         } else {
           this.setState({ modalVisible: false });
           alert(res.data.message);
@@ -266,7 +260,7 @@ export default class ProductCombo extends Component {
     );
   }
 
-  viewProductActon(data, index) {
+  viewProductActon (data, index) {
     this.state.viewProductData.push({ data });
     this.setState({
       viewProductData: this.state.viewProductData,
@@ -274,7 +268,7 @@ export default class ProductCombo extends Component {
       flagViewProduct: true,
     });
     // console.log({ item }, item.barcode)
-    console.log(this.state.viewProductData[0].data.productTextiles);
+    console.log(this.state.viewProductData[ 0 ].data.productTextiles);
   }
 
   modalHandleForClose = () => {
@@ -291,28 +285,47 @@ export default class ProductCombo extends Component {
     });
   };
 
-  continuePagination() {
-    console.log("in logg", this.state.pageNo, this.state.totalPages);
-    if (this.state.pageNo < this.state.totalPages - 1) {
-      this.setState({ loadMoreActive: true });
-    } else {
-      this.setState({ loadMoreActive: false });
-    }
-  }
-
-  isLoadMoreList = () => {
-    if (this.state.filterActive) {
-      this.setState({ filterPageNo: this.state.filterPageNo + 1 }, () => {
-        this.applyBarcodeFilter();
-      });
-    } else {
-      this.setState({ pageNo: this.state.pageNo + 1 }, () => {
-        this.getAllProductsCombo();
+  // Pagination Function
+  loadMoreList = (value) => {
+    if (value >= 0 && value < this.state.totalPages) {
+      this.setState({ pageNo: value }, () => {
+        if (this.state.filterActive) {
+          this.applyBarcodeFilter();
+        } else {
+          this.getAllProductsCombo();
+        }
+        if (this.state.pageNo === (this.state.totalPages - 1)) {
+          this.setState({ loadNextActive: false });
+        } else {
+          this.setState({ loadNextActive: true });
+        }
+        if (this.state.pageNo === 0) {
+          this.setState({ loadPrevActive: false });
+        } else {
+          this.setState({ loadPrevActive: true });
+        }
       });
     }
   };
 
-  render() {
+  continuePagination () {
+    if (this.state.filterActive) {
+      if (this.state.totalPages > 1) {
+        this.setState({ loadMoreActive: true });
+      } else {
+        this.setState({ loadMoreActive: false, loadNextActive: false });
+      }
+    } else {
+      if (this.state.totalPages > 1) {
+        this.setState({ loadMoreActive: true });
+      }
+      else {
+        this.setState({ loadMoreActive: false, loadNextActive: false });
+      }
+    }
+  }
+
+  render () {
     return (
       <View>
         {this.state.loading && <Loader loading={this.state.loading} />}
@@ -401,12 +414,48 @@ export default class ProductCombo extends Component {
           )}
           ListFooterComponent={
             this.state.loadMoreActive && (
-              <TouchableOpacity
-                style={loadMoreBtn}
-                onPress={() => this.isLoadMoreList()}
-              >
-                <Text style={loadmoreBtnText}>Load More ?</Text>
-              </TouchableOpacity>
+              <View style={scss.page_navigation_container}>
+                <View style={scss.page_navigation_subcontainer}>
+                  <Text style={scss.page_nav_text}>{`Page: ${this.state.pageNo + 1} - ${this.state.totalPages}`}</Text>
+                </View>
+                <View style={scss.page_navigation_subcontainer}>
+                  {this.state.loadPrevActive && (
+                    <View style={scss.page_navigation_subcontainer}>
+                      <IconMA
+                        style={[ scss.pag_nav_btn ]}
+                        color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
+                        onPress={() => this.loadMoreList(0)}
+                        name="chevron-double-left"
+                        size={25}
+                      />
+                      <IconMA
+                        style={[ scss.pag_nav_btn ]}
+                        color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
+                        onPress={() => this.loadMoreList(this.state.pageNo - 1)}
+                        name="chevron-left"
+                        size={25}
+                      />
+                    </View>
+                  )}
+                  <Text style={scss.page_nav_pageno}>{this.state.pageNo + 1}</Text>
+                  {this.state.loadNextActive && (
+                    <View style={scss.page_navigation_subcontainer}>
+                      <IconMA
+                        style={[ scss.pag_nav_btn ]}
+                        onPress={() => this.loadMoreList(this.state.pageNo + 1)}
+                        name="chevron-right"
+                        size={25}
+                      />
+                      <IconMA
+                        style={[ scss.pag_nav_btn ]}
+                        onPress={() => this.loadMoreList(this.state.totalPages - 1)}
+                        name="chevron-double-right"
+                        size={25}
+                      />
+                    </View>
+                  )}
+                </View>
+              </View>
             )
           }
         />
@@ -416,22 +465,9 @@ export default class ProductCombo extends Component {
               onBackButtonPress={() => this.modalHandleForViewClose()}
               onBackdropPress={() => this.modalHandleForViewClose()}
             >
-              <View style={scss.model_container}>
-                <View>
-                  <View style={scss.model_header}>
-                    <View>
-                      <Text variant="titleLarge"> View Product Combo </Text>
-                    </View>
-                    <View>
-                      <IconMa
-                        name="close"
-                        size={20}
-                        onPress={() => this.modalHandleForViewClose()}
-                      ></IconMa>
-                    </View>
-                  </View>
-                </View>
-                <View style={scss.model_body}>
+              <View style={forms.filterModelContainer}>
+                <Text style={forms.popUp_decorator}>-</Text>
+                <View style={forms.filterModelSub}>
                   <FlatList
                     removeClippedSubviews={false}
                     data={this.state.viewProductData}
@@ -480,121 +516,109 @@ export default class ProductCombo extends Component {
             <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
               onBackButtonPress={() => this.modalHandleForClose()}
               onBackdropPress={() => this.modalHandleForClose()}>
-              <View style={filterMainContainer}>
-                <View>
-                  <View style={filterSubContainer}>
-                    <View>
-                      <Text style={filterHeading}> {I18n.t("Filter By")} </Text>
-                    </View>
-                    <View>
+              <View style={forms.filterModelContainer}>
+                <Text style={forms.popUp_decorator}>-</Text>
+                <View style={forms.filerModelSub}>
+                  <KeyboardAwareScrollView>
+                    <View style={forms.filter_dates_container}>
                       <TouchableOpacity
-                        style={filterCloseImage}
-                        onPress={() => this.modelCancel()}
+                        style={forms.filter_dates}
+                        testID="openModal"
+                        onPress={() => this.datepickerClicked()}
                       >
+                        <Text style={forms.filter_dates_text}>
+                          {this.state.startDate === ""
+                            ? "Start Date"
+                            : this.state.startDate}
+                        </Text>
                         <Image
-                          style={{ margin: RH(5) }}
-                          source={require("../assets/images/modelcancel.png")}
+                          style={forms.calender_image}
+                          source={require("../assets/images/calender.png")}
+                        />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={forms.filter_dates}
+                        testID="openModal"
+                        onPress={() => this.enddatepickerClicked()}
+                      >
+                        <Text style={forms.filter_dates_text}>
+                          {this.state.endDate === ""
+                            ? "End Date"
+                            : this.state.endDate}
+                        </Text>
+                        <Image
+                          style={forms.calender_image}
+                          source={require("../assets/images/calender.png")}
                         />
                       </TouchableOpacity>
                     </View>
-                  </View>
-                </View>
-                <KeyboardAwareScrollView enableOnAndroid={true}>
-                  <TouchableOpacity
-                    style={dateSelector}
-                    testID="openModal"
-                    onPress={() => this.datepickerClicked()}
-                  >
-                    <Text style={dateText}>
-                      {this.state.startDate === ""
-                        ? "Start Date"
-                        : this.state.startDate}
-                    </Text>
-                    <Image
-                      style={styles.calenderpng}
-                      source={require("../assets/images/calender.png")}
-                    />
-                  </TouchableOpacity>
-                  {this.state.datepickerOpen && (
-                    <View style={styles.dateTopView}>
-                      <View style={styles.dateTop2}>
-                        <TouchableOpacity
-                          style={datePickerButton1}
-                          onPress={() => this.datepickerCancelClicked()}
-                        >
-                          <Text style={datePickerBtnText}> Cancel </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                          style={datePickerButton2}
-                          onPress={() => this.datepickerDoneClicked()}
-                        >
-                          <Text style={datePickerBtnText}> Done </Text>
-                        </TouchableOpacity>
-                      </View>
-                      <DatePicker
-                        style={datePicker}
-                        date={this.state.date}
-                        mode={"date"}
-                        onDateChange={(date) => this.setState({ date })}
-                      />
-                    </View>
-                  )}
-                  <TouchableOpacity
-                    style={dateSelector}
-                    testID="openModal"
-                    onPress={() => this.enddatepickerClicked()}
-                  >
-                    <Text style={dateText}>
-                      {this.state.endDate === ""
-                        ? "End Date"
-                        : this.state.endDate}
-                    </Text>
-                    <Image
-                      style={styles.calenderpng}
-                      source={require("../assets/images/calender.png")}
-                    />
-                  </TouchableOpacity>
-
-                  {this.state.datepickerendOpen && (
-                    <View style={styles.dateTopView}>
-                      <View style={styles.dateTop2}>
-                        <View>
+                    {this.state.datepickerOpen && (
+                      <View style={styles.dateTopView}>
+                        <View style={styles.dateTop2}>
                           <TouchableOpacity
                             style={datePickerButton1}
                             onPress={() => this.datepickerCancelClicked()}
                           >
                             <Text style={datePickerBtnText}> Cancel </Text>
                           </TouchableOpacity>
-                        </View>
-                        <View>
+
                           <TouchableOpacity
                             style={datePickerButton2}
-                            onPress={() => this.datepickerendDoneClicked()}
+                            onPress={() => this.datepickerDoneClicked()}
                           >
                             <Text style={datePickerBtnText}> Done </Text>
                           </TouchableOpacity>
                         </View>
+                        <DatePicker
+                          style={datePicker}
+                          date={this.state.date}
+                          mode={"date"}
+                          onDateChange={(date) => this.setState({ date })}
+                        />
                       </View>
-                      <DatePicker
-                        style={datePicker}
-                        date={this.state.enddate}
-                        mode={"date"}
-                        onDateChange={(enddate) => this.setState({ enddate })}
-                      />
+                    )}
+
+
+                    {this.state.datepickerendOpen && (
+                      <View style={styles.dateTopView}>
+                        <View style={styles.dateTop2}>
+                          <View>
+                            <TouchableOpacity
+                              style={datePickerButton1}
+                              onPress={() => this.datepickerCancelClicked()}
+                            >
+                              <Text style={datePickerBtnText}> Cancel </Text>
+                            </TouchableOpacity>
+                          </View>
+                          <View>
+                            <TouchableOpacity
+                              style={datePickerButton2}
+                              onPress={() => this.datepickerendDoneClicked()}
+                            >
+                              <Text style={datePickerBtnText}> Done </Text>
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                        <DatePicker
+                          style={datePicker}
+                          date={this.state.enddate}
+                          mode={"date"}
+                          onDateChange={(enddate) => this.setState({ enddate })}
+                        />
+                      </View>
+                    )}
+                    <View style={forms.action_buttons_container}>
+                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                        onPress={() => this.applyBarcodeFilter()}>
+                        <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                        onPress={() => this.modelCancel()}>
+                        <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                      </TouchableOpacity>
                     </View>
-                  )}
-                  <View style={forms.action_buttons_container}>
-                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
-                      onPress={() => this.applyBarcodeFilter()}>
-                      <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
-                      onPress={() => this.modelCancel()}>
-                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
-                    </TouchableOpacity>
-                  </View>
-                </KeyboardAwareScrollView>
+                  </KeyboardAwareScrollView>
+                </View>
               </View>
             </Modal>
           </View>

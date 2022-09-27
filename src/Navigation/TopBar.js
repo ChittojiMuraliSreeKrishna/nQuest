@@ -12,10 +12,12 @@ import { Text as TEXT } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconMA from 'react-native-vector-icons/MaterialIcons';
 import scss from "../commonUtils/assets/styles/Bars.scss";
+import headers from '../commonUtils/assets/styles/HeaderStyles.scss';
 import UrmService from "../components/services/UrmService";
 
 
 var data = [];
+var subData = [];
 var currentSelection = "";
 var dataCleared = true;
 var firstDisplayRoute = "";
@@ -28,6 +30,7 @@ export const screenMapping = {
   "Accounting Portal": "AccountingNaviagtion",
   "Reports": "ReportsNavigation",
   "URM Portal": "UrmNavigation",
+  "Ticketing Portal": "TicketingNavigation"
 };
 
 const GetImageBasedOnPrevilageName = (name) => {
@@ -61,6 +64,8 @@ export class TopBar extends Component {
       firstDisplayNameScreen: "",
       modalVisibleData: false,
       refresh: true,
+      privilages: [],
+      headerNames: []
     };
   }
 
@@ -76,6 +81,7 @@ export class TopBar extends Component {
             screenMapping[ currentSelection ],
             this.refresh(),
           );
+          this.renderSubHeadings(previlage.item);
           this.setState({ modalVisibleData: false });
         }}
       >
@@ -88,6 +94,56 @@ export class TopBar extends Component {
     );
   }
 
+  renderSubHeadings (privilegeName) {
+    this.setState({ headerNames: [], privilages: [] });
+    AsyncStorage.getItem("rolename").then((value) => {
+      console.log({ value });
+      UrmService.getPrivillagesByRoleName(value).then((res) => {
+        console.log(res.data, "TopPrev");
+        if (res) {
+          if (res.data) {
+            let len = res.data.parentPrivileges.length;
+            for (let i = 0; i < len; i++) {
+              let privilege = res.data.parentPrivileges[ i ];
+              if (privilege.name === String(privilegeName)) {
+                let privilegeId = privilege.id;
+                let sublen = privilege.subPrivileges.length;
+                let subPrivileges = privilege.subPrivileges;
+                console.log(subPrivileges, "TopSubPrev");
+                for (let i = 0; i < sublen; i++) {
+                  if (privilegeId === subPrivileges[ i ].parentPrivilegeId) {
+                    let routes = subPrivileges[ i ].name;
+
+                    this.state.headerNames.push({ name: routes });
+                    console.log("Header Names", this.state.headerNames);
+                  }
+                }
+                this.setState({ headerNames: this.state.headerNames }, () => {
+                  for (let j = 0; j < this.state.headerNames.length; j++) {
+                    if (j === 0) {
+                      this.state.privilages.push({
+                        bool: true,
+                        name: this.state.headerNames[ j ].name,
+                      });
+                    } else {
+                      this.state.privilages.push({
+                        bool: false,
+                        name: this.state.headerNames[ j ].name,
+                      });
+                    }
+                  }
+                });
+                this.setState({ privilages: this.state.privilages }, () => {
+                  this.props.navigation.navigate(String(this.state.privilages[ 0 ].name));
+                });
+                console.log(this.state.privilages, "TopPtiv");
+              }
+            }
+          }
+        }
+      });
+    });
+  }
   //Before screen render
   async componentWillMount () {
     currentSelection = "";
@@ -172,6 +228,7 @@ export class TopBar extends Component {
                   const firstDisplayName = this.state.firstDisplayName;
                   console.log({ firstDisplayName });
                   firstDisplayRoute = res.data.parentPrivileges[ 0 ].name;
+                  this.renderSubHeadings(firstDisplayName);
                   var privilegesSet = new Set();
                   for (let i = 0; i < len; i++) {
                     let previlage = res.data.parentPrivileges[ i ];
@@ -195,6 +252,9 @@ export class TopBar extends Component {
                     }
                     if (previlage.name === "URM Portal") {
                       global.previlage7 = "URM Portal";
+                    }
+                    if (previlage.name === "Ticketing Portal") {
+                      global.previlage7 = "Ticketing Portal";
                     }
                     privilegesSet.add(previlage.name);
                     // data.push(previlage.name);user1
@@ -271,6 +331,24 @@ export class TopBar extends Component {
   logoutNavigation () {
     this.props.navigation.push("Login");
     this.setState({ popupModel: false });
+  }
+
+  handleSubHeaderNavigation (value, index) {
+    if (this.state.privilages[ index ].bool === true) {
+      this.state.privilages[ index ].bool = false;
+    } else {
+      this.state.privilages[ index ].bool = true;
+    }
+    for (let i = 0; i < this.state.privilages.length; i++) {
+      if (index != i) {
+        this.state.privilages[ i ].bool = false;
+      }
+      this.setState({ privilages: this.state.privilages }, () => {
+        const { privilages } = this.state;
+        console.log({ privilages });
+        this.props.navigation.navigate(String(value));
+      });
+    }
   }
 
   render () {
@@ -398,6 +476,25 @@ export class TopBar extends Component {
               </Modal>
             )}
           </>
+        </View>
+        <View style={{ backgroundColor: '#d6d6d6', height: 40, width: '100%' }}>
+          <FlatList
+            horizontal
+            data={this.state.privilages}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+            style={headers.pageNavigationContainer}
+            renderItem={({ item, index }) => (
+              <View>
+                <TouchableOpacity style={[ headers.pageNavigationBtn, {
+                  borderColor: item.bool ? "#ed1c24" : "#d7d7d7",
+                  borderBottomWidth: item.bool ? 3 : 0
+                } ]} onPress={() => this.handleSubHeaderNavigation(item.name, index)}>
+                  <Text style={headers.pageNavigationBtnText}>{item.name}</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          />
         </View>
       </>
     );

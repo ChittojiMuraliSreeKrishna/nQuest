@@ -321,9 +321,6 @@ class TextilePayment extends Component {
     return true;
   }
 
-  statatics() {
-    this.props.navigation.navigate('Statitics');
-  }
 
   cashAction() {
     this.setState({

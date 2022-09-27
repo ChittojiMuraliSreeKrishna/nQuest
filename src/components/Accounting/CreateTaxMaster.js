@@ -25,19 +25,18 @@ export default class CreateTaxMaster extends Component {
     };
   }
 
-  componentDidMount() {
+  componentDidMount () {
     this.getTaxMaster();
-    this.props.onRef(this);
   }
 
   // Refreshing the taxMasters
-  refresh() {
+  refresh () {
     this.setState({ taxList: [] }, () => {
       this.getTaxMaster();
     });
   }
 
-  async getTaxMaster() {
+  async getTaxMaster () {
     this.setState({ loading: true });
     AccountingService.getAllMasterTax()
       .then((res) => {
@@ -53,15 +52,15 @@ export default class CreateTaxMaster extends Component {
       });
   }
 
-  modelCancel() {
+  modelCancel () {
     this.setState({ modalVisible: false });
   }
 
-  handledeleteTax(item, index) {
+  handledeleteTax (item, index) {
     this.setState({ taxMasterDelete: true, modalVisible: true });
   }
 
-  handleeditTax(item, index) {
+  handleeditTax (item, index) {
     this.props.navigation.navigate("AddTaxMaster", {
       item: item,
       isEdit: true,
@@ -70,7 +69,7 @@ export default class CreateTaxMaster extends Component {
     });
   }
 
-  navigateToAddTax() {
+  navigateToAddTax () {
     this.props.navigation.navigate("AddTaxMaster", {
       isEdit: false,
       onGoBack: () => this.refresh(),
@@ -78,7 +77,7 @@ export default class CreateTaxMaster extends Component {
     });
   }
 
-  render() {
+  render () {
     return (
       <View>
         {this.state.loading && <Loader loading={this.state.loading} />}

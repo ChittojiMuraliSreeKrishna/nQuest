@@ -284,6 +284,7 @@ export class ListOfBarcodes extends Component {
                 <IconFA
                   style={[scss.action_icons, { marginRight: 10 }]}
                   name="sliders"
+                  color="#000"
                   size={25}
                   onPress={() => this.filterAction()}
                 ></IconFA>

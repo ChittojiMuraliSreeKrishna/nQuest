@@ -9,6 +9,7 @@ import InventoryNavigation from "./InventoryNavigation";
 import NewSaleNavigation from "./NewSaleNavigation";
 import PromoNavigation from "./PromoNavigation";
 import ReportsNavigation from "./ReportsNavigation";
+import { TicketingNavigation } from "./TicketingNavigation";
 import TopBar from "./TopBar";
 import UrmNavigation from "./UrmNavigation";
 
@@ -64,6 +65,11 @@ export default class TopBarNavigation extends Component {
             name="NewSaleNavigation"
             options={{ headerShown: false }}
             component={NewSaleNavigation}
+          />
+          <Stack.Screen
+            name="TicketingNavigation"
+            options={{ headerShown: false }}
+            component={TicketingNavigation}
           />
           <Stack.Screen
             name="Settings"

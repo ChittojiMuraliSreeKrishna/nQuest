@@ -1,21 +1,21 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import Device from 'react-native-device-detection';
+import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
+import { TextInput } from 'react-native-paper';
 import IconFA from 'react-native-vector-icons/FontAwesome';
 import IconIA from 'react-native-vector-icons/Ionicons';
+import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from "../../commonUtils/assets/styles/style.scss";
 import Loader from '../../commonUtils/loader';
 import { RH, RW } from '../../Responsive';
 import AccountingService from '../services/AccountingService';
-import { cancelBtn, cancelBtnText, datePickerBtnText, datePickerButton1, datePickerButton2, dateSelector, dateText, inputField, submitBtn, submitBtnText } from '../Styles/FormFields';
-import { filterCloseImage, filterHeading, filterMainContainer, filterSubContainer } from '../Styles/PopupStyles';
-import { flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleLight, textStyleMedium } from '../Styles/Styles';
-import forms from '../../commonUtils/assets/styles/formFields.scss';
-import I18n from 'react-native-i18n';
+import { datePickerBtnText, datePickerButton1, datePickerButton2 } from '../Styles/FormFields';
+import { flatListTitle } from '../Styles/Styles';
 
 var deviceWidth = Dimensions.get("window").width;
 
@@ -53,7 +53,7 @@ export default class DebitNotes extends Component {
     };
   }
 
-  async componentDidMount() {
+  async componentDidMount () {
     const storeId = await AsyncStorage.getItem("storeId");
     const userId = await AsyncStorage.getItem('custom:userId');
     this.setState({ storeId: storeId, userId: userId });
@@ -61,15 +61,15 @@ export default class DebitNotes extends Component {
   }
 
 
-  datepickerClicked() {
+  datepickerClicked () {
     this.setState({ datepickerOpen: true });
   }
 
-  enddatepickerClicked() {
+  enddatepickerClicked () {
     this.setState({ datepickerendOpen: true });
   }
 
-  datepickerDoneClicked() {
+  datepickerDoneClicked () {
     if (parseInt(this.state.date.getDate()) < 10 && (parseInt(this.state.date.getMonth()) < 10)) {
       this.setState({ startDate: this.state.date.getFullYear() + "-0" + (this.state.date.getMonth() + 1) + "-" + "0" + this.state.date.getDate() });
     }
@@ -85,7 +85,7 @@ export default class DebitNotes extends Component {
     this.setState({ doneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
 
-  datepickerendDoneClicked() {
+  datepickerendDoneClicked () {
     if (parseInt(this.state.enddate.getDate()) < 10 && (parseInt(this.state.enddate.getMonth()) < 10)) {
       this.setState({ endDate: this.state.enddate.getFullYear() + "-0" + (this.state.enddate.getMonth() + 1) + "-" + "0" + this.state.enddate.getDate() });
     }
@@ -103,16 +103,16 @@ export default class DebitNotes extends Component {
   }
 
 
-  datepickerCancelClicked() {
+  datepickerCancelClicked () {
     this.setState({ date: new Date(), enddate: new Date(), datepickerOpen: false, datepickerendOpen: false });
   }
 
-  modelCancel() {
-    this.setState({ modalVisible: false });
+  modelCancel () {
+    this.setState({ flagFilterOpen: false, isShowAllTransactions: false });
   }
 
 
-  async getDebitNotes() {
+  async getDebitNotes () {
     this.setState({ lodaing: true });
     const accountType = 'DEBIT';
     const { storeId } = this.state;
@@ -136,7 +136,7 @@ export default class DebitNotes extends Component {
     });
   }
 
-  handleViewDebit(item, index) {
+  handleViewDebit (item, index) {
     const reqObj = {
       fromDate: null,
       toDate: null,
@@ -156,7 +156,7 @@ export default class DebitNotes extends Component {
     });
   }
 
-  applyDebitNotesFilter() {
+  applyDebitNotesFilter () {
     this.setState({ loading: true });
     const accountType = 'DEBIT';
     const { storeId, startDate, endDate, mobileNumber } = this.state;
@@ -182,28 +182,28 @@ export default class DebitNotes extends Component {
     });
   }
 
-  modalViewCancel() {
-    this.setState({ modalVisible: false });
+  modalViewCancel () {
+    this.setState({ isShowAllTransactions: false });
   }
 
-  handleAddDebit(item, index) {
+  handleAddDebit (item, index) {
     this.props.navigation.navigate('AddDebitNotes', {
       item: item,
       onGoBack: () => this.getDebitNotes()
     });
   }
 
-  filterAction() {
+  filterAction () {
     this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
-  clearFilterAction() {
+  clearFilterAction () {
     this.setState({ filterActive: false });
   }
 
 
 
-  render() {
+  render () {
     return (
       <View style={{ backgroundColor: "#FFFFFF" }}>
         {this.state.loading &&
@@ -214,23 +214,25 @@ export default class DebitNotes extends Component {
           data={this.state.filterActive ? this.state.filterDebitData : this.state.debitNotes}
           style={{ marginTop: 10 }}
           scrollEnabled={true}
-          ListHeaderComponent={<View style={flatListHeaderContainer}>
+          ListHeaderComponent={<View style={scss.headerContainer}>
             <Text style={flatListTitle}>Debit Notes - <Text style={{ color: '#ED1C24' }}>{this.state.filterActive ? this.state.filterDebitNotes.length : this.state.debitNotes.length}</Text> </Text>
-            {!this.state.filterActive &&
-              <IconFA
-                size={25}
-                name="sliders"
-                onPress={() => this.filterAction()}
-              ></IconFA>
+            <View style={scss.headerContainer}>
+              {!this.state.filterActive &&
+                <IconFA
+                  size={25}
+                  name="sliders"
+                  onPress={() => this.filterAction()}
+                ></IconFA>
 
-            }
-            {this.state.filterActive &&
-              <IconFA
-                size={25}
-                name="sliders"
-                color='#ED1C24'
-                onPress={() => this.clearFilterAction()}
-              ></IconFA>}
+              }
+              {this.state.filterActive &&
+                <IconFA
+                  size={25}
+                  name="sliders"
+                  color='#ED1C24'
+                  onPress={() => this.clearFilterAction()}
+                ></IconFA>}
+            </View>
           </View>}
           renderItem={({ item, index }) => (
             <ScrollView>
@@ -256,7 +258,7 @@ export default class DebitNotes extends Component {
                     <Text style={scss.footerText}>
                       Date:{" "}
                       {item.createdDate
-                        ? item.createdDate.toString().split(/T/)[0]
+                        ? item.createdDate.toString().split(/T/)[ 0 ]
                         : item.createdDate}
                     </Text>
                     <View style={scss.buttonContainer}>
@@ -270,7 +272,7 @@ export default class DebitNotes extends Component {
                       <IconIA
                         name='add-circle-outline'
                         size={25}
-                        style={[scss.action_icons, { marginLeft: 10 }]}
+                        style={[ scss.action_icons, { marginLeft: 10 } ]}
                         onPress={() => this.handleAddDebit(item, index)}
                       ></IconIA>
                     </View>
@@ -282,105 +284,104 @@ export default class DebitNotes extends Component {
         />
         {this.state.flagFilterOpen && (
           <View>
-            <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}
+            <Modal isVisible={this.state.flagFilterOpen} style={{ margin: 0 }}
               onBackButtonPress={() => this.modelCancel()}
               onBackdropPress={() => this.modelCancel()} >
-              <View style={filterMainContainer} >
-                <KeyboardAwareScrollView enableOnAndroid={true} >
-                  <View style={filterSubContainer}>
-                    <View>
-                      <Text style={filterHeading} > Filter by </Text>
-                    </View>
-                    <View>
-                      <TouchableOpacity style={filterCloseImage} onPress={() => this.modelCancel()}>
-                        <Image style={{ margin: RH(5) }} source={require('../assets/images/modelcancel.png')} />
+              <View style={forms.filterModelContainer} >
+                <Text style={forms.popUp_decorator}>-</Text>
+                <View style={forms.filterModelSub}>
+                  <KeyboardAwareScrollView>
+                    <View style={forms.filter_dates_container}>
+                      <TouchableOpacity
+                        style={forms.filter_dates}
+                        testID="openModal"
+                        onPress={() => this.datepickerClicked()}
+                      >
+                        <Text
+                          style={forms.filter_dates_text}
+                        >{this.state.startDate == "" ? 'START DATE' : this.state.startDate}</Text>
+                        <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={forms.filter_dates}
+                        testID="openModal"
+                        onPress={() => this.enddatepickerClicked()}
+                      >
+                        <Text
+                          style={forms.filter_dates_text}
+                        >{this.state.endDate == "" ? 'END DATE' : this.state.endDate}</Text>
+                        <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
                       </TouchableOpacity>
                     </View>
-                  </View>
-                  <TouchableOpacity
-                    style={dateSelector}
-                    testID="openModal"
-                    onPress={() => this.datepickerClicked()}
-                  >
-                    <Text
-                      style={dateText}
-                    >{this.state.startDate == "" ? 'START DATE' : this.state.startDate}</Text>
-                    <Image style={styles.calenderpng} source={require('../assets/images/calender.png')} />
-                  </TouchableOpacity>
-                  {this.state.datepickerOpen && (
-                    <View style={styles.dateTopView}>
-                      <View style={styles.dateTop2}>
-                        <TouchableOpacity
-                          style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
-                        >
-                          <Text style={datePickerBtnText}  > Cancel </Text>
+                    {this.state.datepickerOpen && (
+                      <View style={styles.dateTopView}>
+                        <View style={styles.dateTop2}>
+                          <TouchableOpacity
+                            style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
+                          >
+                            <Text style={datePickerBtnText}  > Cancel </Text>
 
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={datePickerButton2} onPress={() => this.datepickerDoneClicked()}
-                        >
-                          <Text style={datePickerBtnText}  > Done </Text>
-                        </TouchableOpacity>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={datePickerButton2} onPress={() => this.datepickerDoneClicked()}
+                          >
+                            <Text style={datePickerBtnText}  > Done </Text>
+                          </TouchableOpacity>
+                        </View>
+                        <DatePicker style={styles.date}
+                          date={this.state.date}
+                          mode={'date'}
+                          onDateChange={(date) => this.setState({ date })}
+                        />
                       </View>
-                      <DatePicker style={styles.date}
-                        date={this.state.date}
-                        mode={'date'}
-                        onDateChange={(date) => this.setState({ date })}
-                      />
-                    </View>
-                  )}
-                  <TouchableOpacity
-                    style={dateSelector}
-                    testID="openModal"
-                    onPress={() => this.enddatepickerClicked()}
-                  >
-                    <Text
-                      style={dateText}
-                    >{this.state.endDate == "" ? 'END DATE' : this.state.endDate}</Text>
-                    <Image style={styles.calenderpng} source={require('../assets/images/calender.png')} />
-                  </TouchableOpacity>
-                  {this.state.datepickerendOpen && (
-                    <View style={styles.dateTopView}>
-                      <View style={styles.dateTop2}>
-                        <TouchableOpacity
-                          style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
-                        >
-                          <Text style={datePickerBtnText}  > Cancel </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={datePickerButton2} onPress={() => this.datepickerendDoneClicked()}
-                        >
-                          <Text style={datePickerBtnText}  > Done </Text>
-                        </TouchableOpacity>
+                    )}
+
+                    {this.state.datepickerendOpen && (
+                      <View style={styles.dateTopView}>
+                        <View style={styles.dateTop2}>
+                          <TouchableOpacity
+                            style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
+                          >
+                            <Text style={datePickerBtnText}  > Cancel </Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={datePickerButton2} onPress={() => this.datepickerendDoneClicked()}
+                          >
+                            <Text style={datePickerBtnText}  > Done </Text>
+                          </TouchableOpacity>
+                        </View>
+                        <DatePicker style={styles.date}
+                          date={this.state.enddate}
+                          mode={'date'}
+                          onDateChange={(enddate) => this.setState({ enddate })}
+                        />
                       </View>
-                      <DatePicker style={styles.date}
-                        date={this.state.enddate}
-                        mode={'date'}
-                        onDateChange={(enddate) => this.setState({ enddate })}
-                      />
+                    )}
+                    <TextInput
+                      style={forms.input_fld}
+                      underlineColorAndroid="transparent"
+                      mode='outlined'
+                      placeholder="MOBILE"
+                      outlineColor='#d6d6d6'
+                      activeOutlineColor='#d6d6d6'
+                      placeholderTextColor="#6F6F6F"
+                      textAlignVertical="center"
+                      autoCapitalize="none"
+                      value={this.state.mobile}
+                      onChangeText={this.handleMobile}
+                    />
+                    <View style={forms.action_buttons_container}>
+                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                        onPress={() => this.applyDebitNotesFilter()}>
+                        <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                        onPress={() => this.modelCancel()}>
+                        <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                      </TouchableOpacity>
                     </View>
-                  )}
-                  <TextInput
-                    style={inputField}
-                    underlineColorAndroid="transparent"
-                    placeholder="MOBILE"
-                    placeholderTextColor="#6F6F6F"
-                    textAlignVertical="center"
-                    autoCapitalize="none"
-                    value={this.state.mobile}
-                    onChangeText={this.handleMobile}
-                  />
-                  <View style={forms.action_buttons_container}>
-                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
-                      onPress={() => this.applyDebitNotesFilter()}>
-                      <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
-                      onPress={() => this.modelCancel()}>
-                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
-                    </TouchableOpacity>
-                  </View>
-                </KeyboardAwareScrollView>
+                  </KeyboardAwareScrollView>
+                </View>
               </View>
             </Modal>
           </View>
@@ -388,49 +389,38 @@ export default class DebitNotes extends Component {
         )}
         {this.state.isShowAllTransactions && (
           <View>
-            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
+            <Modal style={{ margin: 0 }} isVisible={this.state.isShowAllTransactions}
               onBackButtonPress={() => this.modalViewCancel()}
               onBackdropPress={() => this.modalViewCancel()} >
-              <View style={filterMainContainer}>
-                <View>
-                  <View style={filterSubContainer}>
-                    <View>
-                      <Text style={filterHeading}>Transaction History</Text>
-                    </View>
-                    <View>
-                      <TouchableOpacity style={filterCloseImage} onPress={() => this.modalViewCancel()}>
-                        <Image style={{ margin: RH(5) }} source={require('../assets/images/modelcancel.png')} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </View>
-                <ScrollView>
-                  <FlatList
-                    data={this.state.transactionHistory}
-                    style={{ marginTop: 20 }}
-                    scrollEnabled={true}
-                    renderItem={({ item, index }) => (
-                      <View style={flatListMainContainer}>
-                        <View style={flatlistSubContainer}>
-                          <View style={textContainer}>
-                            <Text style={highText}>#CRM ID: {item.customerId}</Text>
-                            <Text style={textStyleMedium}>STORE: {item.storeId}</Text>
+              <View style={forms.filterModelContainer}>
+                <Text style={forms.popUp_decorator}>-</Text>
+                <View style={forms.filterModelSub}>
+                  <ScrollView>
+                    <FlatList
+                      data={this.state.transactionHistory}
+                      style={{ marginTop: 20 }}
+                      scrollEnabled={true}
+                      renderItem={({ item, index }) => (
+                        <View style={scss.model_subbody}>
+                          <View style={scss.model_text_container}>
+                            <Text style={scss.highText}>#CRM ID: {item.customerId}</Text>
+                            <Text style={scss.textStyleMedium}>STORE: {item.storeId}</Text>
                           </View>
-                          <View style={textContainer}>
-                            <Text style={textStyleLight}>TRANSACTION TYPE: {"\n"}{item.transactionType}</Text>
-                            <Text style={textStyleLight}>ACCOUNT TYPE: {"\n"}{item.accountType}</Text>
+                          <View style={scss.model_text_container}>
+                            <Text style={scss.textStyleLight}>TRANSACTION TYPE: {"\n"}{item.transactionType}</Text>
+                            <Text style={scss.textStyleLight}>ACCOUNT TYPE: {"\n"}{item.accountType}</Text>
                           </View>
-                          <View style={textContainer}>
-                            <Text style={textStyleLight}>AMOUNT: {item.amount}</Text>
-                            <Text style={textStyleLight}>DATE: {item.createdDate
-                              ? item.createdDate.toString().split(/T/)[0]
+                          <View style={scss.model_text_container}>
+                            <Text style={scss.textStyleLight}>AMOUNT: {item.amount}</Text>
+                            <Text style={scss.textStyleLight}>DATE: {item.createdDate
+                              ? item.createdDate.toString().split(/T/)[ 0 ]
                               : item.createdDate}</Text>
                           </View>
                         </View>
-                      </View>
-                    )}
-                  />
-                </ScrollView>
+                      )}
+                    />
+                  </ScrollView>
+                </View>
               </View>
             </Modal>
           </View>
