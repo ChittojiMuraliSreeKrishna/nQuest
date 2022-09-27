@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BackHandler, ToastAndroid, View } from 'react-native';
+import { BackHandler, View } from 'react-native';
 import Loader from '../../commonUtils/loader';
 
 const Blank = () => {
@@ -14,7 +14,6 @@ const Blank = () => {
   });
 
   const backAction = (e) => {
-    ToastAndroid.showWithGravity("Back button is pressed", ToastAndroid.SHORT, ToastAndroid.TOP);
     return true;
   };
 
