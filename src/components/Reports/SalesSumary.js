@@ -282,101 +282,87 @@ export class SalesSumary extends Component {
             <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
               onBackButtonPress={() => this.modelCancel()}
               onBackdropPress={() => this.modelCancel()} >
-              <View style={styles.filterMainContainer} >
-                <View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
-                    <View>
-                      <Text style={{ marginTop: 15, fontSize: Device.isTablet ? 22 : 17, marginLeft: 20 }} > {I18n.t("Filter By")} </Text>
-                    </View>
-                    <View>
-                      <TouchableOpacity style={{ width: Device.isTablet ? 60 : 50, height: Device.isTablet ? 60 : 50, marginTop: Device.isTablet ? 20 : 15, }} onPress={() => this.modelCancel()}>
-                        <Image style={{ margin: 5 }} source={require('../assets/images/modelcancel.png')} />
+              <View style={forms.filterModelContainer} >
+                <Text style={forms.popUp_decorator}>-</Text>
+                <View style={forms.filterModelSub}>
+                  <KeyboardAwareScrollView >
+                    <View style={forms.filter_dates_container}>
+                      <TouchableOpacity
+                        style={forms.filter_dates}
+                        testID="openModal"
+                        onPress={() => this.datepickerClicked()}
+                      >
+                        <Text
+                          style={forms.filter_dates_text}
+                        >{this.state.startDate == "" ? 'START DATE' : this.state.startDate}</Text>
+                        <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={forms.filter_dates}
+                        testID="openModal"
+                        onPress={() => this.enddatepickerClicked()}
+                      >
+                        <Text
+                          style={forms.filter_dates_text}
+                        >{this.state.endDate == "" ? 'END DATE' : this.state.endDate}</Text>
+                        <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
                       </TouchableOpacity>
                     </View>
-                  </View>
-                  <Text style={{
-                    height: Device.isTablet ? 2 : 1,
-                    width: deviceWidth,
-                    backgroundColor: 'lightgray',
-                  }}></Text>
+                    {this.state.datepickerOpen && (
+                      <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
+                        <TouchableOpacity
+                          style={styles.datePickerButton} onPress={() => this.datepickerCancelClicked()}
+                        >
+                          <Text style={styles.datePickerButtonText}  > Cancel </Text>
+
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={styles.datePickerEndButton} onPress={() => this.datepickerDoneClicked()}
+                        >
+                          <Text style={styles.datePickerButtonText}  > Done </Text>
+
+                        </TouchableOpacity>
+                        <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
+                          date={this.state.date}
+                          mode={'date'}
+                          onDateChange={(date) => this.setState({ date })}
+                        />
+                      </View>
+                    )}
+
+                    {this.state.datepickerendOpen && (
+                      <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
+                        <TouchableOpacity
+                          style={styles.datePickerButton} onPress={() => this.datepickerCancelClicked()}
+                        >
+                          <Text style={styles.datePickerButtonText}  > Cancel </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={styles.datePickerEndButton} onPress={() => this.datepickerendDoneClicked()}
+                        >
+                          <Text style={styles.datePickerButtonText}  > Done </Text>
+
+                        </TouchableOpacity>
+                        <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
+                          date={this.state.enddate}
+                          mode={'date'}
+                          onDateChange={(enddate) => this.setState({ enddate })}
+                        />
+                      </View>
+                    )}
+
+                    <View style={forms.action_buttons_container}>
+                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                        onPress={() => this.applySalesSummary()}>
+                        <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                        onPress={() => this.modelCancel()}>
+                        <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </KeyboardAwareScrollView>
                 </View>
-                <KeyboardAwareScrollView enableOnAndroid={true} >
-                  <View style={forms.filter_dates_container}>
-                    <TouchableOpacity
-                      style={forms.filter_dates}
-                      testID="openModal"
-                      onPress={() => this.datepickerClicked()}
-                    >
-                      <Text
-                        style={forms.filter_dates_text}
-                      >{this.state.startDate == "" ? 'START DATE' : this.state.startDate}</Text>
-                      <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={forms.filter_dates}
-                      testID="openModal"
-                      onPress={() => this.enddatepickerClicked()}
-                    >
-                      <Text
-                        style={forms.filter_dates_text}
-                      >{this.state.endDate == "" ? 'END DATE' : this.state.endDate}</Text>
-                      <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
-                    </TouchableOpacity>
-                  </View>
-                  {this.state.datepickerOpen && (
-                    <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
-                      <TouchableOpacity
-                        style={styles.datePickerButton} onPress={() => this.datepickerCancelClicked()}
-                      >
-                        <Text style={styles.datePickerButtonText}  > Cancel </Text>
-
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.datePickerEndButton} onPress={() => this.datepickerDoneClicked()}
-                      >
-                        <Text style={styles.datePickerButtonText}  > Done </Text>
-
-                      </TouchableOpacity>
-                      <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
-                        date={this.state.date}
-                        mode={'date'}
-                        onDateChange={(date) => this.setState({ date })}
-                      />
-                    </View>
-                  )}
-
-                  {this.state.datepickerendOpen && (
-                    <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
-                      <TouchableOpacity
-                        style={styles.datePickerButton} onPress={() => this.datepickerCancelClicked()}
-                      >
-                        <Text style={styles.datePickerButtonText}  > Cancel </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.datePickerEndButton} onPress={() => this.datepickerendDoneClicked()}
-                      >
-                        <Text style={styles.datePickerButtonText}  > Done </Text>
-
-                      </TouchableOpacity>
-                      <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
-                        date={this.state.enddate}
-                        mode={'date'}
-                        onDateChange={(enddate) => this.setState({ enddate })}
-                      />
-                    </View>
-                  )}
-
-                  <View style={forms.action_buttons_container}>
-                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
-                      onPress={() => this.applySalesSummary()}>
-                      <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
-                      onPress={() => this.modelCancel()}>
-                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
-                    </TouchableOpacity>
-                  </View>
-                </KeyboardAwareScrollView>
               </View>
             </Modal>
           </View>

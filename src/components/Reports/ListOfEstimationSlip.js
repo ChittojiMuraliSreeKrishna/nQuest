@@ -47,11 +47,16 @@ export class ListOfEstimationSlip extends Component {
       storeId: 0,
       filterActive: false,
       estimationSlips: [],
-      flagFilterOpen: false
+      flagFilterOpen: false,
+      loadMoreActive: false,
+      totalPages: 0,
+      pageNo: 0,
+      loadPrevActive: false,
+      loadNextActive: true
     };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     AsyncStorage.getItem("storeId").then((value) => {
       storeStringId = value;
       this.setState({ storeId: parseInt(storeStringId) });
@@ -64,16 +69,16 @@ export class ListOfEstimationSlip extends Component {
 
   }
 
-  filterAction () {
+  filterAction() {
     this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
 
-  handledeleteEstimationSlip (item, index) {
+  handledeleteEstimationSlip(item, index) {
     this.setState({ deleteEstimationSlip: true, modalVisible: true, flagViewDetail: false });
   }
 
-  handleviewEstimationSlip (item, index) {
+  handleviewEstimationSlip(item, index) {
     console.log({ item });
     this.state.viewEstimationsSlipList.push(item);
     this.setState({ viewEstimationsSlipList: this.state.viewEstimationsSlipList, flagViewDetail: true });
@@ -85,19 +90,19 @@ export class ListOfEstimationSlip extends Component {
     alert("you have deleted", index);
   };
 
-  estimationModelCancel () {
+  estimationModelCancel() {
     this.setState({ modalVisible: false });
   }
 
-  datepickerClicked () {
+  datepickerClicked() {
     this.setState({ datepickerOpen: true });
   }
 
-  enddatepickerClicked () {
+  enddatepickerClicked() {
     this.setState({ datepickerendOpen: true });
   }
 
-  datepickerDoneClicked () {
+  datepickerDoneClicked() {
     if (parseInt(this.state.date.getDate()) < 10 && (parseInt(this.state.date.getMonth()) < 10)) {
       this.setState({ startDate: this.state.date.getFullYear() + "-0" + (this.state.date.getMonth() + 1) + "-" + "0" + this.state.date.getDate() });
     }
@@ -115,7 +120,7 @@ export class ListOfEstimationSlip extends Component {
     this.setState({ doneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
 
-  datepickerendDoneClicked () {
+  datepickerendDoneClicked() {
     if (parseInt(this.state.enddate.getDate()) < 10 && (parseInt(this.state.enddate.getMonth()) < 10)) {
       this.setState({ endDate: this.state.enddate.getFullYear() + "-0" + (this.state.enddate.getMonth() + 1) + "-" + "0" + this.state.enddate.getDate() });
     }
@@ -143,11 +148,11 @@ export class ListOfEstimationSlip extends Component {
     this.setState({ barcode: value });
   };
 
-  datepickerCancelClicked () {
+  datepickerCancelClicked() {
     this.setState({ date: new Date(), enddate: new Date(), datepickerOpen: false, datepickerendOpen: false });
   }
 
-  applyEstimationSlipFilter () {
+  applyEstimationSlipFilter() {
     if (this.state.startDate === "") {
       this.state.startDate = null;
     }
@@ -172,23 +177,19 @@ export class ListOfEstimationSlip extends Component {
       dsNumber: this.state.dsNumber,
       storeId: this.state.storeId,
     };
-
-
     console.log('params are' + JSON.stringify(obj));
-    this.setState({ loading: true });
+    this.setState({ loading: true, loadMoreActive: false });
     let pageNumber = 0;
-    console.log(ReportsService.estimationSlips());
-    ReportsService.estimationSlips(obj, pageNumber).then((res) => {
-      console.log(res.data.result.deliverySlip);
-      if (res.data && res.data[ "isSuccess" ] === "true") {
+    ReportsService.estimationSlips(obj, this.state.pageNo).then((res) => {
+      if (res.data && res.data["isSuccess"] === "true") {
         if (res.data.result.length !== 0) {
           this.setState({ filterActive: true });
-          this.setState({ estimationSlips: res.data.result.deliverySlip.content });
+          this.setState({ estimationSlips: res.data.result.deliverySlip.content, totalPages: res.data.result.deliverySlip.totalPages });
           this.setState({ modalVisible: false, flagFilterOpen: false });
         } else {
           alert("records not found");
         }
-        this.setState({ startDate: "", endDate: "", dsStatus: "", barcode: "", dsNumber: "" });
+        this.continuePagination()
         console.log(this.props.estimationSlip);
       }
       else {
@@ -203,22 +204,48 @@ export class ListOfEstimationSlip extends Component {
       this.props.modelCancelCallback();
       this.setState({ startDate: "", endDate: "", dsStatus: "", barcode: "", dsNumber: "" });
     });
-
   }
 
-  modelCancel () {
+  loadMoreList = (value) => {
+    if (value >= 0 && value < this.state.totalPages) {
+      this.setState({ pageNo: value }, () => {
+        this.applyEstimationSlipFilter();
+        if (this.state.pageNo === (this.state.totalPages - 1)) {
+          this.setState({ loadNextActive: false });
+        } else {
+          this.setState({ loadNextActive: true });
+        }
+        if (this.state.pageNo === 0) {
+          this.setState({ loadPrevActive: false });
+        } else {
+          this.setState({ loadPrevActive: true });
+        }
+      });
+    }
+  };
+
+  continuePagination() {
+    if (this.state.totalPages > 1) {
+      this.setState({ loadMoreActive: true });
+    }
+    else {
+      this.setState({ loadMoreActive: false, loadNextActive: false });
+    }
+  }
+
+  modelCancel() {
     this.setState({ modalVisible: false, flagFilterOpen: false, deleteEstimationSlip: false, flagViewDetail: false });
   }
 
-  clearFilterAction () {
+  clearFilterAction() {
     this.setState({ filterActive: false, estimationSlips: [], fromDate: "", toDate: "", dsStatus: "", dsNumber: "", barcode: "", flagViewDetail: false, flagFilterOpen: false });
   }
 
-  closeViewAction () {
+  closeViewAction() {
     this.setState({ flagViewDetail: false, viewEstimationsSlipList: [], viewEstimationsSlipSubList: [] });
   }
 
-  render () {
+  render() {
     return (
       <View>
         <FlatList
@@ -237,7 +264,7 @@ export class ListOfEstimationSlip extends Component {
                 <Icon
                   name="sliders"
                   size={25}
-                  style={[ { marginRight: 10 }, scss.action_icons ]}
+                  style={[{ marginRight: 10 }, scss.action_icons]}
                   onPress={() => this.filterAction()}
                 ></Icon>
               }
@@ -268,14 +295,14 @@ export class ListOfEstimationSlip extends Component {
                   <View style={scss.flatListFooter}>
                     <Text style={scss.footerText}>
                       {I18n.t("DATE")}:
-                      {item.lastModifiedDate ? item.lastModifiedDate.toString().split(/T/)[ 0 ]
+                      {item.lastModifiedDate ? item.lastModifiedDate.toString().split(/T/)[0]
                         : item.lastModifiedDate}
                     </Text>
                     <View style={scss.buttonContainer}>
                       <Icon
                         name="eye"
                         size={25}
-                        style={[ { paddingRight: 10 }, scss.action_icons ]}
+                        style={[{ paddingRight: 10 }, scss.action_icons]}
                         onPress={() => this.handleviewEstimationSlip(item, index)}
                       ></Icon>
                       <IconMA
@@ -290,13 +317,59 @@ export class ListOfEstimationSlip extends Component {
               </View>
             </ScrollView>
           )}
+          ListFooterComponent={
+            this.state.loadMoreActive && (
+              <View style={scss.page_navigation_container}>
+                <View style={scss.page_navigation_subcontainer}>
+                  <Text style={scss.page_nav_text}>{`Page: ${this.state.pageNo + 1} - ${this.state.totalPages}`}</Text>
+                </View>
+                <View style={scss.page_navigation_subcontainer}>
+                  {this.state.loadPrevActive && (
+                    <View style={scss.page_navigation_subcontainer}>
+                      <IconMA
+                        style={[scss.pag_nav_btn]}
+                        color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
+                        onPress={() => this.loadMoreList(0)}
+                        name="chevron-double-left"
+                        size={25}
+                      />
+                      <IconMA
+                        style={[scss.pag_nav_btn]}
+                        color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
+                        onPress={() => this.loadMoreList(this.state.pageNo - 1)}
+                        name="chevron-left"
+                        size={25}
+                      />
+                    </View>
+                  )}
+                  <Text style={scss.page_nav_pageno}>{this.state.pageNo + 1}</Text>
+                  {this.state.loadNextActive && (
+                    <View style={scss.page_navigation_subcontainer}>
+                      <IconMA
+                        style={[scss.pag_nav_btn]}
+                        onPress={() => this.loadMoreList(this.state.pageNo + 1)}
+                        name="chevron-right"
+                        size={25}
+                      />
+                      <IconMA
+                        style={[scss.pag_nav_btn]}
+                        onPress={() => this.loadMoreList(this.state.totalPages - 1)}
+                        name="chevron-double-right"
+                        size={25}
+                      />
+                    </View>
+                  )}
+                </View>
+              </View>
+            )
+          }
         />
         {this.state.deleteEstimationSlip && (
           <View>
             <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}
               onBackButtonPress={() => this.estimationModelCancel()}
               onBackdropPress={() => this.estimationModelCancel()} >
-              <View style={[ styles.deleteMainContainer, { backgroundColor: "#ED1C24" } ]}>
+              <View style={[styles.deleteMainContainer, { backgroundColor: "#ED1C24" }]}>
                 <View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: RH(5), height: Device.isTablet ? RH(60) : RH(50) }}>
                     <View>
@@ -324,16 +397,16 @@ export class ListOfEstimationSlip extends Component {
                     color: '#353C40'
                   }}> {I18n.t("Are you sure want to delete Estimation Slip")} ?  </Text>
                   <TouchableOpacity
-                    style={[ Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile, { marginTop: Device.isTablet ? RH(40) : RH(30) } ]} onPress={() => this.deleteEstimationSlip(item, index)}
+                    style={[Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile, { marginTop: Device.isTablet ? RH(40) : RH(30) }]} onPress={() => this.deleteEstimationSlip(item, index)}
                   >
                     <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile}  > {I18n.t("DELETE")} </Text>
 
                   </TouchableOpacity>
 
                   <TouchableOpacity
-                    style={[ Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile, { borderColor: '#ED1C24', } ]} onPress={() => this.estimationModelCancel()}
+                    style={[Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile, { borderColor: '#ED1C24', }]} onPress={() => this.estimationModelCancel()}
                   >
-                    <Text style={[ Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile, { color: '#ED1C24' } ]}  > {I18n.t("CANCEL")} </Text>
+                    <Text style={[Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile, { color: '#ED1C24' }]}  > {I18n.t("CANCEL")} </Text>
 
                   </TouchableOpacity>
                 </View>
@@ -348,149 +421,134 @@ export class ListOfEstimationSlip extends Component {
             <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}
               onBackButtonPress={() => this.modelCancel()}
               onBackdropPress={() => this.modelCancel()} >
-              <View style={styles.filterMainContainer} >
-                <View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: RH(5), height: Device.isTablet ? RH(60) : RH(50) }}>
-                    <View>
-                      <Text style={{ marginTop: RH(15), fontSize: Device.isTablet ? RF(22) : RF(17), marginLeft: RW(20) }} > {I18n.t("Filter By")} </Text>
-                    </View>
-                    <View>
-                      <TouchableOpacity style={{ width: Device.isTablet ? RW(60) : RW(50), height: Device.isTablet ? RH(60) : RH(50), marginTop: Device.isTablet ? RH(20) : RH(15), }} onPress={() => this.modelCancel()}>
-                        <Image style={{ margin: 5 }} source={require('../assets/images/modelcancel.png')} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                  <Text style={{
-                    height: Device.isTablet ? 2 : 1,
-                    width: deviceWidth,
-                    backgroundColor: 'lightgray',
-                  }}></Text>
-                </View>
-
-                <KeyboardAwareScrollView enableOnAndroid={true} >
-                  <View style={forms.filter_dates_container}>
-                    <TouchableOpacity
-                      style={forms.filter_dates}
-                      testID="openModal"
-                      onPress={() => this.datepickerClicked()}
-                    >
-                      <Text
-                        style={forms.filter_dates_text}
-                      >{this.state.startDate == "" ? 'START DATE' : this.state.startDate}</Text>
-                      <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={forms.filter_dates}
-                      testID="openModal"
-                      onPress={() => this.enddatepickerClicked()}
-                    >
-                      <Text
-                        style={forms.filter_dates_text}
-                      >{this.state.endDate == "" ? 'END DATE' : this.state.endDate}</Text>
-                      <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
-                    </TouchableOpacity>
-                  </View>
-                  {this.state.datepickerOpen && (
-                    <View style={{ height: RH(280), width: deviceWidth, backgroundColor: '#ffffff' }}>
+              <View style={forms.filterModelContainer} >
+                <Text style={forms.popUp_decorator}>-</Text>
+                <View style={forms.filterModelSub}>
+                  <KeyboardAwareScrollView>
+                    <View style={forms.filter_dates_container}>
                       <TouchableOpacity
-                        style={Device.isTablet ? styles.datePickerButton_tablet : styles.datePickerButton_mobile} onPress={() => this.datepickerCancelClicked()}
+                        style={forms.filter_dates}
+                        testID="openModal"
+                        onPress={() => this.datepickerClicked()}
                       >
-                        <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Cancel </Text>
-
+                        <Text
+                          style={forms.filter_dates_text}
+                        >{this.state.startDate == "" ? 'START DATE' : this.state.startDate}</Text>
+                        <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
                       </TouchableOpacity>
                       <TouchableOpacity
-                        style={Device.isTablet ? styles.datePickerEndButton_tablet : styles.datePickerEndButton_mobile} onPress={() => this.datepickerDoneClicked()}
+                        style={forms.filter_dates}
+                        testID="openModal"
+                        onPress={() => this.enddatepickerClicked()}
                       >
-                        <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Done </Text>
-
+                        <Text
+                          style={forms.filter_dates_text}
+                        >{this.state.endDate == "" ? 'END DATE' : this.state.endDate}</Text>
+                        <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
                       </TouchableOpacity>
-                      <DatePicker style={{ width: deviceWidth, height: RH(200), marginTop: RH(50), }}
-                        date={this.state.date}
-                        mode={'date'}
-                        onDateChange={(date) => this.setState({ date })}
+                    </View>
+                    {this.state.datepickerOpen && (
+                      <View style={{ height: RH(280), width: deviceWidth, backgroundColor: '#ffffff' }}>
+                        <TouchableOpacity
+                          style={Device.isTablet ? styles.datePickerButton_tablet : styles.datePickerButton_mobile} onPress={() => this.datepickerCancelClicked()}
+                        >
+                          <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Cancel </Text>
+
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={Device.isTablet ? styles.datePickerEndButton_tablet : styles.datePickerEndButton_mobile} onPress={() => this.datepickerDoneClicked()}
+                        >
+                          <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Done </Text>
+
+                        </TouchableOpacity>
+                        <DatePicker style={{ width: deviceWidth, height: RH(200), marginTop: RH(50), }}
+                          date={this.state.date}
+                          mode={'date'}
+                          onDateChange={(date) => this.setState({ date })}
+                        />
+                      </View>
+                    )}
+
+                    {this.state.datepickerendOpen && (
+                      <View style={{ height: RH(280), width: deviceWidth, backgroundColor: '#ffffff' }}>
+                        <TouchableOpacity
+                          style={Device.isTablet ? styles.datePickerButton_tablet : styles.datePickerButton_mobile} onPress={() => this.datepickerCancelClicked()}
+                        >
+                          <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Cancel </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={Device.isTablet ? styles.datePickerEndButton_tablet : styles.datePickerEndButton_mobile} onPress={() => this.datepickerendDoneClicked()}
+                        >
+                          <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Done </Text>
+
+                        </TouchableOpacity>
+                        <DatePicker style={{ width: deviceWidth, height: RH(200), marginTop: RH(50), }}
+                          date={this.state.enddate}
+                          mode={'date'}
+                          onDateChange={(enddate) => this.setState({ enddate })}
+                        />
+                      </View>
+                    )}
+                    <View style={[styles.rnSelectContainer_mobile, { width: '92%' }]}>
+                      <RNPickerSelect
+                        // style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
+                        placeholder={{
+                          label: 'DS STATUS'
+                        }}
+                        Icon={() => {
+                          return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
+                        }}
+                        items={[
+                          { label: 'Completed', value: 'Completed' },
+                          { label: 'Pending', value: 'Pending' },
+                          { label: 'Cancelled', value: 'Cancelled' },
+                        ]}
+                        onValueChange={this.handleDsStatus}
+                        style={pickerSelectStyles_mobile}
+                        value={this.state.dsStatus}
+                        useNativeAndroidPickerStyle={false}
                       />
-                    </View>
-                  )}
 
-                  {this.state.datepickerendOpen && (
-                    <View style={{ height: RH(280), width: deviceWidth, backgroundColor: '#ffffff' }}>
-                      <TouchableOpacity
-                        style={Device.isTablet ? styles.datePickerButton_tablet : styles.datePickerButton_mobile} onPress={() => this.datepickerCancelClicked()}
-                      >
-                        <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Cancel </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={Device.isTablet ? styles.datePickerEndButton_tablet : styles.datePickerEndButton_mobile} onPress={() => this.datepickerendDoneClicked()}
-                      >
-                        <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Done </Text>
 
-                      </TouchableOpacity>
-                      <DatePicker style={{ width: deviceWidth, height: RH(200), marginTop: RH(50), }}
-                        date={this.state.enddate}
-                        mode={'date'}
-                        onDateChange={(enddate) => this.setState({ enddate })}
-                      />
                     </View>
-                  )}
-                  <View style={[ styles.rnSelectContainer_mobile, { width: deviceWidth - 30 } ]}>
-                    <RNPickerSelect
-                      // style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
-                      placeholder={{
-                        label: 'DS STATUS'
-                      }}
-                      Icon={() => {
-                        return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-                      }}
-                      items={[
-                        { label: 'Completed', value: 'Completed' },
-                        { label: 'Pending', value: 'Pending' },
-                        { label: 'Cancelled', value: 'Cancelled' },
-                      ]}
-                      onValueChange={this.handleDsStatus}
-                      style={pickerSelectStyles_mobile}
-                      value={this.state.dsStatus}
-                      useNativeAndroidPickerStyle={false}
+                    <TextInput
+                      outlineColor='#d8d8d8'
+                      mode='outlined'
+                      activeOutlineColor='#d8d8d8'
+                      style={forms.input_fld}
+                      underlineColorAndroid="transparent"
+                      placeholder={I18n.t("DS NUMBER")}
+                      placeholderTextColor="#6F6F6F"
+                      textAlignVertical="center"
+                      autoCapitalize="none"
+                      value={this.state.dsNumber}
+                      onChangeText={this.handleDsNumber}
                     />
-
-
-                  </View>
-                  <TextInput
-                    outlineColor='#d8d8d8'
-                    mode='outlined'
-                    activeOutlineColor='#d8d8d8'
-                    style={forms.input_fld}
-                    underlineColorAndroid="transparent"
-                    placeholder={I18n.t("DS NUMBER")}
-                    placeholderTextColor="#6F6F6F"
-                    textAlignVertical="center"
-                    autoCapitalize="none"
-                    value={this.state.dsNumber}
-                    onChangeText={this.handleDsNumber}
-                  />
-                  <TextInput
-                    outlineColor='#d8d8d8'
-                    mode='outlined'
-                    activeOutlineColor='#d8d8d8'
-                    style={forms.input_fld}
-                    underlineColorAndroid="transparent"
-                    placeholder={I18n.t("BARCODE")}
-                    placeholderTextColor="#6F6F6F"
-                    textAlignVertical="center"
-                    autoCapitalize="none"
-                    value={this.state.barcode}
-                    onChangeText={this.handleBarCode}
-                  />
-                  <View style={forms.action_buttons_container}>
-                    <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
-                      onPress={() => this.applyEstimationSlipFilter()}>
-                      <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
-                      onPress={() => this.modelCancel()}>
-                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
-                    </TouchableOpacity>
-                  </View>
-                </KeyboardAwareScrollView>
+                    <TextInput
+                      outlineColor='#d8d8d8'
+                      mode='outlined'
+                      activeOutlineColor='#d8d8d8'
+                      style={forms.input_fld}
+                      underlineColorAndroid="transparent"
+                      placeholder={I18n.t("BARCODE")}
+                      placeholderTextColor="#6F6F6F"
+                      textAlignVertical="center"
+                      autoCapitalize="none"
+                      value={this.state.barcode}
+                      onChangeText={this.handleBarCode}
+                    />
+                    <View style={forms.action_buttons_container}>
+                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                        onPress={() => this.applyEstimationSlipFilter()}>
+                        <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                        onPress={() => this.modelCancel()}>
+                        <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </KeyboardAwareScrollView>
+                </View>
               </View>
             </Modal>
           </View>
@@ -499,62 +557,52 @@ export class ListOfEstimationSlip extends Component {
         {this.state.flagViewDetail && (
           <View>
             <Modal isVisible={this.state.flagViewDetail} onBackdropPress={() => this.closeViewAction()} style={{ margin: 0 }}>
-              <View style={scss.model_container}>
-                <FlatList
-                  scrollEnabled={false}
-                  data={this.state.viewEstimationsSlipList}
-                  removeClippedSubviews={false}
-                  ListHeaderComponent={
-                    <View style={scss.model_header}>
+              <View style={forms.filterModelContainer} >
+                <Text style={forms.popUp_decorator}>-</Text>
+                <View style={forms.filterModelSub}>
+                  <FlatList
+                    scrollEnabled={false}
+                    data={this.state.viewEstimationsSlipList}
+                    removeClippedSubviews={false}
+                    renderItem={({ item, index }) => (
                       <View>
-                        <Txt variant='titleLarge'>View EstimationSlip</Txt>
-                      </View>
-                      <IconMA
-                        style={scss.action_icons}
-                        name='close'
-                        size={20}
-                        onPress={() => this.closeViewAction()}
-                      />
-                    </View>
-                  }
-                  renderItem={({ item, index }) => (
-                    <View>
-                      <View style={{ margin: 10 }}>
-                        <Txt style={{ textAlign: 'center' }} selectable={true} variant="titleMedium">{item.dsNumber}</Txt>
-                      </View>
-                      <View style={scss.model_subContainer}>
-                        <ScrollView>
-                          {item.lineItems.map((item, index) => {
-                            return (
-                              <View id={index} style={scss.model_subbody}>
-                                <View style={scss.model_text_container}>
-                                  <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>Barcode:{"\n"}{item.barCode}</Txt>
-                                  <Txt variant='bodyMedium' style={{ textAlign: 'right' }}>SM:{"\n"}{item.userId}</Txt>
+                        <View style={{ margin: 10 }}>
+                          <Txt style={{ textAlign: 'center' }} selectable={true} variant="titleMedium">{item.dsNumber}</Txt>
+                        </View>
+                        <View style={scss.model_subContainer}>
+                          <ScrollView>
+                            {item.lineItems.map((item, index) => {
+                              return (
+                                <View id={index} style={scss.model_subbody}>
+                                  <View style={scss.model_text_container}>
+                                    <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>Barcode:{"\n"}{item.barCode}</Txt>
+                                    <Txt variant='bodyMedium' style={{ textAlign: 'right' }}>SM:{"\n"}{item.userId}</Txt>
+                                  </View>
+                                  <View style={scss.model_text_container}>
+                                    <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>QTY:{"\n"}{item.quantity}</Txt>
+                                    <Txt variant='bodyMedium' style={{ textAlign: 'right' }}>Item MRP:{"\n"}{item.netValue}</Txt>
+                                  </View>
+                                  <View style={scss.model_text_container}>
+                                    <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>Gross Amount:{"\n"}{item.grossValue}</Txt>
+                                    <Txt variant='bodyMedium' style={{ textAlign: 'right' }}>Promo Discount:{"\n"}{item.discount}</Txt>
+                                  </View>
+                                  <View style={scss.model_text_container}>
+                                    <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>Net Amount:{"\n"}{item.netValue}</Txt>
+                                  </View>
                                 </View>
-                                <View style={scss.model_text_container}>
-                                  <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>QTY:{"\n"}{item.quantity}</Txt>
-                                  <Txt variant='bodyMedium' style={{ textAlign: 'right' }}>Item MRP:{"\n"}{item.netValue}</Txt>
-                                </View>
-                                <View style={scss.model_text_container}>
-                                  <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>Gross Amount:{"\n"}{item.grossValue}</Txt>
-                                  <Txt variant='bodyMedium' style={{ textAlign: 'right' }}>Promo Discount:{"\n"}{item.discount}</Txt>
-                                </View>
-                                <View style={scss.model_text_container}>
-                                  <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>Net Amount:{"\n"}{item.netValue}</Txt>
-                                </View>
-                              </View>
-                            );
-                          })}
-                        </ScrollView>
+                              );
+                            })}
+                          </ScrollView>
+                        </View>
+                        <View>
+                          <TouchableOpacity onPress={() => this.closeViewAction()} style={[forms.action_button, forms.cancel_btn]}>
+                            <Text style={forms.cancel_btn_text}>Close</Text>
+                          </TouchableOpacity>
+                        </View>
                       </View>
-                      <View>
-                        <TouchableOpacity onPress={() => this.closeViewAction()} style={[ forms.action_button, forms.cancel_btn ]}>
-                          <Text style={forms.cancel_btn_text}>Close</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  )}
-                />
+                    )}
+                  />
+                </View>
               </View>
             </Modal>
           </View>
@@ -573,10 +621,10 @@ const pickerSelectStyles_mobile = StyleSheet.create({
   inputIOS: {
     justifyContent: 'center',
     height: RH(42),
+    width: '92%',
     borderRadius: 3,
     borderWidth: Device.isTablet ? 2 : 1,
     fontFamily: 'regular',
-    //paddingLeft: -20,
     fontSize: RF(14),
     borderColor: '#FBFBFB',
     backgroundColor: '#FBFBFB',
@@ -584,7 +632,7 @@ const pickerSelectStyles_mobile = StyleSheet.create({
   inputAndroid: {
     justifyContent: 'center',
     height: RF(44),
-    width: '100%',
+    width: '92%',
     borderRadius: 3,
     borderWidth: Device.isTablet ? 2 : 1,
     fontFamily: 'regular',
@@ -595,51 +643,7 @@ const pickerSelectStyles_mobile = StyleSheet.create({
   },
 });
 
-const pickerSelectStyles_tablet = StyleSheet.create({
-  placeholder: {
-    color: "#6F6F6F",
-    fontFamily: "regular",
-    fontSize: RF(20),
-  },
-  inputIOS: {
-    justifyContent: 'center',
-    height: RH(52),
-    borderRadius: 3,
-    borderWidth: Device.isTablet ? 2 : 1,
-    fontFamily: 'regular',
-    //paddingLeft: -20,
-    fontSize: RF(20),
-    borderColor: '#FBFBFB',
-    backgroundColor: '#FBFBFB',
-  },
-  inputAndroid: {
-    justifyContent: 'center',
-    height: RH(52),
-    borderRadius: 3,
-    borderWidth: Device.isTablet ? 2 : 1,
-    fontFamily: 'regular',
-    //paddingLeft: -20,
-    fontSize: RF(20),
-    borderColor: '#FBFBFB',
-    backgroundColor: '#FBFBFB',
-    color: '#001B4A',
-
-    // marginLeft: RW(20),
-    // marginRight: RW(20),
-    // marginTop: 10,
-    // height: 40,
-    // backgroundColor: '#ffffff',
-    // borderBottomColor: '#456CAF55',
-    // color: '#001B4A',
-    // fontFamily: "bold",
-    // fontSize: 16,
-    // borderRadius: 3,
-  },
-});
-
-
 const styles = StyleSheet.create({
-
   imagealign: {
     marginTop: Device.isTablet ? RH(25) : RH(20),
     marginRight: Device.isTablet ? RW(30) : RW(20),

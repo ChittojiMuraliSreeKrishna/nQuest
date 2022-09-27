@@ -17,6 +17,8 @@ import { flatListMainContainer, flatlistSubContainer, highText, loadMoreBtn, loa
 import Loader from '../../commonUtils/loader';
 import { formatDate } from '../../commonUtils/DateFormate';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
+import scss from "../../commonUtils/assets/styles/style.scss";
+import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
 var deviceWidth = Dimensions.get("window").width;
@@ -48,7 +50,9 @@ export class GoodsReturn extends Component {
       totalPages: 0,
       pageNo: 0,
       loading: false,
-      filterActive: false
+      filterActive: false,
+      loadPrevActive: false,
+      loadNextActive: true
     };
   }
 
@@ -177,19 +181,29 @@ export class GoodsReturn extends Component {
     })
   }
 
-  // Pagination Function
-  loadMoreList = () => {
-    this.setState({ pageNo: this.state.pageNo + 1 }, () => {
-      this.applyGoodsReturn();
-    });
+  loadMoreList = (value) => {
+    if (value >= 0 && value < this.state.totalPages) {
+      this.setState({ pageNo: value }, () => {
+        this.applyGoodsReturn();
+        if (this.state.pageNo === (this.state.totalPages - 1)) {
+          this.setState({ loadNextActive: false });
+        } else {
+          this.setState({ loadNextActive: true });
+        }
+        if (this.state.pageNo === 0) {
+          this.setState({ loadPrevActive: false });
+        } else {
+          this.setState({ loadPrevActive: true });
+        }
+      });
+    }
   };
 
-
   continuePagination() {
-    if (this.state.pageNo < this.state.totalPages - 1) {
+    if (this.state.totalPages > 1) {
       this.setState({ loadMoreActive: true });
     } else {
-      this.setState({ loadMoreActive: false });
+      this.setState({ loadMoreActive: false, loadNextActive: false });
     }
   }
 
@@ -233,6 +247,7 @@ export class GoodsReturn extends Component {
 
   clearFilterAction() {
     this.setState({
+      loadMoreActive: false, loadNextActive: false,
       filterActive: false, flagFilterGoodsReturn: false, modalVisible: false,
       startDate: "", endDate: "",
       returnSlip: "", barCode: "",
@@ -269,8 +284,6 @@ export class GoodsReturn extends Component {
           removeClippedSubviews={false}
           keyExtractor={(item, i) => i.toString()}
           ListEmptyComponent={<Text style={emptyTextStyle}>&#9888; {I18n.t("Results not loaded")}</Text>}
-          // onEndReached={this.loadMoreList}
-          // onEndReachedThreshold={200}
           renderItem={({ item, index }) => (
             <View style={[flatListMainContainer, { backgroundColor: "#FFF" }]} >
               <View style={flatlistSubContainer}>
@@ -296,12 +309,48 @@ export class GoodsReturn extends Component {
           )}
           ListFooterComponent={
             this.state.loadMoreActive && (
-              <TouchableOpacity
-                style={loadMoreBtn}
-                onPress={() => this.loadMoreList()}
-              >
-                <Text style={loadmoreBtnText}>Load More ?</Text>
-              </TouchableOpacity>
+              <View style={scss.page_navigation_container}>
+                <View style={scss.page_navigation_subcontainer}>
+                  <Text style={scss.page_nav_text}>{`Page: ${this.state.pageNo + 1} - ${this.state.totalPages}`}</Text>
+                </View>
+                <View style={scss.page_navigation_subcontainer}>
+                  {this.state.loadPrevActive && (
+                    <View style={scss.page_navigation_subcontainer}>
+                      <IconMA
+                        style={[scss.pag_nav_btn]}
+                        color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
+                        onPress={() => this.loadMoreList(0)}
+                        name="chevron-double-left"
+                        size={25}
+                      />
+                      <IconMA
+                        style={[scss.pag_nav_btn]}
+                        color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
+                        onPress={() => this.loadMoreList(this.state.pageNo - 1)}
+                        name="chevron-left"
+                        size={25}
+                      />
+                    </View>
+                  )}
+                  <Text style={scss.page_nav_pageno}>{this.state.pageNo + 1}</Text>
+                  {this.state.loadNextActive && (
+                    <View style={scss.page_navigation_subcontainer}>
+                      <IconMA
+                        style={[scss.pag_nav_btn]}
+                        onPress={() => this.loadMoreList(this.state.pageNo + 1)}
+                        name="chevron-right"
+                        size={25}
+                      />
+                      <IconMA
+                        style={[scss.pag_nav_btn]}
+                        onPress={() => this.loadMoreList(this.state.totalPages - 1)}
+                        name="chevron-double-right"
+                        size={25}
+                      />
+                    </View>
+                  )}
+                </View>
+              </View>
             )
           }
         />
@@ -312,134 +361,120 @@ export class GoodsReturn extends Component {
             <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
               onBackButtonPress={() => this.modelCancel()}
               onBackdropPress={() => this.modelCancel()} >
-              <View style={styles.filterMainContainer} >
-                <View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
-                    <View>
-                      <Text style={{ marginTop: 15, fontSize: Device.isTablet ? 22 : 17, marginLeft: 20 }} > {I18n.t("Filter By")} </Text>
-                    </View>
-                    <View>
-                      <TouchableOpacity style={{ width: Device.isTablet ? 60 : 50, height: Device.isTablet ? 60 : 50, marginTop: Device.isTablet ? 20 : 15, }} onPress={() => this.modelCancel()}>
-                        <Image style={{ margin: RH(5) }} source={require('../assets/images/modelcancel.png')} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                  <Text style={{
-                    height: Device.isTablet ? 2 : 1,
-                    width: deviceWidth,
-                    backgroundColor: 'lightgray',
-                  }}></Text>
-                </View>
-                <KeyboardAwareScrollView enableOnAndroid={true} >
-                  <View style={forms.filter_dates_container}>
-                    <TouchableOpacity
-                      style={forms.filter_dates}
-                      testID="openModal"
-                      onPress={() => this.datepickerClicked()}
-                    >
-                      <Text
-                        style={forms.filter_dates_text}
-                      >{this.state.startDate == "" ? 'START DATE' : this.state.startDate}</Text>
-                      <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={forms.filter_dates}
-                      testID="openModal"
-                      onPress={() => this.enddatepickerClicked()}
-                    >
-                      <Text
-                        style={forms.filter_dates_text}
-                      >{this.state.endDate == "" ? 'END DATE' : this.state.endDate}</Text>
-                      <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
-                    </TouchableOpacity>
-                  </View>
-
-                  {this.state.datepickerOpen && (
-                    <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
-                      <TouchableOpacity style={styles.datePickerButton} onPress={() => this.datepickerCancelClicked()}>
-                        <Text style={styles.datePickerButtonText}  > Cancel </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity style={styles.datePickerEndButton} onPress={() => this.datepickerDoneClicked()}>
-                        <Text style={styles.datePickerButtonText}  > Done </Text>
-                      </TouchableOpacity>
-                      <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
-                        date={this.state.date}
-                        mode={'date'}
-                        onDateChange={(date) => this.setState({ date })}
-                      />
-                    </View>
-                  )}
-                  {this.state.datepickerendOpen && (
-                    <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
+              <View style={forms.filterModelContainer} >
+                <Text style={forms.popUp_decorator}>-</Text>
+                <View style={forms.filterModelSub}>
+                  <KeyboardAwareScrollView>
+                    <View style={forms.filter_dates_container}>
                       <TouchableOpacity
-                        style={styles.datePickerButton} onPress={() => this.datepickerCancelClicked()}
+                        style={forms.filter_dates}
+                        testID="openModal"
+                        onPress={() => this.datepickerClicked()}
                       >
-                        <Text style={styles.datePickerButtonText}  > Cancel </Text>
+                        <Text
+                          style={forms.filter_dates_text}
+                        >{this.state.startDate == "" ? 'START DATE' : this.state.startDate}</Text>
+                        <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
                       </TouchableOpacity>
                       <TouchableOpacity
-                        style={styles.datePickerEndButton} onPress={() => this.datepickerendDoneClicked()}
+                        style={forms.filter_dates}
+                        testID="openModal"
+                        onPress={() => this.enddatepickerClicked()}
                       >
-                        <Text style={styles.datePickerButtonText}  > Done </Text>
-
+                        <Text
+                          style={forms.filter_dates_text}
+                        >{this.state.endDate == "" ? 'END DATE' : this.state.endDate}</Text>
+                        <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
                       </TouchableOpacity>
-                      <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
-                        date={this.state.enddate}
-                        mode={'date'}
-                        onDateChange={(enddate) => this.setState({ enddate })}
+                    </View>
+
+                    {this.state.datepickerOpen && (
+                      <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
+                        <TouchableOpacity style={styles.datePickerButton} onPress={() => this.datepickerCancelClicked()}>
+                          <Text style={styles.datePickerButtonText}  > Cancel </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.datePickerEndButton} onPress={() => this.datepickerDoneClicked()}>
+                          <Text style={styles.datePickerButtonText}  > Done </Text>
+                        </TouchableOpacity>
+                        <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
+                          date={this.state.date}
+                          mode={'date'}
+                          onDateChange={(date) => this.setState({ date })}
+                        />
+                      </View>
+                    )}
+                    {this.state.datepickerendOpen && (
+                      <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
+                        <TouchableOpacity
+                          style={styles.datePickerButton} onPress={() => this.datepickerCancelClicked()}
+                        >
+                          <Text style={styles.datePickerButtonText}  > Cancel </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={styles.datePickerEndButton} onPress={() => this.datepickerendDoneClicked()}
+                        >
+                          <Text style={styles.datePickerButtonText}  > Done </Text>
+
+                        </TouchableOpacity>
+                        <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
+                          date={this.state.enddate}
+                          mode={'date'}
+                          onDateChange={(enddate) => this.setState({ enddate })}
+                        />
+                      </View>
+                    )}
+                    <Text style={styles.headings}>{I18n.t("RT Status")}</Text>
+                    <View style={styles.rnSelectContainer}>
+                      <RNPickerSelect
+                        // style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
+                        placeholder={{ label: 'RT Status', value: '' }}
+                        Icon={() => {
+                          return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
+                        }}
+                        items={[
+                          { value: 'PENDING', label: 'Pending', },
+                          { value: 'COMPLETED', label: 'Completed', },
+                        ]}
+                        onValueChange={this.handleRTStatus}
+                        style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
+                        value={this.state.rtStatus}
+                        useNativeAndroidPickerStyle={false}
                       />
                     </View>
-                  )}
-                  <Text style={styles.headings}>{I18n.t("RT Status")}</Text>
-                  <View style={styles.rnSelectContainer}>
-                    <RNPickerSelect
-                      // style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
-                      placeholder={{ label: 'RT Status', value: '' }}
-                      Icon={() => {
-                        return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-                      }}
-                      items={[
-                        { value: 'PENDING', label: 'Pending', },
-                        { value: 'COMPLETED', label: 'Completed', },
-                      ]}
-                      onValueChange={this.handleRTStatus}
-                      style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
-                      value={this.state.rtStatus}
-                      useNativeAndroidPickerStyle={false}
+                    <Text style={styles.headings}>{I18n.t("RT Number")}</Text>
+                    <TextInput
+                      style={forms.input_fld}
+                      underlineColorAndroid="transparent"
+                      placeholder={I18n.t("RT Number")}
+                      placeholderTextColor="#6F6F6F"
+                      textAlignVertical="center"
+                      autoCapitalize="none"
+                      value={this.state.returnSlipNumber}
+                      onChangeText={this.handleReturnSlipNumber}
                     />
-                  </View>
-                  <Text style={styles.headings}>{I18n.t("RT Number")}</Text>
-                  <TextInput
-                    style={[styles.input, { width: deviceWidth - 40 }]}
-                    underlineColorAndroid="transparent"
-                    placeholder={I18n.t("RT Number")}
-                    placeholderTextColor="#6F6F6F"
-                    textAlignVertical="center"
-                    autoCapitalize="none"
-                    value={this.state.returnSlipNumber}
-                    onChangeText={this.handleReturnSlipNumber}
-                  />
-                  <Text style={styles.headings}>{I18n.t("Barcode")}</Text>
-                  <TextInput
-                    style={[styles.input, { width: deviceWidth - 40 }]}
-                    underlineColorAndroid="transparent"
-                    placeholder={I18n.t("Barcode")}
-                    placeholderTextColor="#6F6F6F"
-                    textAlignVertical="center"
-                    autoCapitalize="none"
-                    value={this.state.barCode}
-                    onChangeText={this.handleBarCode}
-                  />
-                  <View style={forms.action_buttons_container}>
-                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
-                      onPress={() => this.applyGoodsReturn(this.state.pageNo)}>
-                      <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
-                      onPress={() => this.modelCancel()}>
-                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
-                    </TouchableOpacity>
-                  </View>
-                </KeyboardAwareScrollView>
+                    <Text style={styles.headings}>{I18n.t("Barcode")}</Text>
+                    <TextInput
+                      style={forms.input_fld}
+                      underlineColorAndroid="transparent"
+                      placeholder={I18n.t("Barcode")}
+                      placeholderTextColor="#6F6F6F"
+                      textAlignVertical="center"
+                      autoCapitalize="none"
+                      value={this.state.barCode}
+                      onChangeText={this.handleBarCode}
+                    />
+                    <View style={forms.action_buttons_container}>
+                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                        onPress={() => this.applyGoodsReturn(this.state.pageNo)}>
+                        <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                        onPress={() => this.modelCancel()}>
+                        <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </KeyboardAwareScrollView>
+                </View>
               </View>
             </Modal>
           </View>

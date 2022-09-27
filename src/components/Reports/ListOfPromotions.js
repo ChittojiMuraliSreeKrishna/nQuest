@@ -18,6 +18,8 @@ import { emptyTextStyle } from '../Styles/FormFields';
 import Loader from '../../commonUtils/loader';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss'
+import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
+
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -38,7 +40,9 @@ export class ListOfPromotions extends Component {
       totalPages: 0,
       pageNo: 0,
       loading: false,
-      filterActive: false
+      filterActive: false,
+      loadPrevActive: false,
+      loadNextActive: true
     };
   }
 
@@ -57,6 +61,7 @@ export class ListOfPromotions extends Component {
       applicability: this.state.promoType,
       clientId: this.state.clientId
     };
+    this.setState({ loadMoreActive: false })
     ReportsService.promotionsList(obj, this.state.pageNo).then((res, err) => {
       console.log(res.data, err);
       if (res.data) {
@@ -73,19 +78,30 @@ export class ListOfPromotions extends Component {
     });
   }
 
-  // Pagination Function
-  loadMoreList = () => {
-    this.setState({ pageNo: this.state.pageNo + 1 }, () => {
-      this.applyListPromotions();
-    });
+  loadMoreList = (value) => {
+    if (value >= 0 && value < this.state.totalPages) {
+      this.setState({ pageNo: value }, () => {
+        this.applyListPromotions();
+        if (this.state.pageNo === (this.state.totalPages - 1)) {
+          this.setState({ loadNextActive: false });
+        } else {
+          this.setState({ loadNextActive: true });
+        }
+        if (this.state.pageNo === 0) {
+          this.setState({ loadPrevActive: false });
+        } else {
+          this.setState({ loadPrevActive: true });
+        }
+      });
+    }
   };
 
-
   continuePagination() {
-    if (this.state.pageNo < this.state.totalPages - 1) {
+    if (this.state.totalPages > 1) {
       this.setState({ loadMoreActive: true });
-    } else {
-      this.setState({ loadMoreActive: false });
+    }
+    else {
+      this.setState({ loadMoreActive: false, loadNextActive: false });
     }
   }
 
@@ -107,6 +123,7 @@ export class ListOfPromotions extends Component {
 
   clearFilterAction() {
     this.setState({
+      loadMoreActive: false, loadNextActive: false,
       filterActive: false, flagFilterListPromotions: false, modalVisible: false, promoType: '', promoStatus: '', listPromotions: []
     })
   }
@@ -161,12 +178,48 @@ export class ListOfPromotions extends Component {
           )}
           ListFooterComponent={
             this.state.loadMoreActive && (
-              <TouchableOpacity
-                style={loadMoreBtn}
-                onPress={() => this.loadMoreList()}
-              >
-                <Text style={loadmoreBtnText}>Load More ?</Text>
-              </TouchableOpacity>
+              <View style={scss.page_navigation_container}>
+                <View style={scss.page_navigation_subcontainer}>
+                  <Text style={scss.page_nav_text}>{`Page: ${this.state.pageNo + 1} - ${this.state.totalPages}`}</Text>
+                </View>
+                <View style={scss.page_navigation_subcontainer}>
+                  {this.state.loadPrevActive && (
+                    <View style={scss.page_navigation_subcontainer}>
+                      <IconMA
+                        style={[scss.pag_nav_btn]}
+                        color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
+                        onPress={() => this.loadMoreList(0)}
+                        name="chevron-double-left"
+                        size={25}
+                      />
+                      <IconMA
+                        style={[scss.pag_nav_btn]}
+                        color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
+                        onPress={() => this.loadMoreList(this.state.pageNo - 1)}
+                        name="chevron-left"
+                        size={25}
+                      />
+                    </View>
+                  )}
+                  <Text style={scss.page_nav_pageno}>{this.state.pageNo + 1}</Text>
+                  {this.state.loadNextActive && (
+                    <View style={scss.page_navigation_subcontainer}>
+                      <IconMA
+                        style={[scss.pag_nav_btn]}
+                        onPress={() => this.loadMoreList(this.state.pageNo + 1)}
+                        name="chevron-right"
+                        size={25}
+                      />
+                      <IconMA
+                        style={[scss.pag_nav_btn]}
+                        onPress={() => this.loadMoreList(this.state.totalPages - 1)}
+                        name="chevron-double-right"
+                        size={25}
+                      />
+                    </View>
+                  )}
+                </View>
+              </View>
             )
           }
         />
@@ -176,84 +229,70 @@ export class ListOfPromotions extends Component {
             <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
               onBackButtonPress={() => this.modelCancel()}
               onBackdropPress={() => this.modelCancel()} >
-              <View style={styles.filterMainContainer} >
-                <View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
-                    <View>
-                      <Text style={{ marginTop: 15, fontSize: Device.isTablet ? 22 : 17, marginLeft: 20 }} > Filter by </Text>
+              <View style={forms.filterModelContainer} >
+                <Text style={forms.popUp_decorator}>-</Text>
+                <View style={forms.filterModelSub}>
+                  <KeyboardAwareScrollView >
+                    <Text style={styles.headings}>{I18n.t("Promo Type")}</Text>
+                    <View style={[styles.rnSelectContainer, { width: '92%' }]}>
+                      <RNPickerSelect
+                        placeholder={{
+                          label: 'Promo Type', value: ''
+                        }}
+                        Icon={() => {
+                          return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
+                        }}
+                        items={[{
+                          label: "On Barcode",
+                          value: "promotionForEachBarcode",
+                        },
+                        {
+                          label: "On WholeBill",
+                          value: "promotionForWholeBill",
+                        }]}
+                        onValueChange={this.handlePromoType}
+                        style={pickerSelectStyles}
+                        value={this.state.promoType}
+                        useNativeAndroidPickerStyle={false}
+                      />
                     </View>
-                    <View>
-                      <TouchableOpacity style={{ width: Device.isTablet ? 60 : RW(50), height: Device.isTablet ? 60 : RW(50), marginTop: Device.isTablet ? 20 : RH(15), }} onPress={() => this.modelCancel()}>
-                        <Image style={{ margin: RH(5) }} source={require('../assets/images/modelcancel.png')} />
+
+                    <Text style={styles.headings}>{I18n.t("Promo Status")}</Text>
+                    <View style={[styles.rnSelectContainer, { width: '92%' }]}>
+                      <RNPickerSelect
+                        placeholder={{
+                          label: 'Promo Status ', value: ''
+                        }}
+                        Icon={() => {
+                          return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
+                        }}
+                        items={[{
+                          label: "Active",
+                          value: "true",
+                        },
+                        {
+                          label: "In Active",
+                          value: "false",
+                        }]}
+                        onValueChange={this.handlePromoStatus}
+                        style={pickerSelectStyles}
+                        value={this.state.promoStatus}
+                        useNativeAndroidPickerStyle={false}
+                      />
+                    </View>
+
+                    <View style={forms.action_buttons_container}>
+                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                        onPress={() => this.applyListPromotions(this.state.pageNo)}>
+                        <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                        onPress={() => this.modelCancel()}>
+                        <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>
                     </View>
-                  </View>
-                  <Text style={{
-                    height: Device.isTablet ? 2 : 1,
-                    width: deviceWidth,
-                    backgroundColor: 'lightgray',
-                  }}></Text>
+                  </KeyboardAwareScrollView>
                 </View>
-                <KeyboardAwareScrollView enableOnAndroid={true} >
-                  <Text style={styles.headings}>{I18n.t("Promo Type")}</Text>
-                  <View style={[styles.rnSelectContainer, { width: deviceWidth - RW(40) }]}>
-                    <RNPickerSelect
-                      placeholder={{
-                        label: 'Promo Type', value: ''
-                      }}
-                      Icon={() => {
-                        return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-                      }}
-                      items={[{
-                        label: "On Barcode",
-                        value: "promotionForEachBarcode",
-                      },
-                      {
-                        label: "On WholeBill",
-                        value: "promotionForWholeBill",
-                      }]}
-                      onValueChange={this.handlePromoType}
-                      style={pickerSelectStyles}
-                      value={this.state.promoType}
-                      useNativeAndroidPickerStyle={false}
-                    />
-                  </View>
-
-                  <Text style={styles.headings}>{I18n.t("Promo Status")}</Text>
-                  <View style={[styles.rnSelectContainer, { width: deviceWidth - RW(40) }]}>
-                    <RNPickerSelect
-                      placeholder={{
-                        label: 'Promo Status ', value: ''
-                      }}
-                      Icon={() => {
-                        return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-                      }}
-                      items={[{
-                        label: "Active",
-                        value: "true",
-                      },
-                      {
-                        label: "In Active",
-                        value: "false",
-                      }]}
-                      onValueChange={this.handlePromoStatus}
-                      style={pickerSelectStyles}
-                      value={this.state.promoStatus}
-                      useNativeAndroidPickerStyle={false}
-                    />
-                  </View>
-
-                  <View style={forms.action_buttons_container}>
-                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
-                      onPress={() => this.applyListPromotions(this.state.pageNo)}>
-                      <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
-                      onPress={() => this.modelCancel()}>
-                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
-                    </TouchableOpacity>
-                  </View>
-                </KeyboardAwareScrollView>
               </View>
             </Modal>
           </View>
