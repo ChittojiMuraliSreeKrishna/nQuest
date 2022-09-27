@@ -1,8 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import DatePicker from 'react-native-date-picker';
+import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -10,15 +8,14 @@ import Modal from 'react-native-modal';
 import { Appbar } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
+import FilterIcon from 'react-native-vector-icons/FontAwesome';
+import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
+import forms from '../../commonUtils/assets/styles/formFields.scss';
+import scss from '../../commonUtils/assets/styles/style.scss';
+import Loader from '../../commonUtils/loader';
 import { RF, RH, RW } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
-import FilterIcon from 'react-native-vector-icons/FontAwesome'
-import { flatListMainContainer, flatlistSubContainer, highText, loadMoreBtn, loadmoreBtnText, textContainer, textStyleLight, textStyleMedium } from '../Styles/Styles';
 import { emptyTextStyle } from '../Styles/FormFields';
-import Loader from '../../commonUtils/loader';
-import forms from '../../commonUtils/assets/styles/formFields.scss';
-import scss from '../../commonUtils/assets/styles/style.scss'
-import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
 var deviceWidth = Dimensions.get("window").width;
@@ -46,35 +43,35 @@ export class ListOfPromotions extends Component {
     };
   }
 
-  async componentDidMount() {
+  async componentDidMount () {
     const clientId = await AsyncStorage.getItem("custom:clientId1");
-    this.setState({ clientId: clientId })
+    this.setState({ clientId: clientId });
   }
 
   handlePromoId = (value) => {
     this.setState({ promoId: value });
   };
 
-  applyListPromotions() {
+  applyListPromotions () {
     const obj = {
       isActive: this.state.promoStatus,
       applicability: this.state.promoType,
       clientId: this.state.clientId
     };
-    this.setState({ loadMoreActive: false })
+    this.setState({ loadMoreActive: false });
     ReportsService.promotionsList(obj, this.state.pageNo).then((res, err) => {
       console.log(res.data, err);
       if (res.data) {
         this.setState({
           listPromotions: res.data.result.content, totalPages: res.data.result.totalPages,
           filterActive: true, modalVisible: false
-        })
-        this.continuePagination()
+        });
+        this.continuePagination();
       }
     }).catch(() => {
       alert('No Records Found');
-      this.modelCancel()
-      this.setState({ promoType: '', promoStatus: '' })
+      this.modelCancel();
+      this.setState({ promoType: '', promoStatus: '' });
     });
   }
 
@@ -96,7 +93,7 @@ export class ListOfPromotions extends Component {
     }
   };
 
-  continuePagination() {
+  continuePagination () {
     if (this.state.totalPages > 1) {
       this.setState({ loadMoreActive: true });
     }
@@ -105,31 +102,31 @@ export class ListOfPromotions extends Component {
     }
   }
 
-  filterAction() {
-    this.setState({ flagFilterListPromotions: true, modalVisible: true })
+  filterAction () {
+    this.setState({ flagFilterListPromotions: true, modalVisible: true });
   }
 
-  modelCancel() {
-    this.setState({ flagFilterListPromotions: false, modalVisible: false })
+  modelCancel () {
+    this.setState({ flagFilterListPromotions: false, modalVisible: false });
   }
 
   handlePromoType = (value) => {
     this.setState({ promoType: value });
-  }
+  };
 
   handlePromoStatus = (value) => {
     this.setState({ promoStatus: value });
-  }
+  };
 
-  clearFilterAction() {
+  clearFilterAction () {
     this.setState({
       loadMoreActive: false, loadNextActive: false,
       filterActive: false, flagFilterListPromotions: false, modalVisible: false, promoType: '', promoStatus: '', listPromotions: []
-    })
+    });
   }
 
 
-  render() {
+  render () {
     return (
       <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
         <Appbar>
@@ -144,6 +141,7 @@ export class ListOfPromotions extends Component {
             /> :
             <FilterIcon
               name="sliders"
+              color="#000"
               size={25}
               style={{ marginRight: 10 }}
               onPress={() => this.filterAction()}
@@ -160,18 +158,18 @@ export class ListOfPromotions extends Component {
           // onEndReached={this.loadMoreList}
           // onEndReachedThreshold={200}
           renderItem={({ item, index }) => (
-            <View style={[scss.flatListContainer, { backgroundColor: "#FFF" }]} >
+            <View style={[ scss.flatListContainer, { backgroundColor: "#FFF" } ]} >
               <View style={scss.flatListSubContainer}>
                 <View style={scss.textContainer}>
-                  <Text style={[scss.highText, { textAlign: 'left' }]} >PROMO ID: {item.promoId}</Text>
+                  <Text style={[ scss.highText, { textAlign: 'left' } ]} >PROMO ID: {item.promoId}</Text>
                 </View>
                 <View style={scss.textContainer}>
-                  <Text style={[scss.textStyleMedium, { textAlign: 'left' }]}>PROMO NAME: {"\n"} {item.promotionName}</Text>
-                  <Text style={[scss.textStyleMedium, { textAlign: 'right' }]} >DESCRIPTION: {"\n"}{item.description} </Text>
+                  <Text style={[ scss.textStyleMedium, { textAlign: 'left' } ]}>PROMO NAME: {"\n"} {item.promotionName}</Text>
+                  <Text style={[ scss.textStyleMedium, { textAlign: 'right' } ]} >DESCRIPTION: {"\n"}{item.description} </Text>
                 </View>
                 <View style={scss.textContainer}>
-                  <Text style={[scss.textStyleMedium, { textAlign: 'left' }]}>PROMO APPLY TYPE: {"\n"} {item.promoApplyType}</Text>
-                  <Text style={[scss.textStyleMedium, { textAlign: 'right' }]}>APPLICABILITY: {"\n"} {item.applicability}</Text>
+                  <Text style={[ scss.textStyleMedium, { textAlign: 'left' } ]}>PROMO APPLY TYPE: {"\n"} {item.promoApplyType}</Text>
+                  <Text style={[ scss.textStyleMedium, { textAlign: 'right' } ]}>APPLICABILITY: {"\n"} {item.applicability}</Text>
                 </View>
               </View>
             </View>
@@ -186,14 +184,14 @@ export class ListOfPromotions extends Component {
                   {this.state.loadPrevActive && (
                     <View style={scss.page_navigation_subcontainer}>
                       <IconMA
-                        style={[scss.pag_nav_btn]}
+                        style={[ scss.pag_nav_btn ]}
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(0)}
                         name="chevron-double-left"
                         size={25}
                       />
                       <IconMA
-                        style={[scss.pag_nav_btn]}
+                        style={[ scss.pag_nav_btn ]}
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(this.state.pageNo - 1)}
                         name="chevron-left"
@@ -205,13 +203,13 @@ export class ListOfPromotions extends Component {
                   {this.state.loadNextActive && (
                     <View style={scss.page_navigation_subcontainer}>
                       <IconMA
-                        style={[scss.pag_nav_btn]}
+                        style={[ scss.pag_nav_btn ]}
                         onPress={() => this.loadMoreList(this.state.pageNo + 1)}
                         name="chevron-right"
                         size={25}
                       />
                       <IconMA
-                        style={[scss.pag_nav_btn]}
+                        style={[ scss.pag_nav_btn ]}
                         onPress={() => this.loadMoreList(this.state.totalPages - 1)}
                         name="chevron-double-right"
                         size={25}
@@ -234,7 +232,7 @@ export class ListOfPromotions extends Component {
                 <View style={forms.filterModelSub}>
                   <KeyboardAwareScrollView >
                     <Text style={styles.headings}>{I18n.t("Promo Type")}</Text>
-                    <View style={[styles.rnSelectContainer, { width: '92%' }]}>
+                    <View style={[ styles.rnSelectContainer, { width: '92%' } ]}>
                       <RNPickerSelect
                         placeholder={{
                           label: 'Promo Type', value: ''
@@ -242,14 +240,14 @@ export class ListOfPromotions extends Component {
                         Icon={() => {
                           return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
                         }}
-                        items={[{
+                        items={[ {
                           label: "On Barcode",
                           value: "promotionForEachBarcode",
                         },
                         {
                           label: "On WholeBill",
                           value: "promotionForWholeBill",
-                        }]}
+                        } ]}
                         onValueChange={this.handlePromoType}
                         style={pickerSelectStyles}
                         value={this.state.promoType}
@@ -258,7 +256,7 @@ export class ListOfPromotions extends Component {
                     </View>
 
                     <Text style={styles.headings}>{I18n.t("Promo Status")}</Text>
-                    <View style={[styles.rnSelectContainer, { width: '92%' }]}>
+                    <View style={[ styles.rnSelectContainer, { width: '92%' } ]}>
                       <RNPickerSelect
                         placeholder={{
                           label: 'Promo Status ', value: ''
@@ -266,14 +264,14 @@ export class ListOfPromotions extends Component {
                         Icon={() => {
                           return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
                         }}
-                        items={[{
+                        items={[ {
                           label: "Active",
                           value: "true",
                         },
                         {
                           label: "In Active",
                           value: "false",
-                        }]}
+                        } ]}
                         onValueChange={this.handlePromoStatus}
                         style={pickerSelectStyles}
                         value={this.state.promoStatus}
@@ -282,11 +280,11 @@ export class ListOfPromotions extends Component {
                     </View>
 
                     <View style={forms.action_buttons_container}>
-                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
                         onPress={() => this.applyListPromotions(this.state.pageNo)}>
                         <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
                         onPress={() => this.modelCancel()}>
                         <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>

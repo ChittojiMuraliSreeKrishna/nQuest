@@ -7,18 +7,18 @@ import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
 import { Appbar } from 'react-native-paper';
-import ReportsService from '../services/ReportsService';
-import FilterIcon from 'react-native-vector-icons/FontAwesome'
-import { RH, RW } from '../../Responsive';
 import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
-import { emptyTextStyle } from '../Styles/FormFields';
-import { flatListMainContainer, flatlistSubContainer, highText, loadMoreBtn, loadmoreBtnText, textContainer, textStyleMedium, textStyleSmall } from '../Styles/Styles';
-import Loader from '../../commonUtils/loader';
-import { formatDate } from '../../commonUtils/DateFormate';
+import FilterIcon from 'react-native-vector-icons/FontAwesome';
+import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from "../../commonUtils/assets/styles/style.scss";
-import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
+import { formatDate } from '../../commonUtils/DateFormate';
+import Loader from '../../commonUtils/loader';
+import { RH } from '../../Responsive';
+import ReportsService from '../services/ReportsService';
+import { emptyTextStyle } from '../Styles/FormFields';
+import { flatListMainContainer, flatlistSubContainer, highText, textContainer, textStyleSmall } from '../Styles/Styles';
 
 
 var deviceWidth = Dimensions.get("window").width;
@@ -56,7 +56,7 @@ export class GoodsReturn extends Component {
     };
   }
 
-  componentDidMount() {
+  componentDidMount () {
     if (global.domainName === "Textile") {
       this.setState({ domainId: 1 });
     }
@@ -82,15 +82,15 @@ export class GoodsReturn extends Component {
   }
 
 
-  datepickerClicked() {
+  datepickerClicked () {
     this.setState({ datepickerOpen: true });
   }
 
-  enddatepickerClicked() {
+  enddatepickerClicked () {
     this.setState({ datepickerendOpen: true });
   }
 
-  datepickerDoneClicked() {
+  datepickerDoneClicked () {
     if (parseInt(this.state.date.getDate()) < 10 && (parseInt(this.state.date.getMonth()) < 10)) {
       this.setState({ startDate: this.state.date.getFullYear() + "-0" + (this.state.date.getMonth() + 1) + "-" + "0" + this.state.date.getDate() });
     }
@@ -108,7 +108,7 @@ export class GoodsReturn extends Component {
     this.setState({ doneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
 
-  datepickerendDoneClicked() {
+  datepickerendDoneClicked () {
     if (parseInt(this.state.enddate.getDate()) < 10 && (parseInt(this.state.enddate.getMonth()) < 10)) {
       this.setState({ endDate: this.state.enddate.getFullYear() + "-0" + (this.state.enddate.getMonth() + 1) + "-" + "0" + this.state.enddate.getDate() });
     }
@@ -124,7 +124,7 @@ export class GoodsReturn extends Component {
     this.setState({ enddoneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
 
-  applyGoodsReturn(pageNumber) {
+  applyGoodsReturn (pageNumber) {
     this.setState({ loading: true, loadMoreActive: false });
     const obj = {
       dateFrom: this.state.startDate ? this.state.startDate : undefined,
@@ -140,7 +140,7 @@ export class GoodsReturn extends Component {
     ReportsService.returnSlips(obj, pageNumber).then((res) => {
       console.log("returnSlips response", res.data);
       console.log(res.data.result.length);
-      if (res.data && res.data["isSuccess"] === "true") {
+      if (res.data && res.data[ "isSuccess" ] === "true") {
         if (res.data.result.length !== 0) {
           res.data.result.content.map((prop, i) => {
             let barcodeData = "";
@@ -153,7 +153,7 @@ export class GoodsReturn extends Component {
             }
             prop.barcodeVal = barcodeData;
             prop.review = false;
-          })
+          });
           this.setState({ filterActive: true });
           this.setState({
             loading: false,
@@ -161,24 +161,24 @@ export class GoodsReturn extends Component {
             // rsDetailsList: res.data.result.content,
             totalPages: res.data.result.totalPages
             // totalPages: res.data.totalPages,
-          })
+          });
           this.continuePagination();
-          this.modelCancel()
+          this.modelCancel();
         } else {
           alert("Results Not Found");
-          this.modelCancel()
+          this.modelCancel();
         }
       }
       else {
         alert(res.data.message);
-        this.setState({ loading: false })
-        this.modelCancel()
+        this.setState({ loading: false });
+        this.modelCancel();
       }
     }).catch((err) => {
       alert('No Records Found');
       this.setState({ loading: false });
-      this.modelCancel()
-    })
+      this.modelCancel();
+    });
   }
 
   loadMoreList = (value) => {
@@ -199,7 +199,7 @@ export class GoodsReturn extends Component {
     }
   };
 
-  continuePagination() {
+  continuePagination () {
     if (this.state.totalPages > 1) {
       this.setState({ loadMoreActive: true });
     } else {
@@ -207,7 +207,7 @@ export class GoodsReturn extends Component {
     }
   }
 
-  datepickerCancelClicked() {
+  datepickerCancelClicked () {
     this.setState({ date: new Date(), enddate: new Date(), datepickerOpen: false, datepickerendOpen: false });
   }
 
@@ -223,40 +223,40 @@ export class GoodsReturn extends Component {
     this.setState({ empId: value });
   };
 
-  handledeleteNewSale() {
+  handledeleteNewSale () {
     this.setState({ flagDeleteGoodsReturn: true, modalVisible: true });
   }
 
 
-  filterAction() {
-    this.setState({ flagFilterGoodsReturn: true, modalVisible: true })
+  filterAction () {
+    this.setState({ flagFilterGoodsReturn: true, modalVisible: true });
   }
 
-  modelCancel() {
+  modelCancel () {
     this.setState({
       flagFilterGoodsReturn: false, modalVisible: false,
       startDate: '', endDate: '',
       returnSlip: '', barCode: '',
       rtStatus: ''
-    })
+    });
   }
 
   handleRTStatus = (value) => {
-    this.setState({ rtStatus: value })
-  }
+    this.setState({ rtStatus: value });
+  };
 
-  clearFilterAction() {
+  clearFilterAction () {
     this.setState({
       loadMoreActive: false, loadNextActive: false,
       filterActive: false, flagFilterGoodsReturn: false, modalVisible: false,
       startDate: "", endDate: "",
       returnSlip: "", barCode: "",
       rtStatus: "", goodsReturn: []
-    })
+    });
   }
 
 
-  render() {
+  render () {
     return (
       <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
         <Appbar>
@@ -272,6 +272,7 @@ export class GoodsReturn extends Component {
             <FilterIcon
               name="sliders"
               size={25}
+              color="#000"
               style={{ marginRight: 10 }}
               onPress={() => this.filterAction()}
             />
@@ -285,16 +286,16 @@ export class GoodsReturn extends Component {
           keyExtractor={(item, i) => i.toString()}
           ListEmptyComponent={<Text style={emptyTextStyle}>&#9888; {I18n.t("Results not loaded")}</Text>}
           renderItem={({ item, index }) => (
-            <View style={[flatListMainContainer, { backgroundColor: "#FFF" }]} >
+            <View style={[ flatListMainContainer, { backgroundColor: "#FFF" } ]} >
               <View style={flatlistSubContainer}>
                 <View style={textContainer}>
                   <Text style={highText} >S NO: {index + 1} </Text>
                   <Text selectable={true} style={textStyleSmall}>{I18n.t("RTS NUMBER")}: {"\n"}{item.rtNumber}</Text>
-                  <Text style={textStyleSmall}>{I18n.t("BARCODE")}: {"\n"}{item && item.barcodes.length !== 0 ? item.barcodes[0].barCode : '-'}</Text>
+                  <Text style={textStyleSmall}>{I18n.t("BARCODE")}: {"\n"}{item && item.barcodes.length !== 0 ? item.barcodes[ 0 ].barCode : '-'}</Text>
                 </View>
                 <View style={textContainer}>
                   <Text style={textStyleSmall} >{I18n.t("EMP ID")}: {item.createdBy} </Text>
-                  <Text style={textStyleSmall}>{I18n.t("RTS DATE")}: {"\n"} {formatDate(item.createdInfo)}</Text>
+                  <Text style={textStyleSmall}>{I18n.t("RTS DATE & TIME")}: {"\n"} {formatDate(item.createdInfo)}</Text>
                   <Text style={textStyleSmall}>{I18n.t("AMOUNT")}: {"\n"} ₹{item.amount}</Text>
                 </View>
                 <View style={textContainer}>
@@ -317,14 +318,14 @@ export class GoodsReturn extends Component {
                   {this.state.loadPrevActive && (
                     <View style={scss.page_navigation_subcontainer}>
                       <IconMA
-                        style={[scss.pag_nav_btn]}
+                        style={[ scss.pag_nav_btn ]}
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(0)}
                         name="chevron-double-left"
                         size={25}
                       />
                       <IconMA
-                        style={[scss.pag_nav_btn]}
+                        style={[ scss.pag_nav_btn ]}
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(this.state.pageNo - 1)}
                         name="chevron-left"
@@ -336,13 +337,13 @@ export class GoodsReturn extends Component {
                   {this.state.loadNextActive && (
                     <View style={scss.page_navigation_subcontainer}>
                       <IconMA
-                        style={[scss.pag_nav_btn]}
+                        style={[ scss.pag_nav_btn ]}
                         onPress={() => this.loadMoreList(this.state.pageNo + 1)}
                         name="chevron-right"
                         size={25}
                       />
                       <IconMA
-                        style={[scss.pag_nav_btn]}
+                        style={[ scss.pag_nav_btn ]}
                         onPress={() => this.loadMoreList(this.state.totalPages - 1)}
                         name="chevron-double-right"
                         size={25}
@@ -464,11 +465,11 @@ export class GoodsReturn extends Component {
                       onChangeText={this.handleBarCode}
                     />
                     <View style={forms.action_buttons_container}>
-                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
                         onPress={() => this.applyGoodsReturn(this.state.pageNo)}>
                         <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
                         onPress={() => this.modelCancel()}>
                         <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>
