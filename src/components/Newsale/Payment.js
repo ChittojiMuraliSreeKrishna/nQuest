@@ -229,9 +229,6 @@ class Payment extends Component {
         return true;
     }
 
-    statatics() {
-        this.props.navigation.navigate('Statitics');
-    }
 
 
     menuAction() {
