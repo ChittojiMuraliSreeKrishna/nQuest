@@ -12,6 +12,7 @@ import { Text as TEXT } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconMA from 'react-native-vector-icons/MaterialIcons';
 import scss from "../commonUtils/assets/styles/Bars.scss";
+import headers from '../commonUtils/assets/styles/HeaderStyles.scss';
 import UrmService from "../components/services/UrmService";
 
 
@@ -131,7 +132,9 @@ export class TopBar extends Component {
                     }
                   }
                 });
-                this.setState({ privilages: this.state.privilages });
+                this.setState({ privilages: this.state.privilages }, () => {
+                  this.props.navigation.navigate(String(this.state.privilages[ 0 ].name));
+                });
                 console.log(this.state.privilages, "TopPtiv");
               }
             }
@@ -326,8 +329,22 @@ export class TopBar extends Component {
     this.setState({ popupModel: false });
   }
 
-  handleSubHeaderNavigation (value) {
-    this.props.navigation.navigate(String(value));
+  handleSubHeaderNavigation (value, index) {
+    if (this.state.privilages[ index ].bool === true) {
+      this.state.privilages[ index ].bool = false;
+    } else {
+      this.state.privilages[ index ].bool = true;
+    }
+    for (let i = 0; i < this.state.privilages.length; i++) {
+      if (index != i) {
+        this.state.privilages[ i ].bool = false;
+      }
+      this.setState({ privilages: this.state.privilages }, () => {
+        const { privilages } = this.state;
+        console.log({ privilages });
+        this.props.navigation.navigate(String(value));
+      });
+    }
   }
 
   render () {
@@ -460,10 +477,16 @@ export class TopBar extends Component {
           <FlatList
             horizontal
             data={this.state.privilages}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+            style={headers.pageNavigationContainer}
             renderItem={({ item, index }) => (
               <View>
-                <TouchableOpacity onPress={() => this.handleSubHeaderNavigation(item.name)}>
-                  <Text style={{ margin: 5 }}>{item.name}</Text>
+                <TouchableOpacity style={[ headers.pageNavigationBtn, {
+                  borderColor: item.bool ? "#ed1c24" : "#d7d7d7",
+                  borderBottomWidth: item.bool ? 3 : 0
+                } ]} onPress={() => this.handleSubHeaderNavigation(item.name, index)}>
+                  <Text style={headers.pageNavigationBtnText}>{item.name}</Text>
                 </TouchableOpacity>
               </View>
             )}
