@@ -968,6 +968,13 @@ class TextilePayment extends Component {
   //     }
   // }
 
+  validationCheckForPay() {
+    if (this.state.isCash === true || this.state.isCard === true || this.state.isCardOrCash === true || this.state.isUpi === true){
+      this.pay()
+    }else{
+      alert("Please Select any payment method")
+    }
+  }
   render() {
     return (
       <View style={styles.mainContainer}>
@@ -1502,7 +1509,7 @@ class TextilePayment extends Component {
                           style={forms.inputfld}
                           underlineColor="transparent"
                           activeUnderlineColor='#000'
-                          disabled 
+                          disabled
                           value={(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()}
                         />
                         <Text style={scss.textStyleLight}>Mobile Number:</Text>
@@ -1716,7 +1723,7 @@ class TextilePayment extends Component {
               <View style={styles.TopcontainerforPay}>
                 <TouchableOpacity
                   style={styles.signInButton}
-                  onPress={() => this.pay()} >
+                  onPress={() => this.validationCheckForPay()} >
 
                   <Text style={styles.signInButtonText}> Pay </Text>
                 </TouchableOpacity>

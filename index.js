@@ -92,6 +92,9 @@ axios.interceptors.response.use((response) => response, (error) => {
   console.log(error.response.status);
   if (error.response.status === 404) {
     // alert('The requested resource does not exist or has been deleted')
+    alert(error.response && error.response.data && error.response.data.message
+      ? error.response.data.message : "Something went Wrong"
+    )
   }
 
   if (error.response.status === 401) {

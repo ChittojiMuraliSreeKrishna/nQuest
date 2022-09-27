@@ -77,37 +77,37 @@ export default class Login extends Component {
     this.setState({ store: value });
   };
 
-  registerClient () {
+  registerClient() {
     // console.log('adsadasdd');
     this.props.navigation.navigate("RegisterClient");
   }
 
-  validationForm () {
+  validationForm() {
     let isFormValid = true;
     let errors = {};
 
     if (this.state.userName.length < 1) {
       isFormValid = false;
-      errors[ "userName" ] = urmErrorMessages.loginUserName;
+      errors["userName"] = urmErrorMessages.loginUserName;
       this.setState({ userValid: false });
     }
     if (this.state.password.length < 1) {
       isFormValid = false;
-      errors[ "password" ] = urmErrorMessages.password;
+      errors["password"] = urmErrorMessages.password;
       this.setState({ passwordValid: false });
     }
 
     this.setState({ errors: errors });
     return isFormValid;
   }
-  clearAllData () {
+  clearAllData() {
     AsyncStorage.clear();
     AsyncStorage.getAllKeys()
       .then(keys => AsyncStorage.multiRemove(keys));
 
   }
 
-  async login () {
+  async login() {
     const isFormValid = this.validationForm();
     const { userName, password } = this.state;
     if (isFormValid) {
@@ -125,7 +125,7 @@ export default class Login extends Component {
             if (res.data.authenticationResult) {
               // Token
               const token = res.data.authenticationResult.idToken;
-              AsyncStorage.setItem("username", jwt_decode(token)[ "name" ]);
+              AsyncStorage.setItem("username", jwt_decode(token)["name"]);
               console.log("Token", jwt_decode(token));
               AsyncStorage.setItem("tokenkey", JSON.stringify(token)).catch(
                 (err) => {
@@ -139,7 +139,7 @@ export default class Login extends Component {
                   Authorization: "Bearer" + " " + finalToken,
                 };
               });
-              AsyncStorage.setItem("userId", jwt_decode(token)[ "custom:userId" ])
+              AsyncStorage.setItem("userId", jwt_decode(token)["custom:userId"])
                 .then(() => { })
                 .catch(() => {
                   this.setState({ loading: false });
@@ -147,7 +147,7 @@ export default class Login extends Component {
                 });
               AsyncStorage.setItem(
                 "rolename",
-                jwt_decode(token)[ "custom:roleName" ],
+                jwt_decode(token)["custom:roleName"],
               )
                 .then(() => { })
                 .catch(() => {
@@ -156,7 +156,7 @@ export default class Login extends Component {
                 });
               AsyncStorage.setItem(
                 "phone_number",
-                jwt_decode(token)[ "phone_number" ],
+                jwt_decode(token)["phone_number"],
               )
                 .then(() => { })
                 .catch((err) => {
@@ -165,7 +165,7 @@ export default class Login extends Component {
                 });
               AsyncStorage.setItem(
                 "custom:clientId1",
-                jwt_decode(token)[ "custom:clientId1" ],
+                jwt_decode(token)["custom:clientId1"],
               )
                 .then(() => {
                   // console.log
@@ -183,7 +183,7 @@ export default class Login extends Component {
               });
               AsyncStorage.setItem(
                 "custom:isEsSlipEnabled",
-                jwt_decode(token)[ "custom:isEsSlipEnabled" ],
+                jwt_decode(token)["custom:isEsSlipEnabled"],
               )
                 .then(() => { })
                 .catch(() => {
@@ -191,10 +191,19 @@ export default class Login extends Component {
                   console.log("There is error saving isEsSlipEnabled");
                 });
               AsyncStorage.setItem(
+                "custom:isTaxIncluded",
+                jwt_decode(token)["custom:isTaxIncluded"],
+              )
+                .then(() => { })
+                .catch(() => {
+                  this.setState({ loading: false });
+                  console.log("There is error saving isTaxIncluded");
+                });
+              AsyncStorage.setItem(
                 "roleType",
-                jwt_decode(token)[ "custom:roleName" ],
+                jwt_decode(token)["custom:roleName"],
               );
-              let storesAssigned = jwt_decode(token)[ "custom:assignedStores" ];
+              let storesAssigned = jwt_decode(token)["custom:assignedStores"];
 
               AsyncStorage.getItem("roleType").then((value) => {
                 console.log("Roles", value);
@@ -209,10 +218,10 @@ export default class Login extends Component {
                       .map((pair) => pair.split(":"));
                     let store = [];
                     table.forEach((ele, index) => {
-                      if ((ele[ 0 ], ele[ 1 ])) {
+                      if ((ele[0], ele[1])) {
                         const obj = {
-                          name: ele[ 0 ],
-                          id: ele[ 1 ],
+                          name: ele[0],
+                          id: ele[1],
                         };
                         store.push(obj);
                       }
@@ -235,7 +244,7 @@ export default class Login extends Component {
                   : "";
                 this.props.navigation.navigate("ManagePassword", {
                   session: res.data.session,
-                  roleName: roleData[ "custom:roleName" ],
+                  roleName: roleData["custom:roleName"],
                   userName: this.state.userName,
                   password: this.state.password,
                 });
@@ -256,17 +265,17 @@ export default class Login extends Component {
     }
   }
 
-  getAdminStores () {
+  getAdminStores() {
     LoginService.getUserStores().then((res) => {
       console.log("getting Stores", res);
       if (res.data.length > 1) {
         this.props.navigation.navigate("SelectStore");
       } else {
-        AsyncStorage.setItem("storeId", String(res.data[ 0 ].id)).catch(
+        AsyncStorage.setItem("storeId", String(res.data[0].id)).catch(
           (err) => { },
         );
-        global.storeName = String(res.data[ 0 ].name);
-        AsyncStorage.setItem("storeName", String(res.data[ 0 ].name)).catch(
+        global.storeName = String(res.data[0].name);
+        AsyncStorage.setItem("storeName", String(res.data[0].name)).catch(
           (err) => { },
         );
         AsyncStorage.getItem("rolename").then((name) => {
@@ -282,7 +291,7 @@ export default class Login extends Component {
     });
   }
 
-  async getStores () {
+  async getStores() {
     let userId = await AsyncStorage.getItem("userId");
     LoginService.getSelectStores(userId).then((res) => {
       console.warn("storeStatus", res.status);
@@ -292,8 +301,8 @@ export default class Login extends Component {
         if (storeData.length > 1) {
           this.props.navigation.navigate("SelectStore");
         } else {
-          const storeId = String(storeData[ 0 ].id);
-          const storeName = String(storeData[ 0 ].name);
+          const storeId = String(storeData[0].id);
+          const storeName = String(storeData[0].name);
           AsyncStorage.setItem("storeId", storeId);
           global.storeName = storeName;
           AsyncStorage.getItem("rolename").then((name) => {
@@ -310,13 +319,13 @@ export default class Login extends Component {
     });
   }
 
-  forgotPassword () {
+  forgotPassword() {
     this.props.navigation.navigate("ForgotPassword", {
       username: this.state.userName,
     });
   }
 
-  componentDidMount () {
+  componentDidMount() {
     // this.refresh()
     this.clearAllData();
   }
@@ -333,7 +342,7 @@ export default class Login extends Component {
   };
 
 
-  render () {
+  render() {
     const userValid = this.state.userValid;
     const passValid = this.state.passwordValid;
     return (
@@ -376,7 +385,7 @@ export default class Login extends Component {
                   }}
                 />
                 {!userValid && (
-                  <Message imp={true} message={this.state.errors[ "userName" ]} />
+                  <Message imp={true} message={this.state.errors["userName"]} />
                 )}
                 <Text style={scss.input_heading}>{I18n.t("Password")}</Text>
                 <TextInput
@@ -398,7 +407,7 @@ export default class Login extends Component {
                   }}
                 />
                 {!passValid && (
-                  <Message imp={true} message={this.state.errors[ "password" ]} />
+                  <Message imp={true} message={this.state.errors["password"]} />
                 )}
 
                 <View>
