@@ -40,11 +40,11 @@ class CustomerService {
   }
 
   getDsSlip(esnumber, flag, storeId) {
-    let params = esnumber + flag + storeId;
-    console.log({ params });
     if (flag) {
       const param = '?dsNumber=' + esnumber;
-      return axios.get(BASE_URL + NEW_SALE_URL.getDslipData + param);
+      const url = BASE_URL + NEW_SALE_URL.getDslipData + param
+      console.log("url get Dsslip",url);
+      return axios.get(url);
     } else {
       const param = '?barcode=' + esnumber + '&storeId=' + storeId;
       return axios.get(BASE_URL + NEW_SALE_URL.getDsAsbarcode + param);
