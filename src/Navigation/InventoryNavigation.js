@@ -6,8 +6,11 @@ import AddBarcode from "../components/Inventory/AddBarcode";
 import AddProductCombo from "../components/Inventory/AddProductCombo";
 import Barcode from "../components/Inventory/Barcode";
 import EditBarcode from "../components/Inventory/EditBarcode";
+import GoodsTransfer from "../components/Inventory/GoodsTransfer";
+import OrderShipment from "../components/Inventory/OrderShipment";
 import ProductCombo from "../components/Inventory/ProductCombo";
 import ReBarcode from "../components/Inventory/ReBarcode";
+import RecieveOrder from "../components/Inventory/RecieveOrder";
 import ViewReBarcode from "../components/Inventory/ViewReBarcode";
 const Stack = createStackNavigator();
 export default class InventoryNavigation extends Component {
@@ -24,7 +27,7 @@ export default class InventoryNavigation extends Component {
   render () {
     return (
       <>
-        <Stack.Navigator>
+        <Stack.Navigator initialRouteName="Blank">
           <Stack.Screen
             name="Blank"
             options={{ headerShown: false }}
@@ -49,6 +52,19 @@ export default class InventoryNavigation extends Component {
             name="AddBarcode"
             options={{ headerShown: false }}
             component={AddBarcode}
+          />
+          <Stack.Screen
+            name="Receive Order"
+            options={{ headerShown: false }}
+            component={RecieveOrder}
+          /><Stack.Screen
+            name="Goods Transfer"
+            options={{ headerShown: false }}
+            component={GoodsTransfer}
+          /><Stack.Screen
+            name="Order Shipment"
+            options={{ headerShown: false }}
+            component={OrderShipment}
           />
           <Stack.Screen
             name="EditBarcode"

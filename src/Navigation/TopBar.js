@@ -30,6 +30,7 @@ export const screenMapping = {
   "Accounting Portal": "AccountingNaviagtion",
   "Reports": "ReportsNavigation",
   "URM Portal": "UrmNavigation",
+  "Ticketing Portal": "TicketingNavigation"
 };
 
 const GetImageBasedOnPrevilageName = (name) => {
@@ -251,6 +252,9 @@ export class TopBar extends Component {
                     }
                     if (previlage.name === "URM Portal") {
                       global.previlage7 = "URM Portal";
+                    }
+                    if (previlage.name === "Ticketing Portal") {
+                      global.previlage7 = "Ticketing Portal";
                     }
                     privilegesSet.add(previlage.name);
                     // data.push(previlage.name);user1

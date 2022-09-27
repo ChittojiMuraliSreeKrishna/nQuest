@@ -18,7 +18,7 @@ export default class AccountingNaviagtion extends Component {
   render () {
     return (
       <>
-        <Stack.Navigator initialRouteName="AccountManagement">
+        <Stack.Navigator initialRouteName="Blank">
           <Stack.Screen
             name="Blank"
             options={{ headerShown: false }}
