@@ -8,6 +8,7 @@ import UpdateNewpassword from "../components/Login/UpdateNewpassword";
 import ManagePassword from "../components/URM/ManagePassword";
 import RegisterClient from "../components/URM/RegisterClient";
 import LoginAfterLanguageSelect from "../components/Welcome/LoginAfterLanguageSelect";
+import InventoryNavigation from "./InventoryNavigation";
 import TopBarNavigation from "./TopBarNavigation";
 
 const Stack = createStackNavigator();
@@ -24,6 +25,11 @@ export default class HomeNavigation extends React.Component {
           name="Login"
           options={{ headerShown: false, gestureEnabled: false }}
           component={Login}
+        />
+        <Stack.Screen
+          name="Inventory"
+          options={{ headerShown: false, gestureEnabled: false }}
+          component={InventoryNavigation}
         />
         <Stack.Screen
           name="LoginAfterLanguageSelect"

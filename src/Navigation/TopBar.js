@@ -326,6 +326,10 @@ export class TopBar extends Component {
     this.setState({ popupModel: false });
   }
 
+  handleSubHeaderNavigation (value) {
+    this.props.navigation.navigate(String(value));
+  }
+
   render () {
     displayName =
       currentSelection === "" ? this.state.firstDisplayName : currentSelection;
@@ -458,7 +462,9 @@ export class TopBar extends Component {
             data={this.state.privilages}
             renderItem={({ item, index }) => (
               <View>
-                <Text style={{ margin: 5 }}>{item.name}</Text>
+                <TouchableOpacity onPress={() => this.handleSubHeaderNavigation(item.name)}>
+                  <Text style={{ margin: 5 }}>{item.name}</Text>
+                </TouchableOpacity>
               </View>
             )}
           />
