@@ -186,10 +186,10 @@ export class ListOfEstimationSlip extends Component {
           this.setState({ filterActive: true });
           this.setState({ estimationSlips: res.data.result.deliverySlip.content, totalPages: res.data.result.deliverySlip.totalPages });
           this.setState({ modalVisible: false, flagFilterOpen: false });
+          this.continuePagination()
         } else {
           alert("records not found");
         }
-        this.continuePagination()
         console.log(this.props.estimationSlip);
       }
       else {
@@ -238,7 +238,9 @@ export class ListOfEstimationSlip extends Component {
   }
 
   clearFilterAction() {
-    this.setState({ filterActive: false, estimationSlips: [], fromDate: "", toDate: "", dsStatus: "", dsNumber: "", barcode: "", flagViewDetail: false, flagFilterOpen: false });
+    this.setState({ 
+      loadMoreActive: false, loadNextActive: false,
+      filterActive: false, estimationSlips: [], fromDate: "", toDate: "", dsStatus: "", dsNumber: "", barcode: "", flagViewDetail: false, flagFilterOpen: false });
   }
 
   closeViewAction() {

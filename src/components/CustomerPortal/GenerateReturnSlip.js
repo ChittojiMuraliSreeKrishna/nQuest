@@ -479,27 +479,9 @@ export default class GenerateReturnSlip extends Component {
             <Modal style={{ margin: 0 }} isVisible={this.state.modelVisible}
               onBackButtonPress={() => this.modelCancel()}
               onBackdropPress={() => this.modelCancel()} >
-              <View style={[Device.isTablet ? styles.filterMainContainer_tablet : styles.filterMainContainer_mobile, { height: Device.isTablet ? 400 : 320, marginTop: Device.isTablet ? deviceheight - 400 : deviceheight - 320, paddingBottom: Device.isTablet ? 0 : 20 }]}>
-                <View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
-                    <View>
-                      <Text style={{ marginTop: 15, fontSize: Device.isTablet ? 22 : 17, marginLeft: 20 }} > {I18n.t("Tag Customer")} </Text>
-                    </View>
-                    <View>
-                      <TouchableOpacity style={{ width: Device.isTablet ? 60 : 50, height: Device.isTablet ? 60 : 50, marginTop: Device.isTablet ? 20 : 15, }} onPress={() => this.modelCancel()}>
-                        <Image style={{ margin: 5 }} source={require('../assets/images/modelcancel.png')} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                  <Text style={{
-                    height: Device.isTablet ? 2 : 1,
-                    width: deviceWidth,
-                    backgroundColor: 'lightgray',
-                  }}></Text>
-                </View>
-
-
-                <View>
+              <View style={forms.filterModelContainer} >
+                <Text style={forms.popUp_decorator}>-</Text>
+                <View style={forms.filterModelSub}>
                   <Text style={{
                     height: Device.isTablet ? 40 : 20,
                     textAlign: 'center',
@@ -509,7 +491,7 @@ export default class GenerateReturnSlip extends Component {
                     color: '#353C40'
                   }}> {I18n.t("Please provide customer phone number")}  </Text>
                   <TextInput
-                    style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
+                    style={forms.inputfld}
                     mode="flat"
                     activeUnderlineColor='#000'
                     underlineColor={'#6f6f6f'}

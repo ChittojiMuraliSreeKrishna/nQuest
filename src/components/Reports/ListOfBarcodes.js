@@ -48,10 +48,15 @@ export class ListOfBarcodes extends Component {
       listBarcodes: [],
       filterActive: false,
       viewBarcodeList: [],
+      loadMoreActive: false,
+      totalPages: 0,
+      pageNo: 0,
+      loadPrevActive: false,
+      loadNextActive: true
     };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     AsyncStorage.getItem("storeId").then((value) => {
       storeStringId = value;
       this.setState({ storeId: parseInt(storeStringId) });
@@ -74,26 +79,27 @@ export class ListOfBarcodes extends Component {
     });
   }
 
-  filterAction () {
+  filterAction() {
     this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
-  clearFilterAction () {
+  clearFilterAction() {
     this.setState({
+      loadMoreActive: false, loadNextActive: false,
       filterActive: false, listBarcodes: [], startDate: "", endDate: "", empId: "", fromPrice: "", toPrice: "", barCode: "", flagFilterOpen: false, flagViewDetail: false
     });
   }
 
 
-  datepickerClicked () {
+  datepickerClicked() {
     this.setState({ datepickerOpen: true });
   }
 
-  enddatepickerClicked () {
+  enddatepickerClicked() {
     this.setState({ datepickerendOpen: true });
   }
 
-  datepickerDoneClicked () {
+  datepickerDoneClicked() {
     if (parseInt(this.state.date.getDate()) < 10 && (parseInt(this.state.date.getMonth()) < 10)) {
       this.setState({ startDate: this.state.date.getFullYear() + "-0" + (this.state.date.getMonth() + 1) + "-" + "0" + this.state.date.getDate() });
     }
@@ -111,7 +117,7 @@ export class ListOfBarcodes extends Component {
     this.setState({ doneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
 
-  datepickerendDoneClicked () {
+  datepickerendDoneClicked() {
     if (parseInt(this.state.enddate.getDate()) < 10 && (parseInt(this.state.enddate.getMonth()) < 10)) {
       this.setState({ endDate: this.state.enddate.getFullYear() + "-0" + (this.state.enddate.getMonth() + 1) + "-" + "0" + this.state.enddate.getDate() });
     }
@@ -127,7 +133,7 @@ export class ListOfBarcodes extends Component {
     this.setState({ enddoneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
 
-  datepickerCancelClicked () {
+  datepickerCancelClicked() {
     this.setState({ date: new Date(), enddate: new Date(), datepickerOpen: false, datepickerendOpen: false });
   }
 
@@ -151,7 +157,7 @@ export class ListOfBarcodes extends Component {
     this.setState({ toPrice: value });
   };
 
-  applyListBarcodes () {
+  applyListBarcodes() {
     if (this.state.startDate === "") {
       this.state.startDate = null;
     }
@@ -183,14 +189,19 @@ export class ListOfBarcodes extends Component {
     };
     console.log('params are' + JSON.stringify(obj));
     let pageNumber = 0;
-    ReportsService.getListOfBarcodes(obj, pageNumber).then((res) => {
-      console.log(res.data.result);
-      if (res.data && res.data[ "isSuccess" ] === "true") {
+    ReportsService.getListOfBarcodes(obj, this.state.pageNo).then((res) => {
+      console.log(res.data.result.totalPages);
+      if (res.data && res.data["isSuccess"] === "true") {
         if (res.data.result.length !== 0) {
-          this.setState({ listBarcodes: res.data.result.content, filterActive: true, modalVisible: false, flagFilterOpen: false });
+          this.setState({
+            listBarcodes: res.data.result.content,
+            totalPages:res.data.result.totalPages,
+            filterActive: true, modalVisible: false, flagFilterOpen: false
+          });
         } else {
           alert("records not found");
         }
+        this.continuePagination()
       }
       else {
         alert(res.data.message);
@@ -204,30 +215,58 @@ export class ListOfBarcodes extends Component {
     });
   }
 
-  modelCancel () {
+  loadMoreList = (value) => {
+    if (value >= 0 && value < this.state.totalPages) {
+      this.setState({ pageNo: value }, () => {
+        this.applyListBarcodes();
+        if (this.state.pageNo === (this.state.totalPages - 1)) {
+          this.setState({ loadNextActive: false });
+        } else {
+          this.setState({ loadNextActive: true });
+        }
+        if (this.state.pageNo === 0) {
+          this.setState({ loadPrevActive: false });
+        } else {
+          this.setState({ loadPrevActive: true });
+        }
+      });
+    }
+  };
+
+  continuePagination() {
+    if (this.state.totalPages > 1) {
+      this.setState({ loadMoreActive: true });
+    }
+    else {
+      this.setState({ loadMoreActive: false, loadNextActive: false });
+    }
+  }
+
+
+  modelCancel() {
     this.setState({ flagFilterOpen: false, modalVisible: false });
   }
 
-  estimationModelCancel () {
+  estimationModelCancel() {
     this.setState({ modalVisible: false });
   }
 
-  handledeleteBarcode () {
+  handledeleteBarcode() {
     this.setState({ flagdelete: true, modalVisible: true, flagViewDetail: false });
   }
 
-  handleviewBarcode (item, index) {
+  handleviewBarcode(item, index) {
     console.log({ item });
     this.state.viewBarcodeList.push(item);
     this.setState({ viewBarcodeList: this.state.viewBarcodeList });
     this.setState({ flagViewDetail: true, modalVisible: true, flagdelete: false });
   }
 
-  closeViewAction () {
+  closeViewAction() {
     this.setState({ flagViewDetail: false, viewBarcodeList: [] });
   }
 
-  render () {
+  render() {
     return (
       <View>
         <FlatList
@@ -243,7 +282,7 @@ export class ListOfBarcodes extends Component {
                   onPress={() => this.clearFilterAction()}
                 ></IconFA> :
                 <IconFA
-                  style={[ scss.action_icons, { marginRight: 10 } ]}
+                  style={[scss.action_icons, { marginRight: 10 }]}
                   name="sliders"
                   size={25}
                   onPress={() => this.filterAction()}
@@ -274,7 +313,7 @@ export class ListOfBarcodes extends Component {
                   <View style={scss.flatListFooter}>
                     <Text style={scss.footerText}>
                       {I18n.t("DATE")}:
-                      {item.lastModifiedDate ? item.lastModifiedDate.toString().split(/T/)[ 0 ]
+                      {item.lastModifiedDate ? item.lastModifiedDate.toString().split(/T/)[0]
                         : item.lastModifiedDate}
                     </Text>
                     <View style={{ marginRight: Device.isTablet ? RW(30) : RW(20) }}>
@@ -290,6 +329,52 @@ export class ListOfBarcodes extends Component {
               </View>
             </ScrollView>
           )
+          }
+          ListFooterComponent={
+            this.state.loadMoreActive && (
+              <View style={scss.page_navigation_container}>
+                <View style={scss.page_navigation_subcontainer}>
+                  <Text style={scss.page_nav_text}>{`Page: ${this.state.pageNo + 1} - ${this.state.totalPages}`}</Text>
+                </View>
+                <View style={scss.page_navigation_subcontainer}>
+                  {this.state.loadPrevActive && (
+                    <View style={scss.page_navigation_subcontainer}>
+                      <IconMA
+                        style={[scss.pag_nav_btn]}
+                        color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
+                        onPress={() => this.loadMoreList(0)}
+                        name="chevron-double-left"
+                        size={25}
+                      />
+                      <IconMA
+                        style={[scss.pag_nav_btn]}
+                        color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
+                        onPress={() => this.loadMoreList(this.state.pageNo - 1)}
+                        name="chevron-left"
+                        size={25}
+                      />
+                    </View>
+                  )}
+                  <Text style={scss.page_nav_pageno}>{this.state.pageNo + 1}</Text>
+                  {this.state.loadNextActive && (
+                    <View style={scss.page_navigation_subcontainer}>
+                      <IconMA
+                        style={[scss.pag_nav_btn]}
+                        onPress={() => this.loadMoreList(this.state.pageNo + 1)}
+                        name="chevron-right"
+                        size={25}
+                      />
+                      <IconMA
+                        style={[scss.pag_nav_btn]}
+                        onPress={() => this.loadMoreList(this.state.totalPages - 1)}
+                        name="chevron-double-right"
+                        size={25}
+                      />
+                    </View>
+                  )}
+                </View>
+              </View>
+            )
           }
         />
 
@@ -423,11 +508,11 @@ export class ListOfBarcodes extends Component {
                       />
                       <View style={forms.action_buttons_container}>
 
-                        <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                        <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                           onPress={() => this.applyListBarcodes()}>
                           <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                        <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
                           onPress={() => this.modelCancel()}>
                           <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                         </TouchableOpacity>

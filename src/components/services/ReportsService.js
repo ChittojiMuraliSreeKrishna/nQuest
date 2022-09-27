@@ -21,12 +21,11 @@ class ReportsService {
 
   getListOfBarcodes(data, pageNumber) {
     const param = '?page=' + pageNumber
-    return axios.post(BASE_URL + REPORTS_URL.listOfBarcodes + param, data)
+    return axios.post(BASE_URL + REPORTS_URL.listOfBarcodes + param + '&size=10', data)
   }
 
   promotionsList(data, pageNumber) {
     const param = '?page=' + pageNumber
-    console.log("param", param, data);
     return axios.post(BASE_URL + '/connection-pool/promo/promotionsSearching' + param + '&size=10', data)
   }
 

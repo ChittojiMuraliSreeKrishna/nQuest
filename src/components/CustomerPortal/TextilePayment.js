@@ -10,6 +10,7 @@ import Modal from "react-native-modal";
 import { Appbar } from 'react-native-paper';
 import RazorpayCheckout from 'react-native-razorpay';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
+import scss from '../../commonUtils/assets/styles/style.scss'
 import Loader from '../../commonUtils/loader';
 import LoginService from '../services/LoginService';
 import NewSaleService from '../services/NewSaleService';
@@ -1394,7 +1395,7 @@ class TextilePayment extends Component {
 
             {this.state.flagredeem && (
               <View>
-                <Modal isVisible={this.state.modalVisible}
+                <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
                   onBackButtonPress={() => this.modelCancel()}
                   onBackdropPress={() => this.modelCancel()} >
 
@@ -1489,49 +1490,44 @@ class TextilePayment extends Component {
 
             {this.state.upiToCustomerModel && (
               <View>
-                <Modal isVisible={this.state.upiModelVisible}
+                <Modal isVisible={this.state.upiModelVisible} style={{ margin: 0 }}
                   onBackButtonPress={() => this.cancelUpiModel()}
                   onBackdropPress={() => this.cancelUpiModel()} >
-                  <View style={styles.filterMainContainer}>
-                    <KeyboardAwareScrollView enableOnAndroid={true} >
-                      <View style={{ backgroundColor: '#F4F6FA' }}>
-                        <Text style={Device.isTablet ? styles.filterByTitle_tablet : styles.filterByTitle_mobile} > UPI </Text>
-                        <TouchableOpacity style={Device.isTablet ? styles.filterCloseButton_tablet : styles.filterCloseButton_mobile} onPress={() => this.modelCancel()}>
-                          <Image style={styles.modelCloseImage} source={require('../assets/images/modelcancel.png')} />
-                        </TouchableOpacity>
-                        <Text style={Device.isTablet ? styles.filterByTitleDecoration_tablet : styles.filterByTitleDecoration_mobile}>
-                        </Text>
-                      </View>
-                      <Text style={{ alignItems: 'center', fontSize: Device.isTablet ? 20 : 15, marginLeft: 20 }}>Net Payable Amount:</Text>
-                      <TextInput
-                        style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                        underlineColor="transparent"
-                        activeUnderlineColor='#000'
-                        editable={false} selectTextOnFocus={false}
-                        value={(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()}
-                      />
-                      <Text style={{ alignItems: 'center', fontSize: Device.isTablet ? 20 : 15, marginLeft: 20 }}>Mobile Number:</Text>
-                      <TextInput
-                        style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                        underlineColor="transparent"
-                        label={"MOBILE NUMBER"}
-                        activeUnderlineColor='#000'
-                        keyboardType='decimal-pad'
-                        maxLength={10}
-                        value={this.state.upiMobileNumber}
-                        onChangeText={(text) => this.handleUpiMobileNumber(text)}
-                      />
-                      <View style={forms.action_buttons_container}>
-                        <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
-                          onPress={() => this.getUPILink()}>
-                          <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
-                          onPress={() => this.cancelUpiModel()}>
-                          <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </KeyboardAwareScrollView>
+                  <View style={forms.filterModelContainer} >
+                    <Text style={forms.popUp_decorator}>-</Text>
+                    <View style={forms.filterModelSub}>
+                      <KeyboardAwareScrollView >
+                        <Text style={scss.textStyleLight}>Net Payable Amount:</Text>
+                        <TextInput
+                          style={forms.inputfld}
+                          underlineColor="transparent"
+                          activeUnderlineColor='#000'
+                          disabled 
+                          value={(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()}
+                        />
+                        <Text style={scss.textStyleLight}>Mobile Number:</Text>
+                        <TextInput
+                          style={forms.inputfld}
+                          underlineColor="transparent"
+                          label={"MOBILE NUMBER"}
+                          activeUnderlineColor='#000'
+                          keyboardType='decimal-pad'
+                          maxLength={10}
+                          value={this.state.upiMobileNumber}
+                          onChangeText={(text) => this.handleUpiMobileNumber(text)}
+                        />
+                        <View style={forms.action_buttons_container}>
+                          <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                            onPress={() => this.getUPILink()}>
+                            <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                            onPress={() => this.cancelUpiModel()}>
+                            <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </KeyboardAwareScrollView>
+                    </View>
                   </View>
                 </Modal>
               </View>
@@ -1540,48 +1536,44 @@ class TextilePayment extends Component {
 
             {this.state.khataToCustomerModel && (
               <View>
-                <Modal isVisible={this.state.kathaModelVisible}
+                <Modal isVisible={this.state.kathaModelVisible} style={{ margin: 0 }}
                   onBackButtonPress={() => this.cancelKathaModel()}
                   onBackdropPress={() => this.cancelKathaModel()} >
-                  <View style={styles.filterMainContainer}>
-                    <KeyboardAwareScrollView enableOnAndroid={true} >
-                      <Text style={Device.isTablet ? styles.filterByTitle_tablet : styles.filterByTitle_mobile} > Katha Payment </Text>
-                      <TouchableOpacity style={Device.isTablet ? styles.filterCloseButton_tablet : styles.filterCloseButton_mobile} onPress={() => this.cancelKathaModel()}>
-                        <Image style={styles.modelCloseImage} source={require('../assets/images/modelcancel.png')} />
-                      </TouchableOpacity>
-                      <Text style={Device.isTablet ? styles.filterByTitleDecoration_tablet : styles.filterByTitleDecoration_mobile}>
-                      </Text>
-                      <Text style={{ fontSize: Device.isTablet ? 20 : 15, padding: 10 }}>Adding Payment Details on Katha</Text>
-
-                      <TextInput
-                        style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                        underlineColor="transparent"
-                        activeUnderlineColor='#000'
-                        editable={false} selectTextOnFocus={false}
-                        value={(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()}
-                      />
-                      <View style={forms.action_buttons_container}>
-                        <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
-                          onPress={() => this.confirmKathaModel()}>
-                          <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
-                          onPress={() => this.cancelKathaModel()}>
-                          <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </KeyboardAwareScrollView>
+                  <View style={forms.filterModelContainer} >
+                    <Text style={forms.popUp_decorator}>-</Text>
+                    <View style={forms.filterModelSub}>
+                      <KeyboardAwareScrollView >
+                        <Text style={scss.textStyleLight}>Adding Payment Details on Katha</Text>
+                        <TextInput
+                          style={forms.inputfld}
+                          underlineColor="transparent"
+                          activeUnderlineColor='#000'
+                          editable={false} selectTextOnFocus={false}
+                          value={(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()}
+                        />
+                        <View style={forms.action_buttons_container}>
+                          <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                            onPress={() => this.confirmKathaModel()}>
+                            <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                            onPress={() => this.cancelKathaModel()}>
+                            <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </KeyboardAwareScrollView>
+                    </View>
                   </View>
                 </Modal>
               </View>)}
 
             {this.state.gvToCustomerModel && (
               <View>
-                <Modal isVisible={this.state.modelVisible}
+                <Modal isVisible={this.state.modelVisible} style={{ margin: 0 }}
                   onBackButtonPress={() => this.modelCancel()}
                   onBackdropPress={() => this.modelCancel()} >
                   <View style={styles.filterMainContainer}>
-                    <KeyboardAwareScrollView enableOnAndroid={true} >
+                    <KeyboardAwareScrollView >
                       <Text style={Device.isTablet ? styles.filterByTitle_tablet : styles.filterByTitle_mobile} > Issue GV Number </Text>
                       <TouchableOpacity style={Device.isTablet ? styles.filterCloseButton_tablet : styles.filterCloseButton_mobile} onPress={() => this.modelCancel()}>
                         <Image style={styles.modelCloseImage} source={require('../assets/images/modelcancel.png')} />
