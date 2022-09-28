@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { TextInput } from 'react-native-paper';
@@ -205,92 +205,94 @@ export default class AddCustomer extends Component {
     const { nameValid, mobileValid, emailValid, gstValid } = this.state;
 
     return (
-      <View style={{ backgroundColor: '#FFFFFF' }}>
-        <Text style={Device.isTablet ? styles.headerText_tablet : styles.hederText_mobile}>{I18n.t("Personal Details")}</Text>
-        <Text style={styles.headings}>{I18n.t("Customer Name")} <Text style={{ color: 'red' }}>*</Text></Text>
-        <TextInput
-          style={nameValid ? Device.isTablet ? styles.input_tablet : styles.input_mobile : Device.isTablet ? styles.inputError_tablet : styles.inputError_mobile}
-          mode="outlined"
-          activeOutlineColor='#d6d6d6'
-          outlineColor={nameValid ? '#d6d6d6' : "#dd0000"}
-          label={I18n.t('CUSTOMER NAME')}
-          maxLength={25}
-          // onBlur={this.handleNameValid}
-          value={this.state.name}
-          onChangeText={(text) => this.handleCustomerName(text)}
-        />
-        {!nameValid && <Message imp={true} message={this.state.errors[ "name" ]} />}
-        <Text style={styles.headings}>{I18n.t("Mobile Number")} <Text style={{ color: 'red' }}>*</Text></Text>
-        <TextInput
-          style={mobileValid ? Device.isTablet ? styles.input_tablet : styles.input_mobile : Device.isTablet ? styles.inputError_tablet : styles.inputError_mobile}
-          mode="outlined"
-          activeOutlineColor='#d6d6d6'
-          outlineColor={mobileValid ? '#d6d6d6' : "#dd0000"}
-          label={I18n.t('MOBILE NUMBER')}
-          maxLength={10}
-          keyboardType='phone-pad'
-          // onBlur={this.handleMobileValid}
-          textContentType='telephoneNumber'
-          value={mobileNumber}
-          onChangeText={(text) => this.handleMobileNumber(text)}
-        />
-        {!mobileValid && <Message imp={true} message={this.state.errors[ "mobile" ]} />}
-        <Text style={styles.headings}>{I18n.t("Email")}</Text>
-        <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-          mode="outlined"
-          activeOutlineColor='#d6d6d6'
-          outlineColor={emailValid ? '#d6d6d6' : "#dd0000"}
-          label={I18n.t('EMAIL')}
-          keyboardType='email-address'
-          autoCapitalize='none'
-          value={this.state.email}
-          onChangeText={(text) => this.handleEmail(text)}
-        />
-        {!emailValid && <Message imp={false} message={this.state.errors[ "email" ]} />}
-        <Text style={styles.headings}>{I18n.t("Address")}</Text>
-        <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-          mode="outlined"
-          activeOutlineColor='#d6d6d6'
-          outlineColor='#d6d6d6'
-          label={I18n.t('ADDRESS')}
-          value={this.state.address}
-          onChangeText={(text) => this.handleAddress(text)}
-        />
-        <Text style={styles.headings}>{I18n.t("GST Number")}</Text>
-        <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-          mode="outlined"
-          activeOutlineColor='#d6d6d6'
-          outlineColor='#d6d6d6'
-          label={I18n.t('GST Number')}
-          value={this.state.gstNumber}
-          onBlur={(text) => this.handleGstNumberValid(text)}
-          onChangeText={(text) => this.handleGstNumber(text)}
-        />
-        {!gstValid && <Message imp={false} message={this.state.errors[ "gst" ]} />}
-        <Text style={styles.headings}>{I18n.t("Gender")}</Text>
-        <View style={rnPickerContainer}>
-          <RNPickerSelect
-            // style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
-            placeholder={{ label: 'GENDER', value: '' }}
-            Icon={() => {
-              return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-            }}
-            items={[
-              { label: 'Male', value: 'male' },
-              { label: 'Female', value: 'female' },
-            ]}
-            onValueChange={this.handlegender}
-            style={rnPicker}
-            value={this.state.gender}
-            useNativeAndroidPickerStyle={false}
+      <View style={{ backgroundColor: '#FFFFFF', flex: 1 }}>
+        <ScrollView>
+          <Text style={Device.isTablet ? styles.headerText_tablet : styles.hederText_mobile}>{I18n.t("Personal Details")}</Text>
+          <Text style={styles.headings}>{I18n.t("Customer Name")} <Text style={{ color: 'red' }}>*</Text></Text>
+          <TextInput
+            style={nameValid ? Device.isTablet ? styles.input_tablet : styles.input_mobile : Device.isTablet ? styles.inputError_tablet : styles.inputError_mobile}
+            mode="outlined"
+            activeOutlineColor='#d6d6d6'
+            outlineColor={nameValid ? '#d6d6d6' : "#dd0000"}
+            label={I18n.t('CUSTOMER NAME')}
+            maxLength={25}
+            // onBlur={this.handleNameValid}
+            value={this.state.name}
+            onChangeText={(text) => this.handleCustomerName(text)}
           />
-        </View>
-        <TouchableOpacity
-          style={Device.isTablet ? styles.signInButton_tablet : styles.signInButton_mobile}
-          onPress={() => this.addCustomer()}
-        >
-          <Text style={Device.isTablet ? styles.signInButtonText_tablet : styles.signInButtonText_mobile}>{I18n.t("Add Customer")}</Text>
-        </TouchableOpacity>
+          {!nameValid && <Message imp={true} message={this.state.errors[ "name" ]} />}
+          <Text style={styles.headings}>{I18n.t("Mobile Number")} <Text style={{ color: 'red' }}>*</Text></Text>
+          <TextInput
+            style={mobileValid ? Device.isTablet ? styles.input_tablet : styles.input_mobile : Device.isTablet ? styles.inputError_tablet : styles.inputError_mobile}
+            mode="outlined"
+            activeOutlineColor='#d6d6d6'
+            outlineColor={mobileValid ? '#d6d6d6' : "#dd0000"}
+            label={I18n.t('MOBILE NUMBER')}
+            maxLength={10}
+            keyboardType='phone-pad'
+            // onBlur={this.handleMobileValid}
+            textContentType='telephoneNumber'
+            value={mobileNumber}
+            onChangeText={(text) => this.handleMobileNumber(text)}
+          />
+          {!mobileValid && <Message imp={true} message={this.state.errors[ "mobile" ]} />}
+          <Text style={styles.headings}>{I18n.t("Email")}</Text>
+          <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
+            mode="outlined"
+            activeOutlineColor='#d6d6d6'
+            outlineColor={emailValid ? '#d6d6d6' : "#dd0000"}
+            label={I18n.t('EMAIL')}
+            keyboardType='email-address'
+            autoCapitalize='none'
+            value={this.state.email}
+            onChangeText={(text) => this.handleEmail(text)}
+          />
+          {!emailValid && <Message imp={false} message={this.state.errors[ "email" ]} />}
+          <Text style={styles.headings}>{I18n.t("Address")}</Text>
+          <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
+            mode="outlined"
+            activeOutlineColor='#d6d6d6'
+            outlineColor='#d6d6d6'
+            label={I18n.t('ADDRESS')}
+            value={this.state.address}
+            onChangeText={(text) => this.handleAddress(text)}
+          />
+          <Text style={styles.headings}>{I18n.t("GST Number")}</Text>
+          <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
+            mode="outlined"
+            activeOutlineColor='#d6d6d6'
+            outlineColor='#d6d6d6'
+            label={I18n.t('GST Number')}
+            value={this.state.gstNumber}
+            onBlur={(text) => this.handleGstNumberValid(text)}
+            onChangeText={(text) => this.handleGstNumber(text)}
+          />
+          {!gstValid && <Message imp={false} message={this.state.errors[ "gst" ]} />}
+          <Text style={styles.headings}>{I18n.t("Gender")}</Text>
+          <View style={rnPickerContainer}>
+            <RNPickerSelect
+              // style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
+              placeholder={{ label: 'GENDER', value: '' }}
+              Icon={() => {
+                return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
+              }}
+              items={[
+                { label: 'Male', value: 'male' },
+                { label: 'Female', value: 'female' },
+              ]}
+              onValueChange={this.handlegender}
+              style={rnPicker}
+              value={this.state.gender}
+              useNativeAndroidPickerStyle={false}
+            />
+          </View>
+          <TouchableOpacity
+            style={Device.isTablet ? styles.signInButton_tablet : styles.signInButton_mobile}
+            onPress={() => this.addCustomer()}
+          >
+            <Text style={Device.isTablet ? styles.signInButtonText_tablet : styles.signInButtonText_mobile}>{I18n.t("Add Customer")}</Text>
+          </TouchableOpacity>
+        </ScrollView>
       </View>
     );
   }

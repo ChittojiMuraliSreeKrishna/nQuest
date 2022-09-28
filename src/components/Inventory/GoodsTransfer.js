@@ -4,8 +4,8 @@ import { Text, View } from 'react-native';
 export class GoodsTransfer extends Component {
   render () {
     return (
-      <View>
-        <Text>GoodsTransfer</Text>
+      <View style={{ marginTop: '50%' }}>
+        <Text style={{ fontSize: 25, textAlign: 'center', fontWeight: 'bold' }}>Under Development</Text>
       </View>
     );
   }

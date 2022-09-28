@@ -32,7 +32,7 @@ export default class ReportsNavigation extends Component {
             component={GoodsReturn}
           />
           <Stack.Screen
-            name="List of Promotions"
+            name="List of promotions"
             options={{ headerShown: false }}
             component={ListOfPromotions}
           />
