@@ -192,7 +192,7 @@ class GenerateInvoiceSlip extends Component {
       compareList: [],
       dsCompareList: [],
       dsNumberList2: [],
-      qTY: 1
+      totalQuantity: 0
     };
   }
 
@@ -347,7 +347,6 @@ class GenerateInvoiceSlip extends Component {
     this.state.dsNumberList.push(obj);
     const isEsSlipEnabled = await AsyncStorage.getItem('custom:isEsSlipEnabled')
     const isTaxIncluded = await AsyncStorage.getItem('custom:isTaxIncluded')
-    console.log("isEsSlipEnabled", isEsSlipEnabled);
     if (dayCloseDates.length !== 0) {
       if (isEsSlipEnabled === "true") {
         isEstimationEnable = true;
@@ -432,7 +431,7 @@ class GenerateInvoiceSlip extends Component {
           }
 
           this.state.barCodeList.forEach((barCode, index) => {
-            console.log("valueeee", barCode)
+            console.log("value of barcode", barCode)
             costPrice = costPrice + barCode.itemPrice;
             promoDiscValue = promoDiscValue + barCode.promoDiscount;
             total = total + barCode.grossValue;
@@ -440,14 +439,6 @@ class GenerateInvoiceSlip extends Component {
           });
 
           discount = discount + this.state.manualDisc;
-
-          console.log("datdatdat", costPrice, total, netTotal);
-          // this.setState({
-          //   netPayableAmount: total,
-          //   grandNetAmount: netTotal,
-          //   totalPromoDisc: promoDiscValue,
-          //   grossAmount: costPrice,
-          // });
           if (isTaxIncluded === "true") {
             this.setState({
               netPayableAmount: total,
@@ -531,11 +522,8 @@ class GenerateInvoiceSlip extends Component {
               barCode.qty = parseInt("1");
               total = total + barCode.grossValue;
             }
-
           });
-
           discount = discount + this.state.manualDisc;
-
           this.setState({
             netPayableAmount: total,
             grandNetAmount: netTotal,
@@ -548,7 +536,7 @@ class GenerateInvoiceSlip extends Component {
           if (this.state.barCodeList.length > 0) {
             this.setState({ enablePayment: true });
           }
-
+          this.calculateTotal()
         }
         this.getTaxAmount();
         //   }
@@ -569,7 +557,6 @@ class GenerateInvoiceSlip extends Component {
   getallDates() {
     const { storeId } = this.state;
     CustomerService.getDates(storeId).then(res => {
-      console.log("responseee", res);
       if (res) {
         if (res.data.length > 0) {
           this.setState({ dayCloseDates: res.data });
@@ -936,53 +923,25 @@ class GenerateInvoiceSlip extends Component {
   }
 
   updateQuanty = (text, index, item) => {
-    this.setState({ isgetLineItems: true })
-    if (text !== "") {
-      item.qty = parseInt(text);
-      let quantity = item.qty;
-      if (item.qty <= item.quantity) {
-        this.setState({ qty: text });
-        console.log("++++++++qty++++++++", item.qty, item.quantity)
-
-        item.qty = parseInt(text);
-        let totalcostMrp = item.itemPrice * parseInt(text);
-
-        item.totalMrp = totalcostMrp
-
-      } else {
-        this.setState({ isgetLineItems: false })
-        alert("Insufficient Quantity");
-      }
-    } else {
-      item.qty = parseInt(text);
-    }
-
-    let grandTotal = 0;
-    let totalqty = 0;
-    let promoDiscount = 0;
-    this.state.barCodeList.forEach(bardata => {
-      grandTotal = grandTotal + bardata.totalMrp;
-      promoDiscount = promoDiscount + bardata?.itemDiscount;
-      totalqty = totalqty + parseInt(bardata.qty)
+    const qtyarr = [...this.state.barCodeList];
+    qtyarr[index].qty = text;
+    this.setState({ barCodeList: qtyarr }, () => {
+      this.updateQty(text, index, item);
     });
-
-    // this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty, promoDisc: promoDiscount });
-
   };
 
   updateQty = (text, index, item) => {
     const Qty = /^[0-9\b]+$/;
     const qtyarr = [...this.state.barCodeList];
-    console.log(qtyarr[index].quantity);
     let addItem = '';
     let value = text;
     if (value === '') {
       addItem = '';
-      qtyarr[index].quantity = addItem.toString();
+      qtyarr[index].qty = addItem.toString();
     }
     else if (value !== '' && Qty.test(value) === false) {
       addItem = 1;
-      qtyarr[index].quantity = addItem.toString();
+      qtyarr[index].qty = addItem.toString();
     } else {
       if (parseInt(value) < parseInt(qtyarr[index].qty)) {
         addItem = value;
@@ -992,69 +951,126 @@ class GenerateInvoiceSlip extends Component {
         qtyarr[index].quantity = addItem.toString();
       }
     }
-    let totalcostMrp = item.itemMrp * parseInt(qtyarr[index].quantity);
-    item.totalMrp = totalcostMrp;
-    this.setState({ itemsList: qtyarr });
+    let totalcostMrp = item.itemPrice * parseInt(qtyarr[index].qty);
+    item.grossValue = totalcostMrp;
+    this.setState({ barCodeList: qtyarr });
     console.error("TEXT", value);
     let grandTotal = 0;
     let totalqty = 0;
-    this.state.barList.forEach(bardata => {
-      grandTotal = grandTotal + bardata.totalMrp;
-      totalqty = totalqty + parseInt(bardata.quantity);
+    let promoDiscValue = 0;
+    let discount = 0
+    let costPrice = 0
+    let total = 0
+    let netTotal = 0
+    this.state.barCodeList.forEach((barCode, index) => {
+      costPrice = costPrice + barCode.itemPrice;
+      promoDiscValue = promoDiscValue + barCode.promoDiscount;
+      total = total + barCode.grossValue;
+      netTotal = netTotal + barCode.grossValue;
+      totalqty = totalqty + parseInt(barCode.qty)
+      grandTotal = grandTotal + barCode.grossValue;
     });
-    this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty });
+    discount = discount + this.state.manualDisc;
+    this.setState({
+      netPayableAmount: grandTotal,
+      grandNetAmount: grandTotal,
+      totalPromoDisc: promoDiscValue,
+      grossAmount: costPrice,
+    });
+    this.setState({ totalQuantity: totalqty })
     this.state.totalQuantity = (parseInt(this.state.totalQuantity) + 1);
-    // this.setState({ itemsList: qtyarr });
   };
 
   incrementForTable(item, index) {
-    const qtyarr = [...this.state.itemsList];
-    console.log(qtyarr[index].quantity);
-    if (parseInt(qtyarr[index].quantity) < parseInt(qtyarr[index].qty)) {
-      var additem = parseInt(qtyarr[index].quantity) + 1;
-      qtyarr[index].quantity = additem.toString();
+    const qtyarr = [...this.state.barCodeList];
+    console.log("datta in increment button", qtyarr[index]);
+    if (parseInt(qtyarr[index].qty) < parseInt(qtyarr[index].quantity)) {
+      var additem = parseInt(qtyarr[index].qty) + 1;
+      console.log("add item value", additem);
+      qtyarr[index].qty = additem.toString();
     } else {
-      var additem = parseInt(qtyarr[index].qty);
-      qtyarr[index].quantity = additem.toString();
+      var additem = parseInt(qtyarr[index].quantity);
+      qtyarr[index].qty = additem.toString();
       alert(`only ${additem} items are in this barcode`);
     }
-    let totalcostMrp = item.itemMrp * parseInt(qtyarr[index].quantity);
-    item.totalMrp = totalcostMrp;
-    this.setState({ itemsList: qtyarr });
+    let totalcostMrp = item.itemPrice * parseInt(qtyarr[index].qty);
+    item.grossValue = totalcostMrp;
+    this.setState({ barCodeList: qtyarr });
 
     let grandTotal = 0;
     let totalqty = 0;
-    this.state.barList.forEach(bardata => {
-      grandTotal = grandTotal + bardata.totalMrp;
-      totalqty = totalqty + parseInt(bardata.quantity);
+    let promoDiscValue = 0;
+    let discount = 0
+    let costPrice = 0
+    let total = 0
+    let netTotal = 0
+    this.state.barCodeList.forEach((barCode, index) => {
+      costPrice = costPrice + barCode.itemPrice;
+      promoDiscValue = promoDiscValue + barCode.promoDiscount;
+      total = total + barCode.grossValue;
+      netTotal = netTotal + barCode.grossValue;
+      totalqty = totalqty + parseInt(barCode.qty)
+      grandTotal = grandTotal + barCode.grossValue;
     });
-    this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty });
+    discount = discount + this.state.manualDisc;
+    this.setState({
+      netPayableAmount: grandTotal,
+      grandNetAmount: grandTotal,
+      totalPromoDisc: promoDiscValue,
+      grossAmount: costPrice,
+    });
+    this.setState({ totalQuantity: totalqty })
     this.state.totalQuantity = (parseInt(this.state.totalQuantity) + 1);
   }
 
   decreamentForTable(item, index) {
-    const qtyarr = [...this.state.itemsList];
-    if (qtyarr[index].quantity > 1) {
-      var additem = parseInt(qtyarr[index].quantity) - 1;
-      qtyarr[index].quantity = additem.toString();
-      let totalcostMrp = item.itemMrp * parseInt(qtyarr[index].quantity);
-      item.totalMrp = totalcostMrp;
+    const qtyarr = [...this.state.barCodeList];
+    if (qtyarr[index].qty > 1) {
+      var additem = parseInt(qtyarr[index].qty) - 1;
+      qtyarr[index].qty = additem.toString();
+      let totalcostMrp = item.itemPrice * parseInt(qtyarr[index].qty);
+      item.grossValue = totalcostMrp;
       this.state.totalQuantity = (parseInt(this.state.totalQuantity) - 1);
       let grandTotal = 0;
       let totalqty = 0;
-      this.state.barCodeList.forEach(bardata => {
-        grandTotal = grandTotal + bardata.totalMrp;
-        totalqty = totalqty + parseInt(bardata.quantity);
+      let promoDiscValue = 0;
+      let discount = 0
+      let costPrice = 0
+      let total = 0
+      let netTotal = 0
+      this.state.barCodeList.forEach((barCode, index) => {
+        costPrice = costPrice + barCode.itemPrice;
+        promoDiscValue = promoDiscValue + barCode.promoDiscount;
+        total = total + barCode.grossValue;
+        totalqty = totalqty + parseInt(barCode.qty)
+        grandTotal = grandTotal + barCode.grossValue;
       });
-      this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty });
-      this.setState({ itemsList: qtyarr });
+      discount = discount + this.state.manualDisc;
+      this.setState({
+        netPayableAmount: grandTotal,
+        grandNetAmount: grandTotal,
+        totalPromoDisc: promoDiscValue
+      });
+      this.setState({ totalQuantity: totalqty })
+      this.state.totalQuantity = (parseInt(this.state.totalQuantity) + 1);
+      this.setState({ barCodeList: qtyarr });
     } else {
-      this.state.itemsList.splice(index, 1);
-      this.setState({ barList: this.state.itemsList });
+      // this.state.barCodeList.splice(index, 1);
+      this.setState({ barCodeList: this.state.barCodeList });
       this.calculateTotal();
     }
   }
 
+  calculateTotal() {
+    let totalAmount = 0;
+    let totalqty = 0;
+    this.state.barCodeList.forEach(barCode => {
+      totalAmount = totalAmount + barCode.totalMrp;
+      totalqty = totalqty + parseInt(barCode.qty);
+    });
+    this.setState({ mrpAmount: totalAmount, totalQuantity: totalqty }
+    );
+  }
 
   render() {
     console.log(global.barcodeId);
@@ -1220,38 +1236,37 @@ class GenerateInvoiceSlip extends Component {
                               </Text>
                             </View>
                             <View>
-                              {/* {this.state.isEstimationEnable && */}
-                              <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("QTY")}
-                                {"\n"}
-                                <Text style={scss.textStyleMedium}>{('0' + item.quantity).slice(-2)}</Text>
-                              </Text>
-                              {/* {!this.state.isEstimationEnable &&
+                              {this.state.isEstimationEnable &&
+                                <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("QTY")}
+                                  {"\n"}
+                                  <Text style={scss.textStyleMedium}>{('0' + item.quantity).slice(-2)}</Text>
+                                </Text>}
+                              {!this.state.isEstimationEnable &&
                                 <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("QTY")}
                                   {"\n"}
                                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                  <TouchableOpacity
-                                  onPress={() => this.incrementForTable(item, index)}>
-                                  <PlusIcon name="plus-circle-outline" size={20} color={"red"} />
-                                </TouchableOpacity>
-                                  <TextInput
-                                    style={{
-                                      fontFamily: 'regular',
-                                      fontSize: RF(10),
-                                    }}
-                                    keyboardType={'numeric'}
-                                    underlineColor='#6f6f6f'
-                                    activeUnderlineColor='#000'
-                                    maxLength={item.quantity}
-                                    value={item.quantity}
-                                    textAlign={'center'}
-                                    onChangeText={(text) => this.updateQuanty(text, index, item)}
-                                  />
-                                  <TouchableOpacity
-                                  onPress={() => this.decreamentForTable(item, index)}>
-                                  <MinusIcon name="minus-circle-outline" size={20} color={"red"} />
-                                </TouchableOpacity>
+                                    <TouchableOpacity
+                                      onPress={() => this.incrementForTable(item, index)}>
+                                      <PlusIcon name="plus-circle-outline" size={20} color={"red"} />
+                                    </TouchableOpacity>
+                                    <TextInput
+                                      style={{
+                                        fontFamily: 'regular',
+                                        fontSize: RF(10),
+                                      }}
+                                      keyboardType={'numeric'}
+                                      activeUnderlineColor='#000'
+                                      value={String(item.qty)}
+                                      maxLength={parseInt(item.quantity)}
+                                      textAlign={'center'}
+                                      onChangeText={(text) => this.updateQuanty(text, index, item)}
+                                    />
+                                    <TouchableOpacity
+                                      onPress={() => this.decreamentForTable(item, index)}>
+                                      <MinusIcon name="minus-circle-outline" size={20} color={"red"} />
+                                    </TouchableOpacity>
                                   </View>
-                                </Text>} */}
+                                </Text>}
                             </View>
                           </View>
                           <View style={scss.textContainer}>
@@ -1304,7 +1319,7 @@ class GenerateInvoiceSlip extends Component {
                     color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 30, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
                     fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
                   }}>
-                    {this.state.barCodeList.length} </Text>
+                    {this.state.isEstimationEnable ? this.state.barCodeList.length : this.state.totalQuantity || 0} </Text>
                   <Text style={{
                     color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 60, justifyContent: 'center', textAlign: 'center', marginTop: 10,
                     fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
