@@ -696,7 +696,8 @@ class TextilePayment extends Component {
       "returnSlipNumbers": [ this.state.rtNumber ],
       "returnSlipAmount": this.state.rtValue,
       "gvAppliedAmount": this.state.couponDiscount,
-      "gvNumber": [ this.state.promocode ]
+      "gvNumber": [ this.state.promocode ],
+      "totalAmount":(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
     };
 
     console.log(" payment cash method data", obj);
