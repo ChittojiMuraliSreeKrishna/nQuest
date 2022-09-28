@@ -432,7 +432,7 @@ class GenerateEstimationSlip extends Component {
 
   incrementForTable (item, index) {
     const qtyarr = [ ...this.state.itemsList ];
-    console.log(qtyarr[ index ].quantity);
+    console.log("qtyarr value",qtyarr[ index ]);
     if (parseInt(qtyarr[ index ].quantity) < parseInt(qtyarr[ index ].qty)) {
       var additem = parseInt(qtyarr[ index ].quantity) + 1;
       qtyarr[ index ].quantity = additem.toString();
