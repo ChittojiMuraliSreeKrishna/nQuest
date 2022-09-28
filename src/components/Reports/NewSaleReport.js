@@ -272,28 +272,29 @@ export default class NewSaleReport extends Component {
   render () {
     return (
       <View>
-        <Appbar>
-          <Appbar.Content title="New Sale Report" />
-          {this.state.filterActive ?
-            <IconFA
-              name="sliders"
-              style={{ marginRight: 10 }}
-              size={25}
-              color="#ed1c24"
-              onPress={() => this.clearFilterAction()}
-            ></IconFA> :
-            <IconFA
-              name="sliders"
-              color="#000"
-              style={[ { marginRight: 10 }, scss.action_icons ]}
-              size={25}
-              onPress={() => this.filterAction()}
-            ></IconFA>
-          }
-        </Appbar>
         <FlatList
           data={this.state.newSale}
-          style={{ marginTop: 20 }}
+          ListHeaderComponent={
+            <Appbar>
+              <Appbar.Content title="New Sale Report" />
+              {this.state.filterActive ?
+                <IconFA
+                  name="sliders"
+                  style={{ marginRight: 10 }}
+                  size={25}
+                  color="#ed1c24"
+                  onPress={() => this.clearFilterAction()}
+                ></IconFA> :
+                <IconFA
+                  name="sliders"
+                  color="#000"
+                  style={[ { marginRight: 10 }, scss.action_icons ]}
+                  size={25}
+                  onPress={() => this.filterAction()}
+                ></IconFA>
+              }
+            </Appbar>
+          }
           scrollEnabled={true}
           keyExtractor={(item, i) => i.toString()}
           ListEmptyComponent={<Text style={{ fontSize: Device.isTablet ? 21 : 17, fontFamily: 'bold', color: '#000000', textAlign: 'center', marginTop: deviceheight / 3 }}>&#9888; {I18n.t("Results not loaded")}</Text>}

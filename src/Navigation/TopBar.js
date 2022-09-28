@@ -26,7 +26,7 @@ export const screenMapping = {
   "Dashboard": "Home",
   "Billing Portal": "CustomerNavigation",
   "Inventory Portal": "InventoryNavigation",
-  "Promotions & Loyalty": "PromoNavigation",
+  "Promotions": "PromoNavigation",
   "Accounting Portal": "AccountingNaviagtion",
   "Reports": "ReportsNavigation",
   "URM Portal": "UrmNavigation",
@@ -228,7 +228,6 @@ export class TopBar extends Component {
                   const firstDisplayName = this.state.firstDisplayName;
                   console.log({ firstDisplayName });
                   firstDisplayRoute = res.data.parentPrivileges[ 0 ].name;
-                  this.renderSubHeadings(firstDisplayName);
                   var privilegesSet = new Set();
                   for (let i = 0; i < len; i++) {
                     let previlage = res.data.parentPrivileges[ i ];
@@ -241,8 +240,8 @@ export class TopBar extends Component {
                     if (previlage.name === "Inventory Portal") {
                       global.previlage3 = "Inventory Portal";
                     }
-                    if (previlage.name === "Promotions & Loyalty") {
-                      global.previlage4 = "Promotions & Loyalty";
+                    if (previlage.name === "Promotions") {
+                      global.previlage4 = "Promotions";
                     }
                     if (previlage.name === "Accounting Portal") {
                       global.previlage5 = "Accounting Portal";
@@ -283,6 +282,7 @@ export class TopBar extends Component {
       this.props.navigation.navigate(
         this.state.firstDisplayNameScreen,
         this.refresh(),
+        this.renderSubHeadings(firstDisplayRoute)
       );
     } else if (firstDisplayRoute === currentSelection) {
       this.props.navigation.navigate(
@@ -350,6 +350,7 @@ export class TopBar extends Component {
       });
     }
   }
+
 
   render () {
     displayName =
@@ -481,8 +482,12 @@ export class TopBar extends Component {
           <FlatList
             horizontal
             data={this.state.privilages}
+
+            initialScrollIndex={0}
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
+            ref={(ref) => this.flatListRef = ref}
+            keyExtractor={(item, index) => item.id}
             style={headers.pageNavigationContainer}
             renderItem={({ item, index }) => (
               <View>
@@ -500,5 +505,9 @@ export class TopBar extends Component {
     );
   }
 }
+
+
+
+
 
 export default TopBar;

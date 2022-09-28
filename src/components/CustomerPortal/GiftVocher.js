@@ -1,24 +1,22 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
-import CustomerService from '../services/CustomerService';
-import { filterCloseImage, filterHeading, filterMainContainer, filterSubContainer } from '../Styles/PopupStyles';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { cancelBtn, cancelBtnText, datePicker, datePickerBtnText, datePickerButton1, datePickerButton2, dateSelector, dateText, inputField, inputHeading, submitBtn, submitBtnText } from '../Styles/FormFields';
-import { RH, RF, RW } from '../../Responsive';
-import { filterBtn, flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleLight, textStyleMedium } from '../Styles/Styles';
-import Modal from 'react-native-modal'
-import AddGiftVoucher from './AddGiftVoucher'
-import { color } from '../Styles/colorStyles';
-import { Searchbar, TextInput } from 'react-native-paper';
+import Modal from 'react-native-modal';
+import { TextInput } from 'react-native-paper';
+import FilterIcon from 'react-native-vector-icons/FontAwesome';
+import forms from '../../commonUtils/assets/styles/formFields.scss';
+import { RF, RH, RW } from '../../Responsive';
 import { customerErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
-import forms from '../../commonUtils/assets/styles/formFields.scss';
-import FilterIcon from 'react-native-vector-icons/FontAwesome';
+import CustomerService from '../services/CustomerService';
+import { color } from '../Styles/colorStyles';
+import { datePicker, datePickerBtnText, datePickerButton1, datePickerButton2, dateSelector, dateText, inputField, submitBtn, submitBtnText } from '../Styles/FormFields';
+import { flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleLight, textStyleMedium } from '../Styles/Styles';
 
 
 var deviceheight = Dimensions.get('window').height;
@@ -63,13 +61,13 @@ class GiftVocher extends Component {
     };
   }
 
-  async componentDidMount() {
+  async componentDidMount () {
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     this.setState({ clientId: clientId });
     this.getGiftVocherList();
   }
 
-  getGiftVocherList() {
+  getGiftVocherList () {
     axios.get(CustomerService.getGiftVocher()).then(res => {
       if (res) {
         console.log(res.data);
@@ -80,11 +78,11 @@ class GiftVocher extends Component {
     });
   }
 
-  datepickerClicked() {
+  datepickerClicked () {
     this.setState({ datepickerOpen: true, filterStartPickerOpen: true });
   }
 
-  enddatepickerClicked() {
+  enddatepickerClicked () {
     this.setState({ datepickerendOpen: true, filterEndPickerOpen: false });
   }
 
@@ -92,15 +90,15 @@ class GiftVocher extends Component {
     this.setState({ mobile: value });
   };
 
-  formatMonth(number) {
+  formatMonth (number) {
     if (number < 10) {
-      return "-0" + number
+      return "-0" + number;
     } else {
-      return "-" + number
+      return "-" + number;
     }
   }
 
-  datepickerDoneClicked() {
+  datepickerDoneClicked () {
     // if (parseInt(this.state.date.getDate()) < 10) {
     //     this.setState({ fromDate: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-0" + this.state.date.getDate() });
     // }
@@ -110,7 +108,7 @@ class GiftVocher extends Component {
     this.setState({ doneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
 
-  filterStartDatePickerDoneClicked() {
+  filterStartDatePickerDoneClicked () {
     // if (parseInt(this.state.date.getDate()) < 10) {
     //     this.setState({ fromDate: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-0" + this.state.date.getDate() });
     // }
@@ -120,7 +118,7 @@ class GiftVocher extends Component {
     this.setState({ doneButtonClicked: true, filterStartPickerOpen: false, datepickerendOpen: false });
   }
 
-  datepickerendDoneClicked() {
+  datepickerendDoneClicked () {
     // if (parseInt(this.state.enddate.getDate()) < 10) {
     //     this.setState({ toDate: this.state.enddate.getFullYear() + "-" + (this.state.enddate.getMonth() + 1) + "-0" + this.state.enddate.getDate() });
     // }
@@ -131,7 +129,7 @@ class GiftVocher extends Component {
   }
 
 
-  filterEndDatePickerDoneClicked() {
+  filterEndDatePickerDoneClicked () {
     // if (parseInt(this.state.enddate.getDate()) < 10) {
     //     this.setState({ toDate: this.state.enddate.getFullYear() + "-" + (this.state.enddate.getMonth() + 1) + "-0" + this.state.enddate.getDate() });
     // }
@@ -141,51 +139,51 @@ class GiftVocher extends Component {
     this.setState({ enddoneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
 
-  datepickerCancelClicked() {
+  datepickerCancelClicked () {
     this.setState({ date: new Date(), enddate: new Date(), datepickerOpen: false, datepickerendOpen: false, filterStartPickerOpen: false, filterEndPickerOpen: false });
   }
 
-  handleGvNumber(text) {
+  handleGvNumber (text) {
     this.setState({ gvNumber: text });
   }
 
-  handleDescription(text) {
+  handleDescription (text) {
     this.setState({ description: text });
   }
 
-  handleValue(text) {
+  handleValue (text) {
     this.setState({ giftValue: text });
   }
 
-  validationForm() {
+  validationForm () {
     let isFormValid = true;
     let errors = {};
 
     if (this.state.gvNumber === '') {
       isFormValid = false;
-      errors["gvNumber"] = customerErrorMessages.gvNumber;
+      errors[ "gvNumber" ] = customerErrorMessages.gvNumber;
       this.setState({ gvNumberValid: false });
     }
     if (this.state.startDate === '') {
       isFormValid = false;
-      errors["startDate"] = customerErrorMessages.startDate;
+      errors[ "startDate" ] = customerErrorMessages.startDate;
       this.setState({ startDateValid: false });
     }
     if (this.state.endDate === '') {
       isFormValid = false;
-      errors["endDate"] = customerErrorMessages.endDate;
+      errors[ "endDate" ] = customerErrorMessages.endDate;
       this.setState({ endDateValid: false });
     }
     if (this.state.giftValue === "") {
       isFormValid = false;
-      errors["giftValue"] = customerErrorMessages.giftValue;
+      errors[ "giftValue" ] = customerErrorMessages.giftValue;
       this.setState({ giftValueValid: false });
     }
     this.setState({ errors: errors });
     return isFormValid;
   }
 
-  async addGiftVocher() {
+  async addGiftVocher () {
     const isFormValid = this.validationForm();
     if (isFormValid) {
       if (this.state.gvNumber === "") {
@@ -238,38 +236,38 @@ class GiftVocher extends Component {
 
   // Modal Flags
 
-  flagAddGiftVoucher() {
-    this.setState({ flagGiftVoucherAdd: true, modalVisible: true })
+  flagAddGiftVoucher () {
+    this.setState({ flagGiftVoucherAdd: true, modalVisible: true });
   }
 
-  filterAction() {
-    this.setState({ flagFilterOpen: true, modalVisible: true, filterActive: true })
+  filterAction () {
+    this.setState({ flagFilterOpen: true, modalVisible: true, filterActive: true });
   }
 
-  modelCancel() {
-    this.setState({ modalVisible: false })
+  modelCancel () {
+    this.setState({ modalVisible: false });
   }
 
-  applyVoucherFilter() {
-    const { filterStartDate, filterEndDate, gvNumber, searchQuery } = this.state
+  applyVoucherFilter () {
+    const { filterStartDate, filterEndDate, gvNumber, searchQuery } = this.state;
     const obj = {
       fromDate: filterStartDate ? filterStartDate : undefined,
       toDate: filterEndDate ? filterEndDate : undefined,
       gvNumber: gvNumber ? gvNumber : searchQuery ? searchQuery : undefined,
       clientId: parseInt(this.state.clientId)
-    }
+    };
     CustomerService.searchGiftVoucher(obj).then((res) => {
       this.setState({
         filterVouchersData: res.data.result,
         filterActive: true, searchQuery: "", modalVisible: false,
         flagFilterOpen: false, filterStartDate: "", filterEndDate: ""
-      })
+      });
     }).catch((err) => {
-      this.setState({ modalVisible: false, flagFilterOpen: false, searchQuery: "", filterStartDate: "", filterEndDate: "" })
-    })
+      this.setState({ modalVisible: false, flagFilterOpen: false, searchQuery: "", filterStartDate: "", filterEndDate: "" });
+    });
   }
 
-  validationField() {
+  validationField () {
     let isFormValid = true;
     let errors = '';
     if (this.state.searchQuery < 2) {
@@ -281,146 +279,147 @@ class GiftVocher extends Component {
     return isFormValid;
   }
 
-  async onChangeSearch(text) {
+  async onChangeSearch (text) {
     const isFormValid = this.validationField();
     await this.setState({
       searchQuery: text
-    })
+    });
     if (isFormValid) {
-      this.applyVoucherFilter()
+      this.applyVoucherFilter();
     }
   }
 
   activeGV = (item) => {
-    this.setState({ isgvModel: true, activeGVNumber: item.gvNumber, gvModelVisible: true })
-  }
+    this.setState({ isgvModel: true, activeGVNumber: item.gvNumber, gvModelVisible: true });
+  };
 
   hideGVModel = () => {
     this.setState({ isgvModel: false, gvModelVisible: false });
-  }
+  };
 
-  saveGvNumber() {
-    const obj = [this.state.activeGVNumber]
+  saveGvNumber () {
+    const obj = [ this.state.activeGVNumber ];
     CustomerService.saveGvNumber(obj, true).then(res => {
       if (res) {
         console.log("responsee", res);
-        this.setState({ filterVouchersData: [] })
-        alert(res.data.message)
+        this.setState({ filterVouchersData: [] });
+        alert(res.data.message);
       }
-    })
-    this.hideGVModel()
+    });
+    this.hideGVModel();
   }
 
-  render() {
-    const { gvNumberValid, startDateValid, endDateValid, giftValueValid, searchQueryValid } = this.state
+  render () {
+    const { gvNumberValid, startDateValid, endDateValid, giftValueValid, searchQueryValid } = this.state;
     return (
-      <View style={{ backgroundColor: "#FFFFFF" }}>
-        {this.state.flagFilterOpen &&
-          <View>
-            <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
-              onBackButtonPress={() => this.modelCancel()}
-              onBackdropPress={() => this.modelCancel()} >
-              <View style={forms.filterModelContainer}>
-                <Text style={forms.popUp_decorator}>-</Text>
-                <View style={forms.filterModelSub}>
-                  <KeyboardAwareScrollView >
-                    <View style={forms.filter_dates_container}>
-                      <TouchableOpacity
-                        style={forms.filter_dates}
-                        testID="openModal"
-                        onPress={() => this.datepickerClicked()}
-                      >
-                        <Text
-                          style={forms.filter_dates_text}
-                        >{this.state.filterStartDate == "" ? 'START DATE' : this.state.filterStartDate}</Text>
-                        <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={forms.filter_dates}
-                        testID="openModal"
-                        onPress={() => this.enddatepickerClicked()}
-                      >
-                        <Text
-                          style={forms.filter_dates_text}
-                        >{this.state.filterEndDate == "" ? 'END DATE' : this.state.filterEndDate}</Text>
-                        <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
-                      </TouchableOpacity>
-                    </View>
-                    {this.state.filterStartPickerOpen && (
-                      <View style={styles.dateTopView}>
-                        <View style={styles.dateTop2}>
-                          <TouchableOpacity
-                            style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
-                          >
-                            <Text style={datePickerBtnText}  > Cancel </Text>
-                          </TouchableOpacity>
-
-                          <TouchableOpacity
-                            style={datePickerButton2} onPress={() => this.filterStartDatePickerDoneClicked()}
-                          >
-                            <Text style={datePickerBtnText}  > Done </Text>
-                          </TouchableOpacity>
-                        </View>
-                        <DatePicker style={datePicker}
-                          date={this.state.date}
-                          mode={'date'}
-                          onDateChange={(date) => this.setState({ date })}
-                        />
+      <View style={{ backgroundColor: "#FFFFFF", flex: 1 }}>
+        <ScrollView>
+          {this.state.flagFilterOpen &&
+            <View>
+              <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
+                onBackButtonPress={() => this.modelCancel()}
+                onBackdropPress={() => this.modelCancel()} >
+                <View style={forms.filterModelContainer}>
+                  <Text style={forms.popUp_decorator}>-</Text>
+                  <View style={forms.filterModelSub}>
+                    <KeyboardAwareScrollView >
+                      <View style={forms.filter_dates_container}>
+                        <TouchableOpacity
+                          style={forms.filter_dates}
+                          testID="openModal"
+                          onPress={() => this.datepickerClicked()}
+                        >
+                          <Text
+                            style={forms.filter_dates_text}
+                          >{this.state.filterStartDate == "" ? 'START DATE' : this.state.filterStartDate}</Text>
+                          <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={forms.filter_dates}
+                          testID="openModal"
+                          onPress={() => this.enddatepickerClicked()}
+                        >
+                          <Text
+                            style={forms.filter_dates_text}
+                          >{this.state.filterEndDate == "" ? 'END DATE' : this.state.filterEndDate}</Text>
+                          <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                        </TouchableOpacity>
                       </View>
-                    )}
-
-                    {this.state.datepickerendOpen && (
-                      <View style={styles.dateTopView}>
-                        <View style={styles.dateTop2}>
-                          <View>
+                      {this.state.filterStartPickerOpen && (
+                        <View style={styles.dateTopView}>
+                          <View style={styles.dateTop2}>
                             <TouchableOpacity
                               style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
                             >
                               <Text style={datePickerBtnText}  > Cancel </Text>
                             </TouchableOpacity>
-                          </View>
-                          <View>
+
                             <TouchableOpacity
-                              style={datePickerButton2} onPress={() => this.filterEndDatePickerDoneClicked()}
+                              style={datePickerButton2} onPress={() => this.filterStartDatePickerDoneClicked()}
                             >
                               <Text style={datePickerBtnText}  > Done </Text>
                             </TouchableOpacity>
                           </View>
+                          <DatePicker style={datePicker}
+                            date={this.state.date}
+                            mode={'date'}
+                            onDateChange={(date) => this.setState({ date })}
+                          />
                         </View>
-                        <DatePicker style={datePicker}
-                          date={this.state.enddate}
-                          mode={'date'}
-                          onDateChange={(enddate) => this.setState({ enddate })}
-                        />
-                      </View>
-                    )}
-                    <TextInput
-                      mode="flat"
-                      activeUnderlineColor='#000'
-                      underlineColor={'#6f6f6f'}
-                      label={('GV Number')}
-                      style={[inputField, { borderColor: '#8F9EB717' }]}
-                      value={this.state.gvNumber}
-                      onChangeText={(text) => this.handleGvNumber(text)}
-                    />
-                  </KeyboardAwareScrollView>
-                  <View style={forms.action_buttons_container}>
-                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
-                      onPress={() => this.applyVoucherFilter()}>
-                      <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
-                      onPress={() => this.modelCancel()}>
-                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
-                    </TouchableOpacity>
+                      )}
+
+                      {this.state.datepickerendOpen && (
+                        <View style={styles.dateTopView}>
+                          <View style={styles.dateTop2}>
+                            <View>
+                              <TouchableOpacity
+                                style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
+                              >
+                                <Text style={datePickerBtnText}  > Cancel </Text>
+                              </TouchableOpacity>
+                            </View>
+                            <View>
+                              <TouchableOpacity
+                                style={datePickerButton2} onPress={() => this.filterEndDatePickerDoneClicked()}
+                              >
+                                <Text style={datePickerBtnText}  > Done </Text>
+                              </TouchableOpacity>
+                            </View>
+                          </View>
+                          <DatePicker style={datePicker}
+                            date={this.state.enddate}
+                            mode={'date'}
+                            onDateChange={(enddate) => this.setState({ enddate })}
+                          />
+                        </View>
+                      )}
+                      <TextInput
+                        mode="flat"
+                        activeUnderlineColor='#000'
+                        underlineColor={'#6f6f6f'}
+                        label={('GV Number')}
+                        style={[ inputField, { borderColor: '#8F9EB717' } ]}
+                        value={this.state.gvNumber}
+                        onChangeText={(text) => this.handleGvNumber(text)}
+                      />
+                    </KeyboardAwareScrollView>
+                    <View style={forms.action_buttons_container}>
+                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                        onPress={() => this.applyVoucherFilter()}>
+                        <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                        onPress={() => this.modelCancel()}>
+                        <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
-              </View>
-            </Modal>
-          </View>
-        }
-        <View>
-          {/* <View style={{ flexDirection: 'row' }}>
+              </Modal>
+            </View>
+          }
+          <View>
+            {/* <View style={{ flexDirection: 'row' }}>
             <View style={styles.searchBarStyles}>
               <Searchbar
                 placeholder="Search"
@@ -441,202 +440,206 @@ class GiftVocher extends Component {
           )} */}
 
 
-          <FlatList
-            ListHeaderComponent={<View style={flatListHeaderContainer}>
-              <Text style={[flatListTitle, { color: color.accent }]}>{I18n.t('Gift Vouchers')}</Text>
-              <TouchableOpacity
-                style={styles.filterBtnStyle}
-                onPress={() => this.filterAction()} >
-                <FilterIcon
-                  name="sliders"
-                  size={25} />
-              </TouchableOpacity>
-            </View>}
-            data={this.state.filterVouchersData}
-            scrollEnabled={true}
-            renderItem={({ item, index }) => (
-              <View style={flatListMainContainer} >
-                <View style={flatlistSubContainer}>
-                  <View style={textContainer}>
-                    <Text style={highText}>S.NO: {index + 1}</Text>
-                    <Text style={textStyleMedium}>{I18n.t("VALUE")}: {item.value}</Text>
-                  </View>
-                  <View style={textContainer}>
-                    <Text style={textStyleMedium} selectable={true}>GV NUMBER: {item.gvNumber}</Text>
-                    <TouchableOpacity onPress={() => this.activeGV(item)}>
-                      <Text style={[textStyleMedium, { backgroundColor: item.isActivated ? '#009900' : '#ee0000', color: '#ffffff', padding: 5, alignSelf: 'flex-start', borderRadius: Device.isTablet ? 10 : 5, fontFamily: 'medium' }]}>{I18n.t("Activate")} </Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View style={textContainer}>
-                    <Text style={textStyleLight}>{I18n.t("FROM DATE")}: {item.fromDate}</Text>
-                    <Text style={textStyleLight}>{I18n.t("TO DATE")}: {item.toDate}</Text>
-                  </View>
-                </View>
-              </View>
-            )}
-          />
-
-          <Text style={styles.titleStyle}>{I18n.t('Generate Gift Voucher')}</Text>
-          <View>
-            <Text style={styles.inputFieldText}>{I18n.t('GV Number')}</Text>
-            <TextInput
-              style={[inputField, { borderColor: gvNumberValid ? '#8F9EB717' : '#dd0000' }]}
-              mode="flat"
-              activeUnderlineColor='#000'
-              underlineColor={'#6f6f6f'}
-              label={('Enter GV')}
-              maxLength={8}
-              value={this.state.gvNumber}
-              onChangeText={(text) => this.handleGvNumber(text)}
-            />
-            {!gvNumberValid && (
-              <Message imp={true} message={this.state.errors['gvNumber']} />
-            )}
-            <Text style={styles.inputFieldText}>{I18n.t('From Date')}</Text>
-            <TouchableOpacity
-              style={[dateSelector, { borderColor: startDateValid ? '#8F9EB717' : '#dd0000' }]}
-              testID="openModal"
-              onPress={() => this.datepickerClicked()}
-            >
-              <Text style={dateText}>{this.state.startDate === "" ? 'DD/MM/YYYY' : this.state.startDate}</Text>
-              <Image style={styles.calenderpng} source={require('../assets/images/calender.png')} />
-            </TouchableOpacity>
-            {this.state.datepickerOpen && (
-              <View style={styles.dateTopView}>
-                <View style={styles.dateTop2}>
-                  <TouchableOpacity
-                    style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
-                  >
-                    <Text style={datePickerBtnText}  > Cancel </Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={datePickerButton2} onPress={() => this.datepickerDoneClicked()}
-                  >
-                    <Text style={datePickerBtnText}  > Done </Text>
-                  </TouchableOpacity>
-                </View>
-                <DatePicker style={datePicker}
-                  date={this.state.date}
-                  mode={'date'}
-                  onDateChange={(date) => this.setState({ date })}
-                />
-              </View>
-            )}
-            {!startDateValid && (
-              <Message imp={true} message={this.state.errors['startDate']} />
-            )}
-            <Text style={styles.inputFieldText}>{I18n.t('To Date')}</Text>
-            <TouchableOpacity
-              style={[dateSelector, { borderColor: endDateValid ? '#8F9EB717' : '#dd0000' }]}
-              testID="openModal"
-              onPress={() => this.enddatepickerClicked()}
-            >
-              <Text
-                style={dateText}
-              >{this.state.endDate === '' ? 'DD/MM/YYYY' : this.state.endDate}</Text>
-              <Image style={styles.calenderpng} source={require('../assets/images/calender.png')} />
-            </TouchableOpacity>
-
-            {this.state.datepickerendOpen && (
-              <View style={styles.dateTopView}>
-                <View style={styles.dateTop2}>
-                  <View>
-                    <TouchableOpacity
-                      style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
-                    >
-                      <Text style={datePickerBtnText}  > Cancel </Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View>
-                    <TouchableOpacity
-                      style={datePickerButton2} onPress={() => this.datepickerendDoneClicked()}
-                    >
-                      <Text style={datePickerBtnText}  > Done </Text>
-                    </TouchableOpacity>
+            <FlatList
+              ListHeaderComponent={<View style={flatListHeaderContainer}>
+                <Text style={[ flatListTitle, { color: color.accent } ]}>{I18n.t('Gift Vouchers')}</Text>
+                <TouchableOpacity
+                  style={styles.filterBtnStyle}
+                  onPress={() => this.filterAction()} >
+                  <FilterIcon
+                    name="sliders"
+                    size={25} />
+                </TouchableOpacity>
+              </View>}
+              data={this.state.filterVouchersData}
+              scrollEnabled={true}
+              renderItem={({ item, index }) => (
+                <View style={flatListMainContainer} >
+                  <View style={flatlistSubContainer}>
+                    <View style={textContainer}>
+                      <Text style={highText}>S.NO: {index + 1}</Text>
+                      <Text style={textStyleMedium}>{I18n.t("VALUE")}: {item.value}</Text>
+                    </View>
+                    <View style={textContainer}>
+                      <Text style={textStyleMedium} selectable={true}>GV NUMBER: {item.gvNumber}</Text>
+                      <TouchableOpacity onPress={() => this.activeGV(item)}>
+                        <Text style={[ textStyleMedium, { backgroundColor: item.isActivated ? '#009900' : '#ee0000', color: '#ffffff', padding: 5, alignSelf: 'flex-start', borderRadius: Device.isTablet ? 10 : 5, fontFamily: 'medium' } ]}>{I18n.t("Activate")} </Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={textContainer}>
+                      <Text style={textStyleLight}>{I18n.t("FROM DATE")}: {item.fromDate}</Text>
+                      <Text style={textStyleLight}>{I18n.t("TO DATE")}: {item.toDate}</Text>
+                    </View>
                   </View>
                 </View>
-                <DatePicker style={datePicker}
-                  date={this.state.enddate}
-                  mode={'date'}
-                  onDateChange={(enddate) => this.setState({ enddate })}
-                />
-              </View>
-            )}
-            {!startDateValid && (
-              <Message imp={true} message={this.state.errors['endDate']} />
-            )}
-            <View >
-              <Text style={styles.inputFieldText}>{I18n.t('Amount')}</Text>
-              <TextInput
-                style={[inputField, { borderColor: giftValueValid ? '#8F9EB717' : '#dd0000' }]}
-                label={I18n.t('Enter Amount')}
-                mode="flat"
-                activeUnderlineColor='#000'
-                keyboardType='numeric'
-                underlineColor={'#6f6f6f'}
-                value={this.state.giftValue}
-                onChangeText={(text) => this.handleValue(text)}
-              />
-              {!startDateValid && (
-                <Message imp={true} message={this.state.errors['giftValue']} />
               )}
-              <Text style={styles.inputFieldText}>{I18n.t('Description')}</Text>
-              <TextInput
-                mode="flat"
-                activeUnderlineColor='#000'
-                underlineColor={'#6f6f6f'}
-                multiline
-                numberOfLines={5}
-                style={[styles.textArea, { borderColor: '#8F9EB717' }]}
-                label={I18n.t('Write')}
-                value={this.state.description}
-                onChangeText={(text) => this.handleDescription(text)}
-              />
-              <TouchableOpacity
-                style={submitBtn}
-                onPress={() => this.addGiftVocher()}
-              >
-                <Text style={submitBtnText}>{I18n.t("Add Gift Voucher")}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-
-        {this.state.isgvModel && (
-          <View>
-            <Modal style={{ margin: 0 }} isVisible={this.state.gvModelVisible}
-              onBackButtonPress={() => this.hideGVModel()}
-              onBackdropPress={() => this.hideGVModel()} >
-              <View style={forms.filterModelContainer}>
-                <Text style={forms.popUp_decorator}>-</Text>
-                <View style={forms.filterModelSub}>
-                <KeyboardAwareScrollView >
+            />
+            <View style={{ height: 500 }}>
+              <ScrollView>
+                <Text style={styles.titleStyle}>{I18n.t('Generate Gift Voucher')}</Text>
+                <View>
+                  <Text style={styles.inputFieldText}>{I18n.t('GV Number')}</Text>
                   <TextInput
+                    style={[ inputField, { borderColor: gvNumberValid ? '#8F9EB717' : '#dd0000' } ]}
                     mode="flat"
                     activeUnderlineColor='#000'
                     underlineColor={'#6f6f6f'}
-                    label={('GV Number')}
-                    style={[inputField, { borderColor: '#8F9EB717' }]}
-                    value={this.state.activeGVNumber}
-                    disabled
+                    label={('Enter GV')}
+                    maxLength={8}
+                    value={this.state.gvNumber}
+                    onChangeText={(text) => this.handleGvNumber(text)}
                   />
-                </KeyboardAwareScrollView>
-                <View style={forms.action_buttons_container}>
-                  <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
-                    onPress={() => this.saveGvNumber()}>
-                    <Text style={forms.submit_btn_text} >{I18n.t("SAVE")}</Text>
+                  {!gvNumberValid && (
+                    <Message imp={true} message={this.state.errors[ 'gvNumber' ]} />
+                  )}
+                  <Text style={styles.inputFieldText}>{I18n.t('From Date')}</Text>
+                  <TouchableOpacity
+                    style={[ dateSelector, { borderColor: startDateValid ? '#8F9EB717' : '#dd0000' } ]}
+                    testID="openModal"
+                    onPress={() => this.datepickerClicked()}
+                  >
+                    <Text style={dateText}>{this.state.startDate === "" ? 'DD/MM/YYYY' : this.state.startDate}</Text>
+                    <Image style={styles.calenderpng} source={require('../assets/images/calender.png')} />
                   </TouchableOpacity>
-                  <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
-                    onPress={() => this.hideGVModel()}>
-                    <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                  {this.state.datepickerOpen && (
+                    <View style={styles.dateTopView}>
+                      <View style={styles.dateTop2}>
+                        <TouchableOpacity
+                          style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
+                        >
+                          <Text style={datePickerBtnText}  > Cancel </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={datePickerButton2} onPress={() => this.datepickerDoneClicked()}
+                        >
+                          <Text style={datePickerBtnText}  > Done </Text>
+                        </TouchableOpacity>
+                      </View>
+                      <DatePicker style={datePicker}
+                        date={this.state.date}
+                        mode={'date'}
+                        onDateChange={(date) => this.setState({ date })}
+                      />
+                    </View>
+                  )}
+                  {!startDateValid && (
+                    <Message imp={true} message={this.state.errors[ 'startDate' ]} />
+                  )}
+                  <Text style={styles.inputFieldText}>{I18n.t('To Date')}</Text>
+                  <TouchableOpacity
+                    style={[ dateSelector, { borderColor: endDateValid ? '#8F9EB717' : '#dd0000' } ]}
+                    testID="openModal"
+                    onPress={() => this.enddatepickerClicked()}
+                  >
+                    <Text
+                      style={dateText}
+                    >{this.state.endDate === '' ? 'DD/MM/YYYY' : this.state.endDate}</Text>
+                    <Image style={styles.calenderpng} source={require('../assets/images/calender.png')} />
                   </TouchableOpacity>
+
+                  {this.state.datepickerendOpen && (
+                    <View style={styles.dateTopView}>
+                      <View style={styles.dateTop2}>
+                        <View>
+                          <TouchableOpacity
+                            style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
+                          >
+                            <Text style={datePickerBtnText}  > Cancel </Text>
+                          </TouchableOpacity>
+                        </View>
+                        <View>
+                          <TouchableOpacity
+                            style={datePickerButton2} onPress={() => this.datepickerendDoneClicked()}
+                          >
+                            <Text style={datePickerBtnText}  > Done </Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                      <DatePicker style={datePicker}
+                        date={this.state.enddate}
+                        mode={'date'}
+                        onDateChange={(enddate) => this.setState({ enddate })}
+                      />
+                    </View>
+                  )}
+                  {!startDateValid && (
+                    <Message imp={true} message={this.state.errors[ 'endDate' ]} />
+                  )}
+                  <View >
+                    <Text style={styles.inputFieldText}>{I18n.t('Amount')}</Text>
+                    <TextInput
+                      style={[ inputField, { borderColor: giftValueValid ? '#8F9EB717' : '#dd0000' } ]}
+                      label={I18n.t('Enter Amount')}
+                      mode="flat"
+                      activeUnderlineColor='#000'
+                      keyboardType='numeric'
+                      underlineColor={'#6f6f6f'}
+                      value={this.state.giftValue}
+                      onChangeText={(text) => this.handleValue(text)}
+                    />
+                    {!startDateValid && (
+                      <Message imp={true} message={this.state.errors[ 'giftValue' ]} />
+                    )}
+                    <Text style={styles.inputFieldText}>{I18n.t('Description')}</Text>
+                    <TextInput
+                      mode="flat"
+                      activeUnderlineColor='#000'
+                      underlineColor={'#6f6f6f'}
+                      multiline
+                      numberOfLines={5}
+                      style={[ styles.textArea, { borderColor: '#8F9EB717' } ]}
+                      label={I18n.t('Write')}
+                      value={this.state.description}
+                      onChangeText={(text) => this.handleDescription(text)}
+                    />
+                    <TouchableOpacity
+                      style={submitBtn}
+                      onPress={() => this.addGiftVocher()}
+                    >
+                      <Text style={submitBtnText}>{I18n.t("Add Gift Voucher")}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
+              </ScrollView>
+            </View>
           </View>
-            </Modal>
-          </View >
-        )}
+
+          {this.state.isgvModel && (
+            <View>
+              <Modal style={{ margin: 0 }} isVisible={this.state.gvModelVisible}
+                onBackButtonPress={() => this.hideGVModel()}
+                onBackdropPress={() => this.hideGVModel()} >
+                <View style={forms.filterModelContainer}>
+                  <Text style={forms.popUp_decorator}>-</Text>
+                  <View style={forms.filterModelSub}>
+                    <KeyboardAwareScrollView >
+                      <TextInput
+                        mode="flat"
+                        activeUnderlineColor='#000'
+                        underlineColor={'#6f6f6f'}
+                        label={('GV Number')}
+                        style={[ inputField, { borderColor: '#8F9EB717' } ]}
+                        value={this.state.activeGVNumber}
+                        disabled
+                      />
+                    </KeyboardAwareScrollView>
+                    <View style={forms.action_buttons_container}>
+                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                        onPress={() => this.saveGvNumber()}>
+                        <Text style={forms.submit_btn_text} >{I18n.t("SAVE")}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                        onPress={() => this.hideGVModel()}>
+                        <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </Modal>
+            </View >
+          )}
+        </ScrollView>
       </View >
 
     );
