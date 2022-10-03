@@ -19,7 +19,7 @@ import PromotionsService from '../services/PromotionsService';
 var deviceWidth = Dimensions.get('window').width;
 var deviceWidth = Dimensions.get('window').width;
 var deviceheight = Dimensions.get('window').height;
-const data = [ { key: 1 }, { key: 2 }, { key: 3 }, { key: 4 }, { key: 5 } ];
+const data = [{ key: 1 }, { key: 2 }, { key: 3 }, { key: 4 }, { key: 5 }];
 
 class TextilePayment extends Component {
   constructor(props) {
@@ -89,11 +89,12 @@ class TextilePayment extends Component {
       rtAmount: 0,
       rtValue: 0,
       netCardPayment: 0,
-      createdBy: null
+      createdBy: null,
+      giftCouponsList: []
     };
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     var domainStringId = "";
     var storeStringId = "";
     const userId = await AsyncStorage.getItem("userId");
@@ -155,7 +156,7 @@ class TextilePayment extends Component {
   }
 
 
-  addCustomer () {
+  addCustomer() {
     if (this.state.customerPhoneNumber.length != 10) {
       alert('Please Enter a valid 10 digit mobile number');
       return;
@@ -218,7 +219,7 @@ class TextilePayment extends Component {
     };
     this.setState({ loading: true });
     axios.post(LoginService.createUser(), params).then((res) => {
-      if (res.data && res.data[ "isSuccess" ] === "true") {
+      if (res.data && res.data["isSuccess"] === "true") {
         this.setState({
           flagCustomerOpen: false,
           modalVisible: false,
@@ -260,8 +261,8 @@ class TextilePayment extends Component {
       "phoneNo": this.state.customerPhoneNumber,
     };
     axios.post(LoginService.getUser(), params).then((res) => {
-      if (res.data && res.data[ "isSuccess" ] === "true") {
-        this.setState({ customerName: res.data[ "result" ][ 0 ].userName, customerGender: res.data[ "result" ][ 0 ].gender });
+      if (res.data && res.data["isSuccess"] === "true") {
+        this.setState({ customerName: res.data["result"][0].userName, customerGender: res.data["result"][0].gender });
         //this.setState({ customerEmail: res.data["result"][0].userName });
         // this.setState({ customerAddress: res.data["result"][0].gender });
         // alert("get customer" + JSON.stringify(res.data["result"]));
@@ -277,16 +278,16 @@ class TextilePayment extends Component {
     });
   };
 
-  modelCancel () {
+  modelCancel() {
     this.setState({ flagCustomerOpen: false, modalVisible: false });
   }
 
-  removeDuplicates (array, key) {
+  removeDuplicates(array, key) {
     const lookup = new Set();
-    return array.filter(obj => !lookup.has(obj[ key ]) && lookup.add(obj[ key ]));
+    return array.filter(obj => !lookup.has(obj[key]) && lookup.add(obj[key]));
   }
 
-  confirmKathaModel () {
+  confirmKathaModel() {
     const obj = {
       "paymentType": "PKTPENDING",
       "paymentAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
@@ -304,25 +305,25 @@ class TextilePayment extends Component {
     });
   }
 
-  cancelKathaModel () {
+  cancelKathaModel() {
     this.setState({ kathaModelVisible: false });
   }
 
-  getUPILink () {
+  getUPILink() {
     this.savePayment();
   }
 
-  cancelUpiModel () {
+  cancelUpiModel() {
     this.setState({ upiModelVisible: false });
   }
 
-  handleBackButtonClick () {
+  handleBackButtonClick() {
     this.props.navigation.goBack(null);
     return true;
   }
 
 
-  cashAction () {
+  cashAction() {
     this.setState({
       isCash: true,
       isCard: false,
@@ -333,7 +334,7 @@ class TextilePayment extends Component {
     });
   }
 
-  cardAction () {
+  cardAction() {
     this.setState({
       isCash: false,
       isCard: true,
@@ -347,7 +348,7 @@ class TextilePayment extends Component {
     this.setState({ enterredeempoint: text });
   };
 
-  clearRedemption () {
+  clearRedemption() {
     console.log('dasdsdasdafsf');
     this.setState({ redeemedPints: "" });
   }
@@ -376,20 +377,20 @@ class TextilePayment extends Component {
     this.setState({ customerGender: text });
   };
 
-  cancel () {
+  cancel() {
     console.log('clicked');
     this.setState({ flagCustomerOpen: false, flagqtyModelOpen: false, modalVisible: false });
     //this.setState({ modalVisible: true });
   }
 
-  endEditing () {
+  endEditing() {
     console.log("end edited");
     if (this.state.customerPhoneNumber.length > 0) {
       this.getUserDetails();
     }
   }
 
-  qrAction () {
+  qrAction() {
     this.setState({
       isCash: true,
       isCard: false,
@@ -400,7 +401,7 @@ class TextilePayment extends Component {
     });
   }
 
-  upiAction () {
+  upiAction() {
     this.setState({
       upiToCustomerModel: true,
       upiModelVisible: true,
@@ -413,7 +414,7 @@ class TextilePayment extends Component {
     });
   }
 
-  gvAction () {
+  gvAction() {
     this.setState({
       gvToCustomerModel: true,
       modelVisible: true,
@@ -426,7 +427,7 @@ class TextilePayment extends Component {
     });
   }
 
-  khataAction () {
+  khataAction() {
     this.setState({
       khataToCustomerModel: true,
       kathaModelVisible: true,
@@ -443,7 +444,7 @@ class TextilePayment extends Component {
     this.setState({ upiMobileNumber: text });
   };
 
-  modelCancel () {
+  modelCancel() {
     this.setState({ modelVisible: false });
   }
 
@@ -465,7 +466,7 @@ class TextilePayment extends Component {
     this.setState({ gvNumber: text, giftvoucher: text });
   };
 
-  verifycash () {
+  verifycash() {
     if (this.state.isCash === true && this.state.isCardOrCash === false) {
       if ((parseFloat(this.state.recievedAmount) < (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)))) {
         alert('Please collect sufficient amount');
@@ -482,31 +483,53 @@ class TextilePayment extends Component {
       }
   }
 
-  async applyPromocode () {
+  async applyPromocode() {
     const gvNumbers = [];
     const obj = {
       gvNumber: this.state.promocode
     };
     gvNumbers.push(obj);
     console.log("promo params", this.state.clientId, gvNumbers);
-    NewSaleService.getCoupons(this.state.clientId, gvNumbers).then(res => {
-      if (res.data.result.length > 0) {
-        let grandAmount = this.state.totalAmount;
-        res.data.result.map((item) => {
-          if (grandAmount > item.value) {
-            grandAmount = grandAmount - item.value;
-          } else if (grandAmount <= item.value) {
-            alert("Please purchase greater than coupon amount");
-            // this.setState({ promocode: "" });
-          }
-          this.setState({ totalAmount: grandAmount, couponDiscount: item.value });
-        });
-      }
-    }).catch((err) =>
-      this.setState({ promocode: "" }));
+    if (this.state.couponCode !== "") {
+      NewSaleService.getCoupons(this.state.clientId, gvNumbers).then(res => {
+        if (Array.isArray(res.data.result)) {
+          let grandAmount = this.state.totalAmount;
+          const couponsListList = res.data.result.map((item) => {
+            if (grandAmount > item.value) {
+              grandAmount = grandAmount - item.value;
+            } else if (grandAmount <= item.value) {
+              alert("Please purchase greater than coupon amount");
+              // this.setState({ promocode: "" });
+            }
+            this.setState({ totalAmount: grandAmount, couponDiscount: item.value });
+            let obj = {};
+            obj.gvNumber = item.gvNumber;
+            obj.value = item.value;
+            return obj;
+          })
+          this.setState({
+            giftCouponsList: [...this.state.giftCouponsList, couponsListList[0]],
+            promocode: ''
+          }, () => {
+            this.setState({
+              giftCouponsList: [...new Map(this.state.giftCouponsList.map((m) => [m.gvNumber, m])).values()]
+            })
+          })
+        }
+        else {
+          alert(res.data.message);
+          this.setState({
+            promocode: ''
+          })
+        }
+        // }
+      });
+    } else {
+      alert("Please Enter GV Number");
+    }
   }
 
-  applyRedem () {
+  applyRedem() {
     this.setState({ redeemedPints: this.state.enterredeempoint });
     if (parseInt(this.state.loyaltyPoints) < parseInt(this.state.redeemedPints)) {
       alert('please enter greater than the available points');
@@ -518,19 +541,19 @@ class TextilePayment extends Component {
   }
 
 
-  tagCustomer () {
+  tagCustomer() {
     this.setState({ customerEmail: "", customerPhoneNumber: "", customerName: "", customerGender: "", customerAddress: "", flagCustomerOpen: true, modalVisible: true });
   }
 
-  clearTaggedCustomer () {
+  clearTaggedCustomer() {
     this.setState({ mobileNumber: "", loyaltyPoints: "", notfound: "" });
   }
 
-  clearPromocode () {
+  clearPromocode() {
     this.setState({ promoDiscount: "0", giftvoucher: "", promocode: "" });
   }
 
-  clearCashSammary () {
+  clearCashSammary() {
     this.setState({ verifiedCash: "", recievedAmount: "", returnAmount: 0 });
   }
 
@@ -658,7 +681,7 @@ class TextilePayment extends Component {
           {
             "paymentType": "Card",
             "paymentAmount": this.state.ccCardCash
-          } ]
+          }]
       };
       this.state.paymentType.push(obj);
     }
@@ -669,6 +692,14 @@ class TextilePayment extends Component {
       };
       this.state.paymentType.push(obj);
     }
+     if(this.state.giftCouponsList.length>=1){
+            const obj = {
+              "paymentType": "GIFTVOUCHER",
+              "paymentAmount": this.state.couponDiscount
+            }
+            this.state.paymentType.push(obj);
+        }
+
     obj = {
       "natureOfSale": "InStore",
       "domainId": 1,
@@ -693,19 +724,19 @@ class TextilePayment extends Component {
       "returnAmount": this.state.returnAmount,
       "lineItemsReVo": null,
       "paymentAmountType": this.state.paymentType,
-      "returnSlipNumbers": [ this.state.rtNumber ],
-      "returnSlipAmount": this.state.rtValue,
-      "gvAppliedAmount": this.state.couponDiscount,
-      "gvNumber": [ this.state.promocode ],
-      "totalAmount":(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
+      "returnSlipNumbers": [this.state.rtNumber],
+      "returnSlipAmount": (this.state.rtValue === null ? 0 : this.state.rtValue),
+      "gvAppliedAmount": (this.state.couponDiscount === null ? 0 : this.state.couponDiscount),
+      "gvNumber": [this.state.promocode],
+      "totalAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
     };
 
     console.log(" payment cash method data", obj);
     axios.post(NewSaleService.createOrder(), obj).then((res) => {
       console.log("Invoice data", JSON.stringify(res.data));
-      if (res.data && res.data[ "isSuccess" ] === "true") {
+      if (res.data && res.data["isSuccess"] === "true") {
         // const cardAmount = this.state.isCard || this.state.isCardOrCash ? JSON.stringify(Math.round(this.state.ccCardCash)) : JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString());
-        alert("Order created " + res.data[ "result" ]);
+        alert("Order created " + res.data["result"]);
         if (this.state.isKhata === true) {
           this.props.route.params.onGoBack();
           this.props.navigation.goBack();
@@ -719,20 +750,20 @@ class TextilePayment extends Component {
           obj = {
             "amount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)),
             "info": "order creations",
-            "newsaleId": res.data[ "result" ],
+            "newsaleId": res.data["result"],
           };
         } else if (this.state.isCardOrCash === true) {
           obj = {
             "amount": this.state.ccCardCash,
             "info": "order creations",
-            "newsaleId": res.data[ "result" ],
+            "newsaleId": res.data["result"],
           };
 
         }
         console.log('params aresdasd', obj);
         axios.post(NewSaleService.payment(), obj).then((res) => {
           // this.setState({isPayment: false});
-          const data = JSON.parse(res.data[ "result" ]);
+          const data = JSON.parse(res.data["result"]);
           //console.log()
           var options = {
             description: 'Transaction',
@@ -895,12 +926,12 @@ class TextilePayment extends Component {
   };
 
 
-  redeemPoints () {
+  redeemPoints() {
     this.setState({ flagredeem: true, modalVisible: true });
   }
 
 
-  verifyCustomer () {
+  verifyCustomer() {
     this.setState({ loyaltyPoints: '' });
     if (this.state.mobileNumber.length !== 10) {
       alert('please Enter a customer valid mobile number');
@@ -914,13 +945,13 @@ class TextilePayment extends Component {
       this.setState({ loading: true });
       axios.post(PromotionsService.searchLoyaltyPoints(),
         params).then((res) => {
-          if (res.data && res.data[ "isSuccess" ] === "true") {
+          if (res.data && res.data["isSuccess"] === "true") {
             this.setState({ loading: false });
-            let len = res.data[ "result" ].length;
-            console.log(res.data[ "result" ]);
+            let len = res.data["result"].length;
+            console.log(res.data["result"]);
             if (len > 0) {
               for (let i = 0; i < len; i++) {
-                let number = res.data[ "result" ][ i ];
+                let number = res.data["result"][i];
                 this.setState({ loyaltyPoints: number.loyaltyPoints });
 
                 console.log(this.state.loyaltyPoints);
@@ -935,8 +966,8 @@ class TextilePayment extends Component {
     }
   }
 
-  applyGVNumber () {
-    const gvObj = [ this.state.gvNumber ];
+  applyGVNumber() {
+    const gvObj = [this.state.gvNumber];
     const param = '?flag=' + false;
     axios.put(NewSaleService.saveCoupons() + param, gvObj).then(res => {
       if (res) {
@@ -947,20 +978,20 @@ class TextilePayment extends Component {
     });
   }
 
-  async applyRt () {
+  async applyRt() {
     if (this.state.rtNumber.length > 0) {
       const storeId = await AsyncStorage.getItem("storeId");
-      NewSaleService.getRTDetails([ this.state.rtNumber ], storeId).then(res => {
+      NewSaleService.getRTDetails([this.state.rtNumber], storeId).then(res => {
         console.log("___________res______________" + JSON.stringify(res.data));
-        this.setState({ rtAmount: res.data.result[ 0 ].totalAmount, rtValue: parseInt(res.data.result[ 0 ].totalAmount) });
+        this.setState({ rtAmount: res.data.result[0].totalAmount, rtValue: parseInt(res.data.result[0].totalAmount) });
         let grandTotal = this.state.grandNetAmount;
-        if (grandTotal >= res.data.result[ 0 ].totalAmount) {
-          grandTotal = grandTotal - res.data.result[ 0 ].totalAmount;
+        if (grandTotal >= res.data.result[0].totalAmount) {
+          grandTotal = grandTotal - res.data.result[0].totalAmount;
           this.setState({ grandNetAmount: grandTotal }, () => {
-            this.setState({ isRTApplied: true, rtAmount: res.data.result[ 0 ].totalAmount }, () => this.setState({ payingAmount: this.state.rtAmount + grandTotal, totalAmount: this.state.totalAmount - this.state.rtAmount }));
+            this.setState({ isRTApplied: true, rtAmount: res.data.result[0].totalAmount }, () => this.setState({ payingAmount: this.state.rtAmount + grandTotal, totalAmount: this.state.totalAmount - this.state.rtAmount }));
           });
 
-        } else if (grandTotal <= res.data.result[ 0 ].totalAmount) {
+        } else if (grandTotal <= res.data.result[0].totalAmount) {
           alert("Please purchase greater than Return amount");
           this.setState({
             rtAmount: ""
@@ -970,14 +1001,14 @@ class TextilePayment extends Component {
     }
   }
 
-  validationCheckForPay () {
+  validationCheckForPay() {
     if (this.state.isCash === true || this.state.isCard === true || this.state.isCardOrCash === true || this.state.isUpi === true) {
       this.pay();
     } else {
       alert("Please Select any payment method");
     }
   }
-  render () {
+  render() {
     return (
       <View style={styles.mainContainer}>
         {this.state.loading && <Loader loading={this.state.loading} />}
@@ -1508,7 +1539,7 @@ class TextilePayment extends Component {
                       <KeyboardAwareScrollView >
                         <Text style={scss.textStyleLight}>Net Payable Amount:</Text>
                         <TextInput
-                          style={forms.inputfld}
+                          style={forms.input_fld}
                           underlineColor="transparent"
                           activeUnderlineColor='#000'
                           disabled
@@ -1516,7 +1547,7 @@ class TextilePayment extends Component {
                         />
                         <Text style={scss.textStyleLight}>Mobile Number:</Text>
                         <TextInput
-                          style={forms.inputfld}
+                          style={forms.input_fld}
                           underlineColor="transparent"
                           label={"MOBILE NUMBER"}
                           activeUnderlineColor='#000'
@@ -1526,11 +1557,11 @@ class TextilePayment extends Component {
                           onChangeText={(text) => this.handleUpiMobileNumber(text)}
                         />
                         <View style={forms.action_buttons_container}>
-                          <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                          <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                             onPress={() => this.getUPILink()}>
                             <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
                           </TouchableOpacity>
-                          <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                          <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
                             onPress={() => this.cancelUpiModel()}>
                             <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                           </TouchableOpacity>
@@ -1554,18 +1585,18 @@ class TextilePayment extends Component {
                       <KeyboardAwareScrollView >
                         <Text style={scss.textStyleLight}>Adding Payment Details on Katha</Text>
                         <TextInput
-                          style={forms.inputfld}
+                          style={forms.input_fld}
                           underlineColor="transparent"
                           activeUnderlineColor='#000'
                           editable={false} selectTextOnFocus={false}
                           value={(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()}
                         />
                         <View style={forms.action_buttons_container}>
-                          <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                          <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                             onPress={() => this.confirmKathaModel()}>
                             <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
                           </TouchableOpacity>
-                          <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                          <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
                             onPress={() => this.cancelKathaModel()}>
                             <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                           </TouchableOpacity>
@@ -1599,11 +1630,11 @@ class TextilePayment extends Component {
                         onChangeText={this.handleGVNumber}
                       />
                       <View style={forms.action_buttons_container}>
-                        <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                        <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                           onPress={() => this.applyGVNumber()}>
                           <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                        <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
                           onPress={() => this.modelCancel()}>
                           <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                         </TouchableOpacity>
