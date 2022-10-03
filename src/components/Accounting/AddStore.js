@@ -79,7 +79,7 @@ export default class AddStore extends Component {
     };
   }
 
-  async componentDidMount() {
+  async componentDidMount () {
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     const userId = await AsyncStorage.getItem("userId");
     console.log(userId);
@@ -88,7 +88,7 @@ export default class AddStore extends Component {
     if (this.state.isEdit === true) {
       const storeItem = this.props.route.params.item;
       console.log({ storeItem });
-      console.log(storeItem.stateCode, "codeState")
+      console.log(storeItem.stateCode, "codeState");
       this.setState({
         stateId: storeItem.stateId,
         statecode: storeItem.stateCode,
@@ -106,25 +106,25 @@ export default class AddStore extends Component {
         storeStatus: storeItem.isActive,
       }, () => {
         this.getMasterStatesList();
-        this.getMasterDistrictsList(this.state.storeState)
+        this.getMasterDistrictsList(this.state.storeState);
       });
       this.setState({ navtext: "Edit Store" });
     } else {
       this.setState({ navtext: "Add Store" });
-      this.getMasterStatesList()
+      this.getMasterStatesList();
     }
-    console.log("storeStaet", this.state.storeState, this.state.districtId)
+    console.log("storeStaet", this.state.storeState, this.state.districtId);
     // this.getDomainsList();
   }
 
 
-  getGSTNumber() {
-    const { clientId, statecode } = this.state
-    console.log({ clientId, statecode })
+  getGSTNumber () {
+    const { clientId, statecode } = this.state;
+    console.log({ clientId, statecode });
     UrmService.getGSTNumber(clientId, statecode).then((res) => {
       if (res) {
-        let gstResult = res.data
-        console.log({ gstResult })
+        let gstResult = res.data;
+        console.log({ gstResult });
         if (res.data.result !== null) {
           this.setState({ gstNumber: res.data.result.gstNumber, gstEdit: false });
         } else {
@@ -134,17 +134,17 @@ export default class AddStore extends Component {
     });
   }
 
-  getMasterStatesList() {
+  getMasterStatesList () {
     this.setState({ states: [] });
     this.setState({ loading: false });
     var states = [];
     UrmService.getStates().then((res) => {
-      console.log(res.data)
-      if (res.data["result"]) {
-        for (var i = 0; i < res.data["result"].length; i++) {
+      console.log(res.data);
+      if (res.data[ "result" ]) {
+        for (var i = 0; i < res.data[ "result" ].length; i++) {
           states.push({
-            value: res.data.result[i].stateCode,
-            label: res.data.result[i].stateName,
+            value: res.data.result[ i ].stateCode,
+            label: res.data.result[ i ].stateName,
           });
           this.setState({
             states: states,
@@ -152,33 +152,33 @@ export default class AddStore extends Component {
         }
         this.setState({ statesArray: this.state.statesArray });
       }
-      console.log(this.state.states, "states")
+      console.log(this.state.states, "states");
     });
   }
   handleStoreState = (value) => {
     if (!this.state.isEdit) {
       this.setState({ storeState: value, statecode: value }, () => {
-        console.log({ value })
+        console.log({ value });
         console.log(this.state.statecode, "yktld", this.state.storeState);
-        this.getGSTNumber()
+        this.getGSTNumber();
         this.getMasterDistrictsList(this.state.statecode);
       });
     }
   };
 
   // Store Districts
-  getMasterDistrictsList(id) {
+  getMasterDistrictsList (id) {
     this.setState({ loading: false, dictricts: [], dictrictArray: [] });
     UrmService.getDistricts(id).then((res) => {
-      if (res.data["result"]) {
+      if (res.data[ "result" ]) {
         this.setState({ loading: false });
         let dictricts = [];
-        for (var i = 0; i < res.data["result"].length; i++) {
+        for (var i = 0; i < res.data[ "result" ].length; i++) {
           dictricts.push({
-            value: res.data.result[i].districtId,
-            label: res.data.result[i].districtName,
+            value: res.data.result[ i ].districtId,
+            label: res.data.result[ i ].districtName,
           });
-          console.log({ dictricts })
+          console.log({ dictricts });
           this.setState({
             dictricts: dictricts,
           });
@@ -193,12 +193,12 @@ export default class AddStore extends Component {
     }
   };
 
-  handleBackButtonClick() {
+  handleBackButtonClick () {
     this.props.navigation.goBack(null);
     return true;
   }
 
-  cancel() {
+  cancel () {
     this.props.navigation.goBack(null);
     return true;
   }
@@ -232,34 +232,34 @@ export default class AddStore extends Component {
   };
 
 
-  validationForm() {
+  validationForm () {
     let errors = {};
     let formIsValid = true;
     console.log(this.state.domain);
     const mobReg = /^[0-9\b]+$/;
 
     if (this.state.storeState === "" || this.state.storeState === undefined) {
-      errors["state"] = accountingErrorMessages.state;
+      errors[ "state" ] = accountingErrorMessages.state;
       formIsValid = false;
       this.setState({ stateValid: false });
     }
     if (this.state.storeDistrict === "") {
-      errors["district"] = accountingErrorMessages.district;
+      errors[ "district" ] = accountingErrorMessages.district;
       formIsValid = false;
       this.setState({ districtValid: false });
     }
 
     if (this.state.city.length === 0) {
-      errors["city"] = accountingErrorMessages.city;
-      formIsValid = false
-      this.setState({ cityValid: false })
+      errors[ "city" ] = accountingErrorMessages.city;
+      formIsValid = false;
+      this.setState({ cityValid: false });
     }
 
     if (
       this.state.storeName.length < errorLength.name ||
       this.state.storeName === undefined
     ) {
-      errors["store"] = accountingErrorMessages.storeName;
+      errors[ "store" ] = accountingErrorMessages.storeName;
       formIsValid = false;
       this.setState({ storeValid: false });
     }
@@ -267,24 +267,24 @@ export default class AddStore extends Component {
       mobReg.test(this.state.mobile) === false ||
       this.state.mobile.length < errorLength.mobile
     ) {
-      errors["mobile"] = urmErrorMessages.mobile;
+      errors[ "mobile" ] = urmErrorMessages.mobile;
       formIsValid = false;
       this.setState({ mobileValid: false });
     }
     if (this.state.gstNumber.length < errorLength.gstNumber) {
-      errors["gst"] = accountingErrorMessages.gst;
+      errors[ "gst" ] = accountingErrorMessages.gst;
       formIsValid = false;
       this.setState({ gstValid: false });
     }
 
     if (this.state.storeStatus === "") {
-      errors["status"] = urmErrorMessages.status;
+      errors[ "status" ] = urmErrorMessages.status;
     }
 
     if (this.state.city === "") {
-      errors['city'] = urmErrorMessages.city;
-      formIsValid = false
-      this.setState({ cityValid: false })
+      errors[ 'city' ] = urmErrorMessages.city;
+      formIsValid = false;
+      this.setState({ cityValid: false });
     }
 
     this.setState({ errors: errors });
@@ -315,9 +315,9 @@ export default class AddStore extends Component {
 
   handleCityValid = () => {
 
-  }
+  };
 
-  saveStore() {
+  saveStore () {
     const formIsValid = this.validationForm();
     if (formIsValid) {
       if (this.state.isEdit === false) {
@@ -390,7 +390,7 @@ export default class AddStore extends Component {
     }
   }
 
-  render() {
+  render () {
     const {
       stateValid,
       storeValid,
@@ -450,7 +450,7 @@ export default class AddStore extends Component {
             />
           </View>
           {!stateValid && (
-            <Message imp={true} message={this.state.errors["state"]} />
+            <Message imp={true} message={this.state.errors[ "state" ]} />
           )}
           <Text style={inputHeading}>
             {I18n.t("District")} <Text style={{ color: "#aa0000" }}>*</Text>
@@ -484,7 +484,7 @@ export default class AddStore extends Component {
             />
           </View>
           {!districtValid && (
-            <Message imp={true} message={this.state.errors["district"]} />
+            <Message imp={true} message={this.state.errors[ "district" ]} />
           )}
 
           <Text style={inputHeading}>{I18n.t("City")} <Text style={{ color: "#aa0000" }}>*</Text> </Text>
@@ -493,7 +493,7 @@ export default class AddStore extends Component {
             activeOutlineColor="#000"
             mode="outlined"
             outlineColor={cityValid ? "#8F9EB717" : "#dd0000"}
-            style={[inputField,]}
+            style={[ inputField, ]}
 
             placeholder={I18n.t("CITY")}
             placeholderTextColor={cityValid ? "#6F6F6F" : "#dd0000"}
@@ -503,7 +503,7 @@ export default class AddStore extends Component {
             onChangeText={(value) => this.handleCity(value)}
           />
           {!cityValid && (
-            <Message imp={true} message={this.state.errors["city"]} />
+            <Message imp={true} message={this.state.errors[ "city" ]} />
           )}
 
           <Text style={inputHeading}>{I18n.t("Area")}</Text>
@@ -544,7 +544,7 @@ export default class AddStore extends Component {
             onChangeText={(value) => this.handleMobile(value)}
           />
           {!mobileValid && (
-            <Message imp={true} message={this.state.errors["mobile"]} />
+            <Message imp={true} message={this.state.errors[ "mobile" ]} />
           )}
           <Text style={inputHeading}>{"Address"}</Text>
           <TextInput
@@ -580,9 +580,10 @@ export default class AddStore extends Component {
           >
             <RNPickerSelect
               placeholder={{
-                label: "Status",
+                label: "Active",
                 value: "",
               }}
+              disabled
               Icon={() => {
                 return (
                   <Chevron
@@ -603,7 +604,7 @@ export default class AddStore extends Component {
             />
           </View>
           {!statusValid && (
-            <Message imp={true} message={this.state.errors["status"]} />
+            <Message imp={true} message={this.state.errors[ "status" ]} />
           )}
           <Text style={inputHeading}>
             {I18n.t("Store Name")} <Text style={{ color: "#aa0000" }}>*</Text>
@@ -626,7 +627,7 @@ export default class AddStore extends Component {
             onChangeText={(value) => this.handleStoreName(value)}
           />
           {!storeValid && (
-            <Message imp={true} message={this.state.errors["store"]} />
+            <Message imp={true} message={this.state.errors[ "store" ]} />
           )}
           {this.state.isEdit === true && (
             <View>
@@ -677,7 +678,7 @@ export default class AddStore extends Component {
                 onChangeText={(value) => this.handleGstNumber(value)}
               />
               {!gstValid && (
-                <Message imp={true} message={this.state.errors["gst"]} />
+                <Message imp={true} message={this.state.errors[ "gst" ]} />
               )}
             </View>
           )}

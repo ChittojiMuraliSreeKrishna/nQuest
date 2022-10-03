@@ -342,7 +342,7 @@ export default class Stores extends Component {
                       <Text style={scss.textStyleLight}>
                         {I18n.t("Created By")}: {" "}
                         <Text style={scss.textStyleMedium}>
-                          {item.createdBy}
+                          {item.userName}
                         </Text>
                       </Text>
                     </View>

@@ -1,9 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
 import { Dimensions, FlatList, StyleSheet, Text, View } from 'react-native';
-import { Button, RadioButton } from 'react-native-paper';
+import { Appbar, Button, RadioButton } from 'react-native-paper';
+import forms from '../../commonUtils/assets/styles/formFields.scss';
 import LoginService from '../services/LoginService';
-import { submitBtn, submitBtnText } from '../Styles/FormFields';
 var deviceWidth = Dimensions.get('window').width;
 var deviceHeight = Dimensions.get('window').height;
 
@@ -61,6 +61,10 @@ export class SelectClient extends Component {
   render () {
     return (
       <View>
+        <Appbar mode="center-aligned">
+          <Appbar.BackAction onPress={() => this.props.navigation.goBack()} />
+          <Appbar.Content title="Select Client" />
+        </Appbar>
         <FlatList
           style={styles.container}
           data={this.state.clientsList}
@@ -79,8 +83,11 @@ export class SelectClient extends Component {
             </View>
           )}
         />
-        <Button mode='elevated' style={submitBtn} onPress={() => this.continueAction()}>
-          <Text style={submitBtnText}>Continue</Text>
+        <Button mode='elevated' style={forms.continue_btn} onPress={() => this.continueAction()}>
+          <Text style={forms.submit_btn_text}>Continue</Text>
+        </Button>
+        <Button mode='elevated' style={forms.cancel_full_btn} onPress={() => this.props.navigation.goBack()}>
+          <Text style={forms.cancel_btn_text}>Cancel</Text>
         </Button>
       </View>
     );

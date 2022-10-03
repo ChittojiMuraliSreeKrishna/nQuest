@@ -29,7 +29,7 @@ export default class AuthNavigation extends React.Component {
         <Stack.Screen name="ForgotPassword" options={{ headerShown: false }} component={ForgotPassword} />
         <Stack.Screen name="UpdateNewpassword" options={{ headerShown: false }} component={UpdateNewpassword} />
         <Stack.Screen name="ManagePassword" options={{ headerShown: false }} component={ManagePassword} />
-        <Stack.Screen name="SelectClient" options={{ headersShown: false }} component={SelectClient} />
+        <Stack.Screen name="SelectClient" options={{ headerShown: false }} component={SelectClient} />
       </Stack.Navigator>
     );
   }
