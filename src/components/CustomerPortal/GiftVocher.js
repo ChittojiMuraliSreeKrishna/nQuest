@@ -57,17 +57,18 @@ class GiftVocher extends Component {
       clientId: 0,
       isgvModel: false,
       gvModelVisible: false,
-      activeGVNumber: ""
+      activeGVNumber: "",
+      filterGvNumber: ""
     };
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     this.setState({ clientId: clientId });
     this.getGiftVocherList();
   }
 
-  getGiftVocherList () {
+  getGiftVocherList() {
     axios.get(CustomerService.getGiftVocher()).then(res => {
       if (res) {
         console.log(res.data);
@@ -78,11 +79,11 @@ class GiftVocher extends Component {
     });
   }
 
-  datepickerClicked () {
+  datepickerClicked() {
     this.setState({ datepickerOpen: true, filterStartPickerOpen: true });
   }
 
-  enddatepickerClicked () {
+  enddatepickerClicked() {
     this.setState({ datepickerendOpen: true, filterEndPickerOpen: false });
   }
 
@@ -90,7 +91,7 @@ class GiftVocher extends Component {
     this.setState({ mobile: value });
   };
 
-  formatMonth (number) {
+  formatMonth(number) {
     if (number < 10) {
       return "-0" + number;
     } else {
@@ -98,7 +99,7 @@ class GiftVocher extends Component {
     }
   }
 
-  datepickerDoneClicked () {
+  datepickerDoneClicked() {
     // if (parseInt(this.state.date.getDate()) < 10) {
     //     this.setState({ fromDate: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-0" + this.state.date.getDate() });
     // }
@@ -108,7 +109,7 @@ class GiftVocher extends Component {
     this.setState({ doneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
 
-  filterStartDatePickerDoneClicked () {
+  filterStartDatePickerDoneClicked() {
     // if (parseInt(this.state.date.getDate()) < 10) {
     //     this.setState({ fromDate: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-0" + this.state.date.getDate() });
     // }
@@ -118,7 +119,7 @@ class GiftVocher extends Component {
     this.setState({ doneButtonClicked: true, filterStartPickerOpen: false, datepickerendOpen: false });
   }
 
-  datepickerendDoneClicked () {
+  datepickerendDoneClicked() {
     // if (parseInt(this.state.enddate.getDate()) < 10) {
     //     this.setState({ toDate: this.state.enddate.getFullYear() + "-" + (this.state.enddate.getMonth() + 1) + "-0" + this.state.enddate.getDate() });
     // }
@@ -129,7 +130,7 @@ class GiftVocher extends Component {
   }
 
 
-  filterEndDatePickerDoneClicked () {
+  filterEndDatePickerDoneClicked() {
     // if (parseInt(this.state.enddate.getDate()) < 10) {
     //     this.setState({ toDate: this.state.enddate.getFullYear() + "-" + (this.state.enddate.getMonth() + 1) + "-0" + this.state.enddate.getDate() });
     // }
@@ -139,51 +140,57 @@ class GiftVocher extends Component {
     this.setState({ enddoneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
 
-  datepickerCancelClicked () {
+  datepickerCancelClicked() {
     this.setState({ date: new Date(), enddate: new Date(), datepickerOpen: false, datepickerendOpen: false, filterStartPickerOpen: false, filterEndPickerOpen: false });
   }
 
-  handleGvNumber (text) {
+  handleGvNumber(text) {
     this.setState({ gvNumber: text });
   }
 
-  handleDescription (text) {
+
+  handleFilterGvNumber(text) {
+    this.setState({ filterGvNumber: text });
+  }
+
+
+  handleDescription(text) {
     this.setState({ description: text });
   }
 
-  handleValue (text) {
+  handleValue(text) {
     this.setState({ giftValue: text });
   }
 
-  validationForm () {
+  validationForm() {
     let isFormValid = true;
     let errors = {};
 
     if (this.state.gvNumber === '') {
       isFormValid = false;
-      errors[ "gvNumber" ] = customerErrorMessages.gvNumber;
+      errors["gvNumber"] = customerErrorMessages.gvNumber;
       this.setState({ gvNumberValid: false });
     }
     if (this.state.startDate === '') {
       isFormValid = false;
-      errors[ "startDate" ] = customerErrorMessages.startDate;
+      errors["startDate"] = customerErrorMessages.startDate;
       this.setState({ startDateValid: false });
     }
     if (this.state.endDate === '') {
       isFormValid = false;
-      errors[ "endDate" ] = customerErrorMessages.endDate;
+      errors["endDate"] = customerErrorMessages.endDate;
       this.setState({ endDateValid: false });
     }
     if (this.state.giftValue === "") {
       isFormValid = false;
-      errors[ "giftValue" ] = customerErrorMessages.giftValue;
+      errors["giftValue"] = customerErrorMessages.giftValue;
       this.setState({ giftValueValid: false });
     }
     this.setState({ errors: errors });
     return isFormValid;
   }
 
-  async addGiftVocher () {
+  async addGiftVocher() {
     const isFormValid = this.validationForm();
     if (isFormValid) {
       if (this.state.gvNumber === "") {
@@ -236,24 +243,24 @@ class GiftVocher extends Component {
 
   // Modal Flags
 
-  flagAddGiftVoucher () {
+  flagAddGiftVoucher() {
     this.setState({ flagGiftVoucherAdd: true, modalVisible: true });
   }
 
-  filterAction () {
+  filterAction() {
     this.setState({ flagFilterOpen: true, modalVisible: true, filterActive: true });
   }
 
-  modelCancel () {
+  modelCancel() {
     this.setState({ modalVisible: false });
   }
 
-  applyVoucherFilter () {
-    const { filterStartDate, filterEndDate, gvNumber, searchQuery } = this.state;
+  applyVoucherFilter() {
+    const { filterStartDate, filterEndDate, filterGvNumber, searchQuery } = this.state;
     const obj = {
       fromDate: filterStartDate ? filterStartDate : undefined,
       toDate: filterEndDate ? filterEndDate : undefined,
-      gvNumber: gvNumber ? gvNumber : searchQuery ? searchQuery : undefined,
+      gvNumber: filterGvNumber ? filterGvNumber : searchQuery ? searchQuery : undefined,
       clientId: parseInt(this.state.clientId)
     };
     CustomerService.searchGiftVoucher(obj).then((res) => {
@@ -267,7 +274,7 @@ class GiftVocher extends Component {
     });
   }
 
-  validationField () {
+  validationField() {
     let isFormValid = true;
     let errors = '';
     if (this.state.searchQuery < 2) {
@@ -279,7 +286,7 @@ class GiftVocher extends Component {
     return isFormValid;
   }
 
-  async onChangeSearch (text) {
+  async onChangeSearch(text) {
     const isFormValid = this.validationField();
     await this.setState({
       searchQuery: text
@@ -297,8 +304,8 @@ class GiftVocher extends Component {
     this.setState({ isgvModel: false, gvModelVisible: false });
   };
 
-  saveGvNumber () {
-    const obj = [ this.state.activeGVNumber ];
+  saveGvNumber() {
+    const obj = [this.state.activeGVNumber];
     CustomerService.saveGvNumber(obj, true).then(res => {
       if (res) {
         console.log("responsee", res);
@@ -309,7 +316,7 @@ class GiftVocher extends Component {
     this.hideGVModel();
   }
 
-  render () {
+  render() {
     const { gvNumberValid, startDateValid, endDateValid, giftValueValid, searchQueryValid } = this.state;
     return (
       <View style={{ backgroundColor: "#FFFFFF", flex: 1 }}>
@@ -398,17 +405,17 @@ class GiftVocher extends Component {
                         activeUnderlineColor='#000'
                         underlineColor={'#6f6f6f'}
                         label={('GV Number')}
-                        style={[ inputField, { borderColor: '#8F9EB717' } ]}
-                        value={this.state.gvNumber}
-                        onChangeText={(text) => this.handleGvNumber(text)}
+                        style={[inputField, { borderColor: '#8F9EB717' }]}
+                        value={this.state.filterGvNumber}
+                        onChangeText={(text) => this.handleFilterGvNumber(text)}
                       />
                     </KeyboardAwareScrollView>
                     <View style={forms.action_buttons_container}>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                         onPress={() => this.applyVoucherFilter()}>
                         <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
                         onPress={() => this.modelCancel()}>
                         <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>
@@ -442,7 +449,7 @@ class GiftVocher extends Component {
 
             <FlatList
               ListHeaderComponent={<View style={flatListHeaderContainer}>
-                <Text style={[ flatListTitle, { color: color.accent } ]}>{I18n.t('Gift Vouchers')}</Text>
+                <Text style={[flatListTitle, { color: color.accent }]}>{I18n.t('Gift Vouchers')}</Text>
                 <TouchableOpacity
                   style={styles.filterBtnStyle}
                   onPress={() => this.filterAction()} >
@@ -463,7 +470,7 @@ class GiftVocher extends Component {
                     <View style={textContainer}>
                       <Text style={textStyleMedium} selectable={true}>GV NUMBER: {item.gvNumber}</Text>
                       <TouchableOpacity onPress={() => this.activeGV(item)}>
-                        <Text style={[ textStyleMedium, { backgroundColor: item.isActivated ? '#009900' : '#ee0000', color: '#ffffff', padding: 5, alignSelf: 'flex-start', borderRadius: Device.isTablet ? 10 : 5, fontFamily: 'medium' } ]}>{I18n.t("Activate")} </Text>
+                        <Text style={[textStyleMedium, { backgroundColor: item.isActivated ? '#009900' : '#ee0000', color: '#ffffff', padding: 5, alignSelf: 'flex-start', borderRadius: Device.isTablet ? 10 : 5, fontFamily: 'medium' }]}>{I18n.t("Activate")} </Text>
                       </TouchableOpacity>
                     </View>
                     <View style={textContainer}>
@@ -474,13 +481,13 @@ class GiftVocher extends Component {
                 </View>
               )}
             />
-            <View style={{ height: 500 }}>
+            <View>
               <ScrollView>
                 <Text style={styles.titleStyle}>{I18n.t('Generate Gift Voucher')}</Text>
                 <View>
                   <Text style={styles.inputFieldText}>{I18n.t('GV Number')}</Text>
                   <TextInput
-                    style={[ inputField, { borderColor: gvNumberValid ? '#8F9EB717' : '#dd0000' } ]}
+                    style={[inputField, { borderColor: gvNumberValid ? '#8F9EB717' : '#dd0000' }]}
                     mode="flat"
                     activeUnderlineColor='#000'
                     underlineColor={'#6f6f6f'}
@@ -490,11 +497,11 @@ class GiftVocher extends Component {
                     onChangeText={(text) => this.handleGvNumber(text)}
                   />
                   {!gvNumberValid && (
-                    <Message imp={true} message={this.state.errors[ 'gvNumber' ]} />
+                    <Message imp={true} message={this.state.errors['gvNumber']} />
                   )}
                   <Text style={styles.inputFieldText}>{I18n.t('From Date')}</Text>
                   <TouchableOpacity
-                    style={[ dateSelector, { borderColor: startDateValid ? '#8F9EB717' : '#dd0000' } ]}
+                    style={[dateSelector, { borderColor: startDateValid ? '#8F9EB717' : '#dd0000' }]}
                     testID="openModal"
                     onPress={() => this.datepickerClicked()}
                   >
@@ -524,11 +531,11 @@ class GiftVocher extends Component {
                     </View>
                   )}
                   {!startDateValid && (
-                    <Message imp={true} message={this.state.errors[ 'startDate' ]} />
+                    <Message imp={true} message={this.state.errors['startDate']} />
                   )}
                   <Text style={styles.inputFieldText}>{I18n.t('To Date')}</Text>
                   <TouchableOpacity
-                    style={[ dateSelector, { borderColor: endDateValid ? '#8F9EB717' : '#dd0000' } ]}
+                    style={[dateSelector, { borderColor: endDateValid ? '#8F9EB717' : '#dd0000' }]}
                     testID="openModal"
                     onPress={() => this.enddatepickerClicked()}
                   >
@@ -564,12 +571,12 @@ class GiftVocher extends Component {
                     </View>
                   )}
                   {!startDateValid && (
-                    <Message imp={true} message={this.state.errors[ 'endDate' ]} />
+                    <Message imp={true} message={this.state.errors['endDate']} />
                   )}
                   <View >
                     <Text style={styles.inputFieldText}>{I18n.t('Amount')}</Text>
                     <TextInput
-                      style={[ inputField, { borderColor: giftValueValid ? '#8F9EB717' : '#dd0000' } ]}
+                      style={[inputField, { borderColor: giftValueValid ? '#8F9EB717' : '#dd0000' }]}
                       label={I18n.t('Enter Amount')}
                       mode="flat"
                       activeUnderlineColor='#000'
@@ -579,7 +586,7 @@ class GiftVocher extends Component {
                       onChangeText={(text) => this.handleValue(text)}
                     />
                     {!startDateValid && (
-                      <Message imp={true} message={this.state.errors[ 'giftValue' ]} />
+                      <Message imp={true} message={this.state.errors['giftValue']} />
                     )}
                     <Text style={styles.inputFieldText}>{I18n.t('Description')}</Text>
                     <TextInput
@@ -588,7 +595,7 @@ class GiftVocher extends Component {
                       underlineColor={'#6f6f6f'}
                       multiline
                       numberOfLines={5}
-                      style={[ styles.textArea, { borderColor: '#8F9EB717' } ]}
+                      style={[styles.textArea, { borderColor: '#8F9EB717' }]}
                       label={I18n.t('Write')}
                       value={this.state.description}
                       onChangeText={(text) => this.handleDescription(text)}
@@ -619,17 +626,17 @@ class GiftVocher extends Component {
                         activeUnderlineColor='#000'
                         underlineColor={'#6f6f6f'}
                         label={('GV Number')}
-                        style={[ inputField, { borderColor: '#8F9EB717' } ]}
+                        style={[inputField, { borderColor: '#8F9EB717' }]}
                         value={this.state.activeGVNumber}
                         disabled
                       />
                     </KeyboardAwareScrollView>
                     <View style={forms.action_buttons_container}>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                         onPress={() => this.saveGvNumber()}>
                         <Text style={forms.submit_btn_text} >{I18n.t("SAVE")}</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
                         onPress={() => this.hideGVModel()}>
                         <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>

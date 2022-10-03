@@ -675,12 +675,12 @@ class GenerateEstimationSlip extends Component {
                               </TouchableOpacity>
                               <TextInput
                                 style={{
-                                  color: '#ED1C24',
                                   fontFamily: 'regular',
                                   fontSize: RF(10),
                                 }}
                                 keyboardType={'number-pad'}
                                 underlineColor='#6f6f6f'
+                                activeUnderlineColor='#000'
                                 value={String(item.quantity)}
                                 textAlign={'center'}
                                 onChangeText={(text) => this.updateQuanty(text, index, item)}
