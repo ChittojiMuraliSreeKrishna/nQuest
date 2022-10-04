@@ -492,7 +492,7 @@ export default class GenerateReturnSlip extends Component {
                       color: '#353C40'
                     }}> {I18n.t("Please provide customer phone number")}  </Text>
                     <TextInput
-                      style={forms.inputfld}
+                      style={forms.input_fld}
                       mode="flat"
                       activeUnderlineColor='#000'
                       underlineColor={'#6f6f6f'}

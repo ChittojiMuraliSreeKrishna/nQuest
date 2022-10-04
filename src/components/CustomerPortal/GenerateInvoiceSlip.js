@@ -1416,7 +1416,7 @@ class GenerateInvoiceSlip extends Component {
                         color: '#353C40'
                       }}> {I18n.t("Please provide customer phone number")}  </Text>
                       <TextInput
-                        style={forms.inputfld}
+                        style={forms.input_fld}
                         mode="flat"
                         activeUnderlineColor='#000'
                         underlineColor={'#6f6f6f'}
@@ -1455,7 +1455,7 @@ class GenerateInvoiceSlip extends Component {
                   <Text style={forms.popUp_decorator}>-</Text>
                   <View style={forms.filterModelSub}>
                     <TextInput
-                      style={forms.inputfld}
+                      style={forms.input_fld}
                       mode="flat"
                       activeUnderlineColor='#000'
                       underlineColor={'#6f6f6f'}
@@ -1472,7 +1472,7 @@ class GenerateInvoiceSlip extends Component {
                     )}
 
                     <TextInput
-                      style={forms.inputfld}
+                      style={forms.input_fld}
                       mode="flat"
                       activeUnderlineColor='#000'
                       underlineColor={'#6f6f6f'}
