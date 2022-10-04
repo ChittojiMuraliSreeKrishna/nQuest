@@ -45,7 +45,7 @@ export class SelectClient extends Component {
 
   handleChecked = (item, index) => {
     this.setState({ selectedItem: index });
-    AsyncStorage.setItem("custom:clientId1", String(item.id)).then((value) => { console.log({ value }); }).catch(() => { alert('There is an error saving clientId'); });
+    AsyncStorage.setItem("custom:clientId1", String(item.id)).then((value) => { console.log(item.id); }).catch(() => { alert('There is an error saving clientId'); });
 
   };
 

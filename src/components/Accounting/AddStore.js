@@ -343,6 +343,7 @@ export default class AddStore extends Component {
             if (res?.data) {
               this.props.route.params.onGoBack();
               this.props.navigation.goBack();
+              alert("store added successfully");
             } else {
               this.setState({ loading: false });
               alert(res.data.message);
@@ -581,9 +582,9 @@ export default class AddStore extends Component {
             <RNPickerSelect
               placeholder={{
                 label: "Active",
-                value: "",
+                value: "true",
               }}
-              disabled
+              disabled={this.state.isEdit ? false : true}
               Icon={() => {
                 return (
                   <Chevron
@@ -594,7 +595,6 @@ export default class AddStore extends Component {
                 );
               }}
               items={[
-                { label: "Active", value: true },
                 { label: "InActive", value: false },
               ]}
               onValueChange={(value) => this.handleStatus(value)}

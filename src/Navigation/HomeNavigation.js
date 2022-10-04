@@ -13,9 +13,12 @@ import TopBarNavigation from "./TopBarNavigation";
 
 const Stack = createStackNavigator();
 export default class HomeNavigation extends React.Component {
+  componentDidMount () {
+    this.props.navigation.push("TopBarNavigation");
+  }
   render () {
     return (
-      <Stack.Navigator initialRouteName="TopBarNavigation">
+      <Stack.Navigator>
         <Stack.Screen
           name="TopBarNavigation"
           options={{ headerShown: false, gestureEnabled: false, }}
@@ -61,7 +64,7 @@ export default class HomeNavigation extends React.Component {
           options={{ headerShown: false }}
           component={ManagePassword}
         />
-        <Stack.Screen name="SelectClient" options={{ headersShown: false }} component={SelectClient} />
+        <Stack.Screen name="SelectClient" options={{ headerShown: false }} component={SelectClient} />
       </Stack.Navigator>
     );
   }

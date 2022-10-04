@@ -94,73 +94,23 @@ export class TopBar extends Component {
     );
   }
 
-  renderSubHeadings (privilegeName) {
-    this.setState({ headerNames: [], privilages: [] });
-    AsyncStorage.getItem("rolename").then((value) => {
-      console.log({ value });
-      UrmService.getPrivillagesByRoleName(value).then((res) => {
-        console.log(res.data, "TopPrev");
-        if (res) {
-          if (res.data) {
-            let len = res.data.parentPrivileges.length;
-            for (let i = 0; i < len; i++) {
-              let privilege = res.data.parentPrivileges[ i ];
-              if (privilege.name === String(privilegeName)) {
-                let privilegeId = privilege.id;
-                let sublen = privilege.subPrivileges.length;
-                let subPrivileges = privilege.subPrivileges;
-                console.log(subPrivileges, "TopSubPrev");
-                for (let i = 0; i < sublen; i++) {
-                  if (privilegeId === subPrivileges[ i ].parentPrivilegeId) {
-                    let routes = subPrivileges[ i ].name;
-
-                    this.state.headerNames.push({ name: routes });
-                    console.log("Header Names", this.state.headerNames);
-                  }
-                }
-                this.setState({ headerNames: this.state.headerNames }, () => {
-                  for (let j = 0; j < this.state.headerNames.length; j++) {
-                    if (j === 0) {
-                      this.state.privilages.push({
-                        bool: true,
-                        name: this.state.headerNames[ j ].name,
-                      });
-                    } else {
-                      this.state.privilages.push({
-                        bool: false,
-                        name: this.state.headerNames[ j ].name,
-                      });
-                    }
-                  }
-                });
-                this.setState({ privilages: this.state.privilages }, () => {
-                  this.props.navigation.navigate(String(this.state.privilages[ 0 ].name));
-                });
-                console.log(this.state.privilages, "TopPtiv");
-              }
-            }
-          }
-        }
-      });
-    });
-  }
   //Before screen render
   async componentWillMount () {
     currentSelection = "";
     var storeStringId = "";
     displayName = "";
-    this.setState({ firstDisplayName: "" });
+    this.setState({ firstDisplayName: "", privilages: [] });
     var domainStringId = "";
     // this.props.navigation.navigate('Login')
-
+  }
+  async componentDidMount () {
     AsyncStorage.getItem("storeId")
       .then((value) => {
         storeStringId = value;
         this.setState({ storeId: parseInt(storeStringId) });
-        //console.log(this.state.storeId);
       })
       .catch(() => {
-        console.log("There is error getting storeId");
+        console.error("There is error getting storeId");
       });
 
     await AsyncStorage.getItem("rolename")
@@ -168,7 +118,7 @@ export class TopBar extends Component {
         global.userrole = value;
       })
       .catch(() => {
-        console.log("There is error getting userrole");
+        console.error("There is error getting userrole");
       });
 
     await AsyncStorage.getItem("username").then((value) => {
@@ -192,20 +142,8 @@ export class TopBar extends Component {
 
   async getPrivileges () {
     await AsyncStorage.getItem("roleType").then((value) => {
-      if (value === "config_user") {
+      if (value === "super_admin") {
         let privilegesSet = new Set();
-        global.previlage1 = "";
-        global.previlage2 = "";
-        global.previlage3 = "";
-        global.previlage4 = "";
-        global.previlage5 = "";
-        global.previlage6 = "";
-        global.previlage7 = "URM Portal";
-        privilegesSet.add("URM Portal");
-        data = Array.from(privilegesSet);
-        this.setState({ firstDisplayName: "URM Portal" });
-        this.getData();
-      } else if (value === "super_admin") {
         global.previlage1 = "Dashboard";
         global.previlage2 = "Billing Portal";
         global.previlage3 = "Inventory Portal";
@@ -226,7 +164,6 @@ export class TopBar extends Component {
                     firstDisplayName: res.data.parentPrivileges[ 0 ].name,
                   });
                   const firstDisplayName = this.state.firstDisplayName;
-                  console.log({ firstDisplayName });
                   firstDisplayRoute = res.data.parentPrivileges[ 0 ].name;
                   var privilegesSet = new Set();
                   for (let i = 0; i < len; i++) {
@@ -256,7 +193,6 @@ export class TopBar extends Component {
                       global.previlage7 = "Ticketing Portal";
                     }
                     privilegesSet.add(previlage.name);
-                    // data.push(previlage.name);user1
                   }
                   data = Array.from(privilegesSet);
                 }
@@ -266,30 +202,86 @@ export class TopBar extends Component {
             });
           })
           .catch((err) => {
-            console.log(err);
+            console.error(err);
           });
       }
     });
   }
   async getData () {
     const { firstDisplayName, firstDisplayNameScreen } = this.state;
+    this.renderSubHeadings(firstDisplayName);
     console.log("data in get data", firstDisplayName, currentSelection);
-    if (currentSelection === "") {
-      currentSelection = firstDisplayName;
-      this.setState({
-        firstDisplayNameScreen: screenMapping[ firstDisplayName ],
+    this.setState({ privilages: [] }, () => {
+      if (currentSelection === "") {
+        currentSelection = firstDisplayName;
+        this.setState({
+          firstDisplayNameScreen: screenMapping[ firstDisplayName ],
+          privilages: []
+        });
+        this.props.navigation.navigate(
+          this.state.firstDisplayNameScreen,
+        );
+      } else if (firstDisplayRoute === currentSelection) {
+        this.props.navigation.navigate(
+          screenMapping[ firstDisplayRoute ],
+        );
+      }
+    });
+  }
+
+  async renderSubHeadings (privilegeName) {
+    console.log({ privilegeName });
+    this.setState({ headerNames: [], privilages: [] }, async () => {
+      await AsyncStorage.getItem("rolename").then(value => {
+        UrmService.getPrivillagesByRoleName(value).then(async (res) => {
+          console.log(res.data, "TopPrev");
+          if (res) {
+            if (res.data) {
+              let len = res.data.parentPrivileges.length;
+              for (let i = 0; i < len; i++) {
+                let privilege = res.data.parentPrivileges[ i ];
+                if (privilege.name === String(privilegeName)) {
+                  let privilegeId = privilege.id;
+                  let sublen = privilege.subPrivileges.length;
+                  let subPrivileges = privilege.subPrivileges;
+                  console.log(subPrivileges, "TopSubPrev");
+                  for (let i = 0; i < sublen; i++) {
+                    if (privilegeId === subPrivileges[ i ].parentPrivilegeId) {
+                      let routes = subPrivileges[ i ].name;
+                      this.state.headerNames.push({ name: routes });
+                      console.log("Header Names", this.state.headerNames);
+                    }
+                  }
+                  await this.setState({ headerNames: this.state.headerNames }, () => {
+                    for (let j = 0; j < this.state.headerNames.length; j++) {
+                      if (j === 0) {
+                        this.state.privilages.push({
+                          bool: true,
+                          name: this.state.headerNames[ j ].name,
+                        });
+                      } else {
+                        this.state.privilages.push({
+                          bool: false,
+                          name: this.state.headerNames[ j ].name,
+                        });
+                      }
+                    }
+                  });
+                  await this.setState({ privilages: this.state.privilages }, () => {
+                    this.props.navigation.navigate(String(this.state.privilages[ 0 ].name));
+                    console.log(this.state.privilages, "TopPtiv");
+                  });
+                }
+              }
+            }
+          }
+        });
       });
-      this.props.navigation.navigate(
-        this.state.firstDisplayNameScreen,
-        this.refresh(),
-        this.renderSubHeadings(firstDisplayRoute)
-      );
-    } else if (firstDisplayRoute === currentSelection) {
-      this.props.navigation.navigate(
-        screenMapping[ firstDisplayRoute ],
-        this.refresh(),
-      );
-    }
+    });
+  }
+
+  async componentWillUnmount () {
+    await this.setState({ privilages: [] });
   }
 
   modalHandle () {
@@ -309,10 +301,6 @@ export class TopBar extends Component {
     this.setState({ popupModel: !this.state.popupModel });
   }
 
-  refresh () {
-    console.log("inside refresh");
-    this.setState({ refresh: !this.state.refresh });
-  }
 
   openProfilePopup () {
     this.setState({ popupModel: true });
@@ -325,6 +313,11 @@ export class TopBar extends Component {
 
   selectStoreNavigate () {
     this.props.navigation.navigate("SelectStore");
+    this.setState({ popupModel: false });
+  }
+
+  selectClientNavigate () {
+    this.props.navigation.navigate("SelectClient");
     this.setState({ popupModel: false });
   }
 
@@ -406,15 +399,25 @@ export class TopBar extends Component {
                     ></IconMA>
                     <TEXT variant="labelMedium" style={scss.popUpText}>Profile</TEXT>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => this.selectStoreNavigate()}
-                    style={[ scss.popUpButtons ]}>
-                    <IconMA
-                      name="storefront"
-                      size={25}
-                      style={scss.popUpIcons}
-                    ></IconMA>
-                    <TEXT variant="labelMedium" style={[ scss.popUpText ]}>Select Store</TEXT>
-                  </TouchableOpacity>
+                  {global.userrole === "client_support" ?
+                    <TouchableOpacity style={[ scss.popUpButtons ]} onPress={() => this.selectClientNavigate()}>
+                      <IconMA
+                        name="people-outline"
+                        size={25}
+                        style={scss.popUpIcons}
+                      ></IconMA>
+                      <TEXT variant="labelMedium" style={[ scss.popUpText ]}>Select Client</TEXT>
+                    </TouchableOpacity >
+                    :
+                    <TouchableOpacity onPress={() => this.selectStoreNavigate()}
+                      style={[ scss.popUpButtons ]}>
+                      <IconMA
+                        name="storefront"
+                        size={25}
+                        style={scss.popUpIcons}
+                      ></IconMA>
+                      <TEXT variant="labelMedium" style={[ scss.popUpText ]}>Select Store</TEXT>
+                    </TouchableOpacity>}
                   <TouchableOpacity onPress={() => this.logoutNavigation()} style={[ scss.popUpButtons ]}>
                     <IconMA
                       name="logout"
@@ -482,7 +485,6 @@ export class TopBar extends Component {
           <FlatList
             horizontal
             data={this.state.privilages}
-
             initialScrollIndex={0}
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}

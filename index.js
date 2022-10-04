@@ -20,7 +20,7 @@ if (ENCRYPTION) {
 
 // Request Interceptors
 axios.interceptors.request.use(
-  (req) => {
+  async (req) => {
     // const key = "23KAVfsyYqk+hxye3/LDM59Ts8hTiAs=";
     // var encryptedKey = encrypt.encrypt(key);
     // Encryption
@@ -38,29 +38,20 @@ axios.interceptors.request.use(
       var encryptedBytes = cipher.toString();
     }
 
-    var clientId = null;
-    AsyncStorage.getItem("custom:clientId1").then(value => {
-      clientId = value ? value : "0";
-      // console.log({ clientId });
-    });
-    // req.headers = {
-    //   "Content-Type": "application/json",
-    // };
-    var finalToken = null;
-    AsyncStorage.getItem("tokenkey").then(value => {
-      finalToken = value.replace(' " ', '');
-      console.log({ finalToken });
+    var clientId = await AsyncStorage.getItem("custom:clientId1");
+    AsyncStorage.getItem("tokenkey").then((value) => {
+      var finalToken = value.replace('"', "");
+      axios.defaults.headers.common = {
+        Authorization: "Bearer" + " " + finalToken,
+        clientId: clientId ? clientId : "0",
+      };
     });
 
+    req.headers.patch[ 'Content-Type' ] = 'application/json';
+    req.headers.post[ 'Content-Type' ] = 'application/json';
+    req.headers.put[ 'Content-Type' ] = 'application/json';
+    req.headers[ 'Content-Type' ] = 'application/json';
 
-    // req.headers.clientId = clientId ? clientId : "0";
-    if (finalToken !== null) {
-      req.headers.Authorization = "Bearer" + " " + finalToken;
-      req.headers.clientId = clientId ? clientId : "0";
-    }
-
-    // req.headers[ "Content-Type" ] = "application/json";
-    // req.headers[ "enc-key" ] = encryptedKey;
     if (ENCRYPTION) {
       // req.headers = {
       //   "Content-Type": "application/json",
@@ -72,11 +63,10 @@ axios.interceptors.request.use(
       req.headers[ "enc-key" ] = encryptedKey;
       req.headers[ "Authorization" ] = "Bearer" + " " + finalToken;
       req.headers[ "clientId" ] = clientId ? clientId : "0";
-
       req.data = encryptedBytes;
     }
-    console.log(req.headers);
-    console.log({ req });
+    console.log(req.headers, "headersReq");
+    // console.log({ req });
     return req;
   },
   (err) => {
@@ -94,7 +84,7 @@ axios.interceptors.response.use((response) => response, (error) => {
     // alert('The requested resource does not exist or has been deleted')
     alert(error.response && error.response.data && error.response.data.message
       ? error.response.data.message : "Something went Wrong"
-    )
+    );
   }
 
   if (error.response.status === 401) {

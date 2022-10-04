@@ -48,7 +48,7 @@ export default class AddProductCombo extends Component {
     };
   }
 
-  async componentDidMount() {
+  async componentDidMount () {
     const domainId = await AsyncStorage.getItem("domainDataId");
     const storeId = await AsyncStorage.getItem("storeId");
     console.log("storeId");
@@ -66,43 +66,43 @@ export default class AddProductCombo extends Component {
   }
 
   // Back Functions
-  cancel() {
+  cancel () {
     this.props.navigation.goBack(null);
     this.props.route.params.onGoBack(null);
   }
-  handleBackButtonClick() {
+  handleBackButtonClick () {
     this.props.navigation.goBack(null);
     this.props.route.params.onGoBack(null);
   }
 
   // Validation Form
-  validationForm() {
+  validationForm () {
     let isValid = true;
     let errors = {};
     const { listOfProducts, comboName, comboQty, comboPrice } = this.state;
     if (listOfProducts.length < 1) {
       isValid = false;
-      errors["product"] = inventoryErrorMessages.products;
+      errors[ "product" ] = inventoryErrorMessages.products;
     }
     if (comboPrice === "") {
       isValid = false;
-      errors["comboPrice"] = inventoryErrorMessages.comboPrice;
+      errors[ "comboPrice" ] = inventoryErrorMessages.comboPrice;
     }
     if (comboName.length < 1) {
       isValid = false;
-      errors["comboName"] = inventoryErrorMessages.comboName;
+      errors[ "comboName" ] = inventoryErrorMessages.comboName;
       console.log("error");
     }
     if (comboQty.length < 1) {
       isValid = false;
-      errors["comboQty"] = inventoryErrorMessages.comboQty;
+      errors[ "comboQty" ] = inventoryErrorMessages.comboQty;
     }
     this.setState({ errors: errors });
     return isValid;
   }
 
   // Getting Barcode Details
-  getBarcodeDetails() {
+  getBarcodeDetails () {
     const { selectedDomainId, storeId, barCodeId, listOfProducts } = this.state;
     InventoryService.getBarcodesDetails(
       storeId,
@@ -119,11 +119,11 @@ export default class AddProductCombo extends Component {
           listOfProducts.push(Details);
         } else {
           for (let i = 0; i < listOfProducts.length; i++) {
-            if (listOfProducts[i].barcode === Details.barcode) {
+            if (listOfProducts[ i ].barcode === Details.barcode) {
               count = true;
-              var items = [...this.state.listOfProducts];
-              if (items[i].quantity < items[i].qty) {
-                items[i].quantity = items[i].quantity + 1;
+              var items = [ ...this.state.listOfProducts ];
+              if (items[ i ].quantity < items[ i ].qty) {
+                items[ i ].quantity = items[ i ].quantity + 1;
                 break;
               } else {
                 alert("Insufficient quantity");
@@ -148,7 +148,7 @@ export default class AddProductCombo extends Component {
   }
 
   // Save Product Combo
-  saveProduct() {
+  saveProduct () {
     const {
       listOfProducts,
       comboQty,
@@ -206,8 +206,8 @@ export default class AddProductCombo extends Component {
   }
 
   // Delete Barcode
-  handleProductDeleteAction(item, index) {
-    const listOfProducts = [...this.state.listOfProducts];
+  handleProductDeleteAction (item, index) {
+    const listOfProducts = [ ...this.state.listOfProducts ];
     listOfProducts.splice(index, 1);
     this.setState({ listOfProducts });
   }
@@ -216,46 +216,46 @@ export default class AddProductCombo extends Component {
   updateQty = (text, index, item) => {
     const Qty = /^[0-9\b]+$/;
     const { listOfProducts } = this.state;
-    const qtyarr = [...listOfProducts];
-    console.log("barcode Qty", qtyarr[index].quantity);
+    const qtyarr = [ ...listOfProducts ];
+    console.log("barcode Qty", qtyarr[ index ].quantity);
     let addItem = "";
     let value = text === "" ? 1 : text;
     if (value !== "" && Qty.test(value) === false) {
       addItem = 1;
-      qtyarr[index].quantity = addItem.toString();
+      qtyarr[ index ].quantity = addItem.toString();
     } else {
-      if (parseInt(value) < parseInt(qtyarr[index].qty)) {
+      if (parseInt(value) < parseInt(qtyarr[ index ].qty)) {
         addItem = value;
-        qtyarr[index].quantity = addItem.toString();
+        qtyarr[ index ].quantity = addItem.toString();
       } else {
-        addItem = qtyarr[index].qty;
-        qtyarr[index].quantity = addItem.toString();
+        addItem = qtyarr[ index ].qty;
+        qtyarr[ index ].quantity = addItem.toString();
       }
     }
     this.setState({ listOfProducts: qtyarr });
   };
 
   // Decrement Table
-  decreamentForTable(item, index) {
-    const qtyrr = [...this.state.listOfProducts];
-    if (qtyrr[index].quantity > 1) {
-      var additem = parseInt(qtyrr[index].quantity) - 1;
-      qtyrr[index].quantity = additem.toString();
+  decreamentForTable (item, index) {
+    const qtyrr = [ ...this.state.listOfProducts ];
+    if (qtyrr[ index ].quantity > 1) {
+      var additem = parseInt(qtyrr[ index ].quantity) - 1;
+      qtyrr[ index ].quantity = additem.toString();
     } else {
-      qtyrr.splice(index, 1)
+      qtyrr.splice(index, 1);
     }
     this.setState({ listOfProducts: qtyrr });
   }
 
   // Increment Table
-  incrementForTable(item, index) {
-    const qtyrr = [...this.state.listOfProducts];
-    if (parseInt(qtyrr[index].quantity) < parseInt(qtyrr[index].qty)) {
-      var addItem = parseInt(qtyrr[index].quantity) + 1;
-      qtyrr[index].quantity = addItem.toString();
+  incrementForTable (item, index) {
+    const qtyrr = [ ...this.state.listOfProducts ];
+    if (parseInt(qtyrr[ index ].quantity) < parseInt(qtyrr[ index ].qty)) {
+      var addItem = parseInt(qtyrr[ index ].quantity) + 1;
+      qtyrr[ index ].quantity = addItem.toString();
     } else {
-      var addItem = parseInt(qtyrr[index].qty);
-      qtyrr[index].quantity = addItem.toString();
+      var addItem = parseInt(qtyrr[ index ].qty);
+      qtyrr[ index ].quantity = addItem.toString();
       alert(`Only ${addItem} items are in this barcode`);
     }
     this.setState({ listOfProducts: qtyrr });
@@ -281,7 +281,7 @@ export default class AddProductCombo extends Component {
     this.setState({ comboPrice: value });
   };
 
-  render() {
+  render () {
     const { errors, listOfProducts } = this.state;
     console.log({ listOfProducts });
     return (
@@ -308,7 +308,7 @@ export default class AddProductCombo extends Component {
               value={this.state.comboName}
               onChangeText={(value) => this.handleComboName(value)}
             />
-            <Message imp={false} message={errors["comboName"]} />
+            <Message imp={false} message={errors[ "comboName" ]} />
             <Text style={inputHeading}>Combo Price</Text>
             <TextInput
               outlineColor="#8F9EB7"
@@ -323,7 +323,7 @@ export default class AddProductCombo extends Component {
               value={this.state.comboPrice}
               onChangeText={(value) => this.handleComboPrice(value)}
             />
-            <Message imp={false} message={errors["comboPrice"]} />
+            <Message imp={false} message={errors[ "comboPrice" ]} />
             <Text style={inputHeading}>Combo Qty</Text>
             <TextInput
               outlineColor="#8F9EB7"
@@ -338,8 +338,8 @@ export default class AddProductCombo extends Component {
               value={this.state.comboQty}
               onChangeText={(value) => this.handleComboQty(value)}
             />
-            <Message imp={false} message={errors["comboQty"]} />
-            <Text style={inputHeading}>Barcode</Text>
+            <Message imp={false} message={errors[ "comboQty" ]} />
+            <Text style={inputHeading}>Add Products By</Text>
             <TextInput
               outlineColor="#8F9EB7"
               activeOutlineColor="#000"
@@ -356,7 +356,7 @@ export default class AddProductCombo extends Component {
                 this.getBarcodeDetails();
               }}
             />
-            <Message imp={false} message={errors["product"]} />
+            <Message imp={false} message={errors[ "product" ]} />
           </View>
           <View>
             <FlatList
