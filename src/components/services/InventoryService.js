@@ -152,5 +152,9 @@ class InventoryService {
   saveUOM() {
     return BASE_URL + "/uom/saveUom";
   }
+  getDomainAttributes(domain) {
+    const param2 = '?domainType=' + domain;
+    return axios.get(BASE_URL + "/inventory/inventory-management/domain-attributes" + param2);
+  }
 }
 export default new InventoryService();

@@ -101,7 +101,7 @@ export default class CreateHSNCode extends Component {
               <View style={scss.flatListContainer}>
                 <View style={scss.flatListSubContainer}>
                   <View style={scss.textContainer}>
-                    <Text style={scss.highText}>{item.hsnCode}</Text>
+                    <Text style={scss.highText}>HSN Code : {item.hsnCode}</Text>
                   </View>
                   <View style={scss.textContainer}>
                     <Text style={scss.textStyleLight}> GOODS/SERVICES:

@@ -101,7 +101,7 @@ export default class CreateTaxMaster extends Component {
                 <View style={scss.flatListSubContainer}>
                   <View style={scss.textContainer}>
                     <Text style={scss.textStyleLight}>
-                      <Text style={scss.highText}>{item.taxLabel}</Text></Text>
+                      <Text style={scss.highText}>Tax Label: {item.taxLabel}</Text></Text>
                     <Text style={scss.textStyleMedium}>CGST: {item.cgst}</Text>
                   </View>
                   <View style={scss.textContainer}>
