@@ -33,6 +33,7 @@ import {
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { color } from "../Styles/colorStyles";
 
 
 var deviceWidth = Dimensions.get("window").width;
@@ -330,7 +331,7 @@ export default class AddHsnCode extends Component {
 							<View style={rnPickerContainer}>
 								<RNPickerSelect
 									placeholder={{
-										label: "TAX Label",
+										label: "Select",
 										value: "",
 									}}
 									Icon={() => {
@@ -378,7 +379,7 @@ export default class AddHsnCode extends Component {
 							<View style={rnPickerContainer}>
 								<RNPickerSelect
 									placeholder={{
-										label: "TAX Label",
+										label: "Select",
 										value: "",
 									}}
 									Icon={() => {
@@ -403,7 +404,7 @@ export default class AddHsnCode extends Component {
 					<View style={rnPickerContainer}>
 						<RNPickerSelect
 							placeholder={{
-								label: "TAX %",
+								label: "Select",
 							}}
 							Icon={() => {
 								return (
@@ -421,7 +422,7 @@ export default class AddHsnCode extends Component {
 					<View style={rnPickerContainer}>
 						<RNPickerSelect
 							placeholder={{
-								label: "DESCRIPTION",
+								label: "Select",
 							}}
 							Icon={() => {
 								return (
@@ -440,7 +441,7 @@ export default class AddHsnCode extends Component {
 					<View style={rnPickerContainer}>
 						<RNPickerSelect
 							placeholder={{
-								label: "TAX TYPE",
+								label: "Select",
 							}}
 							Icon={() => {
 								return (
@@ -455,10 +456,12 @@ export default class AddHsnCode extends Component {
 						/>
 					</View>
 					<Text style={inputHeading}>Domain</Text>
-					<View style={rnPickerContainer}>
+					<View style={[rnPickerContainer, {
+						// backgroundColor: this.state.isEdit ? color.disabledBorder : color.light
+					}]}>
 						<RNPickerSelect
 							placeholder={{
-								label: "DOMAIN",
+								label: "Select",
 							}}
 							Icon={() => {
 								return (
