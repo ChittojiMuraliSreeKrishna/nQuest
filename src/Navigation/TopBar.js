@@ -209,7 +209,6 @@ export class TopBar extends Component {
   }
   async getData () {
     const { firstDisplayName, firstDisplayNameScreen } = this.state;
-    this.renderSubHeadings(firstDisplayName);
     console.log("data in get data", firstDisplayName, currentSelection);
     this.setState({ privilages: [] }, () => {
       if (currentSelection === "") {
@@ -219,11 +218,13 @@ export class TopBar extends Component {
           privilages: []
         });
         this.props.navigation.navigate(
-          this.state.firstDisplayNameScreen,
+          screenMapping[ firstDisplayName ],
+          this.renderSubHeadings(firstDisplayName)
         );
       } else if (firstDisplayRoute === currentSelection) {
         this.props.navigation.navigate(
           screenMapping[ firstDisplayRoute ],
+          this.renderSubHeadings(firstDisplayName)
         );
       }
     });

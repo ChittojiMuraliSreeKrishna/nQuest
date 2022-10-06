@@ -48,9 +48,6 @@ axios.interceptors.request.use(
     });
 
     req.headers.patch[ 'Content-Type' ] = 'application/json';
-    req.headers.post[ 'Content-Type' ] = 'application/json';
-    req.headers.put[ 'Content-Type' ] = 'application/json';
-    req.headers[ 'Content-Type' ] = 'application/json';
 
     if (ENCRYPTION) {
       // req.headers = {
