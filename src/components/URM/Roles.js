@@ -28,15 +28,11 @@ import {
   datePickerButton2,
   datePickerContainer,
   dateSelector,
-  dateText,
-  inputField
+  dateText
 } from "../Styles/FormFields";
 
+import Loader from "../../commonUtils/loader";
 import { RH } from "../../Responsive";
-import {
-  filterCloseImage,
-  filterHeading, filterSubContainer
-} from "../Styles/PopupStyles";
 import { filterBtn, flatListTitle } from "../Styles/Styles";
 
 var deviceheight = Dimensions.get("window").height;
@@ -54,7 +50,8 @@ export default class Roles extends Component {
       modalVisible: true,
       createdDate: "",
       date: new Date(),
-      role: ''
+      role: '',
+      loading: false
     };
   }
 
@@ -73,14 +70,18 @@ export default class Roles extends Component {
 
   // Getting Roles List
   getRolesList () {
-    this.setState({ rolesData: [] });
+    this.setState({ rolesData: [], loading: true });
     const { clientId, pageNumber } = this.state;
     UrmService.getAllRoles(clientId, pageNumber).then((res) => {
       if (res) {
         let response = res.data;
         console.log({ response });
-        this.setState({ rolesData: res.data });
+        this.setState({ rolesData: res.data, loading: false });
+      } else {
+        this.setState({ loading: false });
       }
+    }).catch((err) => {
+      this.setState({ loading: false });
     });
   }
 
@@ -223,6 +224,7 @@ export default class Roles extends Component {
     const { filterActive, rolesData, filterRolesData } = this.state;
     return (
       <View>
+        {this.state.loading && <Loader loading={this.state.loading} />}
         <FlatList
           style={scss.flatListBody}
           ListHeaderComponent={
@@ -318,38 +320,16 @@ export default class Roles extends Component {
             <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}
               onBackButtonPress={() => this.modelCancel()}
               onBackdropPress={() => this.modelCancel()} >
-              <View style={styles.filterMainContainer}>
-                <View>
-                  <View style={filterSubContainer}>
-                    <View>
-                      <Text style={filterHeading}> {I18n.t("Filter By")} </Text>
-                    </View>
-                    <View>
-                      <TouchableOpacity
-                        style={filterCloseImage}
-                        onPress={() => this.modelCancel()}
-                      >
-                        <Image
-                          style={{ margin: 5 }}
-                          source={require("../assets/images/modelcancel.png")}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                  <Text
-                    style={{
-                      height: Device.isTablet ? 2 : 1,
-                      width: deviceWidth,
-                      backgroundColor: "lightgray",
-                    }}
-                  ></Text>
-                </View>
+              <View style={forms.filterModelContainer}>
+                <Text
+                  style={forms.popUp_decorator}
+                ></Text>
                 <KeyboardAwareScrollView enableOnAndroid={true}>
                   <TextInput
                     mode="outlined"
-                    outlineColor="#dfdfdf"
-                    activeOutlineColor="#dfdfdf"
-                    style={inputField}
+                    outlineColor="#b9b9b9"
+                    activeOutlineColor="#b9b9b9"
+                    style={forms.input_fld}
                     underlineColorAndroid="transparent"
                     placeholder={I18n.t("ROLE")}
                     placeholderTextColor="#6F6F6F"
@@ -360,9 +340,9 @@ export default class Roles extends Component {
                   />
                   <TextInput
                     mode="outlined"
-                    outlineColor="#dfdfdf"
-                    activeOutlineColor="#dfdfdf"
-                    style={inputField}
+                    outlineColor="#b9b9b9"
+                    activeOutlineColor="#b9b9b9"
+                    style={forms.input_fld}
                     underlineColorAndroid="transparent"
                     placeholder={I18n.t("CREATED BY")}
                     placeholderTextColor="#6F6F6F"

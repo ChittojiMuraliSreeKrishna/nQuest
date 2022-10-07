@@ -15,7 +15,6 @@ import Loader from '../../commonUtils/loader';
 import { RH, RW } from '../../Responsive';
 import AccountingService from '../services/AccountingService';
 import { datePickerBtnText, datePickerButton1, datePickerButton2 } from '../Styles/FormFields';
-import { flatListTitle } from '../Styles/Styles';
 
 var deviceWidth = Dimensions.get("window").width;
 
@@ -215,7 +214,7 @@ export default class DebitNotes extends Component {
           style={{ marginTop: 10 }}
           scrollEnabled={true}
           ListHeaderComponent={<View style={scss.headerContainer}>
-            <Text style={flatListTitle}>Debit Notes - <Text style={{ color: '#ED1C24' }}>{this.state.filterActive ? this.state.filterDebitNotes.length : this.state.debitNotes.length}</Text> </Text>
+            <Text style={scss.flat_heading}>List Of Debit Notes - <Text style={{ color: '#ED1C24' }}>{this.state.filterActive ? this.state.filterDebitNotes.length : this.state.debitNotes.length}</Text> </Text>
             <View style={scss.headerContainer}>
               {!this.state.filterActive &&
                 <IconFA

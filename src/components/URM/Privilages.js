@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Dimensions, Image, SectionList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
-import { Appbar } from 'react-native-paper';
+import { Appbar, RadioButton } from 'react-native-paper';
 import forms from "../../commonUtils/assets/styles/formFields.scss";
 import Loader from '../../commonUtils/loader';
 import { RF } from '../../Responsive';
@@ -22,6 +22,7 @@ export default class Privilages extends Component {
       subList: [],
       childList: [],
       isselected: [],
+      isAllChecked: false
     };
   }
 
@@ -166,11 +167,36 @@ export default class Privilages extends Component {
       item.selectedindex = 0;
       const list = this.state.subList;
       list.splice(index, 1);
-      this.setState({ subList: list });
+      this.setState({ subList: list, isAllChecked: false });
     }
     this.setState({ previlages: this.state.previlages });
   };
 
+  handleSelectAll () {
+    this.setState({ isAllChecked: true }, () => {
+      this.state.previlages.map((item, index) => {
+        let data = item.data;
+        console.log({ data });
+        data.map((child, index) => {
+          child.selectedindex = 1;
+        });
+      });
+      this.setState({ privilages: this.state.previlages });
+    });
+  }
+
+  handleUnSelectAll () {
+    this.setState({ isAllChecked: false }, () => {
+      this.state.previlages.map((item, index) => {
+        let data = item.data;
+        console.log({ data });
+        data.map((child, index) => {
+          child.selectedindex = 0;
+        });
+      });
+      this.setState({ privilages: this.state.previlages });
+    });
+  }
 
 
   render () {
@@ -183,8 +209,19 @@ export default class Privilages extends Component {
         <Appbar mode="center-aligned">
           <Appbar.BackAction onPress={() => this.handleBackButtonClick()} />
           <Appbar.Content title={I18n.t("Privileges")} />
+          <View style={{
+            display: 'flex', flexDirection:
+              'row', justifyContent: 'center', alignItems: 'center'
+          }}>
+            <Text style={{
+              fontSize: 19,
+            }}> {this.state.isAllChecked ? "UnSelect-All" : "Select-All"} </Text>
+            <RadioButton
+              status={this.state.isAllChecked ? 'checked' : 'unchecked'}
+              onPress={() => { this.state.isAllChecked ? this.handleUnSelectAll() : this.handleSelectAll(); }}
+            />
+          </View>
         </Appbar>
-
 
         <SectionList
           sections={this.state.previlages}

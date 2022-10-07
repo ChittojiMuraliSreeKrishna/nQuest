@@ -20,20 +20,15 @@ import RNPickerSelect from "react-native-picker-select";
 import { Chevron } from "react-native-shapes";
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from "../../commonUtils/assets/styles/style.scss";
+import Loader from "../../commonUtils/loader";
 import { RH } from "../../Responsive";
 import EmptyList from "../Errors/EmptyList";
 import UrmService from "../services/UrmService";
 import {
-  inputField,
   rnPicker,
   rnPickerContainer
 } from "../Styles/FormFields";
-import {
-  filterCloseImage,
-  filterHeading, filterSubContainer
-} from "../Styles/PopupStyles";
 import { filterBtn } from "../Styles/Styles";
-
 
 var deviceheight = Dimensions.get("window").height;
 var deviceWidth = Dimensions.get("window").width;
@@ -52,6 +47,7 @@ export default class Users extends Component {
       role: "",
       branch: "",
       userType: "",
+      loading: false
     };
   }
 
@@ -71,7 +67,7 @@ export default class Users extends Component {
 
   // Get All Users
   getAllUsers () {
-    this.setState({ usersList: [] });
+    this.setState({ usersList: [], loading: false });
     const { clientId, pageNumber } = this.state;
     UrmService.getAllUsers(clientId, pageNumber).then((res) => {
       let userResponse = res.data.content;
@@ -81,9 +77,14 @@ export default class Users extends Component {
           this.setState({
             usersList: this.state.usersList.concat(userResponse),
             totalPages: res.data.totalPages,
+            loading: false
           });
         }
+      } else {
+        this.setState({ loading: false });
       }
+    }).catch(err => {
+      this.setState({ loading: false });
     });
   }
 
@@ -174,6 +175,7 @@ export default class Users extends Component {
   render () {
     return (
       <View>
+        {this.state.loading && <Loader loading={this.state.loading} />}
         <FlatList
           style={scss.flatListBody}
           ListHeaderComponent={
@@ -303,88 +305,74 @@ export default class Users extends Component {
             <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}
               onBackButtonPress={() => this.modelCancel()}
               onBackdropPress={() => this.modelCancel()} >
-              <View style={styles.filterMainContainer}>
-                <View>
-                  <View style={filterSubContainer}>
-                    <View>
-                      <Text style={filterHeading}> {I18n.t("Filter By")} </Text>
+              <View style={forms.filterModelContainer}>
+                <Text
+                  style={forms.popUp_decorator}
+                ></Text>
+                <View style={forms.filterModelSub}>
+                  <KeyboardAwareScrollView>
+                    <View style={rnPickerContainer}>
+                      <RNPickerSelect
+                        placeholder={{
+                          label: "USER TYPE",
+                        }}
+                        Icon={() => {
+                          return (
+                            <Chevron
+                              style={styles.imagealign}
+                              size={1.5}
+                              color="gray"
+                            />
+                          );
+                        }}
+                        items={[
+                          { label: "Active", value: "Active" },
+                          { label: "InActive", value: "InActive" },
+                        ]}
+                        onValueChange={this.handleUSerType}
+                        style={rnPicker}
+                        value={this.state.userType}
+                        useNativeAndroidPickerStyle={false}
+                      />
                     </View>
-                    <View>
-                      <TouchableOpacity
-                        style={filterCloseImage}
-                        onPress={() => this.modelCancel()}
-                      >
-                        <Image
-                          style={{ margin: 5 }}
-                          source={require("../assets/images/modelcancel.png")}
-                        />
+                    <TextInput
+                      mode="outlined"
+                      activeOutlineColor="#b9b9b9"
+                      outlineColor="#b9b9b9"
+                      style={forms.input_fld}
+                      underlineColorAndroid="transparent"
+                      placeholder={I18n.t("ROLE")}
+                      placeholderTextColor="#6F6F6F"
+                      textAlignVertical="center"
+                      autoCapitalize="none"
+                      value={this.state.role}
+                      onChangeText={this.handleRole}
+                    />
+                    <TextInput
+                      mode="outlined"
+                      activeOutlineColor="#b9b9b9"
+                      outlineColor="#b9b9b9"
+                      style={forms.input_fld}
+                      underlineColorAndroid="transparent"
+                      placeholder={I18n.t("STORE/BRANCH")}
+                      placeholderTextColor="#6F6F6F"
+                      textAlignVertical="center"
+                      autoCapitalize="none"
+                      value={this.state.branch}
+                      onChangeText={this.handleBranch}
+                    />
+                    <View style={forms.action_buttons_container}>
+                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                        onPress={() => this.applyUserFilter()}>
+                        <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                        onPress={() => this.modelCancel()}>
+                        <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>
                     </View>
-                  </View>
-                  <Text
-                    style={{
-                      height: Device.isTablet ? 2 : 1,
-                      width: deviceWidth,
-                      backgroundColor: "lightgray",
-                    }}
-                  ></Text>
+                  </KeyboardAwareScrollView>
                 </View>
-                <KeyboardAwareScrollView enableOnAndroid={true}>
-                  <View style={rnPickerContainer}>
-                    <RNPickerSelect
-                      placeholder={{
-                        label: "USER TYPE",
-                      }}
-                      Icon={() => {
-                        return (
-                          <Chevron
-                            style={styles.imagealign}
-                            size={1.5}
-                            color="gray"
-                          />
-                        );
-                      }}
-                      items={[
-                        { label: "Active", value: "Active" },
-                        { label: "InActive", value: "InActive" },
-                      ]}
-                      onValueChange={this.handleUSerType}
-                      style={rnPicker}
-                      value={this.state.userType}
-                      useNativeAndroidPickerStyle={false}
-                    />
-                  </View>
-                  <TextInput
-                    style={inputField}
-                    underlineColorAndroid="transparent"
-                    placeholder={I18n.t("ROLE")}
-                    placeholderTextColor="#6F6F6F"
-                    textAlignVertical="center"
-                    autoCapitalize="none"
-                    value={this.state.role}
-                    onChangeText={this.handleRole}
-                  />
-                  <TextInput
-                    style={inputField}
-                    underlineColorAndroid="transparent"
-                    placeholder={I18n.t("STORE/BRANCH")}
-                    placeholderTextColor="#6F6F6F"
-                    textAlignVertical="center"
-                    autoCapitalize="none"
-                    value={this.state.branch}
-                    onChangeText={this.handleBranch}
-                  />
-                  <View style={forms.action_buttons_container}>
-                    <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
-                      onPress={() => this.applyUserFilter()}>
-                      <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
-                      onPress={() => this.modelCancel()}>
-                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
-                    </TouchableOpacity>
-                  </View>
-                </KeyboardAwareScrollView>
               </View>
             </Modal>
           </View>

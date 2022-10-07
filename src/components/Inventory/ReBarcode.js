@@ -26,7 +26,7 @@ import {
   datePickerButton1,
   datePickerButton2
 } from "../Styles/FormFields";
-import { flatListTitle, listEmptyMessage } from "../Styles/Styles";
+import { listEmptyMessage } from "../Styles/Styles";
 
 
 var deviceWidth = Dimensions.get("window").width;
@@ -291,22 +291,28 @@ export default class ReBarcode extends Component {
     InventoryService.getBarcodesDetails(this.state.storeId, domainDetails, item.currentBarcodeId).then(res => {
       if (res?.data) {
         console.log({ res });
-        let viewBarcode = res.data;
-        console.log({ viewBarcode });
+        let viewData = res.data;
         if (res.status === 200) {
-          this.props.navigation.navigate('ViewReBarcode', {
-            item: viewBarcode, isEdit: true,
-            onGoBack: () => {
-              this.setState({ reBarcodesData: [] });
-              this.getAllReBarcodes();
-            }
-          });
+          // this.props.navigation.navigate('ViewReBarcode', {
+          //   item: viewData, isEdit: true,
+          //   onGoBack: () => {
+          //     this.setState({ reBarcodesData: [] });
+          //     this.getAllReBarcodes();
+          //   }
+          // });
+          this.state.viewBarcodeData.push(res.data);
+          this.setState({ viewBarcodeData: this.state.viewBarcodeData, viewBarcode: true });
         }
+        console.log({ viewData }, this.state.viewBarcodeData.barcode);
       }
     }).catch((err) => {
       console.log({ err });
     });
   };
+
+  handleModelView () {
+    this.setState({ viewBarcodeData: [], viewBarcode: false });
+  }
 
   // Pagination Function
   loadMoreList = (value) => {
@@ -363,12 +369,13 @@ export default class ReBarcode extends Component {
           style={scss.flatListBody}
           ListHeaderComponent={
             <View style={scss.headerContainer}>
-              <Text style={flatListTitle}>Re-Barcode List - <Text style={{ color: "#ED1C24" }}>{this.state.filterActive ? this.state.filterRebarcodesData.length : this.state.reBarcodesData.length}</Text></Text>
+              <Text style={scss.flat_heading}>List of Re-Barcodings - <Text style={{ color: "#ED1C24" }}>{this.state.filterActive ? this.state.filterRebarcodesData.length : this.state.reBarcodesData.length}</Text></Text>
               <View style={scss.headerContainer}>
                 {!this.state.filterActive && (
                   <IconFA
                     name="sliders"
                     size={25}
+                    style={scss.action_icons}
                     onPress={() => this.filterAction()}
                   >
                   </IconFA>
@@ -480,7 +487,85 @@ export default class ReBarcode extends Component {
 
         {this.state.viewBarcode && (
           <View>
-
+            <Modal style={{ margin: 0 }} isVisible={this.state.viewBarcode}
+              onBackButtonPress={() => this.handleModelView()}
+              onBackdropPress={() => this.handleModelView()}
+            >
+              <View style={forms.filterModelContainer}>
+                <Text style={forms.popUp_decorator}>-</Text>
+                <View style={forms.filterModelSub}>
+                  <FlatList
+                    removeClippedSubviews={false}
+                    data={this.state.viewBarcodeData}
+                    renderItem={({ item, index }) => (
+                      <View>
+                        <View style={scss.model_text_container}>
+                          <Text variant="titleMedium" selectable={true} key={Math.random()}>{item.barcode}</Text>
+                          <Text variant="bodyLarge">Qty: {item.qty}</Text>
+                        </View>
+                        <View style={scss.model_text_container}>
+                          <Text variant="bodyLarge">Name: {item.name}</Text>
+                          <Text variant="bodyLarge">Price: {item.itemMrp}</Text>
+                        </View>
+                        <View style={scss.model_text_container}>
+                          <Text variant="bodyLarge">Batch No: {item.batchNo}</Text>
+                        </View>
+                        <View style={scss.model_subContainer}>
+                          <ScrollView>
+                            <View style={scss.model_subbody}>
+                              <View style={scss.model_text_container}>
+                                <Text variant="bodyMedium">Domain: {item.domainType}</Text>
+                                <Text variant="bodyMedium">Division: {item.divisionName}</Text>
+                              </View>
+                              <View style={scss.model_text_container}>
+                                <Text variant="bodyMedium">Section: {item.sectionName}</Text>
+                                <Text variant="bodyMedium">SubSection: {item.subSectionName}</Text>
+                              </View>
+                              <View style={scss.model_text_container}>
+                                <Text variant="bodyMedium">Category: {item.categoryName}</Text>
+                                <Text variant="bodyMedium">HsnCode: {item.hsnCode}</Text>
+                              </View>
+                              <View style={scss.model_text_container}>
+                                <Text variant="bodyMedium">Colour: {item.colour}</Text>
+                                <Text variant="bodyMedium">costPrice: {item.costPrice}</Text>
+                              </View>
+                              <View style={scss.model_text_container}>
+                                <Text variant="bodyMedium">Uom: {item.uom}</Text>
+                                <Text variant="bodyMedium">store: {item.storeId}</Text>
+                              </View>
+                              <View style={scss.model_text_container}>
+                                <Text variant="bodyMedium">EMP Id: {item.empId}</Text>
+                                <Text variant="bodyMedium">VendorTax: {item.vendorTax}</Text>
+                              </View>
+                              {item.domainType === "Retail" && (
+                                <View style={scss.model_text_container}>
+                                  <Text variant="bodyMedium">FromDate: {item.fromDate
+                                    ? item.fromDate.toString().split(/T/)[ 0 ]
+                                    : item.fromDate}</Text>
+                                  <Text variant="bodyMedium">ToDate: {item.toDate
+                                    ? item.toDate.toString().split(/T/)[ 0 ]
+                                    : item.toDate}</Text>
+                                </View>
+                              )}
+                              <View style={scss.model_text_container}>
+                                <Text variant="bodyMedium">CreatedDate:{" "}
+                                  {item.createdDate
+                                    ? item.createdDate.toString().split(/T/)[ 0 ]
+                                    : item.createdDate}</Text>
+                                <Text variant="bodyMedium"></Text>
+                              </View>
+                            </View>
+                          </ScrollView>
+                        </View>
+                      </View>
+                    )}
+                  />
+                </View>
+                <TouchableOpacity style={forms.close_full_btn} onPress={() => this.handleModelView()}>
+                  <Text style={forms.cancel_btn_text}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </Modal>
           </View>
         )}
 
@@ -585,7 +670,7 @@ export default class ReBarcode extends Component {
                       activeOutlineColor="#b6b6b6"
                       outlineColor="#b6b6b6"
                       style={forms.input_fld}
-                      placeholder={I18n.t("BARCODE ID")}
+                      placeholder={I18n.t("RE-BARCODE ID")}
                       placeholderTextColor="#6f6f6f"
                       value={this.state.barCodeId}
                       onChangeText={this.handlebarCodeId}

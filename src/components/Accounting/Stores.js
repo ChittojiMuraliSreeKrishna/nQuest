@@ -238,7 +238,7 @@ export default class Stores extends Component {
           ListHeaderComponent={
             <View style={scss.headerContainer}>
               <Text style={scss.flat_heading}>
-                Stores -{" "}
+                Stores List -{" "}
                 <Text style={{ color: "#ED1C24" }}>
                   {this.state.filterActive ? this.state.filterStoresData.length : this.state.storesList.length}
                 </Text>

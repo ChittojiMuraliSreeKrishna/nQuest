@@ -5,30 +5,21 @@ import {
   FlatList,
   ScrollView,
   StyleSheet,
-  Text,
-
-  TouchableOpacity,
-  View
+  Text, TextInput, TouchableOpacity, View
 } from "react-native";
 import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
-import { Appbar, TextInput } from 'react-native-paper';
+import { Appbar } from 'react-native-paper';
 import forms from "../../commonUtils/assets/styles/formFields.scss";
+import scss from '../../commonUtils/assets/styles/style.scss';
 import Loader from "../../commonUtils/loader";
 import { RF, RH, RW } from "../../Responsive";
 import { errorLength, urmErrorMessages } from "../Errors/errors";
 import Message from "../Errors/Message";
 import UrmService from "../services/UrmService";
 import {
-  inputField,
   inputHeading
 } from "../Styles/FormFields";
-import {
-  flatListMainContainer,
-  flatlistSubContainer, textContainer,
-  textStyleLight,
-  textStyleMedium
-} from "../Styles/Styles";
 
 
 var deviceWidth = Dimensions.get("window").width;
@@ -283,12 +274,12 @@ export default class CreateRole extends Component {
           </Text>
           <TextInput
             style={[
-              inputField,
-              { borderColor: roleValid ? "#8F9EB717" : "#dd0000" },
+              forms.input_fld,
+              this.state.isEdit ? forms.inactive_fld : forms.active_fld,
+              { borderColor: roleValid ? "#a6a6a6" : "#dd0000" },
             ]}
-            underlineColorAndroid="transparent"
             placeholder={I18n.t("Role")}
-            placeholderTextColor={roleValid ? "#6F6F6F" : "#dd0000"}
+            placeholderTextColor={roleValid ? "#6f6f6f" : "#dd0000"}
             maxLength={25}
             disabled={this.state.isEdit ? true : false}
             textAlignVertical="center"
@@ -305,10 +296,10 @@ export default class CreateRole extends Component {
           </Text>
           <TextInput
             style={[
-              inputField,
-              { borderColor: descriptionValid ? "#8F9EB717" : "#dd0000" },
+              forms.input_fld,
+              forms.active_fld,
+              { borderColor: "#a6a6a6" }
             ]}
-            underlineColorAndroid="transparent"
             placeholder={I18n.t("Description")}
             placeholderTextColor={descriptionValid ? "#6F6F6F" : "#dd0000"}
             textAlignVertical="center"
@@ -350,15 +341,16 @@ export default class CreateRole extends Component {
               }}
               keyExtractor={(item) => item}
               renderItem={({ item, index }) => (
-                <View style={flatListMainContainer}>
-                  <View style={flatlistSubContainer}>
-                    <View style={textContainer}>
-                      <Text style={textStyleLight}>PRIVILEGE</Text>
-                      <Text style={textStyleMedium}>{item.name}</Text>
+                <View style={scss.flatListContainer}>
+                  {console.log({ item })}
+                  <View style={scss.model_subbody}>
+                    <View style={scss.textContainer}>
+                      <Text style={scss.textStyleLight}>PRIVILEGE: {"\n"}<Text style={scss.textStyleMedium}>{item.name}</Text> </Text>
+                      <Text style={scss.textStyleLight}></Text>
                     </View>
-                    <View style={textContainer}>
-                      <Text style={textStyleLight}>DESCRIPTION</Text>
-                      <Text style={textStyleLight}>{item.description}</Text>
+                    <View style={scss.textContainer}>
+                      <Text style={scss.textStyleLight}>DESCRIPTION: {"\n"}{item.description}</Text>
+                      <Text style={scss.textStyleLight}>#{index + 1}</Text>
                     </View>
                   </View>
                 </View>
