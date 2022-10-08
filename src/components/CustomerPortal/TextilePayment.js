@@ -1806,20 +1806,7 @@ class TextilePayment extends Component {
                 }}>
                   ₹  {(parseInt(this.state.redeemedPints) / 10).toString()} </Text>
               </View>
-              {this.state.isRTApplied === true && (
-                <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
-                  <Text style={{
-                    color: "#2ADC09", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                    fontSize: Device.isTablet ? 19 : 14,
-                  }}>
-                    RT Amount </Text>
-                  <Text style={{
-                    color: "#2ADC09", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                    fontSize: Device.isTablet ? 19 : 14,
-                  }}>
-                    ₹  {this.state.rtAmount} </Text>
-                </View>
-              )}
+
               <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
                 <Text style={{
                   color: "#353C40", fontFamily: "bold", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
@@ -1832,8 +1819,6 @@ class TextilePayment extends Component {
                 }}>
                   ₹ {(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()} </Text>
               </View>
-
-
               {
                 this.state.couponAmount > 0 && (
                   <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
@@ -1851,8 +1836,21 @@ class TextilePayment extends Component {
                 )
               }
 
-
-
+              {this.state.isRTApplied === true && (
+                <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
+                  <Text style={{
+                    color: "#2ADC09", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                    fontSize: Device.isTablet ? 19 : 14,
+                  }}>
+                    RT Amount </Text>
+                  <Text style={{
+                    color: "#2ADC09", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                    fontSize: Device.isTablet ? 19 : 14,
+                  }}>
+                    ₹  {this.state.rtAmount} </Text>
+                </View>
+              )}
+              
               <View></View>
               <View style={styles.TopcontainerforPay}>
                 <TouchableOpacity
