@@ -13,6 +13,7 @@ import IconFA from 'react-native-vector-icons/FontAwesome';
 import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
+import { dateFormat, formatMonth } from '../../commonUtils/DateFormate';
 import ReportsService from '../services/ReportsService';
 
 var deviceWidth = Dimensions.get("window").width;
@@ -36,8 +37,8 @@ export default class NewSaleReport extends Component {
       invoiceNumber: null,
       mobile: null,
       empId: null,
-      sbList: [ 1, 2 ],
-      sbDetailsList: [ 1, 2 ],
+      sbList: [1, 2],
+      sbDetailsList: [1, 2],
       isView: false,
       domainId: 0,
       storeId: 0,
@@ -71,7 +72,7 @@ export default class NewSaleReport extends Component {
     };
   }
 
-  componentDidMount () {
+  componentDidMount() {
 
     AsyncStorage.getItem("storeId").then((value) => {
       storeStringId = value;
@@ -86,12 +87,12 @@ export default class NewSaleReport extends Component {
     });
   }
 
-  filterAction () {
+  filterAction() {
     this.setState({ flagFilterNewSale: true, modalVisible: true });
   }
 
 
-  getSaleBills () {
+  getSaleBills() {
     if (this.state.startDate === "") {
       this.state.startDate = null;
     }
@@ -124,7 +125,7 @@ export default class NewSaleReport extends Component {
       let pageNumber = 0;
       ReportsService.newSaleReports(obj, this.state.pageNo).then((res) => {
         console.log(res.data.result);
-        if (res.data && res.data[ "isSuccess" ] === "true") {
+        if (res.data && res.data["isSuccess"] === "true") {
           if (res.data.result.length !== 0) {
             this.setState({ newSale: res.data.result.newSale.content, filterActive: true });
             this.modelCancel();
@@ -167,7 +168,7 @@ export default class NewSaleReport extends Component {
     }
   };
 
-  continuePagination () {
+  continuePagination() {
     if (this.state.totalPages > 1) {
       this.setState({ loadMoreActive: true });
     }
@@ -177,63 +178,40 @@ export default class NewSaleReport extends Component {
   }
 
 
-  handledeleteNewSale () {
+  handledeleteNewSale() {
     this.setState({ flagDeleteNewSale: true, modalVisible: true, flagViewDetail: false });
   }
 
-  handleviewNewSale (item, index) {
+  handleviewNewSale(item, index) {
     console.log({ item });
     console.log(item.lineItemsReVo);
     this.state.viewNewsSaleList.push(item);
     this.setState({ flagViewDetail: true, modalVisible: true, flagDeleteNewSale: false, viewNewsSaleList: this.state.viewNewsSaleList });
   }
 
-  estimationModelCancel () {
+  estimationModelCancel() {
     this.setState({ modalVisible: false });
   }
 
-  datepickerClicked () {
+  datepickerClicked() {
     this.setState({ datepickerOpen: true });
   }
 
-  enddatepickerClicked () {
+  enddatepickerClicked() {
     this.setState({ datepickerendOpen: true });
   }
 
-  datepickerDoneClicked () {
-    if (parseInt(this.state.date.getDate()) < 10 && (parseInt(this.state.date.getMonth()) < 10)) {
-      this.setState({ startDate: this.state.date.getFullYear() + "-0" + (this.state.date.getMonth() + 1) + "-" + "0" + this.state.date.getDate() });
-    }
-    else if (parseInt(this.state.date.getDate()) < 10) {
-      this.setState({ startDate: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-" + "0" + this.state.date.getDate() });
-    }
-    else if (parseInt(this.state.date.getMonth()) < 10) {
-      this.setState({ startDate: this.state.date.getFullYear() + "-0" + (this.state.date.getMonth() + 1) + "-" + this.state.date.getDate() });
-    }
-    else {
-      this.setState({ startDate: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-" + this.state.date.getDate() });
-    }
+  datepickerDoneClicked() {
+    this.setState({ startDate: this.state.date.getFullYear() + formatMonth(this.state.date.getMonth() + 1) + dateFormat(this.state.date.getDate()) });
     this.setState({ doneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
 
-  datepickerendDoneClicked () {
-    if (parseInt(this.state.enddate.getDate()) < 10 && (parseInt(this.state.enddate.getMonth()) < 10)) {
-      this.setState({ endDate: this.state.enddate.getFullYear() + "-0" + (this.state.enddate.getMonth() + 1) + "-" + "0" + this.state.enddate.getDate() });
-    }
-    else if (parseInt(this.state.enddate.getDate()) < 10) {
-      this.setState({ endDate: this.state.enddate.getFullYear() + "-" + (this.state.enddate.getMonth() + 1) + "-" + "0" + this.state.enddate.getDate() });
-    }
-    else if (parseInt(this.state.enddate.getMonth()) < 10) {
-      this.setState({ endDate: this.state.enddate.getFullYear() + "-0" + (this.state.enddate.getMonth() + 1) + "-" + this.state.enddate.getDate() });
-    }
-    else {
-      this.setState({ endDate: this.state.enddate.getFullYear() + "-" + (this.state.enddate.getMonth() + 1) + "-" + this.state.enddate.getDate() });
-    }
-
+  datepickerendDoneClicked() {
+    this.setState({ endDate: this.state.enddate.getFullYear() + formatMonth(this.state.enddate.getMonth() + 1) + dateFormat(this.state.enddate.getDate()) });
     this.setState({ enddoneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
 
-  datepickerCancelClicked () {
+  datepickerCancelClicked() {
     this.setState({ date: new Date(), enddate: new Date(), datepickerOpen: false, datepickerendOpen: false });
   }
 
@@ -253,23 +231,23 @@ export default class NewSaleReport extends Component {
     this.setState({ empId: value });
   };
 
-  modelCancel () {
+  modelCancel() {
     this.setState({ modalVisible: false, flagFilterNewSale: false });
   }
 
-  clearFilterAction () {
+  clearFilterAction() {
     this.setState({
       loadMoreActive: false, loadNextActive: false,
       filterActive: false, newSale: [], fromDate: "", toDate: "", billPosition: "", invoiceNumber: "", mobileNumber: "", empId: ""
     });
   }
 
-  closeViewAction () {
+  closeViewAction() {
     this.setState({ flagViewDetail: !this.state.flagViewDetail, viewNewSaleSubList: [], viewNewsSaleList: [] });
   }
 
 
-  render () {
+  render() {
     return (
       <View>
         <FlatList
@@ -288,7 +266,7 @@ export default class NewSaleReport extends Component {
                 <IconFA
                   name="sliders"
                   color="#000"
-                  style={[ { marginRight: 10 }, scss.action_icons ]}
+                  style={[{ marginRight: 10 }, scss.action_icons]}
                   size={25}
                   onPress={() => this.filterAction()}
                 ></IconFA>
@@ -307,7 +285,7 @@ export default class NewSaleReport extends Component {
                     <Text style={scss.textStyleMedium}>INVOICE NUMBER: {"\n"} {item.invoiceNumber}</Text>
                   </View>
                   <View style={scss.textContainer}>
-                    <Text style={scss.textStyleLight}>{I18n.t("EMP ID")}: {item.empId} </Text>
+                    <Text style={scss.textStyleLight}>{I18n.t("EMP ID")}: {item.userId} </Text>
                     <Text style={scss.textStyleLight}> {item.status}</Text>
                   </View>
 
@@ -317,14 +295,14 @@ export default class NewSaleReport extends Component {
                   <View style={scss.flatListFooter}>
                     <Text style={scss.footerText}>
                       {I18n.t("DATE")}:
-                      {item.createdDate ? item.createdDate.toString().split(/T/)[ 0 ]
+                      {item.createdDate ? item.createdDate.toString().split(/T/)[0]
                         : item.createdDate}
                     </Text>
                     <View style={scss.buttonContainer}>
                       <IconFA
                         name='eye'
                         size={25}
-                        style={[ { marginRight: 10 }, scss.action_icons ]}
+                        style={[{ marginRight: 10 }, scss.action_icons]}
                         onPress={() => this.handleviewNewSale(item, index)}
                       >
                       </IconFA>
@@ -351,14 +329,14 @@ export default class NewSaleReport extends Component {
                   {this.state.loadPrevActive && (
                     <View style={scss.page_navigation_subcontainer}>
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(0)}
                         name="chevron-double-left"
                         size={25}
                       />
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(this.state.pageNo - 1)}
                         name="chevron-left"
@@ -370,13 +348,13 @@ export default class NewSaleReport extends Component {
                   {this.state.loadNextActive && (
                     <View style={scss.page_navigation_subcontainer}>
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         onPress={() => this.loadMoreList(this.state.pageNo + 1)}
                         name="chevron-right"
                         size={25}
                       />
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         onPress={() => this.loadMoreList(this.state.totalPages - 1)}
                         name="chevron-double-right"
                         size={25}
@@ -394,7 +372,7 @@ export default class NewSaleReport extends Component {
               onBackButtonPress={() => this.estimationModelCancel()}
               onBackdropPress={() => this.estimationModelCancel()} >
 
-              <View style={[ styles.deleteMainContainer, { backgroundColor: '#ED1C24' } ]}>
+              <View style={[styles.deleteMainContainer, { backgroundColor: '#ED1C24' }]}>
                 <View style={forms.filterModelContainer} >
                   <Text style={forms.popUp_decorator}>-</Text>
                   <View style={forms.filterModelSub}>
@@ -407,16 +385,16 @@ export default class NewSaleReport extends Component {
                         marginTop: 10
                       }}> {I18n.t("Are you sure want to delete New Sale Report")} ?  </Text>
                       <TouchableOpacity
-                        style={[ Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile, { marginTop: Device.isTablet ? 55 : 25 } ]} onPress={() => this.deleteEstimationSlip(item, index)}
+                        style={[Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile, { marginTop: Device.isTablet ? 55 : 25 }]} onPress={() => this.deleteEstimationSlip(item, index)}
                       >
                         <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile}  > {I18n.t("DELETE")} </Text>
 
                       </TouchableOpacity>
 
                       <TouchableOpacity
-                        style={[ Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile, { borderColor: '#ED1C24' } ]} onPress={() => this.estimationModelCancel()}
+                        style={[Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile, { borderColor: '#ED1C24' }]} onPress={() => this.estimationModelCancel()}
                       >
-                        <Text style={[ Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile, { color: '#ED1C24' } ]}  > {I18n.t("CANCEL")} </Text>
+                        <Text style={[Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile, { color: '#ED1C24' }]}  > {I18n.t("CANCEL")} </Text>
 
                       </TouchableOpacity>
                     </View>
@@ -500,7 +478,7 @@ export default class NewSaleReport extends Component {
                         />
                       </View>
                     )}
-                    <View style={[ styles.rnSelectContainer_mobile, { width: '92%' } ]}>
+                    <View style={[styles.rnSelectContainer_mobile, { width: '92%' }]}>
                       <RNPickerSelect
                         placeholder={{
                           label: 'BILL POSITION'
@@ -560,11 +538,11 @@ export default class NewSaleReport extends Component {
                       onChangeText={this.handleEmpId}
                     />
                     <View style={forms.action_buttons_container}>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                         onPress={() => this.getSaleBills()}>
                         <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
                         onPress={() => this.modelCancel()}>
                         <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>
@@ -595,7 +573,7 @@ export default class NewSaleReport extends Component {
                         </View>
                         <View style={scss.model_text_container}>
                           <Txt style={{ textAlign: 'left' }} variant='bodyLarge'>Mobile: {"\n"}{item.mobileNumber}</Txt>
-                          <Txt style={{ textAlign: 'right' }} variant='bodyLarge'>Date: {"\n"}{item.createdDate ? item.createdDate.toString().split(/T/)[ 0 ]
+                          <Txt style={{ textAlign: 'right' }} variant='bodyLarge'>Date: {"\n"}{item.createdDate ? item.createdDate.toString().split(/T/)[0]
                             : item.createdDate}</Txt>
                         </View>
                         <View style={scss.model_subContainer}>
@@ -640,7 +618,7 @@ export default class NewSaleReport extends Component {
 
                         </View>
                         <View>
-                          <TouchableOpacity onPress={() => this.closeViewAction()} style={[ forms.action_button, forms.cancel_btn ]}>
+                          <TouchableOpacity onPress={() => this.closeViewAction()} style={[forms.action_button, forms.cancel_btn]}>
                             <Text style={forms.cancel_btn_text}>Close</Text>
                           </TouchableOpacity>
                         </View>

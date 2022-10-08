@@ -48,7 +48,7 @@ class GenerateEstimationSlip extends Component {
       error: null,
       search: null,
       totalQty: 0,
-      qty: [ false ],
+      qty: [false],
       quantity: '',
       totalAmount: 0,
       totalDiscount: 0,
@@ -82,9 +82,9 @@ class GenerateEstimationSlip extends Component {
       customerAddress: '',
       customerGSTNumber: '',
       domainId: 1,
-      tableHead: [ 'S.No', 'Barcode', 'Product', 'Price Per Qty', 'Qty', 'Sales Rate' ],
+      tableHead: ['S.No', 'Barcode', 'Product', 'Price Per Qty', 'Qty', 'Sales Rate'],
       // tableData: [],
-      privilages: [ { bool: false, name: "Check Promo Disc" } ],
+      privilages: [{ bool: false, name: "Check Promo Disc" }],
       inventoryDelete: false,
       lineItemDelete: false,
       uom: '',
@@ -112,18 +112,18 @@ class GenerateEstimationSlip extends Component {
   }
 
 
-  async componentDidMount () {
+  async componentDidMount() {
     const storeId = await AsyncStorage.getItem("storeId");
     console.log("stroeiddd", storeId);
     this.setState({ storeId: storeId });
   }
 
 
-  handleMenuButtonClick () {
+  handleMenuButtonClick() {
     this.props.navigation.openDrawer();
   }
 
-  cancel () {
+  cancel() {
     this.props.navigation.goBack(null);
     return true;
   }
@@ -136,38 +136,38 @@ class GenerateEstimationSlip extends Component {
   };
 
 
-  modelCancel () {
+  modelCancel() {
     this.setState({ modalVisible: false });
   }
 
-  onEndReached () {
+  onEndReached() {
     // this.listRef.scrollToOffset({ offset: 0, animated: true });
   }
 
   topbarAction1 = (item, index) => {
-    if (this.state.privilages[ index ].bool === true) {
-      this.state.privilages[ index ].bool = false;
+    if (this.state.privilages[index].bool === true) {
+      this.state.privilages[index].bool = false;
     }
     else {
-      this.state.privilages[ index ].bool = true;
+      this.state.privilages[index].bool = true;
     }
     for (let i = 0; i < this.state.privilages.length; i++) {
       if (item.name === 'Check Promo Disc') {
         this.checkPromo();
       }
       if (index != i) {
-        this.state.privilages[ i ].bool = false;
+        this.state.privilages[i].bool = false;
       }
       this.setState({ privilages: this.state.privilages });
     }
   };
 
-  checkPromo () {
+  checkPromo() {
     const { storeId, domainId, barList } = this.state;
     CustomerService.getCheckPromoAmount(storeId, domainId, barList).then(res => {
       let calculatedDisc = res.data.result.calculatedDiscountVo;
       console.log({ calculatedDisc });
-      if (res?.data && res?.data?.result[ 0 ].calculatedDiscountVo) {
+      if (res?.data && res?.data?.result[0].calculatedDiscountVo) {
         this.setState({ promoDisc: res?.data?.result });
         this.state.barList.forEach(barcodeData => {
           this.state.promoDisc.forEach(promo => {
@@ -192,7 +192,7 @@ class GenerateEstimationSlip extends Component {
     });
   }
 
-  generateEstimationSlip () {
+  generateEstimationSlip() {
     let lineItem = [];
     this.state.barList.forEach((element, index) => {
       const obj = {
@@ -260,19 +260,19 @@ class GenerateEstimationSlip extends Component {
     });
   }
 
-  validationForm () {
+  validationForm() {
     let isFormValid = true;
     let errors = {};
 
     if (this.state.smnumber === '') {
       isFormValid = false;
-      errors[ "smNumber" ] = customerErrorMessages.smNumber;
+      errors["smNumber"] = customerErrorMessages.smNumber;
       this.setState({ smnumberValid: false });
     }
 
     if (this.state.barcodeId === '') {
       isFormValid = false;
-      errors[ "barcodeId" ] = customerErrorMessages.barcodeId;
+      errors["barcodeId"] = customerErrorMessages.barcodeId;
       this.setState({ barcodeIdValid: false });
     }
 
@@ -280,14 +280,14 @@ class GenerateEstimationSlip extends Component {
     return isFormValid;
   }
 
-  endEditing () {
+  endEditing() {
     const isFormValid = this.validationForm();
     if (isFormValid) {
       this.getLineItems();
     }
   }
 
-  getLineItems () {
+  getLineItems() {
     const { barcodeId, storeId, smnumber } = this.state;
     console.log("datataa", barcodeId, storeId, smnumber);
     let lineItem = [];
@@ -305,14 +305,14 @@ class GenerateEstimationSlip extends Component {
             this.state.itemsList.push(res.data);
           } else {
             for (let i = 0; i < this.state.itemsList.length; i++) {
-              if (this.state.itemsList[ i ].barcode === res.data.barcode) {
+              if (this.state.itemsList[i].barcode === res.data.barcode) {
                 count = true;
-                var items = [ ...this.state.itemsList ];
-                if (parseInt(items[ i ].quantity) + 1 <= parseInt(items[ i ].qty)) {
-                  let addItem = parseInt(items[ i ].quantity) + 1;
-                  items[ i ].quantity = addItem.toString();
-                  let totalcostMrp = items[ i ].itemMrp * parseInt(items[ i ].quantity);
-                  items[ i ].totalMrp = totalcostMrp;
+                var items = [...this.state.itemsList];
+                if (parseInt(items[i].quantity) + 1 <= parseInt(items[i].qty)) {
+                  let addItem = parseInt(items[i].quantity) + 1;
+                  items[i].quantity = addItem.toString();
+                  let totalcostMrp = items[i].itemMrp * parseInt(items[i].quantity);
+                  items[i].totalMrp = totalcostMrp;
                   break;
                 } else {
                   alert("Barcode reached max");
@@ -353,7 +353,7 @@ class GenerateEstimationSlip extends Component {
     console.log("BarListst", this.state.barList);
   }
 
-  calculateTotal () {
+  calculateTotal() {
     let totalAmount = 0;
     let totalqty = 0;
     this.state.barList.forEach(barCode => {
@@ -364,7 +364,7 @@ class GenerateEstimationSlip extends Component {
     );
   }
 
-  refresh () {
+  refresh() {
     if (global.barcodeId === 'something') {
       this.setState({ barcodeId: global.barcodeId });
       this.getLineItems();
@@ -386,8 +386,8 @@ class GenerateEstimationSlip extends Component {
   };
 
   updateQuanty = (text, index, item) => {
-    const qtyarr = [ ...this.state.itemsList ];
-    qtyarr[ index ].quantity = text;
+    const qtyarr = [...this.state.itemsList];
+    qtyarr[index].quantity = text;
     this.setState({ itemsList: qtyarr }, () => {
       this.updateQty(text, index, item);
     });
@@ -395,27 +395,27 @@ class GenerateEstimationSlip extends Component {
 
   updateQty = (text, index, item) => {
     const Qty = /^[0-9\b]+$/;
-    const qtyarr = [ ...this.state.itemsList ];
-    console.log(qtyarr[ index ].quantity);
+    const qtyarr = [...this.state.itemsList];
+    console.log(qtyarr[index].quantity);
     let addItem = '';
     let value = text;
     if (value === '') {
       addItem = '';
-      qtyarr[ index ].quantity = addItem.toString();
+      qtyarr[index].quantity = addItem.toString();
     }
     else if (value !== '' && Qty.test(value) === false) {
       addItem = 1;
-      qtyarr[ index ].quantity = addItem.toString();
+      qtyarr[index].quantity = addItem.toString();
     } else {
-      if (parseInt(value) < parseInt(qtyarr[ index ].qty)) {
+      if (parseInt(value) < parseInt(qtyarr[index].qty)) {
         addItem = value;
-        qtyarr[ index ].quantity = addItem.toString();
+        qtyarr[index].quantity = addItem.toString();
       } else {
-        addItem = qtyarr[ index ].qty;
-        qtyarr[ index ].quantity = addItem.toString();
+        addItem = qtyarr[index].qty;
+        qtyarr[index].quantity = addItem.toString();
       }
     }
-    let totalcostMrp = item.itemMrp * parseInt(qtyarr[ index ].quantity);
+    let totalcostMrp = item.itemMrp * parseInt(qtyarr[index].quantity);
     item.totalMrp = totalcostMrp;
     this.setState({ itemsList: qtyarr });
     console.error("TEXT", value);
@@ -430,18 +430,18 @@ class GenerateEstimationSlip extends Component {
     // this.setState({ itemsList: qtyarr });
   };
 
-  incrementForTable (item, index) {
-    const qtyarr = [ ...this.state.itemsList ];
-    console.log("qtyarr value",qtyarr[ index ]);
-    if (parseInt(qtyarr[ index ].quantity) < parseInt(qtyarr[ index ].qty)) {
-      var additem = parseInt(qtyarr[ index ].quantity) + 1;
-      qtyarr[ index ].quantity = additem.toString();
+  incrementForTable(item, index) {
+    const qtyarr = [...this.state.itemsList];
+    console.log("qtyarr value", qtyarr[index]);
+    if (parseInt(qtyarr[index].quantity) < parseInt(qtyarr[index].qty)) {
+      var additem = parseInt(qtyarr[index].quantity) + 1;
+      qtyarr[index].quantity = additem.toString();
     } else {
-      var additem = parseInt(qtyarr[ index ].qty);
-      qtyarr[ index ].quantity = additem.toString();
+      var additem = parseInt(qtyarr[index].qty);
+      qtyarr[index].quantity = additem.toString();
       alert(`only ${additem} items are in this barcode`);
     }
-    let totalcostMrp = item.itemMrp * parseInt(qtyarr[ index ].quantity);
+    let totalcostMrp = item.itemMrp * parseInt(qtyarr[index].quantity);
     item.totalMrp = totalcostMrp;
     this.setState({ itemsList: qtyarr });
 
@@ -455,12 +455,12 @@ class GenerateEstimationSlip extends Component {
     this.state.totalQuantity = (parseInt(this.state.totalQuantity) + 1);
   }
 
-  decreamentForTable (item, index) {
-    const qtyarr = [ ...this.state.itemsList ];
-    if (qtyarr[ index ].quantity > 1) {
-      var additem = parseInt(qtyarr[ index ].quantity) - 1;
-      qtyarr[ index ].quantity = additem.toString();
-      let totalcostMrp = item.itemMrp * parseInt(qtyarr[ index ].quantity);
+  decreamentForTable(item, index) {
+    const qtyarr = [...this.state.itemsList];
+    if (qtyarr[index].quantity > 1) {
+      var additem = parseInt(qtyarr[index].quantity) - 1;
+      qtyarr[index].quantity = additem.toString();
+      let totalcostMrp = item.itemMrp * parseInt(qtyarr[index].quantity);
       item.totalMrp = totalcostMrp;
       this.state.totalQuantity = (parseInt(this.state.totalQuantity) - 1);
       let grandTotal = 0;
@@ -483,7 +483,7 @@ class GenerateEstimationSlip extends Component {
     this.setState({ smnumber: text.trim() });
   };
 
-  navigateToScanCode () {
+  navigateToScanCode() {
     global.barcodeId = 'something';
     this.props.navigation.navigate('ScanBarCode', {
       isFromNewSale: false, isFromAddProduct: true,
@@ -491,7 +491,7 @@ class GenerateEstimationSlip extends Component {
     });
   }
 
-  refresh () {
+  refresh() {
     if (global.barcodeId != 'something') {
       this.setState({ barcodeId: global.barcodeId });
       this.setState({ dsNumber: "" });
@@ -500,7 +500,7 @@ class GenerateEstimationSlip extends Component {
     console.log('bar code is' + this.state.barcodeId);
   }
 
-  render () {
+  render() {
     console.log(global.barcodeId);
     AsyncStorage.getItem("tokenkey").then((value) => {
       console.log(value);
@@ -523,7 +523,6 @@ class GenerateEstimationSlip extends Component {
               <View>
                 <View style={Device.isTablet ? styles.rnSelectContainer_tablet_newsale : styles.rnSelectContainer_mobile_newsale}>
                   <RNPickerSelect
-                    // style={Device.isTablet ? styles.rnSelectContainer_tablet_newsale : styles.rnSelectContainer_mobile_newsale}
                     placeholder={{
                       label: 'SELECT TYPE',
                       value: "",
@@ -544,7 +543,7 @@ class GenerateEstimationSlip extends Component {
                   />
                 </View>
                 <>
-                  <TextInput style={[ Device.isTablet ? styles.input_tablet_normal : styles.input_mobile_normal, { width: Device.isTablet ? 200 : 150 } ]}
+                  <TextInput style={[Device.isTablet ? styles.input_tablet_normal : styles.input_mobile_normal, { width: Device.isTablet ? 200 : 150 }]}
                     mode="flat"
                     activeUnderlineColor='#000'
                     underlineColor='#6f6f6f'
@@ -556,7 +555,7 @@ class GenerateEstimationSlip extends Component {
                   />
                   <View style={{ marginLeft: deviceWidth / 2.8 + 30 }}>
                     {!this.state.smnumberValid && (
-                      <Message imp={true} message={this.state.errors[ "smNumber" ]} />
+                      <Message imp={true} message={this.state.errors["smNumber"]} />
                     )}
                   </View>
                 </>
@@ -583,11 +582,11 @@ class GenerateEstimationSlip extends Component {
                   </View>
                 </View>
                 {!this.state.barcodeIdValid && (
-                  <Message imp={true} message={this.state.errors[ "barcodeId" ]} />
+                  <Message imp={true} message={this.state.errors["barcodeId"]} />
                 )}
 
                 {this.state.uom === "Pieces" && (
-                  <TextInput style={[ Device.isTablet ? styles.input_tablet_notedit : styles.input_mobile_notedit, { marginLeft: Device.isTablet ? deviceWidth / 2.4 : deviceWidth / 2.15, width: Device.isTablet ? 160 : 80 } ]}
+                  <TextInput style={[Device.isTablet ? styles.input_tablet_notedit : styles.input_mobile_notedit, { marginLeft: Device.isTablet ? deviceWidth / 2.4 : deviceWidth / 2.15, width: Device.isTablet ? 160 : 80 }]}
                     mode="flat"
                     activeUnderlineColor='#000'
                     underlineColor='#6f6f6f'
@@ -597,7 +596,7 @@ class GenerateEstimationSlip extends Component {
                 )}
 
                 {this.state.uom === "Meters" && (
-                  <TextInput style={[ Device.isTablet ? styles.input_tablet_normal : styles.input_mobile_normal, { marginLeft: Device.isTablet ? deviceWidth / 1.8 : deviceWidth / 2.15, width: Device.isTablet ? 200 : 80 } ]}
+                  <TextInput style={[Device.isTablet ? styles.input_tablet_normal : styles.input_mobile_normal, { marginLeft: Device.isTablet ? deviceWidth / 1.8 : deviceWidth / 2.15, width: Device.isTablet ? 200 : 80 }]}
                     mode="flat"
                     activeUnderlineColor='#000'
                     underlineColor='#6f6f6f'
@@ -617,48 +616,33 @@ class GenerateEstimationSlip extends Component {
                   showsVerticalScrollIndicator={false}
                   showsHorizontalScrollIndicator={false}
                   renderItem={({ item, index }) => (
-                    <TouchableOpacity style={[ checkPromoDiscountBtn, {
+                    <TouchableOpacity style={[checkPromoDiscountBtn, {
                       backgroundColor: item.bool ? '#ED1C24' : color.white, borderColor: item.bool ? '#ED1C24' : color.lightBlack,
 
-                    } ]} onPress={() =>
+                    }]} onPress={() =>
                       this.topbarAction1(item, index)
                     }>
                       <Image source={require('../../commonUtils/assets/Images/check_promo_disc.png')} />
                       <Text style={{ padding: RF(1), color: item.bool ? "#FFFFFF" : color.dark, fontFamily: 'regular', fontSize: 15 }}>{item.name}</Text>
                     </TouchableOpacity>
-
-                    // <TouchableOpacity style={[pageNavigationBtn, {
-                    //   backgroundColor: item.bool ? '#ED1C24' : '#FFFFFF',
-                    //   borderColor: item.bool ? '#ED1C24' : '#858585',
-                    // }]} onPress={() => this.topbarAction1(item, index)} >
-
-                    //   <Text style={[pageNavigationBtnText, { color: item.bool ? "#FFFFFF" : '#858585', fontFamily: 'regular' }]}>
-                    //     {item.name}
-                    //   </Text>
-                    // </TouchableOpacity>
                   )}
-                // ListFooterComponent={<View style={{ width: 15 }}></View>}
                 />
               )}
 
               {this.state.itemsList.length !== 0 && (
                 <View style={{ flex: 1, flexDirection: 'row', marginLeft: RF(10) }}>
                   <Text style={textStyle}>Total Scanned Items - </Text>
-                  <Text style={[ textStyle, { color: color.accent } ]}>{('0' + this.state.totalQuantity).slice(-2)} </Text>
+                  <Text style={[textStyle, { color: color.accent }]}>{('0' + this.state.totalQuantity).slice(-2)} </Text>
                 </View>
               )}
               {this.state.barList.length !== 0 &&
                 <FlatList style={{ marginTop: 20, marginBottom: 20 }}
                   data={this.state.barList}
                   keyExtractor={item => item}
-                  // contentContainerStyle={{ paddingBottom: 200 }}
                   onEndReached={this.onEndReached.bind(this)}
-                  // scrollEnabled={
-                  //   false
-                  // }
                   renderItem={({ item, index }) => (
                     <>
-                      <View style={[ flatListMainContainer, { backgroundColor: color.white } ]}>
+                      <View style={[flatListMainContainer, { backgroundColor: color.white }]}>
                         <View style={flatlistSubContainer}>
                           <View style={textContainer}>
                             <Text style={textStyleMediumColor}>{I18n.t("Item")}</Text>
@@ -701,7 +685,7 @@ class GenerateEstimationSlip extends Component {
                           <View style={textContainer}>
                             <Text style={textStyleMedium}>{this.state.smnumber}</Text>
                             <Text style={textStyleMedium}>{ }</Text>
-                            <Text style={[ textStyleMedium, { color: '#2ADC09' } ]}>₹{item.itemDiscount + '.00'}</Text>
+                            <Text style={[textStyleMedium, { color: '#2ADC09' }]}>₹{item.itemDiscount + '.00'}</Text>
                           </View>
                         </View>
                       </View>
@@ -710,190 +694,7 @@ class GenerateEstimationSlip extends Component {
                       </View>
                     </>
                   )}
-
-                // <DataTable>
-                //   <DataTable.Row>
-                //     <DataTable.Cell >{I18n.t("Item")}</DataTable.Cell>
-                //     <DataTable.Cell numeric>{I18n.t("MRP")}</DataTable.Cell>
-                //     <DataTable.Cell numeric>{I18n.t("QTY")}</DataTable.Cell>
-                //   </DataTable.Row>
-                //   <DataTable.Row>
-                //     <DataTable.Cell > {item.barcode}</DataTable.Cell>
-                //     <DataTable.Cell numeric>₹ {item.itemMrp}</DataTable.Cell>
-                //     <DataTable.Cell numeric>
-                //       <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' }}>
-                //         <TouchableOpacity
-                //           onPress={() => this.incrementForTable(item, index)}>
-                //           <PlusIcon name="plus-circle-outline" size={20} color={"red"} />
-                //         </TouchableOpacity>
-                //         <TextInput
-                //           style={{
-                //             justifyContent: 'center',
-                //             // height: Device.isTablet ? 50 : 30,
-                //             // width: Device.isTablet ? 50 : 30,
-                //             color: '#ED1C24',
-                //           }}
-                //           underlineColorAndroid="transparent"
-                //           placeholder="01"
-                //           placeholderTextColor="color.accent"
-                //           value={('0' + item.quantity).slice(-2)}
-                //           onChangeText={(text) => this.updateQty(text, index, item)}
-                //         />
-                //         <TouchableOpacity
-                //           onPress={() => this.decreamentForTable(item, index)}>
-                //           <MinusIcon name="minus-circle-outline" size={20} color={"red"} />
-                //         </TouchableOpacity>
-                //       </View>
-                //     </DataTable.Cell>
-                //   </DataTable.Row>
-                //   <DataTable.Row>
-                //     <DataTable.Cell > {I18n.t("SM Number")}</DataTable.Cell>
-                //     <DataTable.Cell numeric>{I18n.t("Discount Type")}</DataTable.Cell>
-                //     <DataTable.Cell numeric>{I18n.t("Discount")}</DataTable.Cell>
-                //   </DataTable.Row>
-                //   <DataTable.Row>
-                //     <DataTable.Cell >{this.state.smnumber}</DataTable.Cell>
-                //     <DataTable.Cell numeric>{}</DataTable.Cell>
-                //     <DataTable.Cell numeric style={{color:'#2ADC09'}}>₹ {item.itemDiscount + .00}</DataTable.Cell>
-                //   </DataTable.Row>
-                // </DataTable>
-
-
-
-                // <View style={{
-                //   height: Device.isTablet ? 240 : 190,
-                //   backgroundColor: '#FFFFFF',
-                //   borderBottomWidth: 5,
-                //   borderBottomColor: '#FBFBFB',
-                //   borderColor:color.light,
-                //   flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
-                // }}>
-                //   <View style={{ flexDirection: 'row', width: deviceWidth, justifyContent: 'space-around', alignItems: 'center', height: Device.isTablet ? 220 : 170, }}>
-                //     <View>
-                //       <Image source={require('../assets/images/default.jpeg')}
-                //         style={{
-                //           width: Device.isTablet ? 140 : 90, height: Device.isTablet ? 140 : 90,
-                //         }} />
-                //     </View>
-                //     <View style={{ flexDirection: 'column', justifyContent: 'space-around' }}>
-                //       <Text style={{ fontSize: Device.isTablet ? 21 : 16, marginTop: 10, fontFamily: 'medium', color: '#353C40' }}>
-                //         {item.itemdesc}
-                //       </Text>
-                //       <Text style={{ fontSize: Device.isTablet ? 17 : 12, marginTop: -20, fontFamily: 'regular', color: '#808080' }}>
-                //         {I18n.t("BARCODE")}: <Text style={{ color: '#000000' }}>{item.barcode}</Text>
-                //       </Text>
-                //       <Text style={{ fontSize: Device.isTablet ? 17 : 12, marginTop: 6, fontFamily: 'regular', color: '#808080' }}>
-                //         {I18n.t("QUANTITY")}: <Text style={{ color: '#000000' }}>{item.quantity}</Text>
-                //       </Text>
-                //       <Text style={{ fontSize: Device.isTablet ? 17 : 12, marginTop: 6, fontFamily: 'regular', color: '#808080' }}>
-                //         {I18n.t("SM")}: <Text style={{ color: '#000000' }}>{this.state.smnumber}</Text>
-                //       </Text>
-                //       <Text style={{ fontSize: Device.isTablet ? 17 : 12, marginTop: 6, fontFamily: 'regular', color: '#808080' }}>
-                //         {I18n.t("DISCOUNT TYPE")}:
-                //       </Text>
-                //       <Text style={{ fontSize: Device.isTablet ? 17 : 12, marginTop: 6, fontFamily: 'regular', color: '#808080' }}>
-                //         {I18n.t("MRP")}: <Text style={{ color: '#ED1C24' }}>₹ {item.itemMrp}</Text>
-                //       </Text>
-                //       <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#808080' }}>
-                //         {I18n.t("DISCOUNT")}: ₹ 0
-                //       </Text>
-                //       <Text style={{ fontSize: Device.isTablet ? 17 : 12, marginTop: 6, fontFamily: 'regular', color: '#808080' }}>
-                //         {I18n.t("TOTAL")}: <Text style={{ color: '#ED1C24' }}>₹ {item.totalMrp}</Text>
-                //       </Text>
-                //     </View>
-                // <View>
-                //   <View style={{
-                //     flexDirection: 'row',
-                //     justifyContent: 'space-around',
-                //     alignItems: 'center',
-                //     height: Device.isTablet ? 60 : 30,
-                //     marginLeft: -40,
-                //     marginRight: Device.isTablet ? 40 : 20,
-                //     width: Device.isTablet ? 150 : 90,
-                //   }}>
-                //     <TouchableOpacity style={{
-                //       borderColor: '#ED1C24',
-                //       height: Device.isTablet ? 50 : 30,
-                //       width: Device.isTablet ? 50 : 30, borderBottomLeftRadius: 3,
-                //       borderTopLeftRadius: 3,
-                //       borderBottomWidth: 1,
-                //       borderTopWidth: 1,
-                //       borderLeftWidth: 1, paddingLeft: 10, marginLeft: 20,
-                //     }}
-                //       onPress={() => this.decreamentForTable(item, index)}>
-                //       <Text style={{
-                //         alignSelf: 'center',
-                //         marginTop: 2,
-                //         marginLeft: -10,
-                //         fontSize: Device.isTablet ? 22 : 12,
-                //         color: '#ED1C24'
-                //       }}
-                //       >-</Text>
-                //     </TouchableOpacity>
-                //     {/* <Text> {item.qty}</Text> */}
-                //     <TextInput
-                //       style={{
-                //         justifyContent: 'center',
-                //         margin: 20,
-                //         height: Device.isTablet ? 50 : 30,
-                //         width: Device.isTablet ? 50 : 30,
-                //         marginTop: 10,
-                //         marginBottom: 10,
-                //         borderColor: '#ED1C24',
-                //         backgroundColor: 'white',
-                //         color: '#353C40',
-                //         borderWidth: 1,
-                //         fontFamily: 'regular',
-                //         fontSize: Device.isTablet ? 22 : 12,
-                //         paddingLeft: Device.isTablet ? 15 : 9,
-                //       }}
-                //       underlineColorAndroid="transparent"
-                //       placeholder="1"
-                //       placeholderTextColor="#8F9EB7"
-                //       value={item.quantity}
-                //       onChangeText={(text) => this.updateQty(text, index, item)}
-                //     />
-                //     <TouchableOpacity style={{
-                //       borderColor: '#ED1C24',
-                //       height: Device.isTablet ? 50 : 30,
-                //       width: Device.isTablet ? 50 : 30, borderBottomRightRadius: 3,
-                //       borderTopRightRadius: 3,
-                //       borderBottomWidth: 1,
-                //       borderTopWidth: 1,
-                //       borderRightWidth: 1
-                //     }}
-                //       onPress={() => this.incrementForTable(item, index)}>
-                //       <Text style={{
-                //         alignSelf: 'center',
-                //         marginTop: 2,
-                //         fontSize: Device.isTablet ? 22 : 12,
-                //         color: '#ED1C24'
-                //       }}
-                //       >+</Text>
-                //     </TouchableOpacity>
-                //     <TouchableOpacity style={{
-                //       position: 'absolute',
-                //       right: Device.isTablet ? 40 : 20,
-                //       top: Device.isTablet ? -55 : -35,
-                //       width: Device.isTablet ? 50 : 30,
-                //       height: Device.isTablet ? 50 : 30,
-                //       borderRadius: 5,
-                //       // borderTopRightRadius: 5,
-                //       borderWidth: 1,
-                //       borderColor: "lightgray",
-                //     }} onPress={() => this.handlenewsaledeleteaction(item, index)}>
-                //       <Image style={{ alignSelf: 'center', top: 5, height: Device.isTablet ? 30 : 20, width: Device.isTablet ? 30 : 20 }} source={require('../assets/images/delete.png')} />
-                //     </TouchableOpacity>
-                //   </View>
-
-                // </View>
-                //   </View>
-
-                // </View>
                 />
-                // :<View>
-                //   <Text style={{ justifyContent: 'center', fontSize: RF(18) ,color:color.accent}}>Data not found</Text>
-                // </View>
               }
 
               {this.state.itemsList.length != 0 && (

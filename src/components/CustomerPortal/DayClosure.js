@@ -4,13 +4,18 @@ import React, { Component } from 'react';
 import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
 import scss from '../../commonUtils/assets/styles/style.scss';
+import { formatDate } from '../../commonUtils/DateFormate';
 import Loader from '../../commonUtils/loader';
 import { RF, RH, RW } from '../../Responsive';
 import CustomerService from '../services/CustomerService';
-import { flatListTitle } from '../Styles/Styles';
+import { flatListTitle, textContainer } from '../Styles/Styles';
+import moment from 'moment'
+import { Image } from 'react-native';
+
 var deviceheight = Dimensions.get('window').height;
 var deviceheight = Dimensions.get('window').height;
 var deviceWidth = Dimensions.get("window").width;
+
 export default class DayClosure extends Component {
 
   constructor(props) {
@@ -34,6 +39,7 @@ export default class DayClosure extends Component {
     const param = "?storeId=" + this.state.storeId;
     axios.get(CustomerService.getAllDayClosure() + param).then(res => {
       if (res) {
+        console.log(res.data.result);
         this.setState({ dayClosureList: res.data.result });
         if (this.state.dayClosureList.length > 0) {
           this.setState({ enableButton: true });
@@ -56,6 +62,18 @@ export default class DayClosure extends Component {
     });
   }
 
+  deleteEstimationSlip(dsNumber) {
+    CustomerService.deleteEstimationSlip(dsNumber).then((res) => {
+      if (res.data.result) {
+        alert(res.data.result);
+        this.getAllDayCloser(0);
+      } else {
+        alert(res.data.message);
+      }
+
+    });
+  }
+
   render() {
     return (
       <View>
@@ -67,7 +85,7 @@ export default class DayClosure extends Component {
           <FlatList
             style={{ backgroundColor: '#FFF' }}
             ListHeaderComponent={<View style={scss.headerContainer}>
-              <Text style={flatListTitle}>List of Pending Dl slips - <Text style={{ color: '#ED1C24' }}>{this.state.dayClosureList.length}</Text> </Text>
+              <Text style={flatListTitle}>List of Pending DL slips - <Text style={{ color: '#ED1C24' }}>{this.state.dayClosureList.length}</Text> </Text>
               {this.state.enableButton && (
                 <TouchableOpacity style={styles.closeBtn} onPress={() => this.closeDay()}>
                   <Text style={styles.closeBtnText}>Day Closure</Text>
@@ -83,13 +101,24 @@ export default class DayClosure extends Component {
                 <View style={scss.flatListSubContainer}>
                   <View style={scss.textContainer}>
                     <Text style={scss.highText}>S.No: {index + 1}</Text>
-                    <Text style={scss.textStyleLight}>M.R.P: {item.mrp}</Text>
+                    <Text style={scss.textStyleLight}>Created Date :
+                      <Text style={scss.textStyleMedium}>{"\n"}
+                        {moment.utc(item.createdDate, "YYYY-MM-DDTHH:mm:ss Z").format('DD-MM-YYYY hh:mm:ss')}
+                      </Text>
+                    </Text>
                   </View>
                   <View style={scss.textContainer}>
-                    <Text selectable={true} style={scss.textStyleLight}>DsNumber:
+                    <Text selectable={true} style={scss.textStyleLight}>ESNumber:
                       <Text style={scss.textStyleMedium}>{"\n"}{item.dsNumber}</Text>
                     </Text>
                     <Text style={scss.textStyleLight}>SalesMan: {item.salesMan}</Text>
+                  </View>
+                  <View style={[textContainer, { justifyContent: 'flex-end' }]}>
+                    <View style={styles.buttons}>
+                      <TouchableOpacity style={styles.deleteButton} onPress={() => this.deleteEstimationSlip(item.dsNumber)}>
+                        <Image style={{ alignSelf: 'center', top: 5, height: Device.isTablet ? 30 : 20, width: Device.isTablet ? 30 : 20 }} source={require('../assets/images/delete.png')} />
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
               </View>
@@ -141,5 +170,17 @@ const styles = StyleSheet.create({
     marginTop: deviceheight / 3,
     textAlign: 'center',
     color: '#ED1C24'
+  },
+  buttons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  deleteButton: {
+    width: Device.isTablet ? 50 : 30,
+    height: Device.isTablet ? 50 : 30,
+    borderBottomRightRadius: 5,
+    borderTopRightRadius: 5,
+    borderWidth: 1,
+    borderColor: "lightgray",
   }
 });
