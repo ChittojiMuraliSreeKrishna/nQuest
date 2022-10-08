@@ -10,6 +10,7 @@ import Modal from 'react-native-modal';
 import { TextInput } from 'react-native-paper';
 import FilterIcon from 'react-native-vector-icons/FontAwesome';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
+import { dateFormat } from '../../commonUtils/DateFormate';
 import { RF, RH, RW } from '../../Responsive';
 import { customerErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
@@ -104,7 +105,7 @@ class GiftVocher extends Component {
     //     this.setState({ fromDate: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-0" + this.state.date.getDate() });
     // }
     // else {
-    this.setState({ startDate: this.state.date.getFullYear() + this.formatMonth(this.state.date.getMonth() + 1) + "-" + this.state.date.getDate() });
+    this.setState({ startDate: this.state.date.getFullYear() + this.formatMonth(this.state.date.getMonth() + 1) + dateFormat( this.state.date.getDate()) });
     // }
     this.setState({ doneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
@@ -114,7 +115,7 @@ class GiftVocher extends Component {
     //     this.setState({ fromDate: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-0" + this.state.date.getDate() });
     // }
     // else {
-    this.setState({ filterStartDate: this.state.date.getFullYear() + this.formatMonth(this.state.date.getMonth() + 1) + "-" + this.state.date.getDate() });
+    this.setState({ filterStartDate: this.state.date.getFullYear() + this.formatMonth(this.state.date.getMonth() + 1) + dateFormat(this.state.date.getDate()) });
     // }
     this.setState({ doneButtonClicked: true, filterStartPickerOpen: false, datepickerendOpen: false });
   }
@@ -124,7 +125,7 @@ class GiftVocher extends Component {
     //     this.setState({ toDate: this.state.enddate.getFullYear() + "-" + (this.state.enddate.getMonth() + 1) + "-0" + this.state.enddate.getDate() });
     // }
     // else {
-    this.setState({ endDate: this.state.enddate.getFullYear() + this.formatMonth(this.state.enddate.getMonth() + 1) + "-" + this.state.enddate.getDate() });
+    this.setState({ endDate: this.state.enddate.getFullYear() + this.formatMonth(this.state.enddate.getMonth() + 1) + dateFormat(this.state.enddate.getDate()) });
     // }
     this.setState({ enddoneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
@@ -135,7 +136,7 @@ class GiftVocher extends Component {
     //     this.setState({ toDate: this.state.enddate.getFullYear() + "-" + (this.state.enddate.getMonth() + 1) + "-0" + this.state.enddate.getDate() });
     // }
     // else {
-    this.setState({ filterEndDate: this.state.enddate.getFullYear() + this.formatMonth(this.state.enddate.getMonth() + 1) + "-" + this.state.enddate.getDate() });
+    this.setState({ filterEndDate: this.state.enddate.getFullYear() + this.formatMonth(this.state.enddate.getMonth() + 1) + dateFormat(this.state.enddate.getDate()) });
     // }
     this.setState({ enddoneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
@@ -593,8 +594,8 @@ class GiftVocher extends Component {
                       mode="flat"
                       activeUnderlineColor='#000'
                       underlineColor={'#6f6f6f'}
-                      multiline
-                      numberOfLines={5}
+                      // multiline
+                      // numberOfLines={5}
                       style={[styles.textArea, { borderColor: '#8F9EB717' }]}
                       label={I18n.t('Write')}
                       value={this.state.description}

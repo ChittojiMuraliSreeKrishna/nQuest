@@ -76,7 +76,7 @@ class GenerateInvoiceSlip extends Component {
       customerAddress: '',
       customerGSTNumber: '',
       reasonDiscount: '',
-      discountAmount: '0',
+      discountAmount: 0,
       approvedBy: '',
       domainId: 1,
       tableHead: ['S.No', 'Barcode', 'Product', 'Price Per Qty', 'Qty', 'Sales Rate'],
@@ -697,7 +697,8 @@ class GenerateInvoiceSlip extends Component {
       discountAmount: this.state.discountAmount,
       userId: this.state.userId,
       dsNumberList: this.state.dsNumberList,
-      customerName: this.state.customerName,
+      customerName: this.state.mobileData.userName,
+      customerFullName: this.state.customerFullName,
       customerPhoneNumber: this.state.customerMobilenumber,
       customerGSTNumber: this.state.customerGSTNumber, customerAddress: this.state.customerAddress,
       customerGender: this.state.customerGender,
@@ -848,32 +849,29 @@ class GenerateInvoiceSlip extends Component {
 
   billDiscount() {
     const isFormValid = this.billValidation();
+    console.log({ isFormValid });
     if (isFormValid) {
-      // if (this.state.discountAmount === "0") {
-      //   alert("discount amount cannot be empty");
-      // } else if (this.state.approvedBy === "") {
-      //   alert("approved By cannot be empty");
-      // } else if (this.state.reasonDiscount === "") {
-      //   alert("reason cannot be empty");
-      // }
-      // else {
-      // this.state.netPayableAmount = 0;
-      const totalDisc =
-        this.state.totalPromoDisc + parseInt(this.state.discountAmount);
-      if (totalDisc < this.state.grandNetAmount) {
-        const netPayableAmount = this.state.grandNetAmount - totalDisc;
-        this.state.netPayableAmount = netPayableAmount;
-        this.setState({ netPayableAmount: netPayableAmount });
-        // this.getTaxAmount();
-      }
-      const promDisc = parseInt(this.state.discountAmount) + this.state.totalPromoDisc;
-      this.setState({ showDiscReason: true, promoDiscount: promDisc });
+      if (this.state.discountAmount === 0 || this.state.approvedBy === "" || this.state.reasonDiscount === "") {
+        alert("Please enter all fields")
+      } else {
+        // this.state.netPayableAmount = 0;
+        const totalDisc =
+          this.state.totalPromoDisc + parseInt(this.state.discountAmount);
+        if (totalDisc < this.state.grandNetAmount) {
+          const netPayableAmount = this.state.grandNetAmount - totalDisc;
+          this.state.netPayableAmount = netPayableAmount;
+          this.setState({ netPayableAmount: netPayableAmount });
+          // this.getTaxAmount();
+        }
+        const promDisc = parseInt(this.state.discountAmount) + this.state.totalPromoDisc;
+        this.setState({ showDiscReason: true, promoDiscount: promDisc });
 
-      this.setState({ modalVisible: false },
-        () => {
-          this.setState({ disableButton: true, reasonDiscount: "" });
-          this.state.privilages[1].bool = false;
-        });
+        this.setState({ modalVisible: false },
+          () => {
+            this.setState({ disableButton: true, reasonDiscount: "" });
+            this.state.privilages[1].bool = false;
+          });
+      }
     }
   }
 
