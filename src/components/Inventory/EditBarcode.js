@@ -18,7 +18,7 @@ import { Chevron } from "react-native-shapes";
 import forms from "../../commonUtils/assets/styles/formFields.scss";
 import Loader from "../../commonUtils/loader";
 import { RF, RH, RW } from "../../Responsive";
-import { errorLength, inventoryErrorMessages } from "../Errors/errors";
+import { inventoryErrorMessages } from "../Errors/errors";
 import Message from "../Errors/Message";
 import InventoryService from "../services/InventoryService";
 import {
@@ -31,6 +31,7 @@ import {
   inputHeading,
   rnPicker,
   rnPickerContainer,
+  rnPickerDisabled,
   rnPickerError
 } from "../Styles/FormFields";
 
@@ -153,10 +154,10 @@ class EditBarcode extends Component {
         batchNo: editBcode.item.batchNo,
         costPrice: String(editBcode.item.costPrice),
         listPrice: String(editBcode.item.itemMrp),
-        uomName: parseInt(editBcode.item.uom),
-        uomId: parseInt(editBcode.item.uom),
-        hsnCode: parseInt(editBcode.item.hsnCode),
-        hsnId: parseInt(editBcode.item.hsnCode),
+        uomName: editBcode.item.uom,
+        uomId: editBcode.item.uom,
+        hsnCode: editBcode.item.hsnCode,
+        hsnId: editBcode.item.hsnCode,
         empId: editBcode.item.empId,
         storeId: editBcode.item.storeId,
         store: editBcode.item.storeId,
@@ -167,18 +168,15 @@ class EditBarcode extends Component {
         reBar: editBcode.reBar,
         empId: String(editBcode.item.empId),
         barcodeId: parseInt(editBcode.item.id),
+        selectedStatus: editBcode.item.status
       },
       () => {
         const { selectedDomain } = this.state;
         if (selectedDomain === "Textile") {
         }
         this.getAllCatogiries(selectedDomain);
-        // this.getAllDivisions(selectedDomain);
-        // this.getAllSections(this.state.divisionId, this.state.selectedDomain);
-        // this.getAllSubsections(this.state.sectionId, this.state.selectedDomain);
         this.getAllstores(selectedDomain);
         this.getAllHSNCodes();
-        this.getAllUOM();
         this.setState({ loading: false });
       },
     );
@@ -196,10 +194,6 @@ class EditBarcode extends Component {
     this.setState({ selectedDomain: value }, () => {
       console.log({ value });
       const { selectedDomain } = this.state;
-      if (this.state.selectedDomain === "Textile") {
-        this.getAllDivisions(selectedDomain);
-        this.getAllCatogiries(selectedDomain);
-      }
       this.getAllHSNCodes(selectedDomain);
       this.getAllUOM();
     });
@@ -211,81 +205,6 @@ class EditBarcode extends Component {
     this.setState({ selectedStatus: value });
   };
 
-  // Division Actions
-  getAllDivisions (data) {
-    let divisions = [];
-    InventoryService.getAllDivisions(data).then((res) => {
-      if (res?.data) {
-        for (let i = 0; i < res.data.length; i++) {
-          divisions.push({
-            value: res.data[ i ].id,
-            label: res.data[ i ].name,
-          });
-        }
-        console.log({ divisions });
-        this.setState({ divisionsList: divisions });
-      }
-    });
-  }
-  handleDivision = (value) => {
-    console.log({ value });
-    this.setState({ divisionId: value, selectedDivision: value }, () => {
-      this.getAllSections(this.state.divisionId, this.state.selectedDomain);
-    });
-    if (this.state.divisionId !== null) {
-      this.setState({ divisionValid: true });
-    }
-  };
-
-  // Section Actions
-  getAllSections (id, data) {
-    this.setState({ sectionsList: [] });
-    let section = [];
-    InventoryService.getAllSections(id, data).then((res) => {
-      if (res?.data) {
-        for (let i = 0; i < res.data.length; i++) {
-          section.push({
-            value: res.data[ i ].id,
-            label: res.data[ i ].name,
-          });
-        }
-        console.log({ section });
-        this.setState({ sectionsList: section });
-      }
-    });
-  }
-  handleSection = (value) => {
-    this.setState({ sectionId: value, section: value }, () => {
-      this.getAllSubsections(this.state.sectionId, this.state.selectedDomain);
-    });
-    if (this.state.sectionId !== null) {
-      this.setState({ sectionValid: true });
-    }
-  };
-
-  // SubSection Actions
-  getAllSubsections (id, data) {
-    this.setState({ subSectionsList: [] });
-    let subSection = [];
-    InventoryService.getAllSections(id, data).then((res) => {
-      if (res?.data) {
-        for (let i = 0; i < res.data.length; i++) {
-          subSection.push({
-            value: res.data[ i ].id,
-            label: res.data[ i ].name,
-          });
-        }
-        console.log({ subSection });
-        this.setState({ subSectionsList: subSection });
-      }
-    });
-  }
-  handleSubSection = (value) => {
-    this.setState({ subSectionId: value, subSection: value });
-    if (this.state.subsectionId !== null) {
-      this.setState({ subSectionValid: true });
-    }
-  };
 
   // Category Actions
   getAllCatogiries (data) {
@@ -311,30 +230,6 @@ class EditBarcode extends Component {
     }
   };
 
-  // UOM Actions
-  getAllUOM () {
-    this.setState({ uomList: [] });
-    let uomList = [];
-    InventoryService.getUOM().then((res) => {
-      if (res?.data) {
-        console.log("UOMS", res.data);
-        for (let i = 0; i < res.data.length; i++) {
-          uomList.push({
-            value: res.data[ i ].id,
-            label: res.data[ i ].uomName,
-          });
-        }
-        console.log({ uomList });
-        this.setState({ uomList: uomList });
-      }
-    });
-  }
-  handleUOM = (value) => {
-    this.setState({ uomId: value, uomName: value });
-    if (this.state.uomId !== null) {
-      this.setState({ uomValid: true });
-    }
-  };
 
   // HSNCodes Actions
   getAllHSNCodes () {
@@ -345,7 +240,7 @@ class EditBarcode extends Component {
         console.log("HSNS", res.data);
         for (let i = 0; i < res.data.result.length; i++) {
           hsnList.push({
-            value: res.data.result[ i ].id,
+            value: res.data.result[ i ].hsnCode,
             label: res.data.result[ i ].hsnCode,
           });
         }
@@ -386,45 +281,6 @@ class EditBarcode extends Component {
     this.setState({ storeId: value, store: value });
   };
 
-  // Color Actions
-  handleColour = (value) => {
-    this.setState({ colour: value });
-  };
-  handleColourValid = () => {
-    if (this.state.colour.length >= errorLength.colour) {
-      this.setState({ colorValid: true });
-    }
-  };
-
-  // Name Actions
-  handleName = (value) => {
-    this.setState({ name: value });
-  };
-  handleNameValid = () => {
-    if (this.state.name.length >= errorLength.name) {
-      this.setState({ nameValid: true });
-    }
-  };
-
-  // BatchNo Actions
-  handleBatchNo = (value) => {
-    this.setState({ batchNo: value });
-  };
-  handleBatchNoValid = () => {
-    if (this.state.batchNo.length > 0) {
-      this.setState({ batchNoValid: true });
-    }
-  };
-
-  // Cost Price Actions
-  handleCostPrice = (value) => {
-    this.setState({ costPrice: value });
-  };
-  handleCostPriceValid = () => {
-    if (this.state.costPrice.length > 0) {
-      this.setState({ costPriceValid: true });
-    }
-  };
 
   // List Price Actions
   handleListPrice = (value) => {
@@ -433,16 +289,6 @@ class EditBarcode extends Component {
   handleListPriceValid = () => {
     if (this.state.listPrice.length > 0) {
       this.setState({ listPriceValid: true });
-    }
-  };
-
-  // Emp Actions
-  handleEMPId = (value) => {
-    this.setState({ empId: value });
-  };
-  handleEMPIdValid = () => {
-    if (this.state.empId >= 3) {
-      this.setState({ empValid: true });
     }
   };
 
@@ -636,106 +482,50 @@ class EditBarcode extends Component {
           <Appbar.BackAction
             onPress={() => this.handleBackButtonClick()}
           />
-          <Appbar.Content title="Edit Barcode" />
+          <Appbar.Content title="Rebarcode" />
         </Appbar>
         <KeyboardAwareScrollView>
           <Text style={inputHeading}>
             {I18n.t("Domian")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
-          <View
+          <TextInput
             style={[
-              rnPickerContainer,
-              { borderColor: divisionValid ? "#8F9EB718" : "#dd0000" },
+              forms.inactive_fld,
+              forms.input_fld
             ]}
-          >
-            <RNPickerSelect
-              placeholder={{
-                label: "Domain",
-              }}
-              disabled={true}
-              Icon={() => {
-                return (
-                  <Chevron
-                    style={styles.imagealign}
-                    size={1.5}
-                    color={divisionValid ? "gray" : "#dd0000"}
-                  />
-                );
-              }}
-              items={data1}
-              onValueChange={(value) => {
-                this.handleDomain(value);
-              }}
-              on
-              style={divisionValid ? rnPicker : rnPickerError}
-              value={this.state.selectedDomain}
-              useNativeAndroidPickerStyle={false}
-            />
-          </View>
-          {this.state.selectedDomain === "Textile" && ( // For Textile Domain only
+            editable={false}
+            placeholder="Domain"
+            value={this.state.selectedDomain}
+          />
+          {this.state.selectedDomain !== "" && (
             <View>
               <Text style={inputHeading}>
                 {I18n.t("Division")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
               </Text>
-              <View
+              <TextInput
+                editable={false}
                 style={[
-                  rnPickerContainer,
-                  { borderColor: divisionValid ? "#8F9EB718" : "#dd0000" },
+                  forms.inactive_fld,
+                  forms.input_fld
                 ]}
-              >
-                <RNPickerSelect
-                  placeholder={{
-                    label: `${this.state.selectedDivision}`,
-                  }}
-                  disabled={true}
-                  Icon={() => {
-                    return (
-                      <Chevron
-                        style={styles.imagealign}
-                        size={1.5}
-                        color={divisionValid ? "gray" : "#dd0000"}
-                      />
-                    );
-                  }}
-                  items={this.state.divisionsList}
-                  onValueChange={(value) => this.handleDivision(value)}
-                  style={divisionValid ? rnPicker : rnPickerError}
-                  value={this.state.selectedDivision}
-                  useNativeAndroidPickerStyle={false}
-                />
-              </View>
+                placeholder="Division"
+                value={this.state.selectedDivision}
+              />
               {!divisionValid && (
                 <Message imp={true} message={this.state.errors[ "divison" ]} />
               )}
               <Text style={inputHeading}>
                 {I18n.t("Section")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
               </Text>
-              <View
+              <TextInput
+                editable={false}
                 style={[
-                  rnPickerContainer,
-                  { borderColor: sectionValid ? "#8F9EB718" : "#dd0000" },
+                  forms.inactive_fld,
+                  forms.input_fld
                 ]}
-              >
-                <RNPickerSelect
-                  disabled={true}
-                  placeholder={{
-                    label: `${this.state.section}`,
-                  }}
-                  Icon={() => {
-                    return (
-                      <Chevron
-                        style={styles.imagealign}
-                        size={1.5}
-                        color={sectionValid ? "gray" : "#dd0000"}
-                      />
-                    );
-                  }}
-                  items={this.state.sectionsList}
-                  style={sectionValid ? rnPicker : rnPickerError}
-                  value={this.state.section}
-                  useNativeAndroidPickerStyle={false}
-                />
-              </View>
+                placeholder="Section"
+                value={this.state.section}
+              />
               {!sectionValid && (
                 <Message imp={true} message={this.state.errors[ "section" ]} />
               )}
@@ -743,66 +533,30 @@ class EditBarcode extends Component {
                 {I18n.t("Sub Section")}{" "}
                 <Text style={{ color: "#aa0000" }}>*</Text>{" "}
               </Text>
-              <View
+              <TextInput
+                editable={false}
                 style={[
-                  rnPickerContainer,
-                  { borderColor: subSectionValid ? "#8F9EB718" : "#dd0000" },
+                  forms.inactive_fld,
+                  forms.input_fld
                 ]}
-              >
-                <RNPickerSelect
-                  placeholder={{
-                    label:`${this.state.subSection}`,
-                  }}
-                  disabled={true}
-                  Icon={() => {
-                    return (
-                      <Chevron
-                        style={styles.imagealign}
-                        size={1.5}
-                        color={subSectionValid ? "gray" : "#dd0000"}
-                      />
-                    );
-                  }}
-                  items={this.state.subSectionsList}
-                  onValueChange={(value) => this.handleSubSection(value)}
-                  style={subSectionValid ? rnPicker : rnPickerError}
-                  value={this.state.subSection}
-                  useNativeAndroidPickerStyle={false}
-                />
-              </View>
+                placeholder="SubSection"
+                value={this.state.subSection}
+              />
               {!subSectionValid && (
                 <Message imp={true} message={this.state.errors[ "subSection" ]} />
               )}
               <Text style={inputHeading}>
                 {I18n.t("Category")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
               </Text>
-              <View
+              <TextInput
+                editable={false}
                 style={[
-                  rnPickerContainer,
-                  { borderColor: categoryValid ? "#8F9EB718" : "#dd0000" },
+                  forms.inactive_fld,
+                  forms.input_fld
                 ]}
-              >
-                <RNPickerSelect
-                  placeholder={{
-                    label: "Category",
-                  }}
-                  disabled={true}
-                  Icon={() => {
-                    return (
-                      <Chevron
-                        style={styles.imagealign}
-                        size={1.5}
-                        color={categoryValid ? "gray" : "#dd0000"}
-                      />
-                    );
-                  }}
-                  items={this.state.categoriesList}
-                  onValueChange={(value) => this.handleCateory(value)}
-                  style={categoryValid ? rnPicker : rnPickerError}
-                  value={this.state.category}
-                  useNativeAndroidPickerStyle={false}
-                />
-              </View>
+                placeholder="Category"
+                value={this.state.category}
+              />
               {!categoryValid && (
                 <Message imp={true} message={this.state.errors[ "category" ]} />
               )}
@@ -821,7 +575,7 @@ class EditBarcode extends Component {
               >
                 <RNPickerSelect
                   placeholder={{
-                    label: "Division",
+                    label: "Select",
                   }}
                   disabled={true}
                   Icon={() => {
@@ -989,7 +743,7 @@ class EditBarcode extends Component {
             style={[
               forms.input_fld,
               this.state.reBar ? forms.active_fld : forms.inactive_fld,
-              { borderColor: listPriceValid ? "#8F9EB718" : "#dd0000" },
+              { borderColor: listPriceValid ? "#8F9EB7" : "#dd0000" },
             ]}
             underlineColorAndroid="transparent"
             placeholder={I18n.t("List Price")}
@@ -1010,33 +764,12 @@ class EditBarcode extends Component {
           <Text style={inputHeading}>
             {I18n.t("UOM")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
-          <View
-            style={[
-              rnPickerContainer,
-              { borderColor: uomValid ? "#8F9EB718" : "#dd0000" },
-            ]}
-          >
-            <RNPickerSelect
-              placeholder={{
-                label: "UOM",
-              }}
-              Icon={() => {
-                return (
-                  <Chevron
-                    style={styles.imagealign}
-                    size={1.5}
-                    color={uomValid ? "gray" : "#dd0000"}
-                  />
-                );
-              }}
-              disabled={true}
-              items={this.state.uomList}
-              onValueChange={(value) => this.handleUOM(value)}
-              style={uomValid ? rnPicker : rnPickerError}
-              value={this.state.uomName}
-              useNativeAndroidPickerStyle={false}
-            />
-          </View>
+          <TextInput
+            editable={false}
+            style={[ forms.inactive_fld, forms.input_fld ]}
+            placeholder="Uom"
+            value={this.state.uomName}
+          />
           {!uomValid && (
             <Message imp={true} message={this.state.errors[ "uom" ]} />
           )}
@@ -1046,7 +779,7 @@ class EditBarcode extends Component {
           <View
             style={[
               rnPickerContainer,
-              { borderColor: hsnValid ? "#8F9EB718" : "#dd0000" },
+              { borderColor: hsnValid ? "#8F9EB7" : "#dd0000" },
             ]}
           >
             <RNPickerSelect
@@ -1078,7 +811,7 @@ class EditBarcode extends Component {
           <TextInput
             style={[
               forms.input_fld,
-              forms.active_fld,
+              forms.inactive_fld,
               { borderColor: empValid ? "#8F9EB718" : "#dd0000" },
             ]}
             underlineColorAndroid="transparent"
@@ -1101,7 +834,7 @@ class EditBarcode extends Component {
           <View
             style={[
               rnPickerContainer,
-              { borderColor: storeValid ? "#8F9EB718" : "#dd0000" },
+              { borderColor: "#8F9EB718", backgroundColor: '#b9b9b9' },
             ]}
           >
             <RNPickerSelect
@@ -1109,6 +842,7 @@ class EditBarcode extends Component {
               placeholder={{
                 label: "Store",
               }}
+              disabled={true}
               Icon={() => {
                 return (
                   <Chevron
@@ -1120,7 +854,7 @@ class EditBarcode extends Component {
               }}
               items={this.state.storesList}
               onValueChange={(value) => this.handleStore(value)}
-              style={storeValid ? rnPicker : rnPickerError}
+              style={rnPickerDisabled}
               value={this.state.store}
               useNativeAndroidPickerStyle={false}
             />
@@ -1135,7 +869,7 @@ class EditBarcode extends Component {
             style={[
               forms.input_fld,
               forms.active_fld,
-              { borderColor: storeValid ? "#8F9EB718" : "#dd0000" },
+              { borderColor: storeValid ? "#8F9EB7" : "#dd0000" },
             ]}
             underlineColorAndroid="transparent"
             placeholder="QTY"

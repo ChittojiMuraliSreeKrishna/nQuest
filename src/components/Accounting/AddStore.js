@@ -13,6 +13,7 @@ import I18n from "react-native-i18n";
 import { Appbar, TextInput } from "react-native-paper";
 import RNPickerSelect from "react-native-picker-select";
 import { Chevron } from "react-native-shapes";
+import forms from '../../commonUtils/assets/styles/formFields.scss';
 import Loader from "../../commonUtils/loader";
 import { RF } from "../../Responsive";
 import {
@@ -24,11 +25,10 @@ import Message from "../Errors/Message";
 import UrmService from "../services/UrmService";
 import {
   cancelBtn,
-  cancelBtnText,
-  inputField,
-  inputHeading,
+  cancelBtnText, inputHeading,
   rnPicker,
   rnPickerContainer,
+  rnPickerDisabled,
   rnPickerError,
   submitBtn,
   submitBtnText
@@ -399,8 +399,8 @@ export default class AddStore extends Component {
       mobileValid,
       gstValid,
       statusValid,
-      cityValid
-
+      cityValid,
+      isEdit,
     } = this.state;
     return (
       <View style={styles.mainContainer}>
@@ -445,7 +445,7 @@ export default class AddStore extends Component {
               items={this.state.states}
               disabled={this.state.isEdit ? true : false}
               onValueChange={(value) => this.handleStoreState(value)}
-              style={stateValid ? rnPicker : rnPickerError}
+              style={stateValid ? isEdit ? rnPickerDisabled : rnPicker : rnPickerError}
               value={this.state.storeState}
               useNativeAndroidPickerStyle={false}
             />
@@ -479,7 +479,7 @@ export default class AddStore extends Component {
               items={this.state.dictricts}
               onValueChange={(value) => this.handleDistrict(value)}
               disabled={this.state.isEdit ? true : false}
-              style={districtValid ? rnPicker : rnPickerError}
+              style={districtValid ? isEdit ? rnPickerDisabled : rnPicker : rnPickerError}
               value={this.state.storeDistrict}
               useNativeAndroidPickerStyle={false}
             />
@@ -491,11 +491,10 @@ export default class AddStore extends Component {
           <Text style={inputHeading}>{I18n.t("City")} <Text style={{ color: "#aa0000" }}>*</Text> </Text>
 
           <TextInput
-            activeOutlineColor="#000"
-            mode="outlined"
-            outlineColor={cityValid ? "#8F9EB717" : "#dd0000"}
-            style={[ inputField, ]}
-
+            activeUnderlineColor="#000"
+            mode="flat"
+            underlineColor={cityValid ? "#8F9EB717" : "#dd0000"}
+            style={[ forms.input_fld, forms.active_fld ]}
             placeholder={I18n.t("CITY")}
             placeholderTextColor={cityValid ? "#6F6F6F" : "#dd0000"}
             textAlignVertical="center"
@@ -509,10 +508,9 @@ export default class AddStore extends Component {
 
           <Text style={inputHeading}>{I18n.t("Area")}</Text>
           <TextInput
-            activeOutlineColor="#000"
-            mode="outlined"
-            style={inputField}
-            outlineColor="#8F9EB717"
+            activeUnderlineColor="#000"
+            mode="flat"
+            style={[ forms.input_fld, forms.active_fld ]} underlineColor="#8F9EB717"
             placeholder={I18n.t("AREA")}
             placeholderTextColor="#6F6F6F"
             textAlignVertical="center"
@@ -525,14 +523,10 @@ export default class AddStore extends Component {
             <Text style={{ color: "#aa0000" }}>*</Text>
           </Text>
           <TextInput
-            activeOutlineColor="#000"
-            mode="outlined"
-            outlineColor={mobileValid ? "#8F9EB717" : "#dd0000"}
-            style={[
-              inputField,
-              ,
-            ]}
-
+            activeUnderlineColor="#000"
+            mode="flat"
+            underlineColor={mobileValid ? "#8F9EB717" : "#dd0000"}
+            style={[ forms.input_fld, forms.active_fld ]}
             placeholder={I18n.t("Phone Number")}
             maxLength={10}
             keyboardType={"numeric"}
@@ -549,10 +543,9 @@ export default class AddStore extends Component {
           )}
           <Text style={inputHeading}>{"Address"}</Text>
           <TextInput
-            activeOutlineColor="#000"
-            mode="outlined"
-            style={inputField}
-            outlineColor="#8F9EB717"
+            activeUnderlineColor="#000"
+            mode="flat"
+            style={[ forms.input_fld, forms.active_fld ]} underlineColor="#8F9EB717"
             placeholder={I18n.t("ADDRESS")}
             placeholderTextColor="#6F6F6F"
             textAlignVertical="center"
@@ -610,14 +603,10 @@ export default class AddStore extends Component {
             {I18n.t("Store Name")} <Text style={{ color: "#aa0000" }}>*</Text>
           </Text>
           <TextInput
-            activeOutlineColor="#000"
-            mode="outlined"
-            outlineColor={storeValid ? "#8F9EB717" : "#dd0000"}
-            style={[
-              inputField,
-              ,
-            ]}
-
+            activeUnderlineColor="#000"
+            mode="flat"
+            underlineColor={storeValid ? "#8F9EB717" : "#dd0000"}
+            style={[ forms.input_fld, forms.active_fld ]}
             placeholder={I18n.t("STORE NAME")}
             placeholderTextColor={storeValid ? "#6F6F6F" : "#dd0000"}
             textAlignVertical="center"
@@ -636,10 +625,10 @@ export default class AddStore extends Component {
                 <Text style={{ color: "#aa0000" }}>*</Text>
               </Text>
               <TextInput
-                activeOutlineColor="#000"
-                mode="outlined"
-                style={inputField}
-                outlineColor={gstValid ? "#8F9EB717" : "#dd0000"}
+                activeUnderlineColor="#000"
+                mode="flat"
+                style={[ forms.input_fld, forms.inactive_fld ]}
+                underlineColor={gstValid ? "#8F9EB717" : "#dd0000"}
                 placeholder={I18n.t("GST NUMBER")}
                 placeholderTextColor="#6F6F6F"
                 textAlignVertical="center"
@@ -654,19 +643,15 @@ export default class AddStore extends Component {
           )}
           {this.state.isEdit === false && (
             <View>
-              <Text style={inputHeading}>
+              <Text style={[ forms.input_fld, forms.active_fld ]}>
                 {I18n.t("GST Number")}{" "}
                 <Text style={{ color: "#aa0000" }}>*</Text>
               </Text>
               <TextInput
-                activeOutlineColor="#000"
-                mode="outlined"
-                outlineColor={gstValid ? "#8F9EB717" : "#dd0000"}
-                style={[
-                  inputField,
-                  ,
-                ]}
-
+                activeUnderlineColor="#000"
+                mode="flat"
+                underlineColor={gstValid ? "#8F9EB717" : "#dd0000"}
+                style={[ forms.input_fld, forms.active_fld ]}
                 placeholder={I18n.t("GST NUMBER")}
                 placeholderTextColor={gstValid ? "#6F6F6F" : "#dd0000"}
                 textAlignVertical="center"

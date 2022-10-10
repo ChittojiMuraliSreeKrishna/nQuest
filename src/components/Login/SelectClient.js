@@ -14,7 +14,8 @@ export class SelectClient extends Component {
     this.state = {
       selectedClient: "",
       clientsList: [],
-      selectedItem: null
+      selectedItem: null,
+      clientId: null
     };
   }
 
@@ -22,6 +23,8 @@ export class SelectClient extends Component {
     let userId = await AsyncStorage.getItem("userId");
     console.log({ userId });
     this.getAllClients(userId);
+    let clientId = await AsyncStorage.getItem("custom:clientId1");
+    this.setState({ clientId: clientId });
   }
 
   getAllClients (userId) {
@@ -38,15 +41,24 @@ export class SelectClient extends Component {
           });
         }
         this.setState({ clientsList: clientsRes });
+        this.getSelected();
       }
       console.log(this.state.clientsList);
+    });
+  }
+
+  getSelected () {
+    this.state.clientsList.map((item, index) => {
+      console.log(item.id);
+      if (parseInt(item.id) === parseInt(this.state.clientId)) {
+        this.setState({ selectedItem: index });
+      }
     });
   }
 
   handleChecked = (item, index) => {
     this.setState({ selectedItem: index });
     AsyncStorage.setItem("custom:clientId1", String(item.id)).then((value) => { console.log(item.id); }).catch(() => { alert('There is an error saving clientId'); });
-
   };
 
 

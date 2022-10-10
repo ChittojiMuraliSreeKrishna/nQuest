@@ -11,7 +11,6 @@ import OrderShipment from "../components/Inventory/OrderShipment";
 import ProductCombo from "../components/Inventory/ProductCombo";
 import ReBarcode from "../components/Inventory/ReBarcode";
 import RecieveOrder from "../components/Inventory/RecieveOrder";
-import ViewReBarcode from "../components/Inventory/ViewReBarcode";
 const Stack = createStackNavigator();
 export default class InventoryNavigation extends Component {
 
@@ -70,11 +69,6 @@ export default class InventoryNavigation extends Component {
             name="EditBarcode"
             options={{ headerShown: false }}
             component={EditBarcode}
-          />
-          <Stack.Screen
-            name="ViewReBarcode"
-            options={{ headerShown: false }}
-            component={ViewReBarcode}
           />
           <Stack.Screen
             name="AddProduct"

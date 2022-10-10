@@ -8,13 +8,14 @@ import I18n from 'react-native-i18n';
 import { Appbar } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
+import forms from '../../commonUtils/assets/styles/formFields.scss';
 import Loader from '../../commonUtils/loader';
 import { RF, RH, RW } from '../../Responsive';
 import { errorLength, urmErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
 import UrmService from '../services/UrmService';
 import { color } from '../Styles/colorStyles';
-import { cancelBtn, cancelBtnText, datePicker, datePickerBtnText, datePickerButton1, datePickerButton2, datePickerContainer, dateSelector, dateText, inputField, inputHeading, rnPicker, rnPickerContainer, rnPickerError, submitBtn, submitBtnText } from '../Styles/FormFields';
+import { cancelBtn, cancelBtnText, datePicker, datePickerBtnText, datePickerButton1, datePickerButton2, datePickerContainer, dateSelector, dateText, inputHeading, rnPicker, rnPickerContainer, rnPickerError, submitBtn, submitBtnText } from '../Styles/FormFields';
 
 var deviceWidth = Dimensions.get('window').width;
 
@@ -456,7 +457,7 @@ export default class AddUser extends Component {
           </Text>
           <Text style={inputHeading}>{I18n.t("Name")} <Text style={{ color: color.accent }}>*</Text> </Text>
           <TextInput
-            style={[ inputField, { borderColor: nameValid ? color.border : color.accent } ]}
+            style={[ forms.input_fld, { borderColor: nameValid ? color.border : color.accent } ]}
             underlineColorAndroid="transparent"
             placeholder={I18n.t("Name")}
             placeholderTextColor={nameValid ? color.border : color.accent}
@@ -516,7 +517,7 @@ export default class AddUser extends Component {
           </TouchableOpacity>
           <Text style={inputHeading}>{I18n.t("Mobile")} <Text style={{ color: color.accent }}>*</Text> </Text>
           <TextInput
-            style={[ inputField, { borderColor: mobileValid ? color.border : color.accent } ]}
+            style={[ forms.input_fld, { borderColor: mobileValid ? color.border : color.accent } ]}
             underlineColorAndroid="transparent"
             placeholder={I18n.t("Mobile")}
             placeholderTextColor={mobileValid ? color.border : color.accent}
@@ -532,7 +533,7 @@ export default class AddUser extends Component {
           {!mobileValid && <Message imp={true} message={this.state.errors[ "mobile" ]} />}
           <Text style={inputHeading}>{I18n.t("Email")} <Text style={{ color: color.accent }}>*</Text> </Text>
           <TextInput
-            style={[ inputField, { borderColor: emailValid ? color.border : color.accent } ]}
+            style={[ forms.input_fld, { borderColor: emailValid ? color.border : color.accent } ]}
             underlineColorAndroid="transparent"
             placeholder={I18n.t("Email")}
             onBlur={this.handleEmailValid}
@@ -547,7 +548,7 @@ export default class AddUser extends Component {
           {!emailValid && <Message imp={true} message={this.state.errors[ "email" ]} />}
           <Text style={inputHeading}>{I18n.t("Address")}</Text>
           <TextInput
-            style={inputField}
+            style={forms.input_fld}
             underlineColorAndroid="transparent"
             placeholder={I18n.t("Address")}
             placeholderTextColor={color.border}

@@ -13,7 +13,7 @@ import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Modal from "react-native-modal";
-import { Badge, Text, TextInput } from "react-native-paper";
+import { Text, TextInput } from "react-native-paper";
 import IconFA from 'react-native-vector-icons/FontAwesome';
 import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconMAA from 'react-native-vector-icons/MaterialIcons';
@@ -24,7 +24,6 @@ import Loader from "../../commonUtils/loader";
 import { RH, RW } from "../../Responsive";
 import InventoryService from "../services/InventoryService";
 import {
-  flatListTitle,
   listEmptyMessage
 } from "../Styles/Styles";
 
@@ -294,11 +293,9 @@ export default class Barcode extends Component {
             style={scss.flatListBody}
             ListHeaderComponent={
               <View style={scss.headerContainer}>
-                <Text style={flatListTitle}>
-                  Barcode List -{" "}
-                  <Badge size={30} style={{ color: "#ED1C24", }}>
-                    {this.state.filterActive ? this.state.filterBarcodesList.length : this.state.barcodesList.length}
-                  </Badge>
+                <Text style={scss.flat_heading}>
+                  Barcode Details -{" "}
+                  <Text style={{ color: "#ED1C24" }}>{this.state.filterActive ? this.state.filterBarcodesList.length : this.state.barcodesList.length}</Text>
                 </Text>
                 <View style={scss.headerContainer}>
                   <IconMAA

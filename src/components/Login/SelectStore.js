@@ -1,15 +1,15 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
-import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Device from 'react-native-device-detection';
+import { Dimensions, FlatList, StyleSheet, Text, View } from 'react-native';
 import I18n from 'react-native-i18n';
-import { Appbar } from 'react-native-paper';
-import { RF, RH, RW } from '../../Responsive';
+import { Appbar, Button, RadioButton } from 'react-native-paper';
+import forms from '../../commonUtils/assets/styles/formFields.scss';
 import LoginService from '../services/LoginService';
 var deviceWidth = Dimensions.get('window').width;
 I18n.fallbacks = true;
 I18n.defaultLocale = 'english';
-const data = [ { key: "Vijayawada" }, { key: "Kakinada" }, { key: "Anakapalli" } ];
+var deviceWidth = Dimensions.get('window').width;
+var deviceHeight = Dimensions.get('window').height;
 
 export default class SelectStore extends React.Component {
   constructor(props) {
@@ -22,7 +22,8 @@ export default class SelectStore extends React.Component {
       storeNames: [],
       storesData: [],
       isFromDomain: false,
-      userId: 0
+      userId: 0,
+      storeId: 0,
     };
   }
 
@@ -36,6 +37,9 @@ export default class SelectStore extends React.Component {
     this.setState({ userId: userId }, () => {
       this.getstores();
     });
+
+    const storeId = await AsyncStorage.getItem("storeId");
+    this.setState({ storeId: storeId });
   }
 
   async getstores () {
@@ -49,6 +53,15 @@ export default class SelectStore extends React.Component {
           };
         });
         this.setState({ storesData: res.data });
+        this.getSelected();
+      }
+    });
+  }
+
+  getSelected () {
+    this.state.storesData.map((item, index) => {
+      if (parseInt(item.id) === parseInt(this.state.storeId)) {
+        this.setState({ selectedItem: index });
       }
     });
   }
@@ -84,44 +97,38 @@ export default class SelectStore extends React.Component {
   render () {
     console.log(this.state.storesData);
     return (
-      <View style={styles.container}>
+      <View>
+        <Appbar mode='center-aligned'>
+          <Appbar.BackAction
+            onPress={() => this.handleBackButtonClick()} />
+          <Appbar.Content title="Select Store" />
+        </Appbar>
         <View>
-
           <FlatList
-            style={{ width: deviceWidth, marginTop: RH(10) }}
-            ListHeaderComponent={
-              <Appbar mode='center-aligned'>
-                <Appbar.BackAction
-                  onPress={() => this.handleBackButtonClick()} />
-                <Appbar.Content title="Select Store" />
-              </Appbar>
-            }
+            style={styles.container}
             data={this.state.storesData}
             keyExtractor={item => item}
             renderItem={({ item, index }) => (
-              <TouchableOpacity onPress={() => this.selectStoreName(item, index)}>
-                <View style={{
-                  borderBottomColor: 'lightgray', borderBottomWidth: 0.6, marginLeft: this.state.selectedItem === index ? 0 : 0, marginRight: this.state.selectedItem === index ? 0 : 0, backgroundColor: this.state.selectedItem === index ? '#ED1C24' : '#ffffff'
-                }}>
-                  <View style={Device.isTablet ? styles.domainButton_tablet : styles.domainButton_mobile}>
-                    <Text style={[ Device.isTablet ? styles.domainButtonText_tablet : styles.domainButtonText_mobile, {
-                      color: this.state.selectedItem === index ? '#ffffff' : '#353C40'
-                    } ]}>
-                      {item.name}
-                    </Text>
-                    <Image source={this.state.selectedItem === index ? require('../assets/images/langselect.png') : require('../assets/images/langunselect.png')} style={{ position: 'absolute', right: 20, top: 30 }} />
+              <View style={styles.buttonContainer}>
+                <RadioButton
+                  value={item.id}
+                  status={this.state.selectedItem === index ? 'checked' : 'unchecked'}
+                  onPress={() => this.handleChecked(item, index)}
+                />
+                <View style={styles.button}>
+                  <View>
+                    <Text style={styles.btnText}>{item.name}</Text>
                   </View>
                 </View>
-              </TouchableOpacity>
+              </View>
             )}
           />
-        </View>
-        <View style={styles.continueButtonContainer}>
-          <TouchableOpacity
-            style={styles.continueButton}
-            onPress={() => this.letsGoButtonAction()} >
-            <Text style={styles.continueButtonText}> {I18n.t('continue').toUpperCase()} </Text>
-          </TouchableOpacity>
+          <Button mode='elevated' style={forms.continue_btn} onPress={() => this.letsGoButtonAction()}>
+            <Text style={forms.submit_btn_text}>Continue</Text>
+          </Button>
+          <Button mode='elevated' style={forms.cancel_full_btn} onPress={() => this.props.navigation.goBack()}>
+            <Text style={forms.cancel_btn_text}>Cancel</Text>
+          </Button>
         </View>
       </View>
 
@@ -130,107 +137,36 @@ export default class SelectStore extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  imagealign: {
-    marginTop: RH(14),
-    marginRight: RH(10),
-  },
-  logoImage: {
-    width: RW(302),
-    height: RH(275),
-    position: 'absolute',
-    top: RH(130)
-  },
   container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    marginTop: deviceHeight / 4,
+    marginBottom: deviceHeight / 4
   },
-  continueButtonContainer: {
-    width: deviceWidth,
-    backgroundColor: '#8F9EB7',
-    position: 'absolute',
-    bottom: RH(0),
-    height: Device.isTablet ? RH(100) : RH(70),
+
+  buttonContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingLeft: 30,
+    paddingRight: 40,
   },
-  continueButton: {
+  button: {
     backgroundColor: '#ED1C24',
-    justifyContent: 'center',
-    marginLeft: RW(20),
-    width: deviceWidth - RW(40),
-    height: Device.isTablet ? RH(60) : RH(44),
-    borderRadius: 10,
+    height: 40,
+    borderColor: '#000',
+    borderWidth: 1,
+    margin: 2,
+    width: '90%',
+    marginLeft: '5%',
+    marginRight: '5%',
+    borderRadius: 6,
+  },
+  btnText: {
+    textAlign: 'center',
+    color: '#FFF',
+    fontSize: 21,
     fontWeight: 'bold',
-    marginTop: 10,
-  },
-  continueButtonText: {
-    color: 'white',
-    justifyContent: 'center',
-    alignSelf: 'center',
-    fontSize: RF(14),
-    fontFamily: "regular",
-  },
-
-  // Styles For Mobile
-  headerTitle_mobile: {
-    color: "#353C40",
-    fontSize: RF(30),
-    fontFamily: "bold",
-    marginLeft: RW(20),
-    // marginTop: RH(100),
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-  domainButton_mobile: {
-    flexDirection: 'column',
-    width: '100%',
-    height: RH(80)
-  },
-  domainButtonText_mobile: {
-    fontSize: RF(15),
-    marginTop: RH(30),
-    marginLeft: RW(20),
-    fontFamily: 'medium',
-  },
-
-
-  // Styles For Tablet
-  headerTitle_tablet: {
-    color: "#353C40",
-    fontSize: RF(30),
-    fontFamily: "bold",
-    marginLeft: RW(20),
-    // marginTop: RH(100),
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-  domainButton_tablet: {
-    flexDirection: 'column',
-    width: '100%',
-    height: RH(100)
-  },
-  domainButtonText_tablet: {
-    fontSize: RF(20),
-    marginTop: RH(30),
-    marginLeft: RW(20),
-    fontFamily: 'medium',
-  },
-  continueButton_tablet: {
-    backgroundColor: '#ED1C24',
-    justifyContent: 'center',
-    marginLeft: RW(20),
-    width: deviceWidth - RW(40),
-    height: RH(60),
-    borderRadius: 10,
-    fontWeight: 'bold',
-    // marginBottom:100,
-  },
-  continueButtonText_tablet: {
-    color: 'white',
-    justifyContent: 'center',
-    alignSelf: 'center',
-    fontSize: 20,
-    fontFamily: "regular",
-  },
-
+    margin: 0,
+    padding: 0,
+  }
 });

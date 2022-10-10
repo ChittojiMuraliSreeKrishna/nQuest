@@ -29,7 +29,7 @@ import {
   datePickerButton1,
   datePickerButton2
 } from "../Styles/FormFields";
-import { flatListTitle, listEmptyMessage } from "../Styles/Styles";
+import { listEmptyMessage } from "../Styles/Styles";
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
@@ -333,8 +333,8 @@ export default class ProductCombo extends Component {
           style={scss.flatListBody}
           ListHeaderComponent={
             <View style={scss.headerContainer}>
-              <Text style={flatListTitle}>
-                Products Combo -{" "}
+              <Text style={scss.flat_heading}>
+                List of product bundles -{" "}
                 <Text style={{ color: "#ED1C24" }}>
                   {this.state.filterActive ? this.state.filteredProductsList.length : this.state.productComboList.length}
                 </Text>{" "}
@@ -352,6 +352,7 @@ export default class ProductCombo extends Component {
                   <IconFA
                     name="sliders"
                     size={25}
+                    style={scss.action_icons}
                     onPress={() => this.filterAction()}
                   >
                   </IconFA>
@@ -507,6 +508,9 @@ export default class ProductCombo extends Component {
                     )}
                   />
                 </View>
+                <TouchableOpacity style={forms.close_full_btn} onPress={() => this.modalHandleForViewClose()}>
+                  <Text style={forms.cancel_btn_text}>Close</Text>
+                </TouchableOpacity>
               </View>
             </Modal>
           </View>

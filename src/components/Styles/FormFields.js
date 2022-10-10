@@ -58,8 +58,8 @@ export const inputHeading = {
 
 export const rnPickerContainer = {
   justifyContent: "center",
-  margin: '4%',
-  height: RH(50),
+  margin: '5%',
+  height: RH(45),
   marginTop: RH(5),
   marginBottom: RH(5),
   borderColor: "#d6d6d6",
@@ -67,9 +67,9 @@ export const rnPickerContainer = {
   backgroundColor: color.light,
   borderWidth: 1,
   fontFamily: "regular",
-  paddingLeft: RW(13),
+  // paddingLeft: RW(13),
   fontSize: RF(14),
-  width: '92%',
+  width: '90%',
 };
 
 export const rnPicker = {
@@ -98,7 +98,37 @@ export const rnPicker = {
     borderColor: color.border,
     backgroundColor: color.light,
     color: color.blue,
-    marginLeft: 20,
+    marginLeft: 0,
+    paddingLeft: 10,
+  },
+};
+
+export const rnPickerDisabled = {
+  placeholder: {
+    color: color.grey,
+    fontFamily: "regular",
+    fontSize: RF(12),
+  },
+  inputIOS: {
+    justifyContent: "center",
+    height: Device.isTablet ? 52 : 42,
+    borderRadius: 3,
+    fontFamily: "regular",
+    fontSize: RF(14),
+    borderColor: color.border,
+    backgroundColor: '#b9b9b9',
+  },
+  inputAndroid: {
+    justifyContent: "center",
+    height: Device.isTablet ? 52 : 42,
+    borderRadius: 3,
+    fontFamily: "regular",
+    fontSize: RF(14),
+    borderColor: color.border,
+    backgroundColor: '#b9b9b9',
+    color: color.grey,
+    marginLeft: 0,
+    paddingLeft: 10,
   },
 };
 

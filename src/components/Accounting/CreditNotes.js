@@ -354,7 +354,7 @@ export default class CreditNotes extends Component {
           ListHeaderComponent={
             <View style={flatListHeaderContainer}>
               <View>
-                <Text style={flatListTitle}>Credit Notes - <Text style={{ color: '#ED1C24' }}>{this.state.filterActive ? this.state.filterCreditData.length : this.state.creditNotes.length}</Text> </Text>
+                <Text style={scss.flat_heading}>List Of Credit Notes - <Text style={{ color: '#ED1C24' }}>{this.state.filterActive ? this.state.filterCreditData.length : this.state.creditNotes.length}</Text> </Text>
               </View>
               <View
                 style={{
