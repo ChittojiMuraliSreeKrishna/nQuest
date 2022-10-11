@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
 import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import DatePicker from 'react-native-date-picker';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -13,7 +12,7 @@ import IconFA from 'react-native-vector-icons/FontAwesome';
 import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
-import { dateFormat, formatMonth } from '../../commonUtils/DateFormate';
+import DateSelector from '../../commonUtils/DateSelector';
 import ReportsService from '../services/ReportsService';
 
 var deviceWidth = Dimensions.get("window").width;
@@ -137,15 +136,13 @@ export default class NewSaleReport extends Component {
         }
         else {
           alert(res.data.message);
-          this.props.filterActiveCallback();
           this.modelCancel();
         }
       }
       ).catch(() => {
         this.setState({ loading: false });
         // alert('No Results Found');
-        this.props.filterActiveCallback();
-        this.props.modelCancelCallback();
+        this.modelCancel()
       });
     }
   }
@@ -201,20 +198,25 @@ export default class NewSaleReport extends Component {
     this.setState({ datepickerendOpen: true });
   }
 
-  datepickerDoneClicked() {
-    this.setState({ startDate: this.state.date.getFullYear() + formatMonth(this.state.date.getMonth() + 1) + dateFormat(this.state.date.getDate()) });
-    this.setState({ doneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
-  }
+  datepickerCancelClicked = () => {
+    this.setState({
+      datepickerOpen: false,
+    });
+  };
 
-  datepickerendDoneClicked() {
-    this.setState({ endDate: this.state.enddate.getFullYear() + formatMonth(this.state.enddate.getMonth() + 1) + dateFormat(this.state.enddate.getDate()) });
-    this.setState({ enddoneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
-  }
+  datepickerEndCancelClicked = () => {
+    this.setState({
+      datepickerendOpen: false,
+    });
+  };
 
-  datepickerCancelClicked() {
-    this.setState({ date: new Date(), enddate: new Date(), datepickerOpen: false, datepickerendOpen: false });
-  }
+  handleDate = (value) => {
+    this.setState({ startDate: value });
+  };
 
+  handleEndDate = (value) => {
+    this.setState({ endDate: value });
+  };
   handleBillPositions = (value) => {
     this.setState({ billPosition: value });
   };
@@ -438,43 +440,18 @@ export default class NewSaleReport extends Component {
                     </View>
                     {this.state.datepickerOpen && (
                       <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
-                        <TouchableOpacity
-                          style={Device.isTablet ? styles.datePickerButton_tablet : styles.datePickerButton_mobile} onPress={() => this.datepickerCancelClicked()}
-                        >
-                          <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Cancel </Text>
-
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={Device.isTablet ? styles.datePickerEndButton_tablet : styles.datePickerEndButton_mobile} onPress={() => this.datepickerDoneClicked()}
-                        >
-                          <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Done </Text>
-
-                        </TouchableOpacity>
-                        <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
-                          date={this.state.date}
-                          mode={'date'}
-                          onDateChange={(date) => this.setState({ date })}
+                        <DateSelector
+                          dateCancel={this.datepickerCancelClicked}
+                          setDate={this.handleDate}
                         />
                       </View>
                     )}
 
                     {this.state.datepickerendOpen && (
                       <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
-                        <TouchableOpacity
-                          style={Device.isTablet ? styles.datePickerButton_tablet : styles.datePickerButton_mobile} onPress={() => this.datepickerCancelClicked()}
-                        >
-                          <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Cancel </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={Device.isTablet ? styles.datePickerEndButton_tablet : styles.datePickerEndButton_mobile} onPress={() => this.datepickerendDoneClicked()}
-                        >
-                          <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Done </Text>
-
-                        </TouchableOpacity>
-                        <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
-                          date={this.state.enddate}
-                          mode={'date'}
-                          onDateChange={(enddate) => this.setState({ enddate })}
+                        <DateSelector
+                          dateCancel={this.datepickerEndCancelClicked}
+                          setDate={this.handleEndDate}
                         />
                       </View>
                     )}

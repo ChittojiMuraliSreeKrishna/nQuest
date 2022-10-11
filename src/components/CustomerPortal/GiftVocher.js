@@ -11,6 +11,7 @@ import { TextInput } from 'react-native-paper';
 import FilterIcon from 'react-native-vector-icons/FontAwesome';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import { dateFormat } from '../../commonUtils/DateFormate';
+import DateSelector from '../../commonUtils/DateSelector';
 import { RF, RH, RW } from '../../Responsive';
 import { customerErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
@@ -85,7 +86,7 @@ class GiftVocher extends Component {
   }
 
   enddatepickerClicked() {
-    this.setState({ datepickerendOpen: true, filterEndPickerOpen: false });
+    this.setState({ datepickerendOpen: true, filterEndPickerOpen: true });
   }
 
   handleMobile = (value) => {
@@ -100,46 +101,45 @@ class GiftVocher extends Component {
     }
   }
 
-  datepickerDoneClicked() {
-    // if (parseInt(this.state.date.getDate()) < 10) {
-    //     this.setState({ fromDate: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-0" + this.state.date.getDate() });
-    // }
-    // else {
-    this.setState({ startDate: this.state.date.getFullYear() + this.formatMonth(this.state.date.getMonth() + 1) + dateFormat( this.state.date.getDate()) });
-    // }
-    this.setState({ doneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
-  }
+  datepickerCancelClicked = () => {
+    this.setState({
+      datepickerOpen: false,
+    });
+  };
 
-  filterStartDatePickerDoneClicked() {
-    // if (parseInt(this.state.date.getDate()) < 10) {
-    //     this.setState({ fromDate: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-0" + this.state.date.getDate() });
-    // }
-    // else {
-    this.setState({ filterStartDate: this.state.date.getFullYear() + this.formatMonth(this.state.date.getMonth() + 1) + dateFormat(this.state.date.getDate()) });
-    // }
-    this.setState({ doneButtonClicked: true, filterStartPickerOpen: false, datepickerendOpen: false });
-  }
+  datepickerEndCancelClicked = () => {
+    this.setState({
+      datepickerendOpen: false,
+    });
+  };
 
-  datepickerendDoneClicked() {
-    // if (parseInt(this.state.enddate.getDate()) < 10) {
-    //     this.setState({ toDate: this.state.enddate.getFullYear() + "-" + (this.state.enddate.getMonth() + 1) + "-0" + this.state.enddate.getDate() });
-    // }
-    // else {
-    this.setState({ endDate: this.state.enddate.getFullYear() + this.formatMonth(this.state.enddate.getMonth() + 1) + dateFormat(this.state.enddate.getDate()) });
-    // }
-    this.setState({ enddoneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
-  }
+  handleDate = (value) => {
+    this.setState({ startDate: value });
+  };
 
+  handleEndDate = (value) => {
+    this.setState({ endDate: value });
+  };
 
-  filterEndDatePickerDoneClicked() {
-    // if (parseInt(this.state.enddate.getDate()) < 10) {
-    //     this.setState({ toDate: this.state.enddate.getFullYear() + "-" + (this.state.enddate.getMonth() + 1) + "-0" + this.state.enddate.getDate() });
-    // }
-    // else {
-    this.setState({ filterEndDate: this.state.enddate.getFullYear() + this.formatMonth(this.state.enddate.getMonth() + 1) + dateFormat(this.state.enddate.getDate()) });
-    // }
-    this.setState({ enddoneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
-  }
+  datepickerFilterCancelClicked = () => {
+    this.setState({
+      filterStartPickerOpen: false,
+    });
+  };
+
+  datepickerFilterEndCancelClicked = () => {
+    this.setState({
+      filterEndPickerOpen: false,
+    });
+  };
+
+  handleFilterStartDate = (value) => {
+    this.setState({ filterStartDate: value });
+  };
+
+  handleFilterEndDate = (value) => {
+    this.setState({ filterEndDate: value });
+  };
 
   datepickerCancelClicked() {
     this.setState({ date: new Date(), enddate: new Date(), datepickerOpen: false, datepickerendOpen: false, filterStartPickerOpen: false, filterEndPickerOpen: false });
@@ -355,49 +355,18 @@ class GiftVocher extends Component {
                       </View>
                       {this.state.filterStartPickerOpen && (
                         <View style={styles.dateTopView}>
-                          <View style={styles.dateTop2}>
-                            <TouchableOpacity
-                              style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
-                            >
-                              <Text style={datePickerBtnText}  > Cancel </Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                              style={datePickerButton2} onPress={() => this.filterStartDatePickerDoneClicked()}
-                            >
-                              <Text style={datePickerBtnText}  > Done </Text>
-                            </TouchableOpacity>
-                          </View>
-                          <DatePicker style={datePicker}
-                            date={this.state.date}
-                            mode={'date'}
-                            onDateChange={(date) => this.setState({ date })}
+                          <DateSelector
+                            dateCancel={this.datepickerFilterCancelClicked}
+                            setDate={this.handleFilterStartDate}
                           />
                         </View>
                       )}
 
-                      {this.state.datepickerendOpen && (
+                      {this.state.filterEndPickerOpen && (
                         <View style={styles.dateTopView}>
-                          <View style={styles.dateTop2}>
-                            <View>
-                              <TouchableOpacity
-                                style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
-                              >
-                                <Text style={datePickerBtnText}  > Cancel </Text>
-                              </TouchableOpacity>
-                            </View>
-                            <View>
-                              <TouchableOpacity
-                                style={datePickerButton2} onPress={() => this.filterEndDatePickerDoneClicked()}
-                              >
-                                <Text style={datePickerBtnText}  > Done </Text>
-                              </TouchableOpacity>
-                            </View>
-                          </View>
-                          <DatePicker style={datePicker}
-                            date={this.state.enddate}
-                            mode={'date'}
-                            onDateChange={(enddate) => this.setState({ enddate })}
+                          <DateSelector
+                            dateCancel={this.datepickerFilterEndCancelClicked}
+                            setDate={this.handleFilterEndDate}
                           />
                         </View>
                       )}
@@ -427,26 +396,6 @@ class GiftVocher extends Component {
             </View>
           }
           <View>
-            {/* <View style={{ flexDirection: 'row' }}>
-            <View style={styles.searchBarStyles}>
-              <Searchbar
-                placeholder="Search"
-                onChangeText={(text) => this.onChangeSearch(text)}
-                value={this.state.searchQuery}
-              />
-            </View>
-            <TouchableOpacity
-              style={styles.filterBtnStyle}
-              onPress={() => this.filterAction()} >
-              <FilterIcon
-                name="sliders"
-                size={25} />
-            </TouchableOpacity>
-          </View>
-          {!searchQueryValid && (
-            <Message imp={true} message={this.state.searchQueryError} />
-          )} */}
-
 
             <FlatList
               ListHeaderComponent={<View style={flatListHeaderContainer}>
@@ -511,23 +460,9 @@ class GiftVocher extends Component {
                   </TouchableOpacity>
                   {this.state.datepickerOpen && (
                     <View style={styles.dateTopView}>
-                      <View style={styles.dateTop2}>
-                        <TouchableOpacity
-                          style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
-                        >
-                          <Text style={datePickerBtnText}  > Cancel </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                          style={datePickerButton2} onPress={() => this.datepickerDoneClicked()}
-                        >
-                          <Text style={datePickerBtnText}  > Done </Text>
-                        </TouchableOpacity>
-                      </View>
-                      <DatePicker style={datePicker}
-                        date={this.state.date}
-                        mode={'date'}
-                        onDateChange={(date) => this.setState({ date })}
+                      <DateSelector
+                        dateCancel={this.datepickerCancelClicked}
+                        setDate={this.handleDate}
                       />
                     </View>
                   )}
@@ -548,26 +483,9 @@ class GiftVocher extends Component {
 
                   {this.state.datepickerendOpen && (
                     <View style={styles.dateTopView}>
-                      <View style={styles.dateTop2}>
-                        <View>
-                          <TouchableOpacity
-                            style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
-                          >
-                            <Text style={datePickerBtnText}  > Cancel </Text>
-                          </TouchableOpacity>
-                        </View>
-                        <View>
-                          <TouchableOpacity
-                            style={datePickerButton2} onPress={() => this.datepickerendDoneClicked()}
-                          >
-                            <Text style={datePickerBtnText}  > Done </Text>
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                      <DatePicker style={datePicker}
-                        date={this.state.enddate}
-                        mode={'date'}
-                        onDateChange={(enddate) => this.setState({ enddate })}
+                      <DateSelector
+                        dateCancel={this.datepickerEndCancelClicked}
+                        setDate={this.handleEndDate}
                       />
                     </View>
                   )}

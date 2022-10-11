@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import forms from './assets/styles/formFields.scss';
+import { dateFormat, formatMonth } from './DateFormate';
 
 export class DateSelector extends Component {
   constructor(props) {
@@ -13,65 +14,66 @@ export class DateSelector extends Component {
   }
 
 
-  cancelDate () {
+  cancelDate() {
     this.props.dateCancel();
     this.setState({
       date: new Date()
     });
   }
 
-  async saveDate () {
+  async saveDate() {
     const { date } = this.state;
-    if (parseInt(this.state.date.getDate()) < 10 &&
-      parseInt(this.state.date.getMonth()) + 1 < 10) {
-      await this.setState({
-        startDate:
-          this.state.date.getFullYear() +
-          "-0" +
-          (this.state.date.getMonth() + 1) +
-          "-" +
-          "0" +
-          this.state.date.getDate(),
-      });
-    } else if (parseInt(this.state.date.getDate()) < 10) {
-      await this.setState({
-        startDate:
-          this.state.date.getFullYear() +
-          "-" +
-          (this.state.date.getMonth() + 1) +
-          "-" +
-          "0" +
-          this.state.date.getDate(),
-      });
-    } else if (parseInt(this.state.date.getMonth()) + 1 < 10) {
-      await this.setState({
-        startDate:
-          this.state.date.getFullYear() +
-          "-0" +
-          (this.state.date.getMonth() + 1) +
-          "-" +
-          this.state.date.getDate(),
-      });
-    } else {
-      await this.setState({
-        startDate:
-          this.state.date.getFullYear() +
-          "-" +
-          (this.state.date.getMonth() + 1) +
-          "-" +
-          this.state.date.getDate(),
-      });
-    }
+    await this.setState({ startDate: this.state.date.getFullYear() + formatMonth(this.state.date.getMonth() + 1) + dateFormat(this.state.date.getDate()) });
+    // if (parseInt(this.state.date.getDate()) < 10 &&
+    //   parseInt(this.state.date.getMonth()) + 1 < 10) {
+    //   await this.setState({
+    //     startDate:
+    //       this.state.date.getFullYear() +
+    //       "-0" +
+    //       (this.state.date.getMonth() + 1) +
+    //       "-" +
+    //       "0" +
+    //       this.state.date.getDate(),
+    //   });
+    // } else if (parseInt(this.state.date.getDate()) < 10) {
+    //   await this.setState({
+    //     startDate:
+    //       this.state.date.getFullYear() +
+    //       "-" +
+    //       (this.state.date.getMonth() + 1) +
+    //       "-" +
+    //       "0" +
+    //       this.state.date.getDate(),
+    //   });
+    // } else if (parseInt(this.state.date.getMonth()) + 1 < 10) {
+    //   await this.setState({
+    //     startDate:
+    //       this.state.date.getFullYear() +
+    //       "-0" +
+    //       (this.state.date.getMonth() + 1) +
+    //       "-" +
+    //       this.state.date.getDate(),
+    //   });
+    // } else {
+    //   await this.setState({
+    //     startDate:
+    //       this.state.date.getFullYear() +
+    //       "-" +
+    //       (this.state.date.getMonth() + 1) +
+    //       "-" +
+    //       this.state.date.getDate(),
+    //   });
+    // }
     this.handleSave();
     this.props.dateCancel();
   }
 
-  handleSave () {
+  handleSave() {
     this.props.setDate(this.state.startDate);
     // alert(this.state.startDate);
   }
 
-  render () {
+  render() {
     return (
       <View>
         <View style={forms.datePickerContainer}>
