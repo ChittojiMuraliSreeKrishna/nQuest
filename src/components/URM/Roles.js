@@ -34,6 +34,7 @@ import {
 import Loader from "../../commonUtils/loader";
 import { RH } from "../../Responsive";
 import { filterBtn, flatListTitle } from "../Styles/Styles";
+import DateSelector from "../../commonUtils/DateSelector";
 
 var deviceheight = Dimensions.get("window").height;
 var deviceWidth = Dimensions.get("window").width;
@@ -55,21 +56,21 @@ export default class Roles extends Component {
     };
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     this.setState({ clientId: clientId });
     this.getRolesList();
   }
 
   // Refreshing the List
-  refresh () {
+  refresh() {
     this.setState({ rolesData: [] }, () => {
       this.getRolesList();
     });
   }
 
   // Getting Roles List
-  getRolesList () {
+  getRolesList() {
     this.setState({ rolesData: [], loading: true });
     const { clientId, pageNumber } = this.state;
     UrmService.getAllRoles(clientId, pageNumber).then((res) => {
@@ -86,12 +87,12 @@ export default class Roles extends Component {
   }
 
   // Filter Section
-  filterAction () {
+  filterAction() {
     this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
   // Create Role Navigation
-  navigateToCreateRoles () {
+  navigateToCreateRoles() {
     this.props.navigation.navigate("CreateRole", {
       isEdit: false,
       navText: "Add Role",
@@ -101,13 +102,13 @@ export default class Roles extends Component {
   }
 
   // Filter Clear Action
-  clearFilterAction () {
+  clearFilterAction() {
     this.setState({ filterActive: false });
     this.getRolesList();
   }
 
   // Filter Cancel Action
-  modelCancel () {
+  modelCancel() {
     this.setState({ modalVisible: false });
   }
 
@@ -122,71 +123,28 @@ export default class Roles extends Component {
   };
 
   // Created Date Action
-  datepickerClicked () {
+  datepickerClicked() {
     this.setState({ datepickerOpen: true });
   }
 
-  datepickerCancelClicked () {
+  datepickerCancelClicked = () => {
     this.setState({
-      date: new Date(),
-      enddate: new Date(),
       datepickerOpen: false,
-      datepickerendOpen: false,
     });
-  }
+  };
 
-  datepickerDoneClicked () {
-    if (
-      parseInt(this.state.date.getDate()) < 10 &&
-      parseInt(this.state.date.getMonth()) < 10
-    ) {
-      this.setState({
-        createdDate:
-          this.state.date.getFullYear() +
-          "-0" +
-          (this.state.date.getMonth() + 1) +
-          "-" +
-          "0" +
-          this.state.date.getDate(),
-      });
-    } else if (parseInt(this.state.date.getDate()) < 10) {
-      this.setState({
-        createdDate:
-          this.state.date.getFullYear() +
-          "-" +
-          (this.state.date.getMonth() + 1) +
-          "-" +
-          "0" +
-          this.state.date.getDate(),
-      });
-    } else if (parseInt(this.state.date.getMonth()) < 10) {
-      this.setState({
-        createdDate:
-          this.state.date.getFullYear() +
-          "-0" +
-          (this.state.date.getMonth() + 1) +
-          "-" +
-          this.state.date.getDate(),
-      });
-    } else {
-      this.setState({
-        createdDate:
-          this.state.date.getFullYear() +
-          "-" +
-          (this.state.date.getMonth() + 1) +
-          "-" +
-          this.state.date.getDate(),
-      });
-    }
+  datepickerEndCancelClicked = () => {
     this.setState({
-      doneButtonClicked: true,
-      datepickerOpen: false,
       datepickerendOpen: false,
     });
-  }
+  };
+
+  handleDate = (value) => {
+    this.setState({ createdDate: value });
+  };
 
   // Apply Filter Action
-  applyRoleFilter () {
+  applyRoleFilter() {
     const { role, createdBy, createdDate } = this.state;
     this.setState({ loading: true });
     const searchRole = {
@@ -197,7 +155,7 @@ export default class Roles extends Component {
     console.log(searchRole);
     UrmService.getRolesBySearch(searchRole).then((res) => {
       console.log(res.data);
-      if (res && res.data && res.data[ 'status' ] === 200) {
+      if (res && res.data && res.data['status'] === 200) {
         let rolesList = res.data.result;
         console.log({ rolesList });
         this.setState({ filterRolesData: rolesList, filterActive: true });
@@ -210,7 +168,7 @@ export default class Roles extends Component {
   }
 
   // Edit Role Action
-  handleeditrole (item, index) {
+  handleeditrole(item, index) {
     this.props.navigation.navigate("CreateRole", {
       item: item,
       isEdit: true,
@@ -220,7 +178,7 @@ export default class Roles extends Component {
     });
   }
 
-  render () {
+  render() {
     const { filterActive, rolesData, filterRolesData } = this.state;
     return (
       <View>
@@ -296,7 +254,7 @@ export default class Roles extends Component {
                       <Text style={scss.footerText}>
                         Date:{" "}
                         {item.createdDate
-                          ? item.createdDate.toString().split(/T/)[ 0 ]
+                          ? item.createdDate.toString().split(/T/)[0]
                           : item.createdDate}
                       </Text>
                       <TouchableOpacity
@@ -369,32 +327,18 @@ export default class Roles extends Component {
                   </TouchableOpacity>
                   {this.state.datepickerOpen && (
                     <View style={datePickerContainer}>
-                      <TouchableOpacity
-                        style={datePickerButton1}
-                        onPress={() => this.datepickerCancelClicked()}
-                      >
-                        <Text style={datePickerBtnText}> Cancel </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={datePickerButton2}
-                        onPress={() => this.datepickerDoneClicked()}
-                      >
-                        <Text style={datePickerBtnText}> Done </Text>
-                      </TouchableOpacity>
-                      <DatePicker
-                        style={datePicker}
-                        date={this.state.date}
-                        mode={"date"}
-                        onDateChange={(date) => this.setState({ date })}
+                      <DateSelector
+                        dateCancel={this.datepickerCancelClicked}
+                        setDate={this.handleDate}
                       />
                     </View>
                   )}
                   <View style={forms.action_buttons_container}>
-                    <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                       onPress={() => this.applyRoleFilter()}>
                       <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
                       onPress={() => this.modelCancel()}>
                       <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                     </TouchableOpacity>

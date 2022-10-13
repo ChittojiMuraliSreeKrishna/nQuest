@@ -9,6 +9,7 @@ import { Appbar } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
+import DateSelector from '../../commonUtils/DateSelector';
 import Loader from '../../commonUtils/loader';
 import { RF, RH, RW } from '../../Responsive';
 import { errorLength, urmErrorMessages } from '../Errors/errors';
@@ -67,7 +68,7 @@ export default class AddUser extends Component {
     };
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     const userId = await AsyncStorage.getItem("userId");
     this.setState({ isEdit: this.props.route.params.isEdit });
@@ -102,7 +103,7 @@ export default class AddUser extends Component {
     this.getRoles();
   }
 
-  async getStores () {
+  async getStores() {
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     console.log({ clientId });
     const { selectedEditStoresArray } = this.state;
@@ -118,27 +119,27 @@ export default class AddUser extends Component {
         console.log({ response });
         if (response.length > 0) {
           for (let i = 0; i < response.length; i++) {
-            let stores = response[ i ];
+            let stores = response[i];
             let storeNames = stores.name;
             console.log({ stores });
             for (let k = 0; k < selectedEditStoresArray.length; k++) {
-              if (selectedEditStoresArray[ k ].name === stores.name) {
+              if (selectedEditStoresArray[k].name === stores.name) {
                 if (selectedEditStoresArray.includes(stores.name)) { }
                 else {
                   storesEditArray.push(stores.name);
                 }
               }
             }
-            console.log([ { storesEditArray }, {
+            console.log([{ storesEditArray }, {
               storeNames
-            } ]);
+            }]);
             if (storesEditArray.includes(stores.name)) {
               for (let m = 0; m < selectedEditStoresArray.length; m++) {
-                if (stores.name === selectedEditStoresArray[ m ].name) {
-                  if (cleanedStoresArray.includes(selectedEditStoresArray[ i ].name)) { }
+                if (stores.name === selectedEditStoresArray[m].name) {
+                  if (cleanedStoresArray.includes(selectedEditStoresArray[i].name)) { }
                   else {
-                    storesArray.push({ name: selectedEditStoresArray[ m ].name, id: selectedEditStoresArray[ m ].id, selectedindex: 1 });
-                    cleanedStoresArray.push(selectedEditStoresArray[ m ].name);
+                    storesArray.push({ name: selectedEditStoresArray[m].name, id: selectedEditStoresArray[m].id, selectedindex: 1 });
+                    cleanedStoresArray.push(selectedEditStoresArray[m].name);
                     console.log({ cleanedStoresArray });
                   }
                 }
@@ -157,7 +158,7 @@ export default class AddUser extends Component {
 
 
 
-  async getRoles () {
+  async getRoles() {
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     UrmService.getRolesByDomainId(clientId).then(res => {
       if (res) {
@@ -165,8 +166,8 @@ export default class AddUser extends Component {
         console.log({ roleResponse });
         if (roleResponse.length > 0) {
           for (let i = 0; i < roleResponse.length; i++) {
-            this.state.rolesArray.push({ name: roleResponse[ i ].roleName, id: roleResponse[ i ].id });
-            this.state.roles.push({ value: roleResponse[ i ].roleName, label: roleResponse[ i ].roleName });
+            this.state.rolesArray.push({ name: roleResponse[i].roleName, id: roleResponse[i].id });
+            this.state.roles.push({ value: roleResponse[i].roleName, label: roleResponse[i].roleName });
           }
         }
         this.setState({ roles: this.state.roles, rolesArray: this.state.rolesArray });
@@ -174,30 +175,21 @@ export default class AddUser extends Component {
     });
   }
 
-  datepickerClicked () {
+  datepickerClicked() {
     this.setState({ datepickerOpen: true });
   }
 
-  datepickerDoneClicked () {
-    if (parseInt(this.state.date.getDate()) < 10 && (parseInt(this.state.date.getMonth()) < 10)) {
-      this.setState({ dob: this.state.date.getFullYear() + "-0" + (this.state.date.getMonth() + 1) + "-0" + this.state.date.getDate(), doneButtonClicked: true, datepickerOpen: false });
-    }
-    else if (parseInt(this.state.date.getDate()) < 10) {
-      this.setState({ dob: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-0" + this.state.date.getDate(), doneButtonClicked: true, datepickerOpen: false });
-    }
-    else if (parseInt(this.state.date.getMonth()) < 10) {
-      this.setState({ dob: this.state.date.getFullYear() + "-0" + (this.state.date.getMonth() + 1) + "-" + this.state.date.getDate(), doneButtonClicked: true, datepickerOpen: false });
-    }
-    else {
-      this.setState({ dob: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-" + this.state.date.getDate(), doneButtonClicked: true, datepickerOpen: false });
-    }
-  }
+  datepickerCancelClicked = () => {
+    this.setState({
+      datepickerOpen: false,
+    });
+  };
 
-  datepickerCancelClicked () {
-    this.setState({ date: new Date(), datepickerOpen: false });
-  }
+  handleDate = (value) => {
+    this.setState({ dob: value });
+  };
 
-  handleBackButtonClick () {
+  handleBackButtonClick() {
     this.props.navigation.goBack(null);
     return true;
   }
@@ -206,9 +198,9 @@ export default class AddUser extends Component {
   handleStore = (value) => {
     this.setState({ store: value });
     for (let i = 0; i < this.state.storesArray.length; i++) {
-      if (this.state.storesArray[ i ].name === value) {
-        this.state.storeNames.push({ name: this.state.storesArray[ i ].name });
-        this.setState({ storeId: this.state.storesArray[ i ].id, storeNames: this.state.storeNames });
+      if (this.state.storesArray[i].name === value) {
+        this.state.storeNames.push({ name: this.state.storesArray[i].name });
+        this.setState({ storeId: this.state.storesArray[i].id, storeNames: this.state.storeNames });
       }
     }
   };
@@ -216,8 +208,8 @@ export default class AddUser extends Component {
   handleRole = (value) => {
     this.setState({ role: value });
     for (let i = 0; i < this.state.rolesArray.length; i++) {
-      if (this.state.rolesArray[ i ].name === value) {
-        this.setState({ roleId: this.state.rolesArray[ i ].id });
+      if (this.state.rolesArray[i].name === value) {
+        this.setState({ roleId: this.state.rolesArray[i].id });
       }
     }
   };
@@ -244,7 +236,7 @@ export default class AddUser extends Component {
     this.setState({ storesArray: newArrayList });
   };
 
-  cancel () {
+  cancel() {
     this.props.navigation.goBack(null);
     return true;
   }
@@ -270,7 +262,7 @@ export default class AddUser extends Component {
     this.setState({ gender: value });
   };
 
-  issuperAdmin () {
+  issuperAdmin() {
     if (this.state.isSuperAdmin === true) {
       this.setState({ isSuperAdmin: false });
     }
@@ -303,32 +295,32 @@ export default class AddUser extends Component {
     this.setState({ userStatus: value });
   };
 
-  validationForm () {
+  validationForm() {
     const emailReg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     const mobReg = /^[0-9\b]+$/;
     let isFormValid = true;
     let errors = {};
     if (this.state.name.length < errorLength.name) {
       isFormValid = false;
-      errors[ "name" ] = urmErrorMessages.name;
+      errors["name"] = urmErrorMessages.name;
       this.setState({ nameValid: false });
     }
 
     if (this.state.mobile.length !== errorLength.mobile || mobReg.test(this.state.mobile) === false) {
       isFormValid = false;
-      errors[ "mobile" ] = urmErrorMessages.mobile;
+      errors["mobile"] = urmErrorMessages.mobile;
       this.setState({ mobileValid: false });
     }
 
     if (emailReg.test(this.state.email) === false) {
       isFormValid = false;
-      errors[ "email" ] = urmErrorMessages.email;
+      errors["email"] = urmErrorMessages.email;
       this.setState({ emailValid: false });
     }
 
     if (this.state.userStatus === "") {
       isFormValid = false;
-      errors[ "status" ] = urmErrorMessages.userStatus;
+      errors["status"] = urmErrorMessages.userStatus;
       this.setState({ statusValid: false });
     }
 
@@ -336,7 +328,7 @@ export default class AddUser extends Component {
       console.log(this.state.selectedStoresArray.length);
       if (this.state.selectedStoresArray.length === 0) {
         isFormValid = false;
-        errors[ "selectedStore" ] = urmErrorMessages.selectedStores;
+        errors["selectedStore"] = urmErrorMessages.selectedStores;
         this.setState({ selectedStoreValid: false });
       }
     }
@@ -345,10 +337,10 @@ export default class AddUser extends Component {
     return isFormValid;
   }
 
-  saveUser () {
+  saveUser() {
     for (let i = 0; i < this.state.selectedStoresArray.length; i++) {
-      if (this.state.selectedStoresArray[ i ].selectedindex === 1) {
-        this.state.selectedStoresFinalArray.push({ name: this.state.selectedStoresArray[ i ].name, id: this.state.selectedStoresArray[ i ].id });
+      if (this.state.selectedStoresArray[i].selectedindex === 1) {
+        this.state.selectedStoresFinalArray.push({ name: this.state.selectedStoresArray[i].name, id: this.state.selectedStoresArray[i].id });
       }
     }
     console.log(this.state.selectedStoresFinalArray);
@@ -371,7 +363,7 @@ export default class AddUser extends Component {
           "stores": this.state.selectedStoresFinalArray,
           "clientId": this.state.clientId,
           "isConfigUser": false,
-          "clientDomain": [ clientDomain ],
+          "clientDomain": [clientDomain],
           "isSuperAdmin": JSON.stringify(this.state.isSuperAdmin),
           "createdBy": parseInt(this.state.userId),
           "isActive": this.state.userStatus
@@ -392,7 +384,7 @@ export default class AddUser extends Component {
     }
   }
 
-  editUser () {
+  editUser() {
     if (this.state.isEdit === true) {
       const clientDomain = this.state.domainId !== 0 ? this.state.domainId : this.state.clientId;
       const saveObj = {
@@ -411,7 +403,7 @@ export default class AddUser extends Component {
         "stores": this.state.storeNames,
         "clientId": this.state.clientId,
         "isConfigUser": false,
-        "clientDomain": [ clientDomain ],
+        "clientDomain": [clientDomain],
         "isSuperAdmin": JSON.stringify(this.state.isSuperAdmin),
         "createdBy": this.state.userId,
         "isActive": this.state.userStatus
@@ -419,7 +411,7 @@ export default class AddUser extends Component {
       console.log('params are' + JSON.stringify(saveObj));
       this.setState({ loading: true });
       axios.put(UrmService.editUser(), saveObj).then((res) => {
-        if (res.data && res.data[ "isSuccess" ] === "true") {
+        if (res.data && res.data["isSuccess"] === "true") {
           global.privilages = [];
           this.props.route.params.onGoBack();
           this.props.navigation.goBack();
@@ -439,7 +431,7 @@ export default class AddUser extends Component {
 
 
 
-  render () {
+  render() {
     const { nameValid, mobileValid, emailValid, statusValid, selectedStoreValid } = this.state;
     return (
       <View style={styles.mainContainer}>
@@ -457,7 +449,7 @@ export default class AddUser extends Component {
           </Text>
           <Text style={inputHeading}>{I18n.t("Name")} <Text style={{ color: color.accent }}>*</Text> </Text>
           <TextInput
-            style={[ forms.input_fld, { borderColor: nameValid ? color.border : color.accent } ]}
+            style={[forms.input_fld, { borderColor: nameValid ? color.border : color.accent }]}
             underlineColorAndroid="transparent"
             placeholder={I18n.t("Name")}
             placeholderTextColor={nameValid ? color.border : color.accent}
@@ -469,7 +461,7 @@ export default class AddUser extends Component {
             value={this.state.name}
             onChangeText={this.handleName}
           />
-          {!nameValid && <Message imp={true} message={this.state.errors[ "name" ]} />}
+          {!nameValid && <Message imp={true} message={this.state.errors["name"]} />}
           <Text style={inputHeading}>{I18n.t("Gender")}</Text>
           <View style={rnPickerContainer}>
             <RNPickerSelect
@@ -490,7 +482,7 @@ export default class AddUser extends Component {
             />
           </View>
           <Text style={inputHeading}>Status <Text style={{ color: color.accent }}>*</Text></Text>
-          <View style={[ rnPickerContainer, { borderColor: statusValid ? color.border : color.accent } ]}>
+          <View style={[rnPickerContainer, { borderColor: statusValid ? color.border : color.accent }]}>
             <RNPickerSelect
               disabled={this.state.isEdit ? false : true}
               placeholder={{ label: 'Active', value: true }} Icon={() => {
@@ -505,7 +497,7 @@ export default class AddUser extends Component {
               useNativeAndroidPickerStyle={false}
             />
           </View>
-          {!statusValid && <Message imp={true} message={this.state.errors[ "status" ]} />}
+          {!statusValid && <Message imp={true} message={this.state.errors["status"]} />}
           <Text style={inputHeading}>{I18n.t("DOB")}</Text>
           <TouchableOpacity
             style={dateSelector} testID="openModal"
@@ -517,7 +509,7 @@ export default class AddUser extends Component {
           </TouchableOpacity>
           <Text style={inputHeading}>{I18n.t("Mobile")} <Text style={{ color: color.accent }}>*</Text> </Text>
           <TextInput
-            style={[ forms.input_fld, { borderColor: mobileValid ? color.border : color.accent } ]}
+            style={[forms.input_fld, { borderColor: mobileValid ? color.border : color.accent }]}
             underlineColorAndroid="transparent"
             placeholder={I18n.t("Mobile")}
             placeholderTextColor={mobileValid ? color.border : color.accent}
@@ -530,10 +522,10 @@ export default class AddUser extends Component {
             value={this.state.mobile}
             onChangeText={this.handleMobile}
           />
-          {!mobileValid && <Message imp={true} message={this.state.errors[ "mobile" ]} />}
+          {!mobileValid && <Message imp={true} message={this.state.errors["mobile"]} />}
           <Text style={inputHeading}>{I18n.t("Email")} <Text style={{ color: color.accent }}>*</Text> </Text>
           <TextInput
-            style={[ forms.input_fld, { borderColor: emailValid ? color.border : color.accent } ]}
+            style={[forms.input_fld, { borderColor: emailValid ? color.border : color.accent }]}
             underlineColorAndroid="transparent"
             placeholder={I18n.t("Email")}
             onBlur={this.handleEmailValid}
@@ -545,7 +537,7 @@ export default class AddUser extends Component {
             value={this.state.email}
             onChangeText={this.handleEmail}
           />
-          {!emailValid && <Message imp={true} message={this.state.errors[ "email" ]} />}
+          {!emailValid && <Message imp={true} message={this.state.errors["email"]} />}
           <Text style={inputHeading}>{I18n.t("Address")}</Text>
           <TextInput
             style={forms.input_fld}
@@ -558,7 +550,7 @@ export default class AddUser extends Component {
             onChangeText={this.handleAddress}
           />
 
-          <Text style={[ inputHeading, { marginTop: 7, color: '#dd0000' } ]}>
+          <Text style={[inputHeading, { marginTop: 7, color: '#dd0000' }]}>
             {I18n.t("User Permissions")}
           </Text>
           <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
@@ -596,7 +588,7 @@ export default class AddUser extends Component {
                   </TouchableOpacity>
                 )}
               />
-              {!selectedStoreValid && <Message imp={true} message={this.state.errors[ "selectedStore" ]} />}
+              {!selectedStoreValid && <Message imp={true} message={this.state.errors["selectedStore"]} />}
             </View>
 
           )}
@@ -634,22 +626,9 @@ export default class AddUser extends Component {
         </ScrollView>
         {this.state.datepickerOpen && (
           <View style={datePickerContainer}>
-            <TouchableOpacity
-              style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
-            >
-              <Text style={datePickerBtnText}  > Cancel </Text>
-
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={datePickerButton2} onPress={() => this.datepickerDoneClicked()}
-            >
-              <Text style={datePickerBtnText}  > Done </Text>
-
-            </TouchableOpacity>
-            <DatePicker style={datePicker}
-              date={this.state.date}
-              mode={'date'}
-              onDateChange={(date) => this.setState({ date })}
+            <DateSelector
+              dateCancel={this.datepickerCancelClicked}
+              setDate={this.handleDate}
             />
           </View>
         )}

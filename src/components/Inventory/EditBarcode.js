@@ -757,7 +757,7 @@ class EditBarcode extends Component {
             placeholder="EMP ID"
             placeholderTextColor={empValid ? "#6F6F6F17" : "#dd0000"}
             textAlignVertical="center"
-            maxLength={10}
+            maxLength={4}
             editable={false}
             autoCapitalize="none"
             value={this.state.empId}

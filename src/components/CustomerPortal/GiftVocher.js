@@ -82,11 +82,19 @@ class GiftVocher extends Component {
   }
 
   datepickerClicked() {
-    this.setState({ datepickerOpen: true, filterStartPickerOpen: true });
+    this.setState({ datepickerOpen: true });
   }
 
   enddatepickerClicked() {
-    this.setState({ datepickerendOpen: true, filterEndPickerOpen: true });
+    this.setState({ datepickerendOpen: true });
+  }
+
+  filterDatepickerClicked() {
+    this.setState({ filterStartPickerOpen: true });
+  }
+
+  filterEnddatepickerClicked() {
+    this.setState({ filterEndPickerOpen: true });
   }
 
   handleMobile = (value) => {
@@ -335,7 +343,7 @@ class GiftVocher extends Component {
                         <TouchableOpacity
                           style={forms.filter_dates}
                           testID="openModal"
-                          onPress={() => this.datepickerClicked()}
+                          onPress={() => this.filterDatepickerClicked()}
                         >
                           <Text
                             style={forms.filter_dates_text}
@@ -345,7 +353,7 @@ class GiftVocher extends Component {
                         <TouchableOpacity
                           style={forms.filter_dates}
                           testID="openModal"
-                          onPress={() => this.enddatepickerClicked()}
+                          onPress={() => this.filterEnddatepickerClicked()}
                         >
                           <Text
                             style={forms.filter_dates_text}
