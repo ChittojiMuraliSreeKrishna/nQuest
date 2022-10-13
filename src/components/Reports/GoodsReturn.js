@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
 import { Dimensions, FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import DatePicker from 'react-native-date-picker';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -14,6 +13,7 @@ import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from "../../commonUtils/assets/styles/style.scss";
 import { formatDate } from '../../commonUtils/DateFormate';
+import DateSelector from '../../commonUtils/DateSelector';
 import Loader from '../../commonUtils/loader';
 import { RH } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
@@ -56,7 +56,7 @@ export class GoodsReturn extends Component {
     };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     if (global.domainName === "Textile") {
       this.setState({ domainId: 1 });
     }
@@ -82,49 +82,35 @@ export class GoodsReturn extends Component {
   }
 
 
-  datepickerClicked () {
+  datepickerClicked() {
     this.setState({ datepickerOpen: true });
   }
 
-  enddatepickerClicked () {
+  enddatepickerClicked() {
     this.setState({ datepickerendOpen: true });
   }
 
-  datepickerDoneClicked () {
-    if (parseInt(this.state.date.getDate()) < 10 && (parseInt(this.state.date.getMonth()) < 10)) {
-      this.setState({ startDate: this.state.date.getFullYear() + "-0" + (this.state.date.getMonth() + 1) + "-" + "0" + this.state.date.getDate() });
-    }
-    else if (parseInt(this.state.date.getDate()) < 10) {
-      this.setState({ startDate: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-" + "0" + this.state.date.getDate() });
-    }
-    else if (parseInt(this.state.date.getMonth()) < 10) {
-      this.setState({ startDate: this.state.date.getFullYear() + "-0" + (this.state.date.getMonth() + 1) + "-" + this.state.date.getDate() });
-    }
-    else {
-      this.setState({ startDate: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-" + this.state.date.getDate() });
-    }
+  datepickerCancelClicked = () => {
+    this.setState({
+      datepickerOpen: false,
+    });
+  };
 
+  datepickerEndCancelClicked = () => {
+    this.setState({
+      datepickerendOpen: false,
+    });
+  };
 
-    this.setState({ doneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
-  }
+  handleDate = (value) => {
+    this.setState({ startDate: value });
+  };
 
-  datepickerendDoneClicked () {
-    if (parseInt(this.state.enddate.getDate()) < 10 && (parseInt(this.state.enddate.getMonth()) < 10)) {
-      this.setState({ endDate: this.state.enddate.getFullYear() + "-0" + (this.state.enddate.getMonth() + 1) + "-" + "0" + this.state.enddate.getDate() });
-    }
-    else if (parseInt(this.state.enddate.getDate()) < 10) {
-      this.setState({ endDate: this.state.enddate.getFullYear() + "-" + (this.state.enddate.getMonth() + 1) + "-" + "0" + this.state.enddate.getDate() });
-    }
-    else if (parseInt(this.state.enddate.getMonth()) < 10) {
-      this.setState({ endDate: this.state.enddate.getFullYear() + "-0" + (this.state.enddate.getMonth() + 1) + "-" + this.state.enddate.getDate() });
-    }
-    else {
-      this.setState({ endDate: this.state.enddate.getFullYear() + "-" + (this.state.enddate.getMonth() + 1) + "-" + this.state.enddate.getDate() });
-    }
-    this.setState({ enddoneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
-  }
+  handleEndDate = (value) => {
+    this.setState({ endDate: value });
+  };
 
-  applyGoodsReturn (pageNumber) {
+  applyGoodsReturn(pageNumber) {
     this.setState({ loading: true, loadMoreActive: false });
     const obj = {
       dateFrom: this.state.startDate ? this.state.startDate : undefined,
@@ -140,7 +126,7 @@ export class GoodsReturn extends Component {
     ReportsService.returnSlips(obj, pageNumber).then((res) => {
       console.log("returnSlips response", res.data);
       console.log(res.data.result.length);
-      if (res.data && res.data[ "isSuccess" ] === "true") {
+      if (res.data && res.data["isSuccess"] === "true") {
         if (res.data.result.length !== 0) {
           res.data.result.content.map((prop, i) => {
             let barcodeData = "";
@@ -199,7 +185,7 @@ export class GoodsReturn extends Component {
     }
   };
 
-  continuePagination () {
+  continuePagination() {
     if (this.state.totalPages > 1) {
       this.setState({ loadMoreActive: true });
     } else {
@@ -207,9 +193,6 @@ export class GoodsReturn extends Component {
     }
   }
 
-  datepickerCancelClicked () {
-    this.setState({ date: new Date(), enddate: new Date(), datepickerOpen: false, datepickerendOpen: false });
-  }
 
   handleReturnSlipNumber = (value) => {
     this.setState({ returnSlipNumber: value });
@@ -223,16 +206,16 @@ export class GoodsReturn extends Component {
     this.setState({ empId: value });
   };
 
-  handledeleteNewSale () {
+  handledeleteNewSale() {
     this.setState({ flagDeleteGoodsReturn: true, modalVisible: true });
   }
 
 
-  filterAction () {
+  filterAction() {
     this.setState({ flagFilterGoodsReturn: true, modalVisible: true });
   }
 
-  modelCancel () {
+  modelCancel() {
     this.setState({
       flagFilterGoodsReturn: false, modalVisible: false,
       startDate: '', endDate: '',
@@ -245,7 +228,7 @@ export class GoodsReturn extends Component {
     this.setState({ rtStatus: value });
   };
 
-  clearFilterAction () {
+  clearFilterAction() {
     this.setState({
       loadMoreActive: false, loadNextActive: false,
       filterActive: false, flagFilterGoodsReturn: false, modalVisible: false,
@@ -256,7 +239,7 @@ export class GoodsReturn extends Component {
   }
 
 
-  render () {
+  render() {
     return (
       <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
         <Appbar>
@@ -286,12 +269,12 @@ export class GoodsReturn extends Component {
           keyExtractor={(item, i) => i.toString()}
           ListEmptyComponent={<Text style={emptyTextStyle}>&#9888; {I18n.t("Results not loaded")}</Text>}
           renderItem={({ item, index }) => (
-            <View style={[ flatListMainContainer, { backgroundColor: "#FFF" } ]} >
+            <View style={[flatListMainContainer, { backgroundColor: "#FFF" }]} >
               <View style={flatlistSubContainer}>
                 <View style={textContainer}>
                   <Text style={highText} >S NO: {index + 1} </Text>
                   <Text selectable={true} style={textStyleSmall}>{I18n.t("RTS NUMBER")}: {"\n"}{item.rtNumber}</Text>
-                  <Text style={textStyleSmall}>{I18n.t("BARCODE")}: {"\n"}{item && item.barcodes.length !== 0 ? item.barcodes[ 0 ].barCode : '-'}</Text>
+                  <Text style={textStyleSmall}>{I18n.t("BARCODE")}: {"\n"}{item && item.barcodes.length !== 0 ? item.barcodes[0].barCode : '-'}</Text>
                 </View>
                 <View style={textContainer}>
                   <Text style={textStyleSmall} >{I18n.t("EMP ID")}: {item.createdBy} </Text>
@@ -318,14 +301,14 @@ export class GoodsReturn extends Component {
                   {this.state.loadPrevActive && (
                     <View style={scss.page_navigation_subcontainer}>
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(0)}
                         name="chevron-double-left"
                         size={25}
                       />
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(this.state.pageNo - 1)}
                         name="chevron-left"
@@ -337,13 +320,13 @@ export class GoodsReturn extends Component {
                   {this.state.loadNextActive && (
                     <View style={scss.page_navigation_subcontainer}>
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         onPress={() => this.loadMoreList(this.state.pageNo + 1)}
                         name="chevron-right"
                         size={25}
                       />
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         onPress={() => this.loadMoreList(this.state.totalPages - 1)}
                         name="chevron-double-right"
                         size={25}
@@ -391,36 +374,17 @@ export class GoodsReturn extends Component {
 
                     {this.state.datepickerOpen && (
                       <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
-                        <TouchableOpacity style={styles.datePickerButton} onPress={() => this.datepickerCancelClicked()}>
-                          <Text style={styles.datePickerButtonText}  > Cancel </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.datePickerEndButton} onPress={() => this.datepickerDoneClicked()}>
-                          <Text style={styles.datePickerButtonText}  > Done </Text>
-                        </TouchableOpacity>
-                        <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
-                          date={this.state.date}
-                          mode={'date'}
-                          onDateChange={(date) => this.setState({ date })}
+                        <DateSelector
+                          dateCancel={this.datepickerCancelClicked}
+                          setDate={this.handleDate}
                         />
                       </View>
                     )}
                     {this.state.datepickerendOpen && (
                       <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
-                        <TouchableOpacity
-                          style={styles.datePickerButton} onPress={() => this.datepickerCancelClicked()}
-                        >
-                          <Text style={styles.datePickerButtonText}  > Cancel </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={styles.datePickerEndButton} onPress={() => this.datepickerendDoneClicked()}
-                        >
-                          <Text style={styles.datePickerButtonText}  > Done </Text>
-
-                        </TouchableOpacity>
-                        <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
-                          date={this.state.enddate}
-                          mode={'date'}
-                          onDateChange={(enddate) => this.setState({ enddate })}
+                        <DateSelector
+                          dateCancel={this.datepickerEndCancelClicked}
+                          setDate={this.handleEndDate}
                         />
                       </View>
                     )}
@@ -465,11 +429,11 @@ export class GoodsReturn extends Component {
                       onChangeText={this.handleBarCode}
                     />
                     <View style={forms.action_buttons_container}>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                         onPress={() => this.applyGoodsReturn(this.state.pageNo)}>
                         <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
                         onPress={() => this.modelCancel()}>
                         <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>

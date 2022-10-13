@@ -63,6 +63,7 @@ class TextilePayment extends Component {
       couponDiscount: 0,
       grossAmount: 0,
       totalPromoDisc: 0,
+      totalPayAmount: 0,
       CGST: 0,
       SGST: 0,
       manualDisc: 0,
@@ -96,7 +97,10 @@ class TextilePayment extends Component {
       couponAmount: 0,
       numRtList: [],
       isRTApplied: false,
-      payButtonEnable: false
+      payButtonEnable: false,
+      compareRTList: [],
+      rtListList: [],
+      listOfRtnum: []
     };
   }
 
@@ -137,6 +141,7 @@ class TextilePayment extends Component {
     console.log('total amount is,', this.props.route.params);
     this.setState({
       totalAmount: this.props.route.params.totalAmount,
+      totalPayAmount: this.props.route.params.totalAmount,
       grossAmount: this.props.route.params.grossAmount,
       totalPromoDisc: this.props.route.params.totalPromoDisc,
       manualDisc: this.props.route.params.manualDisc,
@@ -447,7 +452,8 @@ class TextilePayment extends Component {
       isCardOrCash: false,
       isUpi: false,
       isGv: false,
-      isKhata: true
+      isKhata: true,
+      payButtonEnable: true
     });
   }
 
@@ -1032,27 +1038,49 @@ class TextilePayment extends Component {
   }
 
   async applyRt() {
-    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString(); if (this.state.rtNumber.length > 0) {
+    const obj = this.state.rtNumber
+    if (this.state.compareRTList.length === 0) {
+      console.log("in if",this.state.compareRTList,this.state.listOfRtnum);
+      this.setState({
+        compareRTList: [...this.state.listOfRtnum, obj],
+      })
+    } else {
+      console.log("in else",this.state.rtListList);
+      const isFound = this.state.rtListList.find(element => {
+        if (element.returnReference === obj) {
+          alert("RT Number Alredy Exist ");
+          return true;
+        }
+        return false;
+      });
+      if (!isFound) {
+        this.setState({
+          compareRTList: [...this.state.compareRTList, obj]
+        })
+      }
+
+    }
+    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString();
+    if (this.state.rtNumber.length > 0) {
       const storeId = await AsyncStorage.getItem("storeId");
       NewSaleService.getRTDetails([this.state.rtNumber], storeId).then(res => {
         console.log("___________res______________" + JSON.stringify(res.data));
         if (res.data.result.length > 0) {
           console.log("---------ress", res.data.result[0]);
-          // let listofRTNum
-          const flattened1 = res.data.result.flatMap(returnReference => returnReference);
-          const unique = [...new Map(flattened1.map((m) => [m.taggedItemId, m])).values()];
-          let listofRTNum = unique.map((itm) => itm.returnReference);
           this.setState({
-            rtSlipList: unique,
-            rtListList: unique,
-            rtNumber: '',
-            listOfRtnum: [],
-            numRtList: listofRTNum
-          });
-          // res.data.result[0].map((item) => {
-          //   console.log(item)
-          //   return listofRTNum = item.returnReference;
-          // })
+            rtListList: [...this.state.rtListList, res.data.result[0]]
+          }, () => {
+            const flattened1 = this.state.rtListList.flatMap(returnReference => returnReference);
+            const unique = [...new Map(flattened1.map((m) => [m.taggedItemId, m])).values()];
+            let listofRTNum = unique.map((itm) => itm.returnReference);
+            this.setState({
+              rtSlipList: unique,
+              rtListList: unique,
+              rtNumber: '',
+              listOfRtnum: [],
+              numRtList: listofRTNum
+            });
+          })
           let sumreturnedAmout = res.data.result[0].barcodes.reduce((accumulator, curValue) => {
             if (curValue.returnQty) {
               accumulator = accumulator + curValue.returnAmount;
@@ -1066,8 +1094,7 @@ class TextilePayment extends Component {
               payingAmount: this.state.rtAmount - grandNetAmount,
               totalAmount: grandNetAmount - sumreturnedAmout,
               payButtonEnable: grandNetAmount - sumreturnedAmout === 0 ? true : false,
-              isRTApplied: true,
-              numRtList: listofRTNum
+              isRTApplied: true
             })
           } else {
             alert("Please purchase greater than return amount")
@@ -1730,7 +1757,7 @@ class TextilePayment extends Component {
             <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 10 }}> {('PRICE SUMMARY')} </Text>
 
 
-            <View style={{ width: deviceWidth, height: Device.isTablet ? 350 : 400, backgroundColor: '#FFFFFF', marginTop: 10, flexDirection: 'column', justifyContent: 'space-around' }}>
+            <View style={{ width: deviceWidth, height: Device.isTablet ? 500 : 350, backgroundColor: '#FFFFFF', marginTop: 10, flexDirection: 'column', justifyContent: 'space-around' }}>
               <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
                 <Text style={{
                   color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
@@ -1741,7 +1768,7 @@ class TextilePayment extends Component {
                   color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
                   fontSize: Device.isTablet ? 19 : 14,
                 }}>
-                  ₹ {parseInt(this.state.totalAmount)} </Text>
+                  ₹ {parseInt(this.state.totalPayAmount)} </Text>
               </View>
               <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
                 <Text style={{
@@ -1793,20 +1820,6 @@ class TextilePayment extends Component {
                   ₹  {this.state.couponDiscount} </Text>
               </View>
 
-
-              <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
-                <Text style={{
-                  color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                  fontSize: Device.isTablet ? 19 : 14,
-                }}>
-                  Points Redemption({this.state.redeemedPints}) </Text>
-                <Text style={{
-                  color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                  fontSize: Device.isTablet ? 19 : 14,
-                }}>
-                  ₹  {(parseInt(this.state.redeemedPints) / 10).toString()} </Text>
-              </View>
-
               <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
                 <Text style={{
                   color: "#353C40", fontFamily: "bold", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
@@ -1818,6 +1831,31 @@ class TextilePayment extends Component {
                   fontSize: 20,
                 }}>
                   ₹ {(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()} </Text>
+              </View>
+
+              <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
+                <Text style={{
+                  color: "#353C40", fontFamily: "bold", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                  fontSize: 16,
+                }}>Collected Amount </Text>
+                <Text style={{
+                  color: "#353C40", fontFamily: "bold", alignItems: 'center', fontSize: 20, justifyContent: 'center', textAlign: 'center',
+                  fontSize: 16,
+                }}>
+                  ₹ {parseFloat(this.state.recievedAmount).toString()} </Text>
+              </View>
+
+              <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
+                <Text style={{
+                  color: "#FFAF4C", fontFamily: "bold", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                  fontSize: 16,
+                }}>
+                  Return Amount </Text>
+                <Text style={{
+                  color: "#FFAF4C", fontFamily: "bold", alignItems: 'center', fontSize: 20, justifyContent: 'center', textAlign: 'center',
+                  fontSize: 16,
+                }}>
+                  ₹ {parseFloat(this.state.returnAmount).toString()} </Text>
               </View>
               {
                 this.state.couponAmount > 0 && (
@@ -1850,12 +1888,12 @@ class TextilePayment extends Component {
                     ₹  {this.state.rtAmount} </Text>
                 </View>
               )}
-              
+
               <View></View>
               <View style={styles.TopcontainerforPay}>
                 <TouchableOpacity
                   style={[styles.signInButton, {
-                    backgroundColor: !this.state.payButtonEnable ? color.lightDark : color.accent
+                    backgroundColor: !this.state.payButtonEnable ? color.disableBackGround : color.accent
                   }]}
                   disabled={!this.state.payButtonEnable}
                   onPress={() => this.pay()} >

@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
 import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import DatePicker from 'react-native-date-picker';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -11,10 +10,10 @@ import IconFA from 'react-native-vector-icons/FontAwesome';
 import IconIA from 'react-native-vector-icons/Ionicons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from "../../commonUtils/assets/styles/style.scss";
+import DateSelector from '../../commonUtils/DateSelector';
 import Loader from '../../commonUtils/loader';
 import { RH, RW } from '../../Responsive';
 import AccountingService from '../services/AccountingService';
-import { datePickerBtnText, datePickerButton1, datePickerButton2 } from '../Styles/FormFields';
 
 var deviceWidth = Dimensions.get("window").width;
 
@@ -52,7 +51,7 @@ export default class DebitNotes extends Component {
     };
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     const storeId = await AsyncStorage.getItem("storeId");
     const userId = await AsyncStorage.getItem('custom:userId');
     this.setState({ storeId: storeId, userId: userId });
@@ -60,58 +59,41 @@ export default class DebitNotes extends Component {
   }
 
 
-  datepickerClicked () {
+  datepickerClicked() {
     this.setState({ datepickerOpen: true });
   }
 
-  enddatepickerClicked () {
+  enddatepickerClicked() {
     this.setState({ datepickerendOpen: true });
   }
 
-  datepickerDoneClicked () {
-    if (parseInt(this.state.date.getDate()) < 10 && (parseInt(this.state.date.getMonth()) < 10)) {
-      this.setState({ startDate: this.state.date.getFullYear() + "-0" + (this.state.date.getMonth() + 1) + "-" + "0" + this.state.date.getDate() });
-    }
-    else if (parseInt(this.state.date.getDate()) < 10) {
-      this.setState({ startDate: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-" + "0" + this.state.date.getDate() });
-    }
-    else if (parseInt(this.state.date.getMonth()) < 10) {
-      this.setState({ startDate: this.state.date.getFullYear() + "-0" + (this.state.date.getMonth() + 1) + "-" + this.state.date.getDate() });
-    }
-    else {
-      this.setState({ startDate: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-" + this.state.date.getDate() });
-    }
-    this.setState({ doneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
-  }
+  datepickerCancelClicked = () => {
+    this.setState({
+      datepickerOpen: false,
+    });
+  };
 
-  datepickerendDoneClicked () {
-    if (parseInt(this.state.enddate.getDate()) < 10 && (parseInt(this.state.enddate.getMonth()) < 10)) {
-      this.setState({ endDate: this.state.enddate.getFullYear() + "-0" + (this.state.enddate.getMonth() + 1) + "-" + "0" + this.state.enddate.getDate() });
-    }
-    else if (parseInt(this.state.enddate.getDate()) < 10) {
-      this.setState({ endDate: this.state.enddate.getFullYear() + "-" + (this.state.enddate.getMonth() + 1) + "-" + "0" + this.state.enddate.getDate() });
-    }
-    else if (parseInt(this.state.enddate.getMonth()) < 10) {
-      this.setState({ endDate: this.state.enddate.getFullYear() + "-0" + (this.state.enddate.getMonth() + 1) + "-" + this.state.enddate.getDate() });
-    }
-    else {
-      this.setState({ endDate: this.state.enddate.getFullYear() + "-" + (this.state.enddate.getMonth() + 1) + "-" + this.state.enddate.getDate() });
-    }
+  datepickerEndCancelClicked = () => {
+    this.setState({
+      datepickerendOpen: false,
+    });
+  };
 
-    this.setState({ enddoneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
-  }
+  handleDate = (value) => {
+    this.setState({ startDate: value });
+  };
+
+  handleEndDate = (value) => {
+    this.setState({ endDate: value });
+  };
 
 
-  datepickerCancelClicked () {
-    this.setState({ date: new Date(), enddate: new Date(), datepickerOpen: false, datepickerendOpen: false });
-  }
-
-  modelCancel () {
+  modelCancel() {
     this.setState({ flagFilterOpen: false, isShowAllTransactions: false });
   }
 
 
-  async getDebitNotes () {
+  async getDebitNotes() {
     this.setState({ lodaing: true });
     const accountType = 'DEBIT';
     const { storeId } = this.state;
@@ -135,7 +117,7 @@ export default class DebitNotes extends Component {
     });
   }
 
-  handleViewDebit (item, index) {
+  handleViewDebit(item, index) {
     const reqObj = {
       fromDate: null,
       toDate: null,
@@ -155,7 +137,7 @@ export default class DebitNotes extends Component {
     });
   }
 
-  applyDebitNotesFilter () {
+  applyDebitNotesFilter() {
     this.setState({ loading: true });
     const accountType = 'DEBIT';
     const { storeId, startDate, endDate, mobileNumber } = this.state;
@@ -175,34 +157,36 @@ export default class DebitNotes extends Component {
         this.setState({ filterDebitData: res.data.content, filterActive: true });
       }
       this.setState({ loading: false, modalVisible: false });
+      this.modelCancel()
     }).catch(err => {
       console.log(err);
+      this.modelCancel()
       this.setState({ loading: false, modalVisible: false, filterActive: false });
     });
   }
 
-  modalViewCancel () {
+  modalViewCancel() {
     this.setState({ isShowAllTransactions: false });
   }
 
-  handleAddDebit (item, index) {
+  handleAddDebit(item, index) {
     this.props.navigation.navigate('AddDebitNotes', {
       item: item,
       onGoBack: () => this.getDebitNotes()
     });
   }
 
-  filterAction () {
+  filterAction() {
     this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
-  clearFilterAction () {
+  clearFilterAction() {
     this.setState({ filterActive: false });
   }
 
 
 
-  render () {
+  render() {
     return (
       <View style={{ backgroundColor: "#FFFFFF" }}>
         {this.state.loading &&
@@ -257,7 +241,7 @@ export default class DebitNotes extends Component {
                     <Text style={scss.footerText}>
                       Date:{" "}
                       {item.createdDate
-                        ? item.createdDate.toString().split(/T/)[ 0 ]
+                        ? item.createdDate.toString().split(/T/)[0]
                         : item.createdDate}
                     </Text>
                     <View style={scss.buttonContainer}>
@@ -271,7 +255,7 @@ export default class DebitNotes extends Component {
                       <IconIA
                         name='add-circle-outline'
                         size={25}
-                        style={[ scss.action_icons, { marginLeft: 10 } ]}
+                        style={[scss.action_icons, { marginLeft: 10 }]}
                         onPress={() => this.handleAddDebit(item, index)}
                       ></IconIA>
                     </View>
@@ -314,45 +298,18 @@ export default class DebitNotes extends Component {
                     </View>
                     {this.state.datepickerOpen && (
                       <View style={styles.dateTopView}>
-                        <View style={styles.dateTop2}>
-                          <TouchableOpacity
-                            style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
-                          >
-                            <Text style={datePickerBtnText}  > Cancel </Text>
-
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            style={datePickerButton2} onPress={() => this.datepickerDoneClicked()}
-                          >
-                            <Text style={datePickerBtnText}  > Done </Text>
-                          </TouchableOpacity>
-                        </View>
-                        <DatePicker style={styles.date}
-                          date={this.state.date}
-                          mode={'date'}
-                          onDateChange={(date) => this.setState({ date })}
+                        <DateSelector
+                          dateCancel={this.datepickerCancelClicked}
+                          setDate={this.handleDate}
                         />
                       </View>
                     )}
 
                     {this.state.datepickerendOpen && (
                       <View style={styles.dateTopView}>
-                        <View style={styles.dateTop2}>
-                          <TouchableOpacity
-                            style={datePickerButton1} onPress={() => this.datepickerCancelClicked()}
-                          >
-                            <Text style={datePickerBtnText}  > Cancel </Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            style={datePickerButton2} onPress={() => this.datepickerendDoneClicked()}
-                          >
-                            <Text style={datePickerBtnText}  > Done </Text>
-                          </TouchableOpacity>
-                        </View>
-                        <DatePicker style={styles.date}
-                          date={this.state.enddate}
-                          mode={'date'}
-                          onDateChange={(enddate) => this.setState({ enddate })}
+                        <DateSelector
+                          dateCancel={this.datepickerEndCancelClicked}
+                          setDate={this.handleEndDate}
                         />
                       </View>
                     )}
@@ -370,11 +327,11 @@ export default class DebitNotes extends Component {
                       onChangeText={this.handleMobile}
                     />
                     <View style={forms.action_buttons_container}>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                         onPress={() => this.applyDebitNotesFilter()}>
                         <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
                         onPress={() => this.modelCancel()}>
                         <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>
@@ -412,7 +369,7 @@ export default class DebitNotes extends Component {
                           <View style={scss.model_text_container}>
                             <Text style={scss.textStyleLight}>AMOUNT: {item.amount}</Text>
                             <Text style={scss.textStyleLight}>DATE: {item.createdDate
-                              ? item.createdDate.toString().split(/T/)[ 0 ]
+                              ? item.createdDate.toString().split(/T/)[0]
                               : item.createdDate}</Text>
                           </View>
                         </View>

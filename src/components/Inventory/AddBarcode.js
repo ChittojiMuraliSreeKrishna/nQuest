@@ -6,7 +6,6 @@ import {
   Text, ToastAndroid, TouchableOpacity,
   View
 } from "react-native";
-import DatePicker from "react-native-date-picker";
 import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -14,7 +13,7 @@ import { Appbar, TextInput } from "react-native-paper";
 import RNPickerSelect from "react-native-picker-select";
 import { Chevron } from "react-native-shapes";
 import forms from "../../commonUtils/assets/styles/formFields.scss";
-import { dateFormat, formatMonth } from "../../commonUtils/DateFormate";
+import DateSelector from "../../commonUtils/DateSelector";
 import Loader from "../../commonUtils/loader";
 import { RF, RH, RW } from "../../Responsive";
 import {
@@ -23,10 +22,6 @@ import {
 import InventoryService from "../services/InventoryService";
 import { color } from "../Styles/colorStyles";
 import {
-  datePicker,
-  datePickerBtnText,
-  datePickerButton1,
-  datePickerButton2,
   dateSelector,
   dateText,
   inputHeading,
@@ -103,7 +98,7 @@ class AddBarcode extends Component {
     };
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     var domainStringId = "";
     var storeStringId = "";
     this.setState({ isEdit: this.props.route.params.isEdit });
@@ -116,7 +111,7 @@ class AddBarcode extends Component {
   }
 
   // Go Back Actions
-  handleBackButtonClick () {
+  handleBackButtonClick() {
     this.props.navigation.goBack(null);
     return true;
   }
@@ -127,7 +122,7 @@ class AddBarcode extends Component {
       if (res.data) {
         let size = [];
         // for (let i = 0; i < res.data.length; i++) {
-        res.data.length > 0 ? res.data[ 0 ].values.map((item) =>
+        res.data.length > 0 ? res.data[0].values.map((item) =>
           size.push({
             value: item,
             label: item,
@@ -156,14 +151,14 @@ class AddBarcode extends Component {
   };
 
   // Division Actions
-  getAllDivisions (data) {
+  getAllDivisions(data) {
     let divisions = [];
     InventoryService.getAllDivisions(data).then((res) => {
       if (res?.data) {
         for (let i = 0; i < res.data.length; i++) {
           divisions.push({
-            value: res.data[ i ].id,
-            label: res.data[ i ].name,
+            value: res.data[i].id,
+            label: res.data[i].name,
           });
         }
         console.log({ divisions });
@@ -182,15 +177,15 @@ class AddBarcode extends Component {
   };
 
   // Section Actions
-  getAllSections (id, data) {
+  getAllSections(id, data) {
     this.setState({ sectionsList: [] });
     let section = [];
     InventoryService.getAllSections(id, data).then((res) => {
       if (res?.data) {
         for (let i = 0; i < res.data.length; i++) {
           section.push({
-            value: res.data[ i ].id,
-            label: res.data[ i ].name,
+            value: res.data[i].id,
+            label: res.data[i].name,
           });
         }
         console.log({ section });
@@ -208,16 +203,16 @@ class AddBarcode extends Component {
   };
 
   // SubSection Actions
-  getAllSubsections (id, data) {
+  getAllSubsections(id, data) {
     this.setState({ subSectionsList: [] });
     let subSection = [];
     InventoryService.getAllSections(id, data).then((res) => {
       if (res?.data) {
         for (let i = 0; i < res.data.length; i++) {
           subSection.push({
-            value: res.data[ i ].id,
-            label: res.data[ i ].name,
-            id: res.data[ i ].id,
+            value: res.data[i].id,
+            label: res.data[i].name,
+            id: res.data[i].id,
           });
         }
         console.log({ subSection });
@@ -233,16 +228,16 @@ class AddBarcode extends Component {
   };
 
   // Category Actions
-  getAllCatogiries (data) {
+  getAllCatogiries(data) {
     this.setState({ categoriesList: [] });
     let categories = [];
     InventoryService.getAllCategories(data).then((res) => {
       if (res?.data) {
         for (let i = 0; i < res.data.length; i++) {
           categories.push({
-            value: res.data[ i ].id,
-            label: res.data[ i ].name,
-            id: res.data[ i ].id,
+            value: res.data[i].id,
+            label: res.data[i].name,
+            id: res.data[i].id,
           });
         }
         console.log({ categories });
@@ -258,7 +253,7 @@ class AddBarcode extends Component {
   };
 
   // UOM Actions
-  getAllUOM () {
+  getAllUOM() {
     this.setState({ uomList: [] });
     let uomList = [];
     InventoryService.getUOM().then((res) => {
@@ -266,8 +261,8 @@ class AddBarcode extends Component {
         console.log("UOMS", res.data);
         for (let i = 0; i < res.data.length; i++) {
           uomList.push({
-            value: res.data[ i ].uomName,
-            label: res.data[ i ].uomName,
+            value: res.data[i].uomName,
+            label: res.data[i].uomName,
           });
         }
         console.log({ uomList });
@@ -287,7 +282,7 @@ class AddBarcode extends Component {
   };
 
   // HSNCodes Actions
-  getAllHSNCodes () {
+  getAllHSNCodes() {
     this.setState({ hsnCodesList: [] });
     let hsnList = [];
     InventoryService.getAllHsnList().then((res) => {
@@ -295,8 +290,8 @@ class AddBarcode extends Component {
         console.log("HSNS", res.data);
         for (let i = 0; i < res.data.result.length; i++) {
           hsnList.push({
-            value: res.data.result[ i ].hsnCode,
-            label: res.data.result[ i ].hsnCode,
+            value: res.data.result[i].hsnCode,
+            label: res.data.result[i].hsnCode,
           });
         }
         console.log({ hsnList });
@@ -312,7 +307,7 @@ class AddBarcode extends Component {
   };
 
   // Store Actions
-  async getAllstores () {
+  async getAllstores() {
     this.setState({ storesList: [] });
     let storesList = [];
     const { clientId } = this.state;
@@ -321,8 +316,8 @@ class AddBarcode extends Component {
       if (res?.data) {
         for (let i = 0; i < res.data.length; i++) {
           storesList.push({
-            value: res.data[ i ].id,
-            label: res.data[ i ].name,
+            value: res.data[i].id,
+            label: res.data[i].name,
           });
         }
         console.log({ storesList });
@@ -420,30 +415,32 @@ class AddBarcode extends Component {
   };
 
   // Date Actions
-  datepickerClicked () {
+  datepickerClicked() {
     this.setState({ datepickerOpen: true });
   }
 
-  datepickerDoneClicked () {
-    this.setState({ productValidity: this.state.date.getFullYear() + formatMonth(this.state.date.getMonth() + 1) + dateFormat(this.state.date.getDate()) });
-    this.setState({ doneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
-  }
-
-  datepickerDoneClickedForFruitDomain () {
-    this.setState({ expiryDateFruitsDomain: this.state.expiryDate.getFullYear() + formatMonth(this.state.expiryDate.getMonth() + 1) + dateFormat(this.state.expiryDate.getDate()) });
-    this.setState({ doneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
-  }
-
-  datepickerCancelClicked () {
+  datepickerCancelClicked = () => {
     this.setState({
-      date: new Date(),
       datepickerOpen: false,
+    });
+  };
+
+  datepickerEndCancelClicked = () => {
+    this.setState({
       datepickerendOpen: false,
     });
-  }
+  };
+
+  handleDate = (value) => {
+    this.setState({ productValidity: value });
+  };
+
+  handleExpiryFruitsDomainDate = (value) => {
+    this.setState({ expiryDateFruitsDomain: value });
+  };
 
   // Validations For Barcode Fields
-  validationForm () {
+  validationForm() {
     let isFormValid = true;
     let errors = {};
     if (this.state.name.length < errorLength.name) {
@@ -495,7 +492,7 @@ class AddBarcode extends Component {
   }
 
   // Saving Barcode
-  saveBarcode () {
+  saveBarcode() {
     // console.log(this.state.store);
     // this.setState({ loading: true });
     const { selectedDomain, isEdit } = this.state;
@@ -550,11 +547,11 @@ class AddBarcode extends Component {
   }
 
   // Cancel Add Barcode
-  cancel () {
+  cancel() {
     this.props.navigation.goBack(null);
   }
 
-  render () {
+  render() {
     return (
       <View>
         {this.state.loading && <Loader loading={this.state.loading} />}
@@ -751,7 +748,7 @@ class AddBarcode extends Component {
               >
                 <Text style={dateText}>
                   {this.state.productValidity === ""
-                    ? "DD/MM/YYYY"
+                    ? "YYYY-MM-DD"
                     : this.state.productValidity}
                 </Text>
                 <Image
@@ -761,26 +758,9 @@ class AddBarcode extends Component {
               </TouchableOpacity>
               {this.state.datepickerOpen && (
                 <View style={filter.dateTopView}>
-                  <View style={filter.dateTop2}>
-                    <TouchableOpacity
-                      style={datePickerButton1}
-                      onPress={() => this.datepickerCancelClicked()}
-                    >
-                      <Text style={datePickerBtnText}> Cancel </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={datePickerButton2}
-                      onPress={() => this.datepickerDoneClicked()}
-                    >
-                      <Text style={datePickerBtnText}> Done </Text>
-                    </TouchableOpacity>
-                  </View>
-                  <DatePicker
-                    style={datePicker}
-                    date={this.state.date}
-                    mode={"date"}
-                    onDateChange={(date) => this.setState({ date })}
+                  <DateSelector
+                    dateCancel={this.datepickerCancelClicked}
+                    setDate={this.handleDate}
                   />
                 </View>
               )}
@@ -842,7 +822,7 @@ class AddBarcode extends Component {
               >
                 <Text style={dateText}>
                   {this.state.expiryDateFruitsDomain === ""
-                    ? "DD/MM/YYYY"
+                    ? "YYYY-MM-DD"
                     : this.state.expiryDateFruitsDomain}
                 </Text>
                 <Image
@@ -852,26 +832,9 @@ class AddBarcode extends Component {
               </TouchableOpacity>
               {this.state.datepickerOpen && (
                 <View style={filter.dateTopView}>
-                  <View style={filter.dateTop2}>
-                    <TouchableOpacity
-                      style={datePickerButton1}
-                      onPress={() => this.datepickerCancelClicked()}
-                    >
-                      <Text style={datePickerBtnText}> Cancel </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={datePickerButton2}
-                      onPress={() => this.datepickerDoneClickedForFruitDomain()}
-                    >
-                      <Text style={datePickerBtnText}> Done </Text>
-                    </TouchableOpacity>
-                  </View>
-                  <DatePicker
-                    style={datePicker}
-                    date={this.state.expiryDate}
-                    mode={"date"}
-                    onDateChange={(date) => this.setState({ date })}
+                  <DateSelector
+                    dateCancel={this.datepickerCancelClicked}
+                    setDate={this.handleExpiryFruitsDomainDate}
                   />
                 </View>
               )}
@@ -1140,12 +1103,12 @@ class AddBarcode extends Component {
             onChangeText={this.handleQuantity}
           />
           <View style={forms.action_buttons_container}>
-            <TouchableOpacity style={[ forms.action_buttons, { backgroundColor: this.state.saveButtonDisabled ? color.accent : color.lightDark } ]}
+            <TouchableOpacity style={[forms.action_buttons, { backgroundColor: this.state.saveButtonDisabled ? color.accent : color.disableBackGround }]}
               disabled={!this.state.saveButtonDisabled}
               onPress={() => this.saveBarcode()}>
               <Text style={forms.submit_btn_text} >{I18n.t("SAVE")}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+            <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
               onPress={() => this.cancel()}>
               <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
             </TouchableOpacity>

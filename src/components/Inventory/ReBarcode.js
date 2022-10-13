@@ -7,7 +7,6 @@ import {
   Image, ScrollView, StyleSheet,
   TouchableOpacity, View
 } from "react-native";
-import DatePicker from "react-native-date-picker";
 import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -17,15 +16,10 @@ import IconFA from 'react-native-vector-icons/FontAwesome';
 import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from "../../commonUtils/assets/styles/style.scss";
+import DateSelector from "../../commonUtils/DateSelector";
 import Loader from "../../commonUtils/loader";
 import { RH, RW } from "../../Responsive";
 import InventoryService from "../services/InventoryService";
-import {
-  datePicker,
-  datePickerBtnText,
-  datePickerButton1,
-  datePickerButton2
-} from "../Styles/FormFields";
 import { listEmptyMessage } from "../Styles/Styles";
 
 
@@ -62,6 +56,7 @@ export default class ReBarcode extends Component {
 
   async componentDidMount () {
     const storeId = await AsyncStorage.getItem("storeId");
+    console.log({storeId});
     this.setState({ storeId: storeId });
     this.getAllReBarcodes();
   }
@@ -124,6 +119,7 @@ export default class ReBarcode extends Component {
       currentBarcodeId: this.state.barCodeId,
       storeId: this.state.storeId,
     };
+    console.log({list});
     const request = "?page=" + parseInt(this.state.filterPageNo) + "&size=10";
     axios
       .post(InventoryService.getbarcodeTexttileAdjustments() + request, list)
@@ -164,115 +160,25 @@ export default class ReBarcode extends Component {
     this.setState({ datepickerendOpen: true });
   }
 
-  datepickerDoneClicked () {
-    if (
-      parseInt(this.state.date.getDate()) < 10 &&
-      parseInt(this.state.date.getMonth()) < 10
-    ) {
-      this.setState({
-        startDate:
-          this.state.date.getFullYear() +
-          "-0" +
-          (this.state.date.getMonth() + 1) +
-          "-" +
-          "0" +
-          this.state.date.getDate(),
-      });
-    } else if (parseInt(this.state.date.getDate()) < 10) {
-      this.setState({
-        startDate:
-          this.state.date.getFullYear() +
-          "-" +
-          (this.state.date.getMonth() + 1) +
-          "-" +
-          "0" +
-          this.state.date.getDate(),
-      });
-    } else if (parseInt(this.state.date.getMonth()) < 10) {
-      this.setState({
-        startDate:
-          this.state.date.getFullYear() +
-          "-0" +
-          (this.state.date.getMonth() + 1) +
-          "-" +
-          this.state.date.getDate(),
-      });
-    } else {
-      this.setState({
-        startDate:
-          this.state.date.getFullYear() +
-          "-" +
-          (this.state.date.getMonth() + 1) +
-          "-" +
-          this.state.date.getDate(),
-      });
-    }
-
+  datepickerCancelClicked = () => {
     this.setState({
-      doneButtonClicked: true,
       datepickerOpen: false,
+    });
+  };
+
+  datepickerEndCancelClicked = () => {
+    this.setState({
       datepickerendOpen: false,
     });
-  }
+  };
 
-  datepickerendDoneClicked () {
-    if (
-      parseInt(this.state.enddate.getDate()) < 10 &&
-      parseInt(this.state.enddate.getMonth()) < 10
-    ) {
-      this.setState({
-        endDate:
-          this.state.enddate.getFullYear() +
-          "-0" +
-          (this.state.enddate.getMonth() + 1) +
-          "-" +
-          "0" +
-          this.state.enddate.getDate(),
-      });
-    } else if (parseInt(this.state.enddate.getDate()) < 10) {
-      this.setState({
-        endDate:
-          this.state.enddate.getFullYear() +
-          "-" +
-          (this.state.enddate.getMonth() + 1) +
-          "-" +
-          "0" +
-          this.state.enddate.getDate(),
-      });
-    } else if (parseInt(this.state.enddate.getMonth()) < 10) {
-      this.setState({
-        endDate:
-          this.state.enddate.getFullYear() +
-          "-0" +
-          (this.state.enddate.getMonth() + 1) +
-          "-" +
-          this.state.enddate.getDate(),
-      });
-    } else {
-      this.setState({
-        endDate:
-          this.state.enddate.getFullYear() +
-          "-" +
-          (this.state.enddate.getMonth() + 1) +
-          "-" +
-          this.state.enddate.getDate(),
-      });
-    }
-    this.setState({
-      enddoneButtonClicked: true,
-      datepickerOpen: false,
-      datepickerendOpen: false,
-    });
-  }
+  handleDate = (value) => {
+    this.setState({ startDate: value });
+  };
 
-  datepickerCancelClicked () {
-    this.setState({
-      date: new Date(),
-      endDate: new Date(),
-      datepickerOpen: false,
-      datepickerendOpen: false,
-    });
-  }
+  handleEndDate = (value) => {
+    this.setState({ endDate: value });
+  };
 
   // handle Barcodeid filter
   handlebarCodeId = (value) => {
@@ -612,26 +518,9 @@ export default class ReBarcode extends Component {
                     </View>
                     {this.state.datepickerOpen && (
                       <View style={filter.dateTopView}>
-                        <View style={filter.dateTop2}>
-                          <TouchableOpacity
-                            style={datePickerButton1}
-                            onPress={() => this.datepickerCancelClicked()}
-                          >
-                            <Text style={datePickerBtnText}> Cancel </Text>
-                          </TouchableOpacity>
-
-                          <TouchableOpacity
-                            style={datePickerButton2}
-                            onPress={() => this.datepickerDoneClicked()}
-                          >
-                            <Text style={datePickerBtnText}> Done </Text>
-                          </TouchableOpacity>
-                        </View>
-                        <DatePicker
-                          style={datePicker}
-                          date={this.state.date}
-                          mode={"date"}
-                          onDateChange={(date) => this.setState({ date })}
+                        <DateSelector
+                          dateCancel={this.datepickerCancelClicked}
+                          setDate={this.handleDate}
                         />
                       </View>
                     )}
@@ -639,29 +528,9 @@ export default class ReBarcode extends Component {
 
                     {this.state.datepickerendOpen && (
                       <View style={filter.dateTopView}>
-                        <View style={filter.dateTop2}>
-                          <View>
-                            <TouchableOpacity
-                              style={datePickerButton1}
-                              onPress={() => this.datepickerCancelClicked()}
-                            >
-                              <Text style={datePickerBtnText}> Cancel </Text>
-                            </TouchableOpacity>
-                          </View>
-                          <View>
-                            <TouchableOpacity
-                              style={datePickerButton2}
-                              onPress={() => this.datepickerendDoneClicked()}
-                            >
-                              <Text style={datePickerBtnText}> Done </Text>
-                            </TouchableOpacity>
-                          </View>
-                        </View>
-                        <DatePicker
-                          style={datePicker}
-                          date={this.state.enddate}
-                          mode={"date"}
-                          onDateChange={(enddate) => this.setState({ enddate })}
+                        <DateSelector
+                          dateCancel={this.datepickerEndCancelClicked}
+                          setDate={this.handleEndDate}
                         />
                       </View>
                     )}

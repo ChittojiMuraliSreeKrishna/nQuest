@@ -1,7 +1,6 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import React, { Component } from "react";
 import AddCustomer from '../components/CustomerPortal/AddCustomer';
-import AddGiftVoucher from "../components/CustomerPortal/AddGiftVoucher";
 import DayClosure from '../components/CustomerPortal/DayClosure';
 import GenerateEstimationSlip from "../components/CustomerPortal/GenerateEstimationSlip";
 import GenerateInvoiceSlip from "../components/CustomerPortal/GenerateInvoiceSlip";
@@ -67,11 +66,6 @@ export default class CustomerNavigation extends Component {
             name="ScanBarCode"
             options={{ headerShown: false }}
             component={ScanBarCode}
-          />
-          <Stack.Screen
-            name="AddGiftVoucher"
-            options={{ headerShow: false }}
-            component={AddGiftVoucher}
           />
         </Stack.Navigator>
       </>

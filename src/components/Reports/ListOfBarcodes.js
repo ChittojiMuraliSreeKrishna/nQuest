@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
 import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import DatePicker from 'react-native-date-picker';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -11,6 +10,7 @@ import IconFA from 'react-native-vector-icons/FontAwesome';
 import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
+import DateSelector from '../../commonUtils/DateSelector';
 import { RF, RH, RW } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
 
@@ -98,44 +98,25 @@ export class ListOfBarcodes extends Component {
   enddatepickerClicked() {
     this.setState({ datepickerendOpen: true });
   }
+  datepickerCancelClicked = () => {
+    this.setState({
+      datepickerOpen: false,
+    });
+  };
 
-  datepickerDoneClicked() {
-    if (parseInt(this.state.date.getDate()) < 10 && (parseInt(this.state.date.getMonth()) < 10)) {
-      this.setState({ startDate: this.state.date.getFullYear() + "-0" + (this.state.date.getMonth() + 1) + "-" + "0" + this.state.date.getDate() });
-    }
-    else if (parseInt(this.state.date.getDate()) < 10) {
-      this.setState({ startDate: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-" + "0" + this.state.date.getDate() });
-    }
-    else if (parseInt(this.state.date.getMonth()) < 10) {
-      this.setState({ startDate: this.state.date.getFullYear() + "-0" + (this.state.date.getMonth() + 1) + "-" + this.state.date.getDate() });
-    }
-    else {
-      this.setState({ startDate: this.state.date.getFullYear() + "-" + (this.state.date.getMonth() + 1) + "-" + this.state.date.getDate() });
-    }
+  datepickerEndCancelClicked = () => {
+    this.setState({
+      datepickerendOpen: false,
+    });
+  };
 
+  handleDate = (value) => {
+    this.setState({ startDate: value });
+  };
 
-    this.setState({ doneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
-  }
-
-  datepickerendDoneClicked() {
-    if (parseInt(this.state.enddate.getDate()) < 10 && (parseInt(this.state.enddate.getMonth()) < 10)) {
-      this.setState({ endDate: this.state.enddate.getFullYear() + "-0" + (this.state.enddate.getMonth() + 1) + "-" + "0" + this.state.enddate.getDate() });
-    }
-    else if (parseInt(this.state.enddate.getDate()) < 10) {
-      this.setState({ endDate: this.state.enddate.getFullYear() + "-" + (this.state.enddate.getMonth() + 1) + "-" + "0" + this.state.enddate.getDate() });
-    }
-    else if (parseInt(this.state.enddate.getMonth()) < 10) {
-      this.setState({ endDate: this.state.enddate.getFullYear() + "-0" + (this.state.enddate.getMonth() + 1) + "-" + this.state.enddate.getDate() });
-    }
-    else {
-      this.setState({ endDate: this.state.enddate.getFullYear() + "-" + (this.state.enddate.getMonth() + 1) + "-" + this.state.enddate.getDate() });
-    }
-    this.setState({ enddoneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
-  }
-
-  datepickerCancelClicked() {
-    this.setState({ date: new Date(), enddate: new Date(), datepickerOpen: false, datepickerendOpen: false });
-  }
+  handleEndDate = (value) => {
+    this.setState({ endDate: value });
+  };
 
   handleSelectStores = (value) => {
     this.setState({ selectedStore: value });
@@ -195,7 +176,7 @@ export class ListOfBarcodes extends Component {
         if (res.data.result.length !== 0) {
           this.setState({
             listBarcodes: res.data.result.content,
-            totalPages:res.data.result.totalPages,
+            totalPages: res.data.result.totalPages,
             filterActive: true, modalVisible: false, flagFilterOpen: false
           });
         } else {
@@ -413,43 +394,18 @@ export class ListOfBarcodes extends Component {
                       </View>
                       {this.state.datepickerOpen && (
                         <View style={{ height: RH(280), width: deviceWidth, backgroundColor: '#ffffff' }}>
-                          <TouchableOpacity
-                            style={Device.isTablet ? styles.datePickerButton_tablet : styles.datePickerButton_mobile} onPress={() => this.datepickerCancelClicked()}
-                          >
-                            <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Cancel </Text>
-
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            style={Device.isTablet ? styles.datePickerEndButton_tablet : styles.datePickerEndButton_mobile} onPress={() => this.datepickerDoneClicked()}
-                          >
-                            <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Done </Text>
-
-                          </TouchableOpacity>
-                          <DatePicker style={{ width: deviceWidth, height: RH(200), marginTop: RH(50), }}
-                            date={this.state.date}
-                            mode={'date'}
-                            onDateChange={(date) => this.setState({ date })}
+                          <DateSelector
+                            dateCancel={this.datepickerCancelClicked}
+                            setDate={this.handleDate}
                           />
                         </View>
                       )}
 
                       {this.state.datepickerendOpen && (
                         <View style={{ height: RH(280), width: deviceWidth, backgroundColor: '#ffffff' }}>
-                          <TouchableOpacity
-                            style={Device.isTablet ? styles.datePickerButton_tablet : styles.datePickerButton_mobile} onPress={() => this.datepickerCancelClicked()}
-                          >
-                            <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Cancel </Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            style={Device.isTablet ? styles.datePickerEndButton_tablet : styles.datePickerEndButton_mobile} onPress={() => this.datepickerendDoneClicked()}
-                          >
-                            <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Done </Text>
-
-                          </TouchableOpacity>
-                          <DatePicker style={{ width: deviceWidth, height: RH(200), marginTop: RH(50), }}
-                            date={this.state.enddate}
-                            mode={'date'}
-                            onDateChange={(enddate) => this.setState({ enddate })}
+                          <DateSelector
+                            dateCancel={this.datepickerEndCancelClicked}
+                            setDate={this.handleEndDate}
                           />
                         </View>
                       )}
