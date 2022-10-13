@@ -1046,7 +1046,7 @@ class AddBarcode extends Component {
             placeholder="EMP ID"
             placeholderTextColor={"#676767"}
             textAlignVertical="center"
-            maxLength={10}
+            maxLength={4}
             autoCapitalize="none"
             value={this.state.empId}
             onBlur={this.handleEMPIdValid}

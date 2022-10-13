@@ -312,7 +312,7 @@ class TextilePayment extends Component {
       payingAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
     }, () => {
       this.cancelKathaModel();
-      // this.pay();
+      this.pay();
     });
   }
 
