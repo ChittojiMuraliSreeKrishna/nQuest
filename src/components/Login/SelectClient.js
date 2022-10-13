@@ -24,7 +24,7 @@ export class SelectClient extends Component {
     console.log({ userId });
     this.getAllClients(userId);
     let clientId = await AsyncStorage.getItem("custom:clientId1");
-    this.setState({ clientId: clientId });
+    this.setState({ clientId: clientId,  });
   }
 
   getAllClients (userId) {

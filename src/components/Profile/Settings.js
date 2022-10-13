@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React, { Component } from 'react';
-import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import DatePicker from "react-native-date-picker";
 import Device from "react-native-device-detection";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -17,15 +17,15 @@ var deviceWidth = Dimensions.get("window").width;
 
 export const logOut = async (props) => {
   AsyncStorage.removeItem("phone_number");
-  AsyncStorage.multiRemove([])
-  global.username = ''
-  AsyncStorage.clear().then(() => console.log('Cleared'))
-  props.navigation.push("Login")
+  AsyncStorage.multiRemove([]);
+  global.username = '';
+  AsyncStorage.clear().then(() => console.log('Cleared'));
+  props.navigation.push("Login");
   return true;
-}
+};
 export default class Settings extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       userName: "",
       roleName: "",
@@ -35,13 +35,15 @@ export default class Settings extends Component {
       address: "",
       userId: null,
       date: new Date(),
+      stores: [],
       datepickerOpen: false,
       mobileNumberValid: false,
       emailValid: false,
-      errors: {}
-    }
+      errors: {},
+      isEdit: false
+    };
   }
-  clearAllData() {
+  clearAllData () {
     AsyncStorage.getAllKeys()
       .then(keys => AsyncStorage.multiRemove(keys));
   }
@@ -85,12 +87,12 @@ export default class Settings extends Component {
   };
 
   // Date Picker Actions
-  datepickerCancelClicked() {
+  datepickerCancelClicked () {
     this.setState({ date: new Date() });
     this.setState({ datepickerOpen: false });
   }
 
-  datepickerDoneClicked() {
+  datepickerDoneClicked () {
     if (parseInt(this.state.date.getDate()) < 10) {
       this.setState({
         dateOfBirth:
@@ -113,65 +115,70 @@ export default class Settings extends Component {
     this.setState({ datepickerOpen: false });
   }
 
-  datepickerClicked() {
+  datepickerClicked () {
     this.setState({ datepickerOpen: true });
   }
 
   // Component Did Mount
-  async componentDidMount() {
-    const username = await AsyncStorage.getItem("username")
-    const phonenumber = await AsyncStorage.getItem("phone_number")
-    this.setState({ loading: true })
+  async componentDidMount () {
+    const username = await AsyncStorage.getItem("username");
+    const roleName = await AsyncStorage.getItem("rolename");
+    const phonenumber = await AsyncStorage.getItem("phone_number");
+    this.setState({ loading: true });
     axios.get(ProfileService.getUser() + username).then(res => {
       if (res?.data) {
-        let details = res.data.result
-        this.setState({ loading: false, userId: details.userId, userName: details.userName, roleName: details.roleName, emailId: details.email, selectedGender: details.gender, address: details.address, mobileNumber: phonenumber })
-        console.log("nameee", details)
+        let details = res.data.result;
+        this.setState({ loading: false, userId: details.userId, userName: details.userName, roleName: roleName, emailId: details.email, selectedGender: details.gender, address: details.address, mobileNumber: phonenumber, stores: details.stores });
+        console.log({ details }, this.state.stores);
         if (details.dob === null) {
-          this.setState({ dateOfBirth: "Date of Birth" })
+          this.setState({ dateOfBirth: "Date of Birth" });
         } else {
-          this.setState({ dateOfBirth: details.dob })
+          this.setState({ dateOfBirth: details.dob });
         }
       }
-      this.setState({ loading: false })
+      this.setState({ loading: false });
     }).catch(err => {
-      console.log({ err })
-      this.setState({ loading: false })
-    })
+      console.log({ err });
+      this.setState({ loading: false });
+    });
   }
 
-  validationForm() {
-    let isFormValid = true
-    let errors = {}
+  validationForm () {
+    let isFormValid = true;
+    let errors = {};
     const emailReg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     if (this.state.mobileNumber.length !== 13) {
-      isFormValid = false
-      errors["mobile"] = "Please Enter a valid 10 digit mobile number With state code";
-      this.setState({ mobileNumberValid: true })
+      isFormValid = false;
+      errors[ "mobile" ] = "Please Enter a valid 10 digit mobile number With state code";
+      this.setState({ mobileNumberValid: true });
     }
     if (emailReg.test(this.state.emailId) === false) {
-      isFormValid = false
-      errors["email"] = "Please Enter a valid email id"
-      this.setState({ emailValid: true })
+      isFormValid = false;
+      errors[ "email" ] = "Please Enter a valid email id";
+      this.setState({ emailValid: true });
     }
-    this.setState({ errors: errors })
-    return isFormValid
+    this.setState({ errors: errors });
+    return isFormValid;
   }
 
-  profileUpdate() {
-    const isFormValid = this.validationForm()
+  profileUpdate () {
+    const isFormValid = this.validationForm();
     if (isFormValid) {
     }
   }
 
-  changePassword() {
+  changePassword () {
     this.props.navigation.navigate("ForgotPassword", {
       username: this.state.userName,
     });
   }
 
-  render() {
-    const { mobileNumberValid, emailValid, errors } = this.state
+  editUser () {
+    this.setState({ isEdit: !this.state.isEdit });
+  }
+
+  render () {
+    const { mobileNumberValid, emailValid, errors } = this.state;
     return (
       <View style={scss.container}>
         <View style={scss.header}>
@@ -180,203 +187,226 @@ export default class Settings extends Component {
             Logout
           </Button>
         </View>
-        <View style={scss.subContainer}>
-          <KeyboardAwareScrollView>
-            <TextInput
-              mode='flat'
-              style={scss.inputField}
-              label="Name"
-              disabled
-              value={this.state.userName}
-              onChange={(value) => this.handleUserName(value)}
-            />
-            <TextInput
-              mode='flat'
-              style={scss.inputField}
-              label="Designation"
-              disabled
-              value={this.state.roleName}
-              onChange={(value) => this.handleRole(value)}
-            />
-            <TextInput
-              mode='flat'
-              underlineColor='#6f6f6f'
-              activeUnderlineColor='#000'
-              keyboardType="email-address"
-              style={scss.inputField}
-              label="Email"
-              value={this.state.emailId}
-              onChangeText={(value) => this.handleEmail(value)}
-            />
-            {emailValid && <Message imp={true} message={this.state.errors["email"]} />}
-            <TextInput
-              mode='flat'
-              activeUnderlineColor='#000'
-              underlineColor='#6f6f6f'
-              keyboardType="phone-pad"
-              style={scss.inputField}
-              maxLength={13}
-              label="Mobile"
-              value={this.state.mobileNumber}
-              onChangeText={(value) => this.handleMobileNumber(value)}
-            />
-            {mobileNumberValid && <Message imp={true} message={this.state.errors["mobile"]} />}
-            <View
-              style={
-                Device.isTablet
-                  ? styles.rnSelectContainer_tablet
-                  : styles.rnSelectContainer_mobile
-              }
-            >
-              <RNPickerSelect
-                placeholder={{
-                  label: "SELECT GENDER",
-                  value: " ",
-                }}
-                Icon={() => {
-                  return (
-                    <Chevron
-                      style={styles.imagealign}
-                      size={1.5}
-                      color="gray"
-                    />
-                  );
-                }}
-                items={[
-                  { label: "MALE", value: "MALE" },
-                  { label: "FEMALE", value: "FEMALE" },
-                  {
-                    label: "PREFER NOT TO SAY",
-                    value: "PREFER NOT TO SAY",
-                  },
-                ]}
-                onValueChange={this.handleGender}
+        <View>
+          <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+            <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+              <Image source={require("../assets/images/profile.png")} style={{ height: 70, width: 70 }} />
+            </View>
+            <Text>UserName: {this.state.userName}</Text>
+            <Text>RoleName: {this.state.roleName}</Text>
+            <View>
+              <Text>Mobile-No: {this.state.mobileNumber}</Text>
+              <Text>Email-Id: {this.state.emailId}</Text>
+              <Text>Stores: {this.state.stores.map((item, index) => {
+                return (
+                  <Text>{item.name}</Text>
+                );
+              })}</Text>
+            </View>
+          </View>
+          <Button onPress={() => this.editUser()}>
+            <Text>{this.state.isEdit ? "Close" : "Edit"}</Text>
+          </Button>
+        </View>
+        {this.state.isEdit && <View style={{ maxHeight: 600 }}>
+          <ScrollView>
+            <KeyboardAwareScrollView>
+              <TextInput
+                mode='flat'
+                style={scss.inputField}
+                label="Name"
+                disabled
+                value={this.state.userName}
+                onChange={(value) => this.handleUserName(value)}
+              />
+              <TextInput
+                mode='flat'
+                style={scss.inputField}
+                label="Designation"
+                disabled
+                value={this.state.roleName}
+                onChange={(value) => this.handleRole(value)}
+              />
+              <TextInput
+                mode='flat'
+                underlineColor='#6f6f6f'
+                activeUnderlineColor='#000'
+                keyboardType="email-address"
+                style={scss.inputField}
+                label="Email"
+                value={this.state.emailId}
+                onChangeText={(value) => this.handleEmail(value)}
+              />
+              {emailValid && <Message imp={true} message={this.state.errors[ "email" ]} />}
+              <TextInput
+                mode='flat'
+                activeUnderlineColor='#000'
+                underlineColor='#6f6f6f'
+                keyboardType="phone-pad"
+                style={scss.inputField}
+                maxLength={13}
+                label="Mobile"
+                value={this.state.mobileNumber}
+                onChangeText={(value) => this.handleMobileNumber(value)}
+              />
+              {mobileNumberValid && <Message imp={true} message={this.state.errors[ "mobile" ]} />}
+              <View
                 style={
                   Device.isTablet
-                    ? pickerSelectStyles_tablet
-                    : pickerSelectStyles_mobile
+                    ? styles.rnSelectContainer_tablet
+                    : styles.rnSelectContainer_mobile
                 }
-                value={this.state.selectedGender}
-                useNativeAndroidPickerStyle={false}
-              />
-            </View>
-            <View>
-              <TouchableOpacity
-                style={{
-                  justifyContent: "center",
-                  margin: 20,
-                  height: Device.isTablet ? 54 : 44,
-                  marginTop: Device.isTable ? 25 : 15,
-                  marginBottom: Device.isTablet ? 25 : 15,
-                  borderColor: "#8F9EB717",
-                  borderRadius: 3,
-                  backgroundColor: "#Ffffff",
-                  borderWidth: 1,
-                  fontFamily: "regular",
-                  paddingLeft: 15,
-                  fontSize: Device.isTablet ? 20 : 14,
-                }}
-                testID="openModal"
-                onPress={() => this.datepickerClicked()}
               >
-                <Text
-                  style={{
-                    marginLeft: 0,
-                    marginTop: 0,
-                    color: "#6F6F6F",
-                    fontSize: Device.isTablet ? 20 : 14,
-                    fontFamily: "regular",
+                <RNPickerSelect
+                  placeholder={{
+                    label: "SELECT GENDER",
+                    value: " ",
                   }}
-                >
-                  {" "}
-                  {this.state.dateOfBirth}{" "}
-                </Text>
-                <Image
-                  style={{ position: "absolute", top: 5, right: 0 }}
-                  source={require("../assets/images/calender.png")}
+                  Icon={() => {
+                    return (
+                      <Chevron
+                        style={styles.imagealign}
+                        size={1.5}
+                        color="gray"
+                      />
+                    );
+                  }}
+                  items={[
+                    { label: "MALE", value: "MALE" },
+                    { label: "FEMALE", value: "FEMALE" },
+                    {
+                      label: "PREFER NOT TO SAY",
+                      value: "PREFER NOT TO SAY",
+                    },
+                  ]}
+                  onValueChange={this.handleGender}
+                  style={
+                    Device.isTablet
+                      ? pickerSelectStyles_tablet
+                      : pickerSelectStyles_mobile
+                  }
+                  value={this.state.selectedGender}
+                  useNativeAndroidPickerStyle={false}
                 />
-              </TouchableOpacity>
-              {this.state.datepickerOpen && (
-                <View
+              </View>
+              <View>
+                <TouchableOpacity
                   style={{
-                    height: 280,
-                    width: deviceWidth,
-                    backgroundColor: "ffffff",
+                    justifyContent: "center",
+                    margin: 20,
+                    height: Device.isTablet ? 54 : 44,
+                    marginTop: Device.isTable ? 25 : 15,
+                    marginBottom: Device.isTablet ? 25 : 15,
+                    borderColor: "#8F9EB717",
+                    borderRadius: 3,
+                    backgroundColor: "#Ffffff",
+                    borderWidth: 1,
+                    fontFamily: "regular",
+                    paddingLeft: 15,
+                    fontSize: Device.isTablet ? 20 : 14,
                   }}
+                  testID="openModal"
+                  onPress={() => this.datepickerClicked()}
                 >
-                  <TouchableOpacity
+                  <Text
                     style={{
-                      position: "absolute",
-                      left: 20,
-                      top: 10,
-                      height: 30,
-                      backgroundColor: "#ED1C24",
-                      borderRadius: 5,
+                      marginLeft: 0,
+                      marginTop: 0,
+                      color: "#6F6F6F",
+                      fontSize: Device.isTablet ? 20 : 14,
+                      fontFamily: "regular",
                     }}
-                    onPress={() => this.datepickerCancelClicked()}
                   >
-                    <Text
-                      style={{
-                        textAlign: "center",
-                        marginTop: 5,
-                        color: "#ffffff",
-                        fontSize: 15,
-                        fontFamily: "regular",
-                      }}
-                    >
-                      {" "}
-                      Cancel{" "}
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={{
-                      position: "absolute",
-                      right: 20,
-                      top: 10,
-                      height: 30,
-                      backgroundColor: "#ED1C24",
-                      borderRadius: 5,
-                    }}
-                    onPress={() => this.datepickerDoneClicked()}
-                  >
-                    <Text
-                      style={{
-                        textAlign: "center",
-                        marginTop: 5,
-                        color: "#ffffff",
-                        fontSize: 15,
-                        fontFamily: "regular",
-                      }}
-                    >
-                      {" "}
-                      Done{" "}
-                    </Text>
-                  </TouchableOpacity>
-                  <DatePicker
-                    style={{ width: deviceWidth, height: 200, marginTop: 50 }}
-                    date={this.state.date}
-                    mode={"date"}
-                    onDateChange={(date) => this.setState({ date })}
+                    {" "}
+                    {this.state.dateOfBirth}{" "}
+                  </Text>
+                  <Image
+                    style={{ position: "absolute", top: 5, right: 0 }}
+                    source={require("../assets/images/calender.png")}
                   />
-                </View>
-              )}
-            </View>
-            <TextInput
-              mode='flat'
-              style={scss.inputField}
-              activeUnderlineColor='#000'
-              underlineColor='#6f6f6f'
-              label="Address"
-              value={this.state.address}
-              onChange={(value) => this.handleAddress(value)}
-            />
+                </TouchableOpacity>
+                {this.state.datepickerOpen && (
+                  <View
+                    style={{
+                      height: 280,
+                      width: deviceWidth,
+                      backgroundColor: "ffffff",
+                    }}
+                  >
+                    <TouchableOpacity
+                      style={{
+                        position: "absolute",
+                        left: 20,
+                        top: 10,
+                        height: 30,
+                        backgroundColor: "#ED1C24",
+                        borderRadius: 5,
+                      }}
+                      onPress={() => this.datepickerCancelClicked()}
+                    >
+                      <Text
+                        style={{
+                          textAlign: "center",
+                          marginTop: 5,
+                          color: "#ffffff",
+                          fontSize: 15,
+                          fontFamily: "regular",
+                        }}
+                      >
+                        {" "}
+                        Cancel{" "}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={{
+                        position: "absolute",
+                        right: 20,
+                        top: 10,
+                        height: 30,
+                        backgroundColor: "#ED1C24",
+                        borderRadius: 5,
+                      }}
+                      onPress={() => this.datepickerDoneClicked()}
+                    >
+                      <Text
+                        style={{
+                          textAlign: "center",
+                          marginTop: 5,
+                          color: "#ffffff",
+                          fontSize: 15,
+                          fontFamily: "regular",
+                        }}
+                      >
+                        {" "}
+                        Done{" "}
+                      </Text>
+                    </TouchableOpacity>
+                    <DatePicker
+                      style={{ width: deviceWidth, height: 200, marginTop: 50 }}
+                      date={this.state.date}
+                      mode={"date"}
+                      onDateChange={(date) => this.setState({ date })}
+                    />
+                  </View>
+                )}
+              </View>
+              <TextInput
+                mode='flat'
+                style={scss.inputField}
+                activeUnderlineColor='#000'
+                underlineColor='#6f6f6f'
+                label="Address"
+                value={this.state.address}
+                onChange={(value) => this.handleAddress(value)}
+              />
               <Button style={scss.submitBtn} textColor="#fff" onPress={() => this.profileUpdate()} mode='elevated'>SAVE</Button>
               <Button style={scss.changeBtn} textColor="#000" onPress={() => this.changePassword()} mode='outlined'>Change Password</Button>
-            <View style={{ margin: 25 }}></View>
-          </KeyboardAwareScrollView>
-        </View>
+              <View style={{ margin: 25 }}></View>
+            </KeyboardAwareScrollView>
+          </ScrollView>
+        </View>}
       </View>
-    )
+    );
   }
 }
 
