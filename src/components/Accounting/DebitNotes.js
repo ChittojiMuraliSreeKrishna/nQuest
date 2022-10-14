@@ -128,7 +128,7 @@ export default class DebitNotes extends Component {
     };
     AccountingService.getAllLedgerLogs(reqObj).then(res => {
       if (res) {
-        this.setState({
+       this.setState({
           isShowAllTransactions: true,
           modalVisible: true,
           transactionHistory: res.data.content
@@ -355,7 +355,8 @@ export default class DebitNotes extends Component {
                     <FlatList
                       data={this.state.transactionHistory}
                       style={{ marginTop: 20 }}
-                      scrollEnabled={true}
+                      // scrollEnabled={true}
+                      keyExtractor={(item, index) => index.toString()}
                       renderItem={({ item, index }) => (
                         <View style={scss.model_subbody}>
                           <View style={scss.model_text_container}>
