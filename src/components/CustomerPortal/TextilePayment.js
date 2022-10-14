@@ -366,7 +366,7 @@ class TextilePayment extends Component {
       this.setState({ payingAmount: grandNetAmount + this.state.rtAmount })
     }
     this.cancelCreditModel();
-    this.pay()
+    // this.pay()
   }
 
   cancelCreditModel() {
@@ -388,7 +388,9 @@ class TextilePayment extends Component {
       isGv: false,
       isKhata: false,
       payButtonEnable: true,
-      isCredit: false
+      isCredit: false,
+      recievedAmount: 0,
+      returnAmount: 0
     });
   }
 
@@ -401,7 +403,9 @@ class TextilePayment extends Component {
       isGv: false,
       isKhata: false,
       payButtonEnable: true,
-      isCredit: false
+      isCredit: false,
+      recievedAmount: 0,
+      returnAmount: 0
     });
   }
   handleredeemPoints = (text) => {
@@ -459,7 +463,9 @@ class TextilePayment extends Component {
       isGv: false,
       isKhata: false,
       payButtonEnable: true,
-      isCredit: false
+      isCredit: false,
+      recievedAmount: 0,
+      returnAmount: 0
     });
   }
 
@@ -474,7 +480,9 @@ class TextilePayment extends Component {
       isGv: false,
       isKhata: false,
       payButtonEnable: true,
-      isCredit: false
+      isCredit: false,
+      recievedAmount: 0,
+      returnAmount: 0
     });
   }
 
@@ -504,7 +512,9 @@ class TextilePayment extends Component {
       isGv: false,
       isKhata: true,
       payButtonEnable: true,
-      isCredit: false
+      isCredit: false,
+      recievedAmount: 0,
+      returnAmount: 0
     });
   }
 
@@ -520,7 +530,9 @@ class TextilePayment extends Component {
       isGv: false,
       isKhata: false,
       isCredit: true,
-      payButtonEnable: true
+      payButtonEnable: true,
+      recievedAmount: 0,
+      returnAmount: 0
     });
   }
 
@@ -1975,7 +1987,6 @@ class TextilePayment extends Component {
                 }}>
                   ₹ {(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()} </Text>
               </View>
-{/* 
               {
                 this.state.isCreditAmount && (
                   <>
@@ -2021,7 +2032,7 @@ class TextilePayment extends Component {
                       ₹ {parseFloat(this.state.balanceCreditAmount).toString()} </Text>
                   </View>
                 )
-              } */}
+              }
               {this.state.returnAmount >= 0 && (
                 <>
                   <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
