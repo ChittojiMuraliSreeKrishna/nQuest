@@ -802,20 +802,20 @@ class TextilePayment extends Component {
       };
       this.state.paymentType.push(obj);
     }
-    else if (this.state.isKhata === true) {
-      const obj = {
-        "paymentType": "PKTPENDING",
-        "paymentAmount": grandNetAmount
-      };
-      this.state.paymentType.push(obj);
-    }
-    else if(this.state.isCredit === true){
-      const obj = {
-        "paymentType": "PKTADVANCE",
-        "paymentAmount": this.state.creditAmount
-      }
-      this.state.paymentType.push(obj);
-    }
+    // else if (this.state.isKhata === true) {
+    //   const obj = {
+    //     "paymentType": "PKTPENDING",
+    //     "paymentAmount": grandNetAmount
+    //   };
+    //   this.state.paymentType.push(obj);
+    // }
+    // else if(this.state.isCredit === true){
+    //   const obj = {
+    //     "paymentType": "PKTADVANCE",
+    //     "paymentAmount": this.state.creditAmount
+    //   }
+    //   this.state.paymentType.push(obj);
+    // }
     if (this.state.giftCouponsList.length >= 1) {
       const obj = {
         "paymentType": "GIFTVOUCHER",
