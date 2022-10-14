@@ -70,6 +70,11 @@ class CustomerService {
     return BASE_URL + "/user-management/user/customer/mobileNo";
   }
 
+  getCreditNotes(mobileNumber, customerId) {
+    const param = '?mobileNumber=' + mobileNumber + '&customerId=' + customerId;
+    return axios.get(BASE_URL + "/hsn-details/accounting/getCreditNotes" + param);
+  }
+
   getCoupons() {
     return BASE_URL + "/new-sale/newsale/getGv";
   }

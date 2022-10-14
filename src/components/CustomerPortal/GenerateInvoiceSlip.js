@@ -192,7 +192,8 @@ class GenerateInvoiceSlip extends Component {
       compareList: [],
       dsCompareList: [],
       dsNumberList2: [],
-      totalQuantity: 0
+      totalQuantity: 0,
+      creditAmount: 0
     };
   }
 
@@ -702,6 +703,7 @@ class GenerateInvoiceSlip extends Component {
       customerPhoneNumber: this.state.customerMobilenumber,
       customerGSTNumber: this.state.customerGSTNumber, customerAddress: this.state.customerAddress,
       customerGender: this.state.customerGender,
+      creditAmount: this.state.creditAmount,
       totalQty: this.state.totalQty.toString(),
       onGoBack: () => this.invoiceUpdate(),
     };
@@ -771,6 +773,15 @@ class GenerateInvoiceSlip extends Component {
             isBillingDetails: true,
             customerMobilenumber: mobileData.phoneNumber,
             mobileNumber: ""
+          });
+
+          CustomerService.getCreditNotes(this.state.mobileNumber, res.data.result.userId).then(response => {
+            if (response) {
+              console.log("creditAmountcreditAmount", response.data.result[0]);
+              if (response.data.result && response.data.result.length > 0) {
+                this.setState({ creditAmount: response.data.result[0].amount });
+              }
+            }
           });
 
         }

@@ -20,7 +20,7 @@ import { color } from '../Styles/colorStyles';
 var deviceWidth = Dimensions.get('window').width;
 var deviceWidth = Dimensions.get('window').width;
 var deviceheight = Dimensions.get('window').height;
-const data = [{ key: 1 }, { key: 2 }, { key: 3 }, { key: 4 }, { key: 5 }];
+const data = [{ key: 1 }, { key: 2 }, { key: 3 }, { key: 4 }, { key: 5 }, { key: 6 }];
 
 class TextilePayment extends Component {
   constructor(props) {
@@ -100,7 +100,11 @@ class TextilePayment extends Component {
       payButtonEnable: false,
       compareRTList: [],
       rtListList: [],
-      listOfRtnum: []
+      listOfRtnum: [],
+      creditModel: false,
+      creditModelVisible: false,
+      creditAmount: 0,
+      payCreditAmount: 0
     };
   }
 
@@ -162,6 +166,7 @@ class TextilePayment extends Component {
       CGST: this.props.route.params.CGST,
       SGST: this.props.route.params.SGST,
       discountAmount: this.props.route.params.discountAmount,
+      creditAmount: this.props.route.params.creditAmount
     });
     this.setState({ isTagCustomer: this.props.route.params.customerPhoneNumber.length >= 10 ? true : false });
   }
@@ -328,6 +333,46 @@ class TextilePayment extends Component {
     this.setState({ upiModelVisible: false });
   }
 
+  confirmCreditModel() {
+    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
+    if (this.state.creditAmount < grandNetAmount) {
+      const amount = grandNetAmount - this.state.creditAmount;
+      this.setState({ isPayment: true, isreturnCreditCash: true, balanceCreditAmount: amount, grandNetAmount: amount }, () => {
+        const obj = {
+
+          "paymentType": "PKTADVANCE",
+          "paymentAmount": this.state.creditAmount
+        }
+
+        this.state.paymentType.push(obj);
+        if (this.state.isRTApplied) {
+          this.setState({ payingAmount: this.state.creditAmount + this.state.rtAmount })
+        }
+      })
+    } else {
+      this.setState({ isPayment: false })
+      const obj = {
+        "paymentType": "PKTADVANCE",
+        "paymentAmount": grandNetAmount
+      }
+      this.state.paymentType.push(obj);
+    }
+    this.setState({ cashAmount: this.state.grandNetAmount, payingAmount: grandNetAmount })
+    const grandAmount = grandNetAmount >= this.state.payCreditAmount ? grandNetAmount - this.state.payCreditAmount : 0
+    this.setState({ isCreditAmount: true, grandNetAmount: grandAmount });
+    if (this.state.isRTApplied) {
+      this.setState({ payingAmount: this.state.grandNetAmount + this.state.rtAmount })
+    }
+
+    this.cancelCreditModel();
+    this.pay()
+
+  }
+
+  cancelCreditModel() {
+    this.setState({ creditModelVisible: false });
+  }
+
   handleBackButtonClick() {
     this.props.navigation.goBack(null);
     return true;
@@ -453,6 +498,22 @@ class TextilePayment extends Component {
       isUpi: false,
       isGv: false,
       isKhata: true,
+      payButtonEnable: true
+    });
+  }
+
+  creditAction() {
+    this.setState({
+      creditModel: true,
+      payCreditAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString(),
+      creditModelVisible: true,
+      isCash: false,
+      isCard: false,
+      isCardOrCash: false,
+      isUpi: false,
+      isGv: false,
+      isKhata: false,
+      isCredit: true,
       payButtonEnable: true
     });
   }
@@ -655,7 +716,7 @@ class TextilePayment extends Component {
           };
           this.state.paymentType.push(obj);
         }
-        if (this.state.isCreditModel) {
+        if (this.state.isCredit) {
           const obj = {
             "paymentAmountType": [
               {
@@ -748,6 +809,13 @@ class TextilePayment extends Component {
       };
       this.state.paymentType.push(obj);
     }
+    else if(this.state.isCredit === true){
+      const obj = {
+        "paymentType": "PKTADVANCE",
+        "paymentAmount": this.state.creditAmount
+      }
+      this.state.paymentType.push(obj);
+    }
     if (this.state.giftCouponsList.length >= 1) {
       const obj = {
         "paymentType": "GIFTVOUCHER",
@@ -798,6 +866,10 @@ class TextilePayment extends Component {
         alert("Order created " + res.data["result"]);
         this.clearStateFields()
         if (this.state.isKhata === true) {
+          this.props.route.params.onGoBack();
+          this.props.navigation.goBack();
+        }
+        if (this.state.isCredit === true) {
           this.props.route.params.onGoBack();
           this.props.navigation.goBack();
         }
@@ -1040,12 +1112,12 @@ class TextilePayment extends Component {
   async applyRt() {
     const obj = this.state.rtNumber
     if (this.state.compareRTList.length === 0) {
-      console.log("in if",this.state.compareRTList,this.state.listOfRtnum);
+      console.log("in if", this.state.compareRTList, this.state.listOfRtnum);
       this.setState({
         compareRTList: [...this.state.listOfRtnum, obj],
       })
     } else {
-      console.log("in else",this.state.rtListList);
+      console.log("in else", this.state.rtListList);
       const isFound = this.state.rtListList.find(element => {
         if (element.returnReference === obj) {
           alert("RT Number Alredy Exist ");
@@ -1256,7 +1328,27 @@ class TextilePayment extends Component {
 
                   </View>;
                 }
-
+                if (item.key === 6 && this.state.isTagCustomer) {
+                  return <View style={{
+                    height: Device.isTablet ? 80 : 50,
+                    width: Device.isTablet ? 80 : 50,
+                    backgroundColor: "#ffffff",
+                    borderRadius: 25,
+                    marginLeft: 20,
+                    marginTop: 10,
+                  }}>
+                    <TouchableOpacity style={{
+                      marginLeft: 0, marginTop: 0,
+                    }} onPress={() => this.creditAction()}>
+                      <Image source={this.state.isCredit ? require('../assets/images/kathaselect.png') : require('../assets/images/kathaunselect.png')} style={{
+                        marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
+                      }} />
+                    </TouchableOpacity>
+                    <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: Device.isTablet ? 19 : 14, color: this.state.isKhata ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
+                      CREDIT
+                    </Text>
+                  </View>;
+                }
               }}
               ListFooterComponent={<View style={{ width: 15 }}></View>}
             />
@@ -1714,6 +1806,52 @@ class TextilePayment extends Component {
                   </View>
                 </Modal>
               </View>)}
+
+            {this.state.creditModel && (
+              <View>
+                <Modal isVisible={this.state.creditModelVisible} style={{ margin: 0 }}
+                  onBackButtonPress={() => this.cancelCreditModel()}
+                  onBackdropPress={() => this.cancelCreditModel()} >
+                  <View style={forms.filterModelContainer} >
+                    <Text style={forms.popUp_decorator}>-</Text>
+                    <View style={forms.filterModelSub}>
+                      <KeyboardAwareScrollView >
+                        <Text style={scss.textStyleMedium}>Credit Amount:</Text>
+                        <TextInput
+                          style={forms.input_fld}
+                          underlineColor="transparent"
+                          activeUnderlineColor='#000'
+                          editable={false} selectTextOnFocus={false}
+                          value={(parseFloat(this.state.creditAmount)).toString()}
+                        />
+                        <Text style={scss.textStyleMedium}>Cash :</Text>
+                        <TextInput
+                          style={forms.input_fld}
+                          underlineColor="transparent"
+                          activeUnderlineColor='#000'
+                          selectTextOnFocus={false}
+                          value={this.state.payCreditAmount}
+                          onChangeText={(value) =>
+                            this.setState({ payCreditAmount: value })
+                          }
+                        // value={}
+                        />
+                        <View style={forms.action_buttons_container}>
+                          <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                            onPress={() => this.confirmCreditModel()}>
+                            <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                            onPress={() => this.cancelCreditModel()}>
+                            <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </KeyboardAwareScrollView>
+                    </View>
+                  </View>
+                </Modal>
+              </View>)}
+
 
             {this.state.gvToCustomerModel && (
               <View>

@@ -149,10 +149,6 @@ class GiftVocher extends Component {
     this.setState({ filterEndDate: value });
   };
 
-  datepickerCancelClicked() {
-    this.setState({ date: new Date(), enddate: new Date(), datepickerOpen: false, datepickerendOpen: false, filterStartPickerOpen: false, filterEndPickerOpen: false });
-  }
-
   handleGvNumber(text) {
     this.setState({ gvNumber: text });
   }
