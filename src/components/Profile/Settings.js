@@ -187,7 +187,8 @@ export default class Settings extends Component {
             Logout
           </Button>
         </View>
-        <View>
+
+        {!this.state.isEdit && <View>
           <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
             <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
               <Image source={require("../assets/images/profile.png")} style={{ height: 70, width: 70 }} />
@@ -204,10 +205,10 @@ export default class Settings extends Component {
               })}</Text>
             </View>
           </View>
-          <Button onPress={() => this.editUser()}>
-            <Text>{this.state.isEdit ? "Close" : "Edit"}</Text>
-          </Button>
-        </View>
+        </View>}
+        <Button onPress={() => this.editUser()}>
+          <Text>{this.state.isEdit ? "Close" : "Edit"}</Text>
+        </Button>
         {this.state.isEdit && <View style={{ maxHeight: 600 }}>
           <ScrollView>
             <KeyboardAwareScrollView>

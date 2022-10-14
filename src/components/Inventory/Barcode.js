@@ -60,6 +60,7 @@ export default class Barcode extends Component {
       flagFilterOpen: false,
       loadPrevActive: false,
       loadNextActive: true,
+      isFetching: false
     };
   }
 
@@ -67,11 +68,14 @@ export default class Barcode extends Component {
     const storeId = await AsyncStorage.getItem("storeId");
     const newstoreId = await AsyncStorage.getItem("newstoreId");
     this.setState({ storeId: storeId });
-    this.getAllBarcodes(0);
     this.setState({ pageNo: 0 });
+    this.getAllBarcodes(0);
     window.setTimeout(() => {
       this.setState({ loading: false });
     }, 11000);
+    this.props.navigation.addListener('focus', () => {
+      this.getAllBarcodes();
+    });
   }
 
   // Filter Action
@@ -291,12 +295,15 @@ export default class Barcode extends Component {
         <View>
           <FlatList
             style={scss.flatListBody}
+            refreshing={this.state.isFetching}
+            onRefresh={() => this.refresh()}
             ListHeaderComponent={
               <View style={scss.headerContainer}>
                 <Text style={scss.flat_heading}>
                   Barcode Details -{" "}
                   <Text style={{ color: "#ED1C24" }}>{this.state.filterActive ? this.state.filterBarcodesList.length : this.state.barcodesList.length}</Text>
                 </Text>
+
                 <View style={scss.headerContainer}>
                   <IconMAA
                     size={30}

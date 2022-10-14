@@ -53,6 +53,7 @@ export default class Stores extends Component {
       flagFilterOpen: false,
       filterActive: false,
       pageNumber: 0,
+      isFetching: false,
     };
   }
 
@@ -60,6 +61,9 @@ export default class Stores extends Component {
     this.getStoresList();
     this.getMasterStatesList();
     this.getMasterDistrictsList();
+    this.props.navigation.addListener('focus', () => {
+      this.getStoresList();
+    });
   }
 
   // Edit Store Navigation
@@ -189,6 +193,11 @@ export default class Stores extends Component {
     this.setState({ storeName: value });
   };
 
+  refresh () {
+    this.setState({ pageNumber: 0 });
+    this.getStoresList();
+  }
+
   // Applying Filter
   applyStoreFilter () {
     const searchStore = {
@@ -278,6 +287,8 @@ export default class Stores extends Component {
           }
           scrollEnabled={true}
           keyExtractor={(item, i) => i.toString()}
+          refreshing={this.state.isFetching}
+          onRefresh={() => this.refresh()}
           style={scss.flatListBody}
           ListEmptyComponent={
             <Text

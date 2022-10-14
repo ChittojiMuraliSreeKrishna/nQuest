@@ -24,7 +24,8 @@ import Loader from "../../commonUtils/loader";
 import { RH, RW } from "../../Responsive";
 import AccountingService from "../services/AccountingService";
 import {
-  flatListHeaderContainer} from "../Styles/Styles";
+  flatListHeaderContainer
+} from "../Styles/Styles";
 
 var deviceWidth = Dimensions.get("window").width;
 
@@ -58,6 +59,7 @@ export default class CreditNotes extends Component {
       loading: false,
       filterActive: false,
       flagFilterOpen: false,
+      isFetching: false
     };
   }
 
@@ -193,7 +195,7 @@ export default class CreditNotes extends Component {
   handleEndDate = (value) => {
     this.setState({ endDate: value });
   };
-  
+
   handleViewCredit (item, index) {
     const reqOb = {
       fromDate: null,
@@ -303,6 +305,8 @@ export default class CreditNotes extends Component {
           style={scss.flatListBody}
           scrollEnabled={true}
           // ListEmptyComponent={<Text style={listEmptyMessage}>&#9888; Records Not Found</Text>}
+          refreshing={this.state.isFetching}
+          onRefresh={() => this.refresh()}
           renderItem={({ item, index }) => (
             <ScrollView>
               <View style={scss.flatListContainer}>
@@ -406,7 +410,7 @@ export default class CreditNotes extends Component {
                     )}
                     {this.state.datepickerendOpen && (
                       <View style={styles.dateTopView}>
-                         <DateSelector
+                        <DateSelector
                           dateCancel={this.datepickerEndCancelClicked}
                           setDate={this.handleEndDate}
                         />

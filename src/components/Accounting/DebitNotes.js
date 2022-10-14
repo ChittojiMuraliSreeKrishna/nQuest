@@ -47,11 +47,12 @@ export default class DebitNotes extends Component {
       loading: false,
       flagFilterOpen: false,
       modalVisible: true,
-      filterActive: false
+      filterActive: false,
+      isFetching: false
     };
   }
 
-  async componentDidMount() {
+  async componentDidMount () {
     const storeId = await AsyncStorage.getItem("storeId");
     const userId = await AsyncStorage.getItem('custom:userId');
     this.setState({ storeId: storeId, userId: userId });
@@ -59,11 +60,11 @@ export default class DebitNotes extends Component {
   }
 
 
-  datepickerClicked() {
+  datepickerClicked () {
     this.setState({ datepickerOpen: true });
   }
 
-  enddatepickerClicked() {
+  enddatepickerClicked () {
     this.setState({ datepickerendOpen: true });
   }
 
@@ -88,12 +89,12 @@ export default class DebitNotes extends Component {
   };
 
 
-  modelCancel() {
+  modelCancel () {
     this.setState({ flagFilterOpen: false, isShowAllTransactions: false });
   }
 
 
-  async getDebitNotes() {
+  async getDebitNotes () {
     this.setState({ lodaing: true });
     const accountType = 'DEBIT';
     const { storeId } = this.state;
@@ -117,7 +118,7 @@ export default class DebitNotes extends Component {
     });
   }
 
-  handleViewDebit(item, index) {
+  handleViewDebit (item, index) {
     const reqObj = {
       fromDate: null,
       toDate: null,
@@ -128,7 +129,7 @@ export default class DebitNotes extends Component {
     };
     AccountingService.getAllLedgerLogs(reqObj).then(res => {
       if (res) {
-       this.setState({
+        this.setState({
           isShowAllTransactions: true,
           modalVisible: true,
           transactionHistory: res.data.content
@@ -137,7 +138,7 @@ export default class DebitNotes extends Component {
     });
   }
 
-  applyDebitNotesFilter() {
+  applyDebitNotesFilter () {
     this.setState({ loading: true });
     const accountType = 'DEBIT';
     const { storeId, startDate, endDate, mobileNumber } = this.state;
@@ -157,36 +158,41 @@ export default class DebitNotes extends Component {
         this.setState({ filterDebitData: res.data.content, filterActive: true });
       }
       this.setState({ loading: false, modalVisible: false });
-      this.modelCancel()
+      this.modelCancel();
     }).catch(err => {
       console.log(err);
-      this.modelCancel()
+      this.modelCancel();
       this.setState({ loading: false, modalVisible: false, filterActive: false });
     });
   }
 
-  modalViewCancel() {
+  modalViewCancel () {
     this.setState({ isShowAllTransactions: false });
   }
 
-  handleAddDebit(item, index) {
+  handleAddDebit (item, index) {
     this.props.navigation.navigate('AddDebitNotes', {
       item: item,
       onGoBack: () => this.getDebitNotes()
     });
   }
 
-  filterAction() {
+  filterAction () {
     this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
-  clearFilterAction() {
+  clearFilterAction () {
     this.setState({ filterActive: false });
   }
 
+  refresh () {
+    this.setState({ debitNotes: [] }, () => {
+      this.getDebitNotes();
+    });
+  }
 
 
-  render() {
+  render () {
     return (
       <View style={{ backgroundColor: "#FFFFFF" }}>
         {this.state.loading &&
@@ -197,6 +203,8 @@ export default class DebitNotes extends Component {
           data={this.state.filterActive ? this.state.filterDebitData : this.state.debitNotes}
           style={{ marginTop: 10 }}
           scrollEnabled={true}
+          refreshing={this.state.isFetching}
+          onRefresh={() => this.refresh()}
           ListHeaderComponent={<View style={scss.headerContainer}>
             <Text style={scss.flat_heading}>List Of Debit Notes - <Text style={{ color: '#ED1C24' }}>{this.state.filterActive ? this.state.filterDebitNotes.length : this.state.debitNotes.length}</Text> </Text>
             <View style={scss.headerContainer}>
@@ -241,7 +249,7 @@ export default class DebitNotes extends Component {
                     <Text style={scss.footerText}>
                       Date:{" "}
                       {item.createdDate
-                        ? item.createdDate.toString().split(/T/)[0]
+                        ? item.createdDate.toString().split(/T/)[ 0 ]
                         : item.createdDate}
                     </Text>
                     <View style={scss.buttonContainer}>
@@ -255,7 +263,7 @@ export default class DebitNotes extends Component {
                       <IconIA
                         name='add-circle-outline'
                         size={25}
-                        style={[scss.action_icons, { marginLeft: 10 }]}
+                        style={[ scss.action_icons, { marginLeft: 10 } ]}
                         onPress={() => this.handleAddDebit(item, index)}
                       ></IconIA>
                     </View>
@@ -327,11 +335,11 @@ export default class DebitNotes extends Component {
                       onChangeText={this.handleMobile}
                     />
                     <View style={forms.action_buttons_container}>
-                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
                         onPress={() => this.applyDebitNotesFilter()}>
                         <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
                         onPress={() => this.modelCancel()}>
                         <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>
@@ -370,7 +378,7 @@ export default class DebitNotes extends Component {
                           <View style={scss.model_text_container}>
                             <Text style={scss.textStyleLight}>AMOUNT: {item.amount}</Text>
                             <Text style={scss.textStyleLight}>DATE: {item.createdDate
-                              ? item.createdDate.toString().split(/T/)[0]
+                              ? item.createdDate.toString().split(/T/)[ 0 ]
                               : item.createdDate}</Text>
                           </View>
                         </View>

@@ -54,6 +54,7 @@ export default class ProductCombo extends Component {
       filterPageNo: 0,
       loadPrevActive: false,
       loadNextActive: true,
+      isFetching: false
     };
   }
 
@@ -61,6 +62,9 @@ export default class ProductCombo extends Component {
     const storeId = await AsyncStorage.getItem("storeId");
     this.setState({ storeId: parseInt(storeId) });
     this.getAllProductsCombo();
+    this.props.navigation.addListener('focus', () => {
+      this.getAllProductsCombo();
+    });
   }
 
   // Refreshing the codes
@@ -278,6 +282,8 @@ export default class ProductCombo extends Component {
           data={
             this.state.filterActive ? this.state.filteredProductsList : this.state.productComboList
           }
+          refreshing={this.state.isFetching}
+          onRefresh={() => this.refresh()}
           scrollEnabled={true}
           keyExtractor={(item, i) => i.toString()}
           removeClippedSubviews={false}

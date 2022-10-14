@@ -51,18 +51,22 @@ export default class ReBarcode extends Component {
       totalPages: 0,
       loadPrevActive: false,
       loadNextActive: true,
+      isFetching: false
     };
   }
 
   async componentDidMount () {
     const storeId = await AsyncStorage.getItem("storeId");
-    console.log({storeId});
+    console.log({ storeId });
     this.setState({ storeId: storeId });
-    this.getAllReBarcodes();
+    this.getAllReBarcodes(0);
+    this.props.navigation.addListener('focus', () => {
+      this.getAllReBarcodes();
+    });
   }
 
   // Rebarcode Data
-  getAllReBarcodes () {
+  getAllReBarcodes (pageNumber) {
     const params = {
       fromDate: this.state.startDate,
       toDate: this.state.endDate,
@@ -119,7 +123,7 @@ export default class ReBarcode extends Component {
       currentBarcodeId: this.state.barCodeId,
       storeId: this.state.storeId,
     };
-    console.log({list});
+    console.log({ list });
     const request = "?page=" + parseInt(this.state.filterPageNo) + "&size=10";
     axios
       .post(InventoryService.getbarcodeTexttileAdjustments() + request, list)
@@ -199,13 +203,6 @@ export default class ReBarcode extends Component {
         console.log({ res });
         let viewData = res.data;
         if (res.status === 200) {
-          // this.props.navigation.navigate('ViewReBarcode', {
-          //   item: viewData, isEdit: true,
-          //   onGoBack: () => {
-          //     this.setState({ reBarcodesData: [] });
-          //     this.getAllReBarcodes();
-          //   }
-          // });
           this.state.viewBarcodeData.push(res.data);
           this.setState({ viewBarcodeData: this.state.viewBarcodeData, viewBarcode: true });
         }
@@ -266,6 +263,13 @@ export default class ReBarcode extends Component {
     });
   };
 
+  refresh () {
+    this.setState({ pageNo: 0 }, () => {
+      this.getAllReBarcodes();
+    });
+  }
+
+
   render () {
     return (
       <View>
@@ -304,6 +308,8 @@ export default class ReBarcode extends Component {
               : this.state.reBarcodesData
           }
           scrollEnabled={true}
+          refreshing={this.state.isFetching}
+          onRefresh={() => this.refresh()}
           ListEmptyComponent={
             <Text style={listEmptyMessage}>&#9888; Records Not Found</Text>
           }
