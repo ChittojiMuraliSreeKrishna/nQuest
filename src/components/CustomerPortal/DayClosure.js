@@ -24,7 +24,8 @@ export default class DayClosure extends Component {
       storeId: "",
       dayClosureList: [],
       enableButton: false,
-      loading: false
+      loading: false,
+      isFetching: false
     };
   }
 
@@ -32,6 +33,12 @@ export default class DayClosure extends Component {
     const storeId = await AsyncStorage.getItem("storeId");
     this.setState({ storeId: storeId });
     this.getAllDayCloser();
+  }
+
+  refresh () {
+    this.setState({ dayClosureList: [] }, () => {
+      this.getAllDayCloser();
+    });
   }
 
   getAllDayCloser() {
@@ -94,6 +101,8 @@ export default class DayClosure extends Component {
             </View>}
             data={this.state.dayClosureList}
             scrollEnabled={true}
+            refreshing={this.state.isFetching}
+            onRefresh={() => this.refresh()}
             removeClippedSubviews={false}
             ListEmptyComponent={<Text style={styles.emptyText}>No Pending Delivery Slips</Text>}
             renderItem={({ item, index }) => (
