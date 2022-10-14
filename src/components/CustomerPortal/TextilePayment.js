@@ -104,7 +104,11 @@ class TextilePayment extends Component {
       creditModel: false,
       creditModelVisible: false,
       creditAmount: 0,
-      payCreditAmount: 0
+      payCreditAmount: 0,
+      isCredit: false,
+      isCreditAmount: false,
+      balanceCreditAmount: "",
+      isreturnCreditCash: false
     };
   }
 
@@ -339,11 +343,9 @@ class TextilePayment extends Component {
       const amount = grandNetAmount - this.state.creditAmount;
       this.setState({ isPayment: true, isreturnCreditCash: true, balanceCreditAmount: amount, grandNetAmount: amount }, () => {
         const obj = {
-
           "paymentType": "PKTADVANCE",
           "paymentAmount": this.state.creditAmount
         }
-
         this.state.paymentType.push(obj);
         if (this.state.isRTApplied) {
           this.setState({ payingAmount: this.state.creditAmount + this.state.rtAmount })
@@ -357,16 +359,14 @@ class TextilePayment extends Component {
       }
       this.state.paymentType.push(obj);
     }
-    this.setState({ cashAmount: this.state.grandNetAmount, payingAmount: grandNetAmount })
+    this.setState({ recievedAmount: grandNetAmount, payingAmount: grandNetAmount })
     const grandAmount = grandNetAmount >= this.state.payCreditAmount ? grandNetAmount - this.state.payCreditAmount : 0
     this.setState({ isCreditAmount: true, grandNetAmount: grandAmount });
     if (this.state.isRTApplied) {
-      this.setState({ payingAmount: this.state.grandNetAmount + this.state.rtAmount })
+      this.setState({ payingAmount: grandNetAmount + this.state.rtAmount })
     }
-
     this.cancelCreditModel();
     this.pay()
-
   }
 
   cancelCreditModel() {
@@ -387,7 +387,8 @@ class TextilePayment extends Component {
       isUpi: false,
       isGv: false,
       isKhata: false,
-      payButtonEnable: true
+      payButtonEnable: true,
+      isCredit: false
     });
   }
 
@@ -399,7 +400,8 @@ class TextilePayment extends Component {
       isUpi: false,
       isGv: false,
       isKhata: false,
-      payButtonEnable: true
+      payButtonEnable: true,
+      isCredit: false
     });
   }
   handleredeemPoints = (text) => {
@@ -456,7 +458,8 @@ class TextilePayment extends Component {
       isUpi: false,
       isGv: false,
       isKhata: false,
-      payButtonEnable: true
+      payButtonEnable: true,
+      isCredit: false
     });
   }
 
@@ -470,7 +473,8 @@ class TextilePayment extends Component {
       isUpi: true,
       isGv: false,
       isKhata: false,
-      payButtonEnable: true
+      payButtonEnable: true,
+      isCredit: false
     });
   }
 
@@ -484,7 +488,8 @@ class TextilePayment extends Component {
       isUpi: false,
       isGv: true,
       isKhata: false,
-      payButtonEnable: true
+      payButtonEnable: true,
+      isCredit: false
     });
   }
 
@@ -498,7 +503,8 @@ class TextilePayment extends Component {
       isUpi: false,
       isGv: false,
       isKhata: true,
-      payButtonEnable: true
+      payButtonEnable: true,
+      isCredit: false
     });
   }
 
@@ -663,7 +669,6 @@ class TextilePayment extends Component {
       payCreditAmount: 0,
       totalAmount: 0,
       couponAmount: 0,
-      isCredit: false,
       isTagCustomer: false,
       rtAmount: 0,
       enablePayment: false,
@@ -1344,7 +1349,7 @@ class TextilePayment extends Component {
                         marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
                       }} />
                     </TouchableOpacity>
-                    <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: Device.isTablet ? 19 : 14, color: this.state.isKhata ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
+                    <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: Device.isTablet ? 19 : 14, color: this.state.isCredit ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
                       CREDIT
                     </Text>
                   </View>;
@@ -1970,31 +1975,80 @@ class TextilePayment extends Component {
                 }}>
                   ₹ {(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()} </Text>
               </View>
+{/* 
+              {
+                this.state.isCreditAmount && (
+                  <>
+                    <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
+                      <Text style={{
+                        color: "#353C40", fontFamily: "bold", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                        fontSize: 16,
+                      }}>
+                        Credit Amount </Text>
+                      <Text style={{
+                        color: "#353C40", fontFamily: "bold", alignItems: 'center', fontSize: 20, justifyContent: 'center', textAlign: 'center',
+                        fontSize: 16,
+                      }}>
+                        ₹ {this.state.creditAmount}</Text>
+                    </View>
+                    <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
+                      <Text style={{
+                        color: "#353C40", fontFamily: "bold", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                        fontSize: 16,
+                      }}>
+                        Payed Amount </Text>
+                      <Text style={{
+                        color: "#353C40", fontFamily: "bold", alignItems: 'center', fontSize: 20, justifyContent: 'center', textAlign: 'center',
+                        fontSize: 16,
+                      }}>
+                        ₹ {this.state.payCreditAmount} </Text>
+                    </View>
+                  </>
+                )
+              }
 
-              <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
-                <Text style={{
-                  color: "#353C40", fontFamily: "bold", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                  fontSize: 16,
-                }}>Collected Amount </Text>
-                <Text style={{
-                  color: "#353C40", fontFamily: "bold", alignItems: 'center', fontSize: 20, justifyContent: 'center', textAlign: 'center',
-                  fontSize: 16,
-                }}>
-                  ₹ {parseFloat(this.state.recievedAmount).toString()} </Text>
-              </View>
+              {
+                this.state.isreturnCreditCash && (
+                  <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
+                    <Text style={{
+                      color: "#353C40", fontFamily: "bold", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                      fontSize: 16,
+                    }}>Balance Amount </Text>
+                    <Text style={{
+                      color: "#353C40", fontFamily: "bold", alignItems: 'center', fontSize: 20, justifyContent: 'center', textAlign: 'center',
+                      fontSize: 16,
+                    }}>
+                      ₹ {parseFloat(this.state.balanceCreditAmount).toString()} </Text>
+                  </View>
+                )
+              } */}
+              {this.state.returnAmount >= 0 && (
+                <>
+                  <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
+                    <Text style={{
+                      color: "#353C40", fontFamily: "bold", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                      fontSize: 16,
+                    }}>Collected Amount </Text>
+                    <Text style={{
+                      color: "#353C40", fontFamily: "bold", alignItems: 'center', fontSize: 20, justifyContent: 'center', textAlign: 'center',
+                      fontSize: 16,
+                    }}>
+                      ₹ {parseFloat(this.state.recievedAmount).toString()} </Text>
+                  </View>
 
-              <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
-                <Text style={{
-                  color: "#FFAF4C", fontFamily: "bold", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                  fontSize: 16,
-                }}>
-                  Return Amount </Text>
-                <Text style={{
-                  color: "#FFAF4C", fontFamily: "bold", alignItems: 'center', fontSize: 20, justifyContent: 'center', textAlign: 'center',
-                  fontSize: 16,
-                }}>
-                  ₹ {parseFloat(this.state.returnAmount).toString()} </Text>
-              </View>
+                  <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
+                    <Text style={{
+                      color: "#FFAF4C", fontFamily: "bold", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                      fontSize: 16,
+                    }}>
+                      Return Amount </Text>
+                    <Text style={{
+                      color: "#FFAF4C", fontFamily: "bold", alignItems: 'center', fontSize: 20, justifyContent: 'center', textAlign: 'center',
+                      fontSize: 16,
+                    }}>
+                      ₹ {parseFloat(this.state.returnAmount).toString()} </Text>
+                  </View>
+                </>)}
               {
                 this.state.couponAmount > 0 && (
                   <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
