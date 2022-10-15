@@ -2,7 +2,6 @@ import { createStackNavigator } from "@react-navigation/stack";
 import React, { Component } from "react";
 import Blank from "../components/Home/Blank";
 import Home from "../components/Home/Home";
-import Settings from "../components/Profile/Settings";
 import AccountingNaviagtion from "./AccountingNavigation";
 import CustomerNavigation from "./CustomerNavigation";
 import InventoryNavigation from "./InventoryNavigation";
@@ -70,11 +69,6 @@ export default class TopBarNavigation extends Component {
             name="TicketingNavigation"
             options={{ headerShown: false }}
             component={TicketingNavigation}
-          />
-          <Stack.Screen
-            name="Settings"
-            options={{ headerShown: false }}
-            component={Settings}
           />
         </Stack.Navigator>
       </>

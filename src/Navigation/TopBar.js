@@ -40,7 +40,7 @@ const GetImageBasedOnPrevilageName = (name) => {
     require("../commonUtils/assets/Images/billing_portal_header_icon.png")
   ) : name === "Inventory Portal" ? (
     require("../commonUtils/assets/Images/inventory_dropdown_icon.png")
-  ) : name === "Promotions & Loyalty" ? (
+  ) : name === "Promotions" ? (
     require("../commonUtils/assets/Images/promotions_dropdown_icon.png")
   ) : name === "Accounting Portal" ? (
     require("../commonUtils/assets/Images/accounting_dropdown_icon.png")
@@ -147,7 +147,7 @@ export class TopBar extends Component {
         global.previlage1 = "Dashboard";
         global.previlage2 = "Billing Portal";
         global.previlage3 = "Inventory Portal";
-        global.previlage4 = "Promotions & Loyalty";
+        global.previlage4 = "Promotions";
         global.previlage5 = "Accounting Portal";
         global.previlage6 = "Reports";
         global.previlage7 = "URM Portal";
@@ -158,16 +158,21 @@ export class TopBar extends Component {
             UrmService.getPrivillagesByRoleName(value).then((res) => {
               console.log({ res });
               if (res.data) {
-                let len = res.data.parentPrivileges.length;
+                let finalResult = this.groupByPrivileges(res.data.parentPrivileges);
+                console.log({ finalResult }, finalResult.mobile.length);
+                let mobilePriv = finalResult.web;
+                console.log({ mobilePriv });
+                let len = finalResult.web.length;
                 if (len > 0) {
                   this.setState({
-                    firstDisplayName: res.data.parentPrivileges[ 0 ].name,
+                    firstDisplayName: finalResult.web[ 0 ].name,
                   });
                   const firstDisplayName = this.state.firstDisplayName;
-                  firstDisplayRoute = res.data.parentPrivileges[ 0 ].name;
+                  console.log({ firstDisplayName });
+                  firstDisplayRoute = finalResult.web[ 0 ].name;
                   var privilegesSet = new Set();
                   for (let i = 0; i < len; i++) {
-                    let previlage = res.data.parentPrivileges[ i ];
+                    let previlage = finalResult.web[ i ];
                     if (previlage.name === "Dashboard") {
                       global.previlage1 = "Dashboard";
                     }
@@ -195,9 +200,12 @@ export class TopBar extends Component {
                     privilegesSet.add(previlage.name);
                   }
                   data = Array.from(privilegesSet);
+                  console.log({ data }, "Privfinl");
+                  this.getData();
+                } else {
+                  alert("Privileges Not Found");
+                  this.props.navigation.push("Login");
                 }
-
-                this.getData();
               }
             });
           })
@@ -207,6 +215,19 @@ export class TopBar extends Component {
       }
     });
   }
+
+  groupByPrivileges = (array) => {
+    console.log({ array });
+    let initialValue = {
+      mobile: [],
+      web: []
+    };
+    return array.reduce((accumulator, current) => {
+      (current.previlegeType === 'Mobile') ? accumulator.mobile.push(current) : accumulator.web.push(current);
+      return accumulator;
+    }, initialValue);
+  };
+
   async getData () {
     const { firstDisplayName, firstDisplayNameScreen } = this.state;
     console.log("data in get data", firstDisplayName, currentSelection);
@@ -238,9 +259,10 @@ export class TopBar extends Component {
           console.log(res.data, "TopPrev");
           if (res) {
             if (res.data) {
-              let len = res.data.parentPrivileges.length;
+              let finalSubResult = this.groupBySubPrivileges(res.data.parentPrivileges);
+              let len = finalSubResult.web.length;
               for (let i = 0; i < len; i++) {
-                let privilege = res.data.parentPrivileges[ i ];
+                let privilege = finalSubResult.web[ i ];
                 if (privilege.name === String(privilegeName)) {
                   let privilegeId = privilege.id;
                   let sublen = privilege.subPrivileges.length;
@@ -279,6 +301,17 @@ export class TopBar extends Component {
         });
       });
     });
+  }
+
+  groupBySubPrivileges (array) {
+    let initialValue = {
+      mobile: [],
+      web: []
+    };
+    return array.reduce((accumulator, current) => {
+      (current.previlegeType === 'Mobile') ? accumulator.mobile.push(current) : accumulator.web.push(current);
+      return accumulator;
+    }, initialValue);
   }
 
   async componentWillUnmount () {

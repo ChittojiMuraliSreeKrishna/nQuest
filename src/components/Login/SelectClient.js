@@ -24,7 +24,7 @@ export class SelectClient extends Component {
     console.log({ userId });
     this.getAllClients(userId);
     let clientId = await AsyncStorage.getItem("custom:clientId1");
-    this.setState({ clientId: clientId,  });
+    this.setState({ clientId: clientId, });
   }
 
   getAllClients (userId) {
@@ -33,6 +33,7 @@ export class SelectClient extends Component {
       let clientsRes = [];
       if (response) {
         console.log("clients", response.result);
+        AsyncStorage.setItem("custom:clientId1", String(response.result[ 0 ].id));
         for (let i = 0; i < response.result.length; i++) {
           clientsRes.push({
             id: response.result[ i ].id,

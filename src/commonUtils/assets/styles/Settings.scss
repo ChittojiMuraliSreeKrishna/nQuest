@@ -43,3 +43,45 @@
   width: 90%;
   margin: 1% 5%;
 }
+
+.profileImgView {
+height: 70px;
+width: 70px;
+border-radius: 50px;
+border-width: 5px;
+}
+
+.profileImg {
+height: 70px;
+width: 70px;
+}
+
+.profileView {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+.profileSubView {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.normalText{
+  color: $grey-dark;
+  font-size: 16px;
+}
+
+.boldText{
+  color: $black;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.highText {
+  color: $primary-color;
+  font-size: 16px;
+  font-weight: bold;
+}

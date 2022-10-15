@@ -5,7 +5,7 @@ import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View
 import DatePicker from "react-native-date-picker";
 import Device from "react-native-device-detection";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { Button, TextInput } from 'react-native-paper';
+import { Appbar, Button, TextInput } from 'react-native-paper';
 import RNPickerSelect from "react-native-picker-select";
 import { Chevron } from "react-native-shapes";
 import scss from '../../commonUtils/assets/styles/Settings.scss';
@@ -177,32 +177,39 @@ export default class Settings extends Component {
     this.setState({ isEdit: !this.state.isEdit });
   }
 
+  handleBackAction () {
+    this.props.navigation.goback();
+  }
+
   render () {
     const { mobileNumberValid, emailValid, errors } = this.state;
     return (
       <View style={scss.container}>
-        <View style={scss.header}>
-          <Text style={scss.header_text}>Profile</Text>
+        <Appbar>
+          <Appbar.BackAction onPress={() => this.handleBackAction()} />
+          <Appbar.Content title="Profile" />
           <Button icon="logout" mode='text' onPress={() => logOut(this.props)}>
             Logout
           </Button>
-        </View>
+        </Appbar>
 
         {!this.state.isEdit && <View>
-          <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
-            <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-              <Image source={require("../assets/images/profile.png")} style={{ height: 70, width: 70 }} />
+          <View style={scss.profileView}>
+            <View style={scss.profileImgView}>
+              <Image source={require("../assets/images/profile.png")} style={scss.profileImg} />
             </View>
-            <Text>UserName: {this.state.userName}</Text>
-            <Text>RoleName: {this.state.roleName}</Text>
             <View>
-              <Text>Mobile-No: {this.state.mobileNumber}</Text>
-              <Text>Email-Id: {this.state.emailId}</Text>
-              <Text>Stores: {this.state.stores.map((item, index) => {
-                return (
-                  <Text>{item.name}</Text>
-                );
-              })}</Text>
+              <Text style={scss.normalText}>UserName: <Text style={scss.highText}>{this.state.userName}</Text></Text>
+              <Text style={scss.normalText}>RoleName: <Text style={scss.boldText}>{this.state.roleName}</Text></Text>
+              <View style={scss.profileSubView}>
+                <Text style={scss.normalText}>Mobile-No: <Text style={scss.boldText}>{this.state.mobileNumber}</Text> </Text>
+                <Text style={scss.normalText}>Email-Id: <Text style={scss.boldText}>{this.state.emailId}</Text></Text>
+                <Text style={scss.normalText}>Stores: {this.state.stores.map((item, index) => {
+                  return (
+                    <Text style={scss.boldText}>{item.name}</Text>
+                  );
+                })}</Text>
+              </View>
             </View>
           </View>
         </View>}

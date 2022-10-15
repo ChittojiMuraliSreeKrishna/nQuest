@@ -5,6 +5,7 @@ import Login from "../components/Login/Login";
 import SelectClient from "../components/Login/SelectClient";
 import SelectStore from "../components/Login/SelectStore";
 import UpdateNewpassword from "../components/Login/UpdateNewpassword";
+import Settings from "../components/Profile/Settings";
 import ManagePassword from "../components/URM/ManagePassword";
 import RegisterClient from "../components/URM/RegisterClient";
 import LoginAfterLanguageSelect from "../components/Welcome/LoginAfterLanguageSelect";
@@ -65,6 +66,11 @@ export default class HomeNavigation extends React.Component {
           component={ManagePassword}
         />
         <Stack.Screen name="SelectClient" options={{ headerShown: false }} component={SelectClient} />
+        <Stack.Screen
+          name="Settings"
+          options={{ headerShown: false }}
+          component={Settings}
+        />
       </Stack.Navigator>
     );
   }

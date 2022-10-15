@@ -1,6 +1,7 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import React, { Component } from "react";
 import AddStore from "../components/Accounting/AddStore";
+import Stores from '../components/Accounting/Stores';
 import Blank from '../components/Home/Blank';
 import AddUser from "../components/URM/AddUser";
 import CreateRole from "../components/URM/CreateRole";
@@ -25,6 +26,11 @@ export default class UrmNavigation extends Component {
             name="Users"
             options={{ headerShown: false }}
             component={Users}
+          />
+          <Stack.Screen
+            name="Stores"
+            options={{ headerShown: false }}
+            component={Stores}
           />
           <Stack.Screen
             name="Roles"
