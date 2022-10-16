@@ -1,0 +1,43 @@
+@import "./Colors.scss";
+.handle_btns {
+  height: 40px;
+  width: 100%;
+  background-color: $grey-light;
+  margin: 10px 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+}
+
+.handle_btns_text {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: justify;
+}
+
+.section_headers{
+  padding: 2px 10px;
+  font-size: 16px;
+  color: $primary-color;
+  font-weight: bold;
+  background-color: $grey-light;
+  border-width: 1px;
+  border-color: $grey;
+}
+
+.item {
+  padding: 15px;
+  font-size: 14px;
+  height: 40px;
+  background-color: $white;
+  color: $grey-darker;
+}
+.sub_item {
+  padding: 15px;
+  font-size: 14px;
+  height: 40px;
+  background-color: $grey-dark;
+  color: $white;
+}

@@ -178,7 +178,8 @@ export default class Settings extends Component {
   }
 
   handleBackAction () {
-    this.props.navigation.goback();
+    this.props.navigation.navigate("TopBarNavigation");
+    return true;
   }
 
   render () {
@@ -199,12 +200,12 @@ export default class Settings extends Component {
               <Image source={require("../assets/images/profile.png")} style={scss.profileImg} />
             </View>
             <View>
-              <Text style={scss.normalText}>UserName: <Text style={scss.highText}>{this.state.userName}</Text></Text>
-              <Text style={scss.normalText}>RoleName: <Text style={scss.boldText}>{this.state.roleName}</Text></Text>
+              <Text style={scss.normalText}><Text style={scss.highText}>{this.state.userName}</Text></Text>
+              <Text style={scss.normalText}>RoleName:{"\n"} <Text style={scss.boldText}>{this.state.roleName}</Text></Text>
               <View style={scss.profileSubView}>
-                <Text style={scss.normalText}>Mobile-No: <Text style={scss.boldText}>{this.state.mobileNumber}</Text> </Text>
-                <Text style={scss.normalText}>Email-Id: <Text style={scss.boldText}>{this.state.emailId}</Text></Text>
-                <Text style={scss.normalText}>Stores: {this.state.stores.map((item, index) => {
+                <Text style={scss.normalText}>Mobile-No:{"\n"} <Text style={scss.boldText}><Text style={{ color: '#ED1c24' }}>+91</Text> {this.state.mobileNumber.split("+91")}</Text> </Text>
+                <Text style={scss.normalText}>Email-Id:{"\n"} <Text style={scss.boldText}>{this.state.emailId}</Text></Text>
+                <Text style={scss.normalText}>Stores:{"\n"} {this.state.stores.map((item, index) => {
                   return (
                     <Text style={scss.boldText}>{item.name}</Text>
                   );
@@ -214,7 +215,7 @@ export default class Settings extends Component {
           </View>
         </View>}
         <Button onPress={() => this.editUser()}>
-          <Text>{this.state.isEdit ? "Close" : "Edit"}</Text>
+          <Text style={scss.highText}>{this.state.isEdit ? "Close" : "Edit"}</Text>
         </Button>
         {this.state.isEdit && <View style={{ maxHeight: 600 }}>
           <ScrollView>

@@ -45,10 +45,16 @@
 }
 
 .profileImgView {
-height: 70px;
-width: 70px;
+height: 90px;
+width: 90px;
 border-radius: 50px;
-border-width: 5px;
+border-color: $grey;
+border-width: 2px;
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+margin-left: 5px;
 }
 
 .profileImg {
@@ -61,6 +67,7 @@ width: 70px;
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
+  margin-left: 5px;
 }
 .profileSubView {
   display: flex;
@@ -77,11 +84,10 @@ width: 70px;
 .boldText{
   color: $black;
   font-size: 16px;
-  font-weight: bold;
 }
 
 .highText {
   color: $primary-color;
-  font-size: 16px;
+  font-size: 20px;
   font-weight: bold;
 }

@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import I18n from 'react-native-i18n';
 import { Appbar } from 'react-native-paper';
 import IconFa from 'react-native-vector-icons/FontAwesome';
+import scss from '../../commonUtils/assets/styles/Privileges.scss';
 import Loader from '../../commonUtils/loader';
 import UrmService from '../services/UrmService';
 var deviceWidth = Dimensions.get('window').width;
@@ -18,8 +19,8 @@ export default class Privilages extends Component {
       domain: "",
       parentlist: [],
       child: [],
-      subList: [],
-      childList: [],
+      subMobileList: [],
+      subWebList: [],
       isselected: [],
       isAllChecked: false,
       selectedItem: null,
@@ -31,6 +32,7 @@ export default class Privilages extends Component {
     };
   }
 
+  // Handle Go Back
   handleBackButtonClick () {
     this.props.navigation.goBack(null);
     return true;
@@ -47,9 +49,9 @@ export default class Privilages extends Component {
     this.getWebPrivileges();
   }
 
-
+  // Mobile Privileges Functions
   getMobilePrivileges () {
-    global.privilages = [];
+    global.mobilePrivilages = [];
     this.setState({ loading: true });
     UrmService.getAllPrivillages().then((res) => {
       if (res) {
@@ -93,7 +95,7 @@ export default class Privilages extends Component {
                           if (subPrivilege.name === this.state.child[ m ].name) {
                             if (namesArray.includes(subPrivilege.name)) { }
                             else {
-                              this.state.subList.push({ title: subPrivilege.name, description: subPrivilege.description, parent: privilege.name, id: privilege.id, subPrivileges: subPrivilege });
+                              this.state.subMobileList.push({ title: subPrivilege.name, description: subPrivilege.description, parent: privilege.name, id: privilege.id, subPrivileges: subPrivilege });
                               subprivilagesArray.push({ name: subPrivilege.name, selectedindex: 1, description: subPrivilege.description, subPrivilege: subPrivilege });
                               namesArray.push(subPrivilege.name);
                               console.log({ namesArray });
@@ -123,7 +125,7 @@ export default class Privilages extends Component {
               this.setState({ mobilePrivileges: this.state.mobilePrivileges },
                 console.error(this.state.mobilePrivileges)
               );
-              this.setState({ subList: this.state.subList });
+              this.setState({ subMobileList: this.state.subMobileList });
             }
           }
         }
@@ -135,8 +137,26 @@ export default class Privilages extends Component {
     });
   }
 
+  selectedMobilePrivilage = (item, index, section) => {
+    if (item.selectedindex === 0) {
+      item.selectedindex = 1;
+    }
+    else {
+      item.selectedindex = 0;
+      const list = this.state.subMobileList;
+      list.splice(index, 1);
+      this.setState({ subMobileList: list, isAllChecked: false });
+    }
+    this.setState({ mobilePrivileges: this.state.mobilePrivileges });
+  };
+
+  handleViewMobile () {
+    this.setState({ viewMobile: !this.state.viewMobile });
+  }
+
+  // Web Privileges Functions
   getWebPrivileges () {
-    global.privilages = [];
+    global.webPrivilages = [];
     this.setState({ loading: true });
     UrmService.getAllPrivillages().then((res) => {
       if (res) {
@@ -180,7 +200,7 @@ export default class Privilages extends Component {
                           if (subPrivilege.name === this.state.child[ m ].name) {
                             if (namesArray.includes(subPrivilege.name)) { }
                             else {
-                              this.state.subList.push({ title: subPrivilege.name, description: subPrivilege.description, parent: privilege.name, id: privilege.id, subPrivileges: subPrivilege });
+                              this.state.subWebList.push({ title: subPrivilege.name, description: subPrivilege.description, parent: privilege.name, id: privilege.id, subPrivileges: subPrivilege });
                               subprivilagesArray.push({ name: subPrivilege.name, selectedindex: 1, description: subPrivilege.description, subPrivilege: subPrivilege });
                               namesArray.push(subPrivilege.name);
                               console.log({ namesArray });
@@ -210,7 +230,7 @@ export default class Privilages extends Component {
               this.setState({ webPrivileges: this.state.webPrivileges },
                 console.error(this.state.webPrivileges)
               );
-              this.setState({ subList: this.state.subList });
+              this.setState({ subWebList: this.state.subWebList });
             }
           }
         }
@@ -222,49 +242,25 @@ export default class Privilages extends Component {
     });
 
   }
-  saveRole () {
-    global.privilages = [];
-    this.state.subList = [];
-    let privileges = this.state.mobilePrivileges;
-    let len = privileges.length;
-    console.log({ privileges, len });
-    for (let i = 0; i < len; i++) {
-      let sublen = privileges[ i ].data.length;
-      console.log({ sublen });
-      for (let j = 0; j < sublen; j++) {
-        if (this.state.mobilePrivileges[ i ].data[ j ].selectedindex === 1) {
-          this.state.subList.push({
-            title: this.state.mobilePrivileges[ i ].data[ j ].name,
-            description: this.state.mobilePrivileges[ i ].data[ j ].description,
-            parent: this.state.mobilePrivileges[ i ].title,
-            id: this.state.mobilePrivileges[ i ].id,
-            subPrivillages: this.state.mobilePrivileges[ i ].data[ j ].subPrivilege
-          });
-          let subList = this.state.subList;
-          console.log({ subList });
-        }
-      }
 
-    }
-    this.setState({ subList: this.state.subList });
-    global.privilages = this.state.subList;
-    this.props.route.params.onGoBack();
-    this.props.navigation.goBack();
-  }
-
-  selectedPrivilage = (item, index, section) => {
+  selectedWebPrivilage = (item, index, section) => {
     if (item.selectedindex === 0) {
       item.selectedindex = 1;
     }
     else {
       item.selectedindex = 0;
-      const list = this.state.subList;
+      const list = this.state.subWebList;
       list.splice(index, 1);
-      this.setState({ subList: list, isAllChecked: false });
+      this.setState({ subWebList: list, isAllChecked: false });
     }
     this.setState({ mobilePrivileges: this.state.mobilePrivileges });
   };
 
+  handleViewWeb () {
+    this.setState({ viewWeb: !this.state.viewWeb });
+  }
+
+  // Select All Functions
   handleSelectAll () {
     this.setState({ isAllChecked: true }, () => {
       this.state.mobilePrivileges.map((item, index) => {
@@ -291,12 +287,56 @@ export default class Privilages extends Component {
     });
   }
 
-  handleViewWeb () {
-    this.setState({ viewWeb: !this.state.viewWeb });
+  // Save Role
+  saveRole () {
+    global.privilages = [];
+    this.state.subMobileList = [];
+    this.state.subWebList = [];
+    let mobilePrivileges = this.state.mobilePrivileges;
+    let mobileLen = mobilePrivileges.length;
+    console.log({ mobilePrivileges, len });
+    for (let i = 0; i < mobileLen; i++) {
+      let sublen = mobilePrivileges[ i ].data.length;
+      console.log({ sublen });
+      for (let j = 0; j < sublen; j++) {
+        if (this.state.mobilePrivileges[ i ].data[ j ].selectedindex === 1) {
+          this.state.subMobileList.push({
+            title: this.state.mobilePrivileges[ i ].data[ j ].name,
+            description: this.state.mobilePrivileges[ i ].data[ j ].description,
+            parent: this.state.mobilePrivileges[ i ].title,
+            id: this.state.mobilePrivileges[ i ].id,
+            subPrivillages: this.state.mobilePrivileges[ i ].data[ j ].subPrivilege
+          });
+          let subMobileList = this.state.subMobileList;
+          console.log({ subMobileList });
+        }
+      }
+    }
+    let webLen = this.state.webPrivileges.length;
+    for (let i = 0; i < webLen; i++) {
+      let sublen = webPrivileges[ i ].data.length;
+      console.log({ sublen });
+      for (let j = 0; j < sublen; j++) {
+        if (this.state.webPrivileges[ i ].data[ j ].selectedindex === 1) {
+          this.state.subWebList.push({
+            title: this.state.webPrivileges[ i ].data[ j ].name,
+            description: this.state.webPrivileges[ i ].data[ j ].description,
+            parent: this.state.webPrivileges[ i ].title,
+            id: this.state.webPrivileges[ i ].id,
+            subPrivillages: this.state.webPrivileges[ i ].data[ j ].subPrivilege
+          });
+          let subMobileList = this.state.subWebList;
+          console.log({ subWebList });
+        }
+      }
+    }
+    this.setState({ subWebList: this.state.subWebList });
+    global.mobilePrivilages = this.state.subMobileList;
+    global.webPrivilages = this.state.subWebList;
+    this.props.route.params.onGoBack();
+    this.props.navigation.goBack();
   }
-  handleViewMobile () {
-    this.setState({ viewMobile: !this.state.viewMobile });
-  }
+
 
 
   render () {
@@ -310,8 +350,8 @@ export default class Privilages extends Component {
           <Appbar.BackAction onPress={() => this.handleBackButtonClick()} />
           <Appbar.Content title={I18n.t("Privileges")} />
         </Appbar>
-        <TouchableOpacity style={styles.handleBtns} onPress={() => this.handleViewWeb()}>
-          <Text style={styles.handleBtnsText}>Web Privileges</Text>
+        <TouchableOpacity style={scss.handle_btns} onPress={() => this.handleViewWeb()}>
+          <Text style={scss.handle_btns_text}>Web Privileges</Text>
           <IconFa
             name={this.state.viewWeb ? 'minus-square-o' : 'plus-square-o'}
             size={25}
@@ -324,30 +364,35 @@ export default class Privilages extends Component {
             <View>
               {this.state.viewWeb && (
                 <View>
-                  <View style={styles.titleContainer}>
-                    <Text style={styles.titleText}>{item.title}</Text>
-                  </View>
+                  <Text style={scss.section_headers}>{item.title}</Text>
                   {item.data?.map((item, index) => {
                     return (
                       <View>
-                        <View style={styles.buttonContainer}>
-                          <View style={styles.button}>
-                            <View>
-                              <Text style={styles.btnText}>{item.name}</Text>
-                            </View>
+                        <TouchableOpacity onPress={() => this.selectedWebPrivilage(item, index)}>
+                          <View style={scss.item}>
+                            <Text>{item.name}</Text>
+                            {item.selectedindex === 1 && (
+                              <Image source={require('../assets/images/selected.png')} style={{ position: 'absolute', right: 20, top: 15 }} />
+                            )}
+                            {item.selectedindex === 0 && (
+                              <Image source={require('../assets/images/langunselect.png')} style={{ position: 'absolute', right: 20, top: 15 }} />
+                            )}
                           </View>
-                        </View>
-                        {item?.subPrivilege?.childPrivileges?.map((item, index) => {
-                          return (
-                            <View style={styles.buttonContainer}>
-                              <View style={styles.childButton}>
-                                <View>
-                                  <Text style={styles.childBtnText}>{item.name}</Text>
-                                </View>
+                        </TouchableOpacity>
+                        {item.selectedindex === 1 &&
+                          item?.subPrivilege?.childPrivileges?.map((item, index) => {
+                            return (
+                              <View style={scss.sub_item}>
+                                <Text>{item.name}</Text>
+                                {item.selectedindex === 1 && (
+                                  <Image source={require('../assets/images/selected.png')} style={{ position: 'absolute', right: 20, top: 15 }} />
+                                )}
+                                {item.selectedindex === 0 && (
+                                  <Image source={require('../assets/images/langunselect.png')} style={{ position: 'absolute', right: 20, top: 15 }} />
+                                )}
                               </View>
-                            </View>
-                          );
-                        })}
+                            );
+                          })}
                       </View>
                     );
                   })}
@@ -356,8 +401,8 @@ export default class Privilages extends Component {
             </View>
           )}
         />
-        <TouchableOpacity style={styles.handleBtns} onPress={() => this.handleViewMobile()}>
-          <Text style={styles.handleBtnsText}>Mobile Privileges</Text>
+        <TouchableOpacity style={scss.handle_btns} onPress={() => this.handleViewMobile()}>
+          <Text style={scss.handle_btns_text}>Mobile Privileges</Text>
           <IconFa
             name={this.state.viewMobile ? 'minus-square-o' : 'plus-square-o'}
             size={25}
@@ -370,30 +415,33 @@ export default class Privilages extends Component {
             <View>
               {this.state.viewMobile && (
                 <View>
-                  <View style={styles.titleContainer}>
-                    <Text style={styles.titleText}>{item.title}</Text>
-                  </View>
+                  <Text style={scss.section_headers}>{item.title}</Text>
                   {item.data?.map((item, index) => {
                     return (
                       <View>
-                        <View style={styles.buttonContainer}>
-                          <View style={styles.button}>
-                            <View>
-                              <Text style={styles.btnText}>{item.name}</Text>
-                            </View>
-                          </View>
-                        </View>
-                        {item?.subPrivilege?.childPrivileges?.map((item, index) => {
-                          return (
-                            <View style={styles.buttonContainer}>
-                              <View style={styles.childButton}>
-                                <View>
-                                  <Text style={styles.childBtnText}>{item.name}</Text>
-                                </View>
+                        <TouchableOpacity onPress={() => this.selectedMobilePrivilage(item, index)} style={scss.item}>
+                          <Text>{item.name}</Text>
+                          {item.selectedindex === 1 && (
+                            <Image source={require('../assets/images/selected.png')} style={{ position: 'absolute', right: 20, top: 15 }} />
+                          )}
+                          {item.selectedindex === 0 && (
+                            <Image source={require('../assets/images/langunselect.png')} style={{ position: 'absolute', right: 20, top: 15 }} />
+                          )}
+                        </TouchableOpacity>
+                        {item.selectedindex === 1 &&
+                          item?.subPrivilege?.childPrivileges?.map((item, index) => {
+                            return (
+                              <View style={scss.sub_item}>
+                                <Text>{item.name}</Text>
+                                {item.selectedindex === 1 && (
+                                  <Image source={require('../assets/images/selected.png')} style={{ position: 'absolute', right: 20, top: 15 }} />
+                                )}
+                                {item.selectedindex === 0 && (
+                                  <Image source={require('../assets/images/langunselect.png')} style={{ position: 'absolute', right: 20, top: 15 }} />
+                                )}
                               </View>
-                            </View>
-                          );
-                        })}
+                            );
+                          })}
                       </View>
                     );
                   })}
@@ -413,83 +461,4 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
   },
-  container: {
-    marginTop: deviceHeight / 4,
-    marginBottom: deviceHeight / 4
-  },
-  buttonContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingLeft: 30,
-    paddingRight: 40,
-  },
-  button: {
-    backgroundColor: '#ED1C24',
-    height: 30,
-    borderColor: '#000',
-    borderWidth: 1,
-    margin: 2,
-    width: '90%',
-    marginLeft: '5%',
-    marginRight: '5%',
-    borderRadius: 6,
-  },
-  childButton: {
-    backgroundColor: '#b9b9b9',
-    height: 30,
-    borderColor: '#000',
-    borderWidth: 1,
-    margin: 2,
-    width: '90%',
-    marginLeft: '5%',
-    marginRight: '5%',
-    borderRadius: 6,
-  },
-  btnText: {
-    textAlign: 'center',
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-    margin: 0,
-    padding: 0,
-  },
-  childBtnText: {
-    textAlign: 'center',
-    color: '#000',
-    fontSize: 16,
-    fontWeight: 'bold',
-    margin: 0,
-    padding: 0,
-  },
-  titleContainer: {
-    backgroundColor: '#ddd',
-    height: 40,
-    width: '100%'
-  },
-  titleText: {
-    color: '#000',
-    fontSize: 21,
-    fontWeight: 'bold',
-    textAlign: 'justify',
-    marginLeft: 10
-  },
-  handleBtns: {
-    height: 40,
-    width: '100%',
-    backgroundColor: '#bbb',
-    marginTop: 10,
-    marginBottom: 10,
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 10
-  },
-  handleBtnsText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'justify',
-  }
 });
