@@ -7,6 +7,7 @@ import AddUser from "../components/URM/AddUser";
 import CreateRole from "../components/URM/CreateRole";
 import EditRole from "../components/URM/EditRole";
 import EditUser from "../components/URM/EditUser";
+import PrivilageMapping from "../components/URM/PrivilageMapping";
 import Privilages from "../components/URM/Privilages";
 import Roles from "../components/URM/Roles";
 import Users from "../components/URM/users";
