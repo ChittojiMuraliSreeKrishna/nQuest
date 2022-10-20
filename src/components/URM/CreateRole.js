@@ -50,7 +50,7 @@ export default class CreateRole extends Component {
     };
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     // Client Id
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     // User Id
@@ -76,18 +76,18 @@ export default class CreateRole extends Component {
   }
 
   // Cancel Actions
-  cancel () {
+  cancel() {
     global.privilages = [];
     this.props.navigation.goBack(null);
   }
-  handleBackButtonClick () {
+  handleBackButtonClick() {
     global.privilages = [];
     this.props.navigation.goBack(null);
     return true;
   }
 
   // Reached End Flatlist
-  onEndReached () {
+  onEndReached() {
     this.listRef.scrollToOffset({ offset: 0, animated: true });
   }
 
@@ -109,17 +109,17 @@ export default class CreateRole extends Component {
   };
 
   // Validation Form
-  validationForm () {
+  validationForm() {
     let errors = {};
     let isFormValid = true;
     if (this.state.role.length < errorLength.name) {
       isFormValid = false;
-      errors[ "role" ] = urmErrorMessages.roleName;
+      errors["role"] = urmErrorMessages.roleName;
       this.setState({ roleValid: false });
     }
     if (this.state.description === "") {
       isFormValid = false;
-      errors[ "description" ] = urmErrorMessages.description;
+      errors["description"] = urmErrorMessages.description;
       this.setState({ descriptionValid: false });
     }
     this.setState({ errors: errors });
@@ -127,10 +127,24 @@ export default class CreateRole extends Component {
   }
 
   // Saving Role
-  saveRole () {
+  saveRole() {
     console.log(this.state.parentlist);
     console.log(this.state.childlist);
     const isFormValid = this.validationForm();
+    let parentPrivilegesList = [];
+    let subPrivilegesList = [];
+    if (global.selectedParentPrvlgs) {
+      parentPrivilegesList = [...global.selectedParentPrvlgs];
+    }
+    if (global.selectedMobileParentPrvlgs) {
+      parentPrivilegesList = [...parentPrivilegesList, ...global.selectedMobileParentPrvlgs];
+    }
+    if (global.selectedSubPrvlgs) {
+      subPrivilegesList = [...global.selectedSubPrvlgs];
+    }
+    if (global.selectedMobileSubPrvlgs) {
+      subPrivilegesList = [...subPrivilegesList, ...global.selectedMobileSubPrvlgs];
+    }
     if (isFormValid) {
       if (this.state.isEdit === false) {
         // Create Role
@@ -139,8 +153,8 @@ export default class CreateRole extends Component {
           description: this.state.description,
           clientId: parseInt(this.state.clientId),
           createdBy: parseInt(this.state.userId),
-          parentPrivileges: this.state.parentlist,
-          subPrivileges: this.state.childlist,
+          parentPrivileges: parentPrivilegesList,
+          subPrivileges: subPrivilegesList,
         };
 
         console.log("role saveObj", saveObj);
@@ -192,7 +206,7 @@ export default class CreateRole extends Component {
   }
 
   // Privileges Mapping Action
-  privilageMapping () {
+  privilageMapping() {
     global.privilages = [];
     this.props.navigation.navigate("Privilages", {
       domain: this.state.domain,
@@ -203,17 +217,17 @@ export default class CreateRole extends Component {
   }
 
   // Refresh Privileges
-  refresh () {
+  refresh() {
     this.setState({ parentlist: [] });
     this.setState({ childlist: [] });
     this.state.roles = [];
     for (let i = 0; i < global.privilages.length; i++) {
       this.state.parentlist.push({
-        name: global.privilages[ i ].parent,
-        id: global.privilages[ i ].id,
+        name: global.privilages[i].parent,
+        id: global.privilages[i].id,
       });
-      this.state.childlist.push(global.privilages[ i ].subPrivillages);
-      this.state.roles.push(global.privilages[ i ].subPrivillages);
+      this.state.childlist.push(global.privilages[i].subPrivillages);
+      this.state.roles.push(global.privilages[i].subPrivillages);
     }
     const newArrayList = [];
     this.state.parentlist.forEach((obj) => {
@@ -243,8 +257,8 @@ export default class CreateRole extends Component {
 
   handleDomain = (value) => {
     for (let i = 0; i < this.state.domainsArray.length; i++) {
-      if (this.state.domainsArray[ i ].name === value) {
-        this.setState({ domainId: this.state.domainsArray[ i ].id });
+      if (this.state.domainsArray[i].name === value) {
+        this.setState({ domainId: this.state.domainsArray[i].id });
       }
     }
     this.setState({ domain: value });
@@ -257,7 +271,7 @@ export default class CreateRole extends Component {
     this.setState({ description: value });
   };
 
-  render () {
+  render() {
     const roleValid = this.state.roleValid;
     const descriptionValid = this.state.descriptionValid;
     const domainValid = this.state.domainValid;
@@ -289,7 +303,7 @@ export default class CreateRole extends Component {
             onChangeText={this.handleRole}
           />
           {!roleValid && (
-            <Message imp={true} message={this.state.errors[ "role" ]} />
+            <Message imp={true} message={this.state.errors["role"]} />
           )}
           <Text style={inputHeading}>
             {I18n.t("Description")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -309,7 +323,7 @@ export default class CreateRole extends Component {
             onChangeText={this.handleDescription}
           />
           {!descriptionValid && (
-            <Message imp={true} message={this.state.errors[ "description" ]} />
+            <Message imp={true} message={this.state.errors["description"]} />
           )}
           <View
             style={{
@@ -365,11 +379,11 @@ export default class CreateRole extends Component {
             </View>
           </ScrollView>
           <View style={forms.action_buttons_container}>
-            <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+            <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
               onPress={() => this.saveRole()}>
               <Text style={forms.submit_btn_text} >{I18n.t("SAVE")}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+            <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
               onPress={() => this.cancel()}>
               <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
             </TouchableOpacity>
