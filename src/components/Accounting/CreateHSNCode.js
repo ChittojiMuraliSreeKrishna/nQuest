@@ -8,9 +8,7 @@ import IconMA from 'react-native-vector-icons/Ionicons';
 import scss from "../../commonUtils/assets/styles/style.scss";
 import Loader from "../../commonUtils/loader";
 import AccountingService from "../services/AccountingService";
-import {
-  flatListTitle, textStyleLight
-} from "../Styles/Styles";
+import { textStyleLight } from "../Styles/Styles";
 var deviceWidth = Dimensions.get("window").width;
 
 export default class CreateHSNCode extends Component {
@@ -21,6 +19,7 @@ export default class CreateHSNCode extends Component {
       deleteHsnCode: false,
       hsnList: [],
       loading: false,
+      isFetching: false,
     };
   }
 
@@ -77,6 +76,10 @@ export default class CreateHSNCode extends Component {
     });
   }
 
+  refresh () {
+    this.getAllHsnCode();
+  }
+
   render () {
     return (
       <View>
@@ -96,6 +99,8 @@ export default class CreateHSNCode extends Component {
           data={this.state.hsnList}
           style={scss.flatListBody}
           scrollEnabled={true}
+          refreshing={this.state.isFetching}
+          onRefresh={() => this.refresh()}
           renderItem={({ item, index }) => (
             <ScrollView>
               <View style={scss.flatListContainer}>

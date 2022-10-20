@@ -109,7 +109,7 @@ export default class Stores extends Component {
             let response = res.data;
             console.log({ response });
             this.setState({
-              storesList: this.state.storesList.concat(response),
+              storesList: response,
             });
           }
         }

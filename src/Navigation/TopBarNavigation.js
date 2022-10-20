@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createStackNavigator } from "@react-navigation/stack";
 import React, { Component } from "react";
 import Blank from "../components/Home/Blank";
@@ -15,6 +16,9 @@ import UrmNavigation from "./UrmNavigation";
 const Stack = createStackNavigator();
 
 export default class TopBarNavigation extends Component {
+  componentDidMount () {
+    AsyncStorage.setItem("Home", "isLogged");
+  }
   render () {
     return (
       <>

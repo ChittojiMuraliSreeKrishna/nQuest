@@ -210,7 +210,7 @@ export default class Login extends Component {
                   if (value === "super_admin") {
                     this.getAdminStores();
                   } else if (value === "client_support") {
-                    this.props.navigation.navigate("SelectClient");
+                    this.props.navigation.push("SelectClient");
                   } else {
                     const table = storesAssigned
                       .split(",")
@@ -268,7 +268,7 @@ export default class Login extends Component {
     LoginService.getUserStores().then((res) => {
       console.log("getting Stores", res);
       if (res.data.length > 1) {
-        this.props.navigation.navigate("SelectStore");
+        this.props.navigation.push("SelectStore");
       } else {
         AsyncStorage.setItem("storeId", String(res.data[ 0 ].id)).catch(
           (err) => { },
@@ -332,7 +332,8 @@ export default class Login extends Component {
   refresh = async () => {
     try {
       await AsyncStorage.removeItem("phone_number");
-      await AsyncStorage.clear().then(() => console.log('Cleared'));
+      await
+        await AsyncStorage.clear().then(() => console.log('Cleared'));
       return true;
     } catch (error) {
       console.log(error);

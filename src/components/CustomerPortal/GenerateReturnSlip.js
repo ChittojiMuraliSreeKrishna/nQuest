@@ -8,7 +8,7 @@ import Modal from 'react-native-modal';
 import { TextInput } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
-import ScanIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import { RF, RW } from '../../Responsive';
 import { customerErrorMessages } from '../Errors/errors';
@@ -57,7 +57,8 @@ export default class GenerateReturnSlip extends Component {
       customerNumberValid: true,
       reasonValid: true,
       errors: {},
-      isItemSelected: true
+      isItemSelected: true,
+      itemsList: [],
     };
   }
 
@@ -125,7 +126,7 @@ export default class GenerateReturnSlip extends Component {
       console.log(res.data.result);
       let items = res.data.result;
       for (let i = 0; i < items.length; i++) {
-        returnInvoiceArray.push({ barCode: items[ i ].barcode, value: items[ i ].netValue, quantity: items[ i ].quantity, isSelected: true });
+        returnInvoiceArray.push({ barCode: items[ i ].barcode, value: items[ i ].netValue, quantity: items[ i ].quantity, isSelected: false, mrp: items[ i ].mrp, returnQty: 0, promoValue: items[ i ].promoDiscount, manualValue: items[ i ].manualDiscount, gvValue: items[ i ].gvAppiled });
       }
       this.setState({ returnInvoice: returnInvoiceArray }, () => {
         let costprice = 0;
@@ -164,10 +165,6 @@ export default class GenerateReturnSlip extends Component {
     this.setState({ netValueList: netValueList }, () => {
       let returnSlipTotal = 0;
       console.log("netvalueList", this.state.netValueList);
-      this.state.netValueList.forEach(ele => {
-        returnSlipTotal = returnSlipTotal + ele.amount;
-      });
-      this.setState({ returnSlipTotal: returnSlipTotal });
     });
   }
 
@@ -188,12 +185,25 @@ export default class GenerateReturnSlip extends Component {
     return isFormValid;
   }
 
-  generateNewSlip () {
+  generateNewSlip (item, index) {
     console.log(this.state.storeId);
+    const qtyarr = [ ...this.state.returnInvoice ];
+    let finallist = [];
+    qtyarr.forEach((item, index) => {
+      if (item.returnQty > 0) {
+        finallist.push({
+          barCode: item.barCode,
+          amount: item.value,
+          qty: item.quantity,
+          returnQty: item.returnQty,
+          returnAmount: item.value / item.quantity * item.returnQty
+        });
+      }
+    });
     console.log("returnSlipList", this.state.netValueList);
     // const isFormValid = this.validationForReturnSlip()
     const saveObj = {
-      barcodes: this.state.netValueList,
+      barcodes: finallist,
       mobileNumber: this.state.mobileNumber ? this.state.mobileNumber : null,
       invoiceNumber: this.state.invoiceNumber,
       reason: this.state.reason,
@@ -205,14 +215,33 @@ export default class GenerateReturnSlip extends Component {
     };
     // if (isFormValid) {
     console.log(saveObj, "params");
-    axios.post(CustomerService.saveRetunSlip(), saveObj).then((res) => {
-      console.log("return slip data,res", JSON.stringify(res.data));
-      if (res) {
-        alert(res.data.message);
+    if (this.state.netValueList.length > 0) {
+      axios.post(CustomerService.saveRetunSlip(), saveObj).then((res) => {
+        console.log("return slip data,res", JSON.stringify(res.data));
+        if (res) {
+          alert(res.data.message);
+          this.setState({
+            resultData: res.data.message,
+            // resultModel: true,
+            modelVisible: true,
+            netValueList: [],
+            returnSlipTotal: 0,
+            returnInvoice: [],
+            mobileNumber: '',
+            invoiceNumber: "",
+            netValue: 0,
+            quantity: 0,
+            reason: "",
+            customerNumber: "",
+            createdBy: null,
+            itemsReturn: false
+          });
+
+        }
+        this.setState({ returnModel: false, modelVisible: false, loading: false, itemsReturn: false });
+      }).catch((err) => {
         this.setState({
-          resultData: res.data.message,
-          // resultModel: true,
-          modelVisible: true,
+          returnModel: false, modelVisible: false, loading: false,
           netValueList: [],
           returnSlipTotal: 0,
           returnInvoice: [],
@@ -222,28 +251,13 @@ export default class GenerateReturnSlip extends Component {
           quantity: 0,
           reason: "",
           customerNumber: "",
-          createdBy: null
+          createdBy: null,
+          itemsReturn: false
         });
-
-      }
-      this.setState({ returnModel: false, modelVisible: false, loading: false });
-    }).catch((err) => {
-      this.setState({
-        returnModel: false, modelVisible: false, loading: false,
-        netValueList: [],
-        returnSlipTotal: 0,
-        returnInvoice: [],
-        mobileNumber: '',
-        invoiceNumber: "",
-        netValue: 0,
-        quantity: 0,
-        reason: "",
-        customerNumber: "",
-        createdBy: null,
-        itemsReturn: false
       });
-    });
-    // }
+    } else {
+      alert("Please Select Atleast One Barcode");
+    }
   }
 
   handleCutomerTagging = () => {
@@ -277,82 +291,80 @@ export default class GenerateReturnSlip extends Component {
 
   updateQty = (text, index, item) => {
     const Qty = /^[0-9\b]+$/;
-    const qtyarr = [ ...this.state.itemsList ];
-    console.log(qtyarr[ index ].quantity);
+    const qtyarr = [ ...this.state.returnInvoice ];
+    console.log(qtyarr[ index ].returnQty);
     let addItem = '';
     let value = text === '' ? 1 : text;
     if (value !== '' && Qty.test(value) === false) {
       addItem = 1;
-      qtyarr[ index ].quantity = addItem.toString();
+      qtyarr[ index ].returnQty = addItem.toString();
     } else {
-      if (parseInt(value) < parseInt(qtyarr[ index ].qty)) {
+      if (parseInt(value) < parseInt(qtyarr[ index ].quantity)) {
         addItem = value;
-        qtyarr[ index ].quantity = addItem.toString();
+        qtyarr[ index ].returnQty = addItem.toString();
       } else {
-        addItem = qtyarr[ index ].qty;
-        qtyarr[ index ].quantity = addItem.toString();
+        addItem = qtyarr[ index ].quantity;
+        qtyarr[ index ].returnQty = addItem.toString();
       }
     }
-    let totalcostMrp = item.itemMrp * parseInt(qtyarr[ index ].quantity);
+    let totalcostMrp = item.itemMrp * parseInt(qtyarr[ index ].returnQty);
     item.totalMrp = totalcostMrp;
-    this.setState({ itemsList: qtyarr });
+    this.setState({ returnInvoice: qtyarr });
     console.error("TEXT", value);
     let grandTotal = 0;
     let totalqty = 0;
-    this.state.barList.forEach(bardata => {
-      grandTotal = grandTotal + bardata.totalMrp;
-      totalqty = totalqty + parseInt(bardata.quantity);
+    this.state.returnInvoice.forEach(bardata => {
+      grandTotal = grandTotal + bardata.value / bardata.quantity * String(bardata.returnQty);
+      totalqty = totalqty + parseInt(bardata.returnQty);
     });
-    this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty });
+    this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty, returnSlipTotal: grandTotal });
     this.state.totalQuantity = (parseInt(this.state.totalQuantity) + 1);
     // this.setState({ itemsList: qtyarr });
   };
 
-  incrementForTable (item, index) {
-    const qtyarr = [ ...this.state.itemsList ];
+  incrementForTable = (item, index) => {
+    const qtyarr = [ ...this.state.returnInvoice ];
     console.log(qtyarr[ index ].quantity);
-    if (parseInt(qtyarr[ index ].quantity) < parseInt(qtyarr[ index ].qty)) {
-      var additem = parseInt(qtyarr[ index ].quantity) + 1;
-      qtyarr[ index ].quantity = additem.toString();
+    console.log({ qtyarr });
+    if (parseInt(qtyarr[ index ].returnQty) < parseInt(qtyarr[ index ].quantity)) {
+      var additem = parseInt(qtyarr[ index ].returnQty) + 1;
+      qtyarr[ index ].returnQty = additem.toString();
     } else {
-      var additem = parseInt(qtyarr[ index ].qty);
-      qtyarr[ index ].quantity = additem.toString();
+      var additem = parseInt(qtyarr[ index ].returnQty);
+      qtyarr[ index ].returnQty = additem.toString();
       alert(`only ${additem} items are in this barcode`);
     }
-    let totalcostMrp = item.itemMrp * parseInt(qtyarr[ index ].quantity);
-    item.totalMrp = totalcostMrp;
-    this.setState({ itemsList: qtyarr });
+    this.setState({ returnInvoice: qtyarr });
 
     let grandTotal = 0;
     let totalqty = 0;
-    this.state.barList.forEach(bardata => {
-      grandTotal = grandTotal + bardata.totalMrp;
-      totalqty = totalqty + parseInt(bardata.quantity);
+    this.state.returnInvoice.forEach(bardata => {
+      grandTotal = grandTotal + bardata.value / bardata.quantity * bardata.returnQty;
+      totalqty = totalqty + parseInt(bardata.returnQty);
     });
-    this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty });
+    this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty, returnSlipTotal: grandTotal });
     this.state.totalQuantity = (parseInt(this.state.totalQuantity) + 1);
-  }
+  };
 
   decreamentForTable (item, index) {
-    const qtyarr = [ ...this.state.itemsList ];
-    if (qtyarr[ index ].quantity > 1) {
-      var additem = parseInt(qtyarr[ index ].quantity) - 1;
-      qtyarr[ index ].quantity = additem.toString();
-      let totalcostMrp = item.itemMrp * parseInt(qtyarr[ index ].quantity);
+    const qtyarr = [ ...this.state.returnInvoice ];
+    if (qtyarr[ index ].returnQty > 0) {
+      var additem = parseInt(qtyarr[ index ].returnQty) - 1;
+      qtyarr[ index ].returnQty = additem.toString();
+      let totalcostMrp = item.itemMrp * parseInt(qtyarr[ index ].returnQty);
       item.totalMrp = totalcostMrp;
       this.state.totalQuantity = (parseInt(this.state.totalQuantity) - 1);
       let grandTotal = 0;
       let totalqty = 0;
-      this.state.barList.forEach(bardata => {
-        grandTotal = grandTotal + bardata.totalMrp;
-        totalqty = totalqty + parseInt(bardata.quantity);
+      this.state.returnInvoice.forEach(bardata => {
+        grandTotal = grandTotal + bardata.value / bardata.quantity * bardata.returnQty;
+        totalqty = totalqty + parseInt(bardata.returnQty);
       });
-      this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty });
-      this.setState({ itemsList: qtyarr });
+      this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty, returnSlipTotal: grandTotal });
+      this.setState({ returnInvoice: qtyarr });
     } else {
-      this.state.itemsList.splice(index, 1);
-      this.setState({ barList: this.state.itemsList });
-      this.calculateTotal();
+      this.state.returnInvoice.splice(index, 1);
+      this.setState({ returnInvoice: this.state.returnInvoice });
     }
   }
 
@@ -433,7 +445,7 @@ export default class GenerateReturnSlip extends Component {
               onEndEditing={() => this.endEditing()}
             />
             <TouchableOpacity style={{ padding: RF(10) }} onPress={() => this.navigateToScanCode()} >
-              <ScanIcon name='barcode-scan' size={30} color={color.black} />
+              <IconMA name='barcode-scan' size={30} color={color.black} />
             </TouchableOpacity>
           </View>
           {!this.state.invoiceNumberValid && (
@@ -544,39 +556,57 @@ export default class GenerateReturnSlip extends Component {
                         <View style={flatlistSubContainer}>
                           <View style={textContainer}>
                             <Text style={textStyleMediumColor}>{I18n.t("Item")}</Text>
-                            <Text style={textStyleMediumColor}>{I18n.t("QTY")}</Text>
+                            <Text style={textStyleMedium}>{item.barCode}</Text>
+                          </View>
+                          <View style={textContainer}>
+                            <Text style={textStyleMediumColor}> {I18n.t("QTY")}</Text>
+                            {item.isSelected && (
+                              <Text style={textStyleMediumColor}> return</Text>
+                            )}
                             <Text style={textStyleMediumColor}>{I18n.t("MRP")}</Text>
                           </View>
                           <View style={textContainer}>
-                            <Text style={textStyleMedium}>{item.barCode}</Text>
-                            {/* <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <TouchableOpacity
-                              onPress={() => this.incrementForTable(item, index)}>
-                              <PlusIcon name="plus-circle-outline" size={20} color={"red"} />
-                            </TouchableOpacity>
-                            <TextInput
-                              style={{
-                                justifyContent: 'center',
-                                // height: Device.isTablet ? 50 : 30,
-                                // width: Device.isTablet ? 50 : 30,
-                                color: '#ED1C24',
-                                fontFamily: 'regular',
-                                fontSize: Device.isTablet ? 22 : 12,
-                              }}
-                              underlineColorAndroid="transparent"
-                              placeholder="01"
-                              placeholderTextColor="#ED1C24"
-                              value={('0' + item.quantity).slice(-2)}
-                              onChangeText={(text) => this.updateQty(text, index, item)}
-                              
-                            />
-                            <TouchableOpacity
-                              onPress={() => this.decreamentForTable(item, index)}>
-                              <MinusIcon name="minus-circle-outline" size={20} color={"red"} />
-                            </TouchableOpacity>
-                          </View> */}
                             <Text style={textStyleMedium}>{item.quantity}</Text>
+                            {item.isSelected && (
+                              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <TouchableOpacity
+                                  onPress={() => this.incrementForTable(item, index)}>
+                                  <IconMA name="plus-circle-outline" size={20} color={"red"} />
+                                </TouchableOpacity>
+                                <TextInput
+                                  style={{
+                                    justifyContent: 'center',
+                                    // height: Device.isTablet ? 50 : 30,
+                                    // width: Device.isTablet ? 50 : 30,
+                                    color: '#ED1C24',
+                                    fontFamily: 'regular',
+                                    fontSize: Device.isTablet ? 22 : 12,
+                                  }}
+                                  underlineColorAndroid="transparent"
+                                  placeholderTextColor="#ED1C24"
+                                  value={('0' + item.returnQty).slice(-2)}
+                                  onChangeText={(text) => this.updateQty(text, index, item)}
+
+                                />
+                                <TouchableOpacity
+                                  onPress={() => this.decreamentForTable(item, index)}>
+                                  <IconMA name="minus-circle-outline" size={20} color={"red"} />
+                                </TouchableOpacity>
+                              </View>
+                            )}
                             <Text style={textStyleMedium}>₹ {item.value + '.00'}</Text>
+                          </View>
+                          <View style={textContainer}>
+                            <Text style={textStyleMediumColor}>MRP</Text>
+                            <Text style={textStyleMediumColor}>Promo</Text>
+                            <Text style={textStyleMediumColor}>GV</Text>
+                            <Text style={textStyleMediumColor}>Manual</Text>
+                          </View>
+                          <View style={textContainer}>
+                            <Text style={textStyleMedium}>{item.mrp}</Text>
+                            <Text style={textStyleMedium}>{item.promoDiscount ? item.promoDiscount : 0}</Text>
+                            <Text style={textStyleMedium}>{item.gvAppiled ? item.gvAppiled : 0}</Text>
+                            <Text style={textStyleMedium}>{item.manualDiscount ? item.manualDiscount : 0}</Text>
                           </View>
                         </View>
                       </View>
@@ -651,7 +681,7 @@ export default class GenerateReturnSlip extends Component {
                 />
                 <TouchableOpacity
                   style={[ Device.isTablet ? styles.signInButton_tablet : styles.signInButton_mobile, { width: deviceWidth - 40, height: Device.isTablet ? 60 : 50 } ]}
-                  onPress={() => this.generateNewSlip()}
+                  onPress={(item, index) => this.generateNewSlip(item, index)}
                 >
                   <Text
                     style={Device.isTablet ? styles.signInButtonText_tablet : styles.signInButtonText_mobile}
