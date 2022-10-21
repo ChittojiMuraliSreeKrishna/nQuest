@@ -18,21 +18,19 @@
 }
 
 .section_headers{
-  padding: 2px 10px;
+  // padding: 2px 10px;
   font-size: 16px;
   color: $primary-color;
   font-weight: bold;
-  background-color: $grey-light;
-  border-width: 1px;
-  border-color: $grey;
+  margin-left: 30px;
 }
 
 .item {
   padding: 15px;
   font-size: 14px;
   height: 40px;
-  background-color: $white;
-  color: $grey-darker;
+  // background-color: $white;
+  // color: $grey-darker;
 }
 .sub_item {
   padding: 15px;
