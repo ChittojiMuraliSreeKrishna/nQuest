@@ -113,7 +113,7 @@ export default class SelectStore extends React.Component {
                 <RadioButton
                   value={item.id}
                   status={this.state.selectedItem === index ? 'checked' : 'unchecked'}
-                  onPress={() => this.handleChecked(item, index)}
+                  onPress={() => this.selectStoreName(item, index)}
                 />
                 <View style={styles.button}>
                   <View>

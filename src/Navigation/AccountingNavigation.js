@@ -1,5 +1,6 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import React, { Component } from "react";
+import AccountingDashboard from '../components/Accounting/AccountingDashboard';
 import AddCreditNotes from "../components/Accounting/AddCreditNotes";
 import AddDebitNotes from "../components/Accounting/AddDebitNotes";
 import AddDomain from "../components/Accounting/AddDomain";
@@ -28,6 +29,11 @@ export default class AccountingNaviagtion extends Component {
             name="Stores"
             options={{ headerShown: false }}
             component={Stores}
+          />
+          <Stack.Screen
+            name="Dashboard"
+            options={{ headerShown: false }}
+            component={AccountingDashboard}
           />
           <Stack.Screen
             name="Debit Notes"

@@ -1,16 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import moment from 'moment';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
 import scss from '../../commonUtils/assets/styles/style.scss';
-import { formatDate } from '../../commonUtils/DateFormate';
 import Loader from '../../commonUtils/loader';
 import { RF, RH, RW } from '../../Responsive';
 import CustomerService from '../services/CustomerService';
 import { flatListTitle, textContainer } from '../Styles/Styles';
-import moment from 'moment'
-import { Image } from 'react-native';
 
 var deviceheight = Dimensions.get('window').height;
 var deviceheight = Dimensions.get('window').height;
@@ -29,7 +27,7 @@ export default class DayClosure extends Component {
     };
   }
 
-  async componentDidMount() {
+  async componentDidMount () {
     const storeId = await AsyncStorage.getItem("storeId");
     this.setState({ storeId: storeId });
     this.getAllDayCloser();
@@ -41,15 +39,17 @@ export default class DayClosure extends Component {
     });
   }
 
-  getAllDayCloser() {
+  getAllDayCloser () {
     this.setState({ loading: true });
     const param = "?storeId=" + this.state.storeId;
     axios.get(CustomerService.getAllDayClosure() + param).then(res => {
-      if (res) {
-        console.log(res.data.result);
-        this.setState({ dayClosureList: res.data.result });
-        if (this.state.dayClosureList.length > 0) {
-          this.setState({ enableButton: true });
+      if (res?.data) {
+        if (res.data.result.deliverySlips.length > 0) {
+          console.log(res.data.result);
+          this.setState({ dayClosureList: res.data.result.deliverySlips });
+          if (this.state.dayClosureList.length > 0) {
+            this.setState({ enableButton: true });
+          }
         }
       }
       this.setState({ loading: false });
@@ -59,7 +59,7 @@ export default class DayClosure extends Component {
     });
   }
 
-  closeDay() {
+  closeDay () {
     const param = "?storeId=" + this.state.storeId;
     axios.put(CustomerService.dayCloseActivity() + param).then(res => {
       if (res) {
@@ -69,7 +69,7 @@ export default class DayClosure extends Component {
     });
   }
 
-  deleteEstimationSlip(dsNumber) {
+  deleteEstimationSlip (dsNumber) {
     CustomerService.deleteEstimationSlip(dsNumber).then((res) => {
       if (res.data.result) {
         alert(res.data.result);
@@ -81,7 +81,7 @@ export default class DayClosure extends Component {
     });
   }
 
-  render() {
+  render () {
     return (
       <View>
         {this.state.loading &&
@@ -122,7 +122,7 @@ export default class DayClosure extends Component {
                     </Text>
                     <Text style={scss.textStyleLight}>SalesMan: {item.salesMan}</Text>
                   </View>
-                  <View style={[textContainer, { justifyContent: 'flex-end' }]}>
+                  <View style={[ textContainer, { justifyContent: 'flex-end' } ]}>
                     <View style={styles.buttons}>
                       <TouchableOpacity style={styles.deleteButton} onPress={() => this.deleteEstimationSlip(item.dsNumber)}>
                         <Image style={{ alignSelf: 'center', top: 5, height: Device.isTablet ? 30 : 20, width: Device.isTablet ? 30 : 20 }} source={require('../assets/images/delete.png')} />

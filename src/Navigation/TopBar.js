@@ -26,7 +26,7 @@ export const screenMapping = {
   "Dashboard": "Home",
   "Billing Portal": "CustomerNavigation",
   "Inventory Portal": "InventoryNavigation",
-  "Promotions": "PromoNavigation",
+  "Promotions & Loyalty": "PromoNavigation",
   "Accounting Portal": "AccountingNaviagtion",
   "Reports": "ReportsNavigation",
   "URM Portal": "UrmNavigation",
@@ -40,7 +40,7 @@ const GetImageBasedOnPrevilageName = (name) => {
     require("../commonUtils/assets/Images/billing_portal_header_icon.png")
   ) : name === "Inventory Portal" ? (
     require("../commonUtils/assets/Images/inventory_dropdown_icon.png")
-  ) : name === "Promotions" ? (
+  ) : name === "Promotions & Loyalty" ? (
     require("../commonUtils/assets/Images/promotions_dropdown_icon.png")
   ) : name === "Accounting Portal" ? (
     require("../commonUtils/assets/Images/accounting_dropdown_icon.png")
@@ -65,7 +65,8 @@ export class TopBar extends Component {
       modalVisibleData: false,
       refresh: true,
       privilages: [],
-      headerNames: []
+      headerNames: [],
+      isClient: false
     };
   }
 
@@ -147,7 +148,7 @@ export class TopBar extends Component {
         global.previlage1 = "Dashboard";
         global.previlage2 = "Billing Portal";
         global.previlage3 = "Inventory Portal";
-        global.previlage4 = "Promotions";
+        global.previlage4 = "Promotions & Loyalty";
         global.previlage5 = "Accounting Portal";
         global.previlage6 = "Reports";
         global.previlage7 = "URM Portal";
@@ -156,23 +157,28 @@ export class TopBar extends Component {
           .then((value) => {
             global.userrole = value;
             UrmService.getPrivillagesByRoleName(value).then((res) => {
+              console.log({ value }, global.userrole);
               console.log({ res });
               if (res.data) {
+                if (value === "client_support") {
+                  this.setState({ isClient: true });
+                }
+                const { isClient } = this.state;
                 let finalResult = this.groupByPrivileges(res.data.parentPrivileges);
-                console.log({ finalResult }, finalResult.mobile.length);
-                let mobilePriv = finalResult.web;
+                console.log({ finalResult });
+                var mobilePriv = isClient ? finalResult.web : finalResult.mobile;
                 console.log({ mobilePriv });
-                let len = finalResult.web.length;
+                let len = mobilePriv.length;
                 if (len > 0) {
                   this.setState({
-                    firstDisplayName: finalResult.web[ 0 ].name,
+                    firstDisplayName: mobilePriv[ 0 ].name,
                   });
                   const firstDisplayName = this.state.firstDisplayName;
                   console.log({ firstDisplayName });
-                  firstDisplayRoute = finalResult.web[ 0 ].name;
+                  firstDisplayRoute = mobilePriv[ 0 ].name;
                   var privilegesSet = new Set();
                   for (let i = 0; i < len; i++) {
-                    let previlage = finalResult.web[ i ];
+                    let previlage = mobilePriv[ i ];
                     if (previlage.name === "Dashboard") {
                       global.previlage1 = "Dashboard";
                     }
@@ -182,8 +188,8 @@ export class TopBar extends Component {
                     if (previlage.name === "Inventory Portal") {
                       global.previlage3 = "Inventory Portal";
                     }
-                    if (previlage.name === "Promotions") {
-                      global.previlage4 = "Promotions";
+                    if (previlage.name === "Promotions & Loyalty") {
+                      global.previlage4 = "Promotions & Loyalty";
                     }
                     if (previlage.name === "Accounting Portal") {
                       global.previlage5 = "Accounting Portal";
@@ -203,7 +209,7 @@ export class TopBar extends Component {
                   console.log({ data }, "Privfinl");
                   this.getData();
                 } else {
-                  alert("Privileges Not Found");
+                  alert("Mobile Privileges Not Found");
                   this.props.navigation.push("Login");
                 }
               }
@@ -260,9 +266,11 @@ export class TopBar extends Component {
           if (res) {
             if (res.data) {
               let finalSubResult = this.groupBySubPrivileges(res.data.parentPrivileges);
-              let len = finalSubResult.web.length;
+              const { isClient } = this.state;
+              var mobileSubPriv = isClient ? finalSubResult.web : finalSubResult.mobile;
+              let len = mobileSubPriv.length;
               for (let i = 0; i < len; i++) {
-                let privilege = finalSubResult.web[ i ];
+                let privilege = mobileSubPriv[ i ];
                 if (privilege.name === String(privilegeName)) {
                   let privilegeId = privilege.id;
                   let sublen = privilege.subPrivileges.length;
@@ -341,7 +349,7 @@ export class TopBar extends Component {
   }
 
   settingsNavigate () {
-    this.props.navigation.navigate("Settings");
+    this.props.navigation.push("Settings");
     this.setState({ popupModel: false });
   }
 
