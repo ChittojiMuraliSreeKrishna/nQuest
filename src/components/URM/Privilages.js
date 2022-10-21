@@ -700,7 +700,7 @@ export default class Privilages extends Component {
 
   render() {
     // console.log("selected Parent Prvlgs", JSON.stringify(this.state.selectedParentPrvlgs), "select sub prvlgs : " + JSON.stringify(this.state.selectedSubPrvlgs));
-    console.log("selected mobile Parent Prvlgs", JSON.stringify(this.state.selectedMobileParentPrvlgs), "select Mobile sub prvlgs : " + JSON.stringify(this.state.selectedMobileSubPrvlgs));
+    // console.log("selected mobile Parent Prvlgs", JSON.stringify(this.state.selectedMobileParentPrvlgs), "select Mobile sub prvlgs : " + JSON.stringify(this.state.selectedMobileSubPrvlgs));
     return (
       <View style={styles.mainContainer}>
         {this.state.loading &&
@@ -739,46 +739,48 @@ export default class Privilages extends Component {
               {this.state.viewWeb && (
                 < View >
                   <TouchableOpacity onPress={() => this.selectedWebParentPrivilage(item, index)}>
-                    <View style={{ padding: 8 }}>
-                      <Text style={scss.section_headers}>{item.title}</Text>
+                    <View style={{ flexDirection: 'row', padding: 4 }}>
                       {item.selectedindex === 1 && (
-                        <Image source={require('../assets/images/selected.png')} style={{ position: 'absolute', right: 20, top: 15 }} />
+                        <Image source={require('../assets/images/selected.png')} style={{ left: 20, top: 5 }} />
                       )}
                       {item.selectedindex === 0 && (
-                        <Image source={require('../assets/images/langunselect.png')} style={{ position: 'absolute', right: 20, top: 15 }} />
+                        <Image source={require('../assets/images/langunselect.png')} style={{ left: 20, top: 5 }} />
                       )}
+                      <Text style={scss.section_headers}>{item.title}</Text>
                     </View>
                   </TouchableOpacity>
                   {item.selectedindex === 1 &&
                     <>
                       {item.data?.map((item, index) => {
                         return (
-                          <View>
+                          <View style={{ paddingLeft: 15, padding: 5 }}>
                             <TouchableOpacity onPress={() => this.selectedWebSubPrivilage(item, index)}>
-                              <View style={scss.item}>
-                                <Text>{item.name}</Text>
+                              <View style={[{ flexDirection: 'row' }]}>
                                 {item.selectedindex === 1 && (
-                                  <Image source={require('../assets/images/selected.png')} style={{ position: 'absolute', right: 20, top: 15 }} />
+                                  <Image source={require('../assets/images/selected.png')} style={{ left: 20, top: 5 }} />
                                 )}
                                 {item.selectedindex === 0 && (
-                                  <Image source={require('../assets/images/langunselect.png')} style={{ position: 'absolute', right: 20, top: 15 }} />
+                                  <Image source={require('../assets/images/langunselect.png')} style={{ left: 20, top: 5 }} />
                                 )}
+                                <Text style={{ marginLeft: 30 }}>{item.name}</Text>
                               </View>
                             </TouchableOpacity>
                             {item.selectedindex === 1 &&
                               item?.subPrivilege?.childPrivileges?.map((childItem, index) => {
                                 return (
-                                  <TouchableOpacity onPress={() => this.selectedWebChildPrivilage(childItem, index, item)}>
-                                    <View style={scss.sub_item}>
-                                      <Text>{childItem.name}</Text>
-                                      {childItem.selectedindex === 1 && (
-                                        <Image source={require('../assets/images/selected.png')} style={{ position: 'absolute', right: 20, top: 15 }} />
-                                      )}
-                                      {childItem.selectedindex === 0 && (
-                                        <Image source={require('../assets/images/langunselect.png')} style={{ position: 'absolute', right: 20, top: 15 }} />
-                                      )}
-                                    </View>
-                                  </TouchableOpacity>
+                                  <View style={{ paddingLeft: 15, padding: 5 }}>
+                                    <TouchableOpacity onPress={() => this.selectedWebChildPrivilage(childItem, index, item)}>
+                                      <View style={{ flexDirection: 'row' }}>
+                                        {childItem.selectedindex === 1 && (
+                                          <Image source={require('../assets/images/selected.png')} style={{ left: 20, top: 5 }} />
+                                        )}
+                                        {childItem.selectedindex === 0 && (
+                                          <Image source={require('../assets/images/langunselect.png')} style={{ left: 20, top: 5 }} />
+                                        )}
+                                        <Text style={{ marginLeft: 30 }}>{childItem.name}</Text>
+                                      </View>
+                                    </TouchableOpacity>
+                                  </View>
                                 );
                               })}
                           </View>
@@ -786,7 +788,8 @@ export default class Privilages extends Component {
                       })}
                     </>}
                 </View>
-              )}
+              )
+              }
             </View>
           )
           }
@@ -819,44 +822,48 @@ export default class Privilages extends Component {
               {this.state.viewMobile && (
                 <View>
                   <TouchableOpacity onPress={() => this.selectedMobileParentPrivilage(item, index)}>
-                    <View style={{ padding: 8 }}>
-                      <Text style={scss.section_headers}>{item.title}</Text>
+                    <View style={{ flexDirection: 'row', padding: 4 }}>
                       {item.selectedindex === 1 && (
-                        <Image source={require('../assets/images/selected.png')} style={{ position: 'absolute', right: 20, top: 15 }} />
+                        <Image source={require('../assets/images/selected.png')} style={{ left: 20, top: 5 }} />
                       )}
                       {item.selectedindex === 0 && (
-                        <Image source={require('../assets/images/langunselect.png')} style={{ position: 'absolute', right: 20, top: 15 }} />
+                        <Image source={require('../assets/images/langunselect.png')} style={{ left: 20, top: 5 }} />
                       )}
+                      <Text style={scss.section_headers}>{item.title}</Text>
                     </View>
                   </TouchableOpacity>
                   {item.selectedindex === 1 &&
                     <>
                       {item.data?.map((item, index) => {
                         return (
-                          <View>
+                          <View style={{ paddingLeft: 8, padding: 2 }}>
                             <TouchableOpacity onPress={() => this.selectedMobileSubPrivilage(item, index)} style={scss.item}>
-                              <Text>{item.name}</Text>
-                              {item.selectedindex === 1 && (
-                                <Image source={require('../assets/images/selected.png')} style={{ position: 'absolute', right: 20, top: 15 }} />
-                              )}
-                              {item.selectedindex === 0 && (
-                                <Image source={require('../assets/images/langunselect.png')} style={{ position: 'absolute', right: 20, top: 15 }} />
-                              )}
+                              <View style={[{ flexDirection: 'row' }]}>
+                                {item.selectedindex === 1 && (
+                                  <Image source={require('../assets/images/selected.png')} style={{ left: 20, top: 5 }} />
+                                )}
+                                {item.selectedindex === 0 && (
+                                  <Image source={require('../assets/images/langunselect.png')} style={{ left: 20, top: 5 }} />
+                                )}
+                                <Text style={{ marginLeft: 30 }}>{item.name}</Text>
+                              </View>
                             </TouchableOpacity>
                             {item.selectedindex === 1 &&
                               item?.subPrivilege?.childPrivileges?.map((childItem, index) => {
                                 return (
-                                  <TouchableOpacity onPress={() => this.selectedMobileChildPrivilage(childItem, index, item)}>
-                                    <View style={scss.sub_item}>
-                                      <Text>{childItem.name}</Text>
-                                      {childItem.selectedindex === 1 && (
-                                        <Image source={require('../assets/images/selected.png')} style={{ position: 'absolute', right: 20, top: 15 }} />
-                                      )}
-                                      {childItem.selectedindex === 0 && (
-                                        <Image source={require('../assets/images/langunselect.png')} style={{ position: 'absolute', right: 20, top: 15 }} />
-                                      )}
-                                    </View>
-                                  </TouchableOpacity>
+                                  <View style={{ paddingLeft: 35, padding: 3 }}>
+                                    <TouchableOpacity onPress={() => this.selectedMobileChildPrivilage(childItem, index, item)}>
+                                      <View style={{ flexDirection: 'row' }}>
+                                        {childItem.selectedindex === 1 && (
+                                          <Image source={require('../assets/images/selected.png')} style={{ left: 20, top: 5 }} />
+                                        )}
+                                        {childItem.selectedindex === 0 && (
+                                          <Image source={require('../assets/images/langunselect.png')} style={{ left: 20, top: 5 }} />
+                                        )}
+                                        <Text style={{ marginLeft: 30 }}>{childItem.name}</Text>
+                                      </View>
+                                    </TouchableOpacity>
+                                  </View>
                                 );
                               })}
                           </View>
@@ -866,9 +873,10 @@ export default class Privilages extends Component {
                 </View>
               )}
             </View>
-          )}
+          )
+          }
         />
-        <View style={forms.action_buttons_container}>
+        < View style={forms.action_buttons_container} >
           <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
             onPress={() => this.saveRole()}>
             <Text style={forms.submit_btn_text} >{I18n.t("SAVE")}</Text>
@@ -877,7 +885,7 @@ export default class Privilages extends Component {
             onPress={() => this.handleBackButtonClick()}>
             <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
           </TouchableOpacity>
-        </View>
+        </View >
 
       </View >
 
