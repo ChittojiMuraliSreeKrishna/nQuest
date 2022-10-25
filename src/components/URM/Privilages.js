@@ -36,7 +36,10 @@ export default class Privilages extends Component {
       selectedSubPrvlgs: [],
       selectedParentPrvlgs: [],
       selectedMobileSubPrvlgs: [],
-      selectedMobileParentPrvlgs: []
+      selectedMobileParentPrvlgs: [],
+      editWebPrivileges: [],
+      editMobilePrivileges: [],
+      isEdit: false
     };
   }
 
@@ -48,11 +51,12 @@ export default class Privilages extends Component {
 
   async componentDidMount() {
     const editPriv = this.props.route.params;
-    // console.log({ editPriv });
     this.setState({
-      parentlist: editPriv.parentlist,
-      child: editPriv.child,
+      editWebPrivileges: editPriv.editParentPrivileges && editPriv.editParentPrivileges.web,
+      editMobilePrivileges: editPriv.editParentPrivileges && editPriv.editParentPrivileges.mobile,
+      isEdit: editPriv.isEdit
     });
+    this.state.selectedMobileSubPrvlgs
     this.getWebPrivileges();
     this.getMobilePrivileges();
   }
@@ -63,86 +67,90 @@ export default class Privilages extends Component {
     this.setState({ loading: true });
     UrmService.getAllPrivillages().then((res) => {
       if (res) {
-        // console.log(res.data);
         if (res.data) {
-          let mobileRes = res.data.mobilePrivileges;
-          // console.log({ mobileRes });
-          let len = mobileRes.length;
-          // console.log({ len });
-          if (len > 0) {
-            this.setState({ loading: false });
-            for (let i = 0; i < len; i++) {
-              let privilege = mobileRes[i];
-              let previlagename = mobileRes[i].name;
-              // console.log({ previlagename });
-              // Sub Privileges
-              if (privilege.subPrivileges !== null) {
-                let subPrivilegeRes = privilege.subPrivileges;
-                let subLen = subPrivilegeRes.length;
-                // console.log({ subPrivilegeRes });
-                var subprivilagesArray = [];
-                var childPrivillagesArray = [];
-                var namesArray = [];
-                var parentArray = [];
-                if (subLen > 0) {
-                  for (let j = 0; j < subLen; j++) {
-                    if (privilege.id === subPrivilegeRes[j].parentPrivilegeId) {
-                      let subPrivilege = subPrivilegeRes[j];
-                      for (let k = 0; k < this.state.parentlist.length; k++) {
-                        if (this.state.parentlist[k].name === privilege.name) {
-                          if (this.state.parentlist.includes(privilege.name)) { }
-                          else {
-                            parentArray.push(privilege.name);
-                          }
-                        }
-                      }
-                      // SubParent Privileges
-                      if (parentArray.includes(privilege.name)) {
-                        for (let m = 0; m < this.state.child.length; m++) {
-                          if (subPrivilege.name === this.state.child[m].name) {
-                            if (namesArray.includes(subPrivilege.name)) { }
-                            else {
-                              this.state.subMobileList.push({ title: subPrivilege.name, description: subPrivilege.description, parent: privilege.name, id: privilege.id, subPrivileges: subPrivilege });
-                              subprivilagesArray.push({ name: subPrivilege.name, selectedindex: 1, description: subPrivilege.description, subPrivilege: subPrivilege });
-                              namesArray.push(subPrivilege.name);
-                              // console.log({ namesArray });
-                            }
-                          }
-                        }
-                      }
-                      else { }
-                      if (privilege.childPrivillages !== null) {
-                        let childLen = privilege.childPrivillages.length;
-                        for (let p = 0; p < childLen; p++) {
-                          if (subPrivilegeRes[j].id === privilege.childPrivillages[p].subPrivillageId) {
-                            childPrivillagesArray.push(privilege.childPrivillages[p]);
-                          }
-                        }
-                      }
-                      // console.log({ childPrivillagesArray });
-                      if (namesArray.includes(subPrivilege.name)) { }
-                      else {
+          if (this.state.isEdit === true) {
+            let allMobilePrivilages = this.state.mobilePrivileges
+            let mobileRes = this.state.editMobilePrivileges
+            let len = mobileRes.length;
+            if (len > 0) {
+              this.setState({ loading: false });
+              this.handleViewMobile()
+              for (let i = 0; i < len; i++) {
+                let privilege = mobileRes[i];
+                let previlagename = mobileRes[i].name;
+                if (privilege.subPrivileges !== null) {
+                  let subPrivilegeRes = privilege.subPrivileges;
+                  let subLen = subPrivilegeRes.length;
+                  var subprivilagesArray = [];
+                  if (subLen > 0) {
+                    for (let j = 0; j < subLen; j++) {
+                      var childIds = []
+                      if (privilege.id === subPrivilegeRes[j].parentPrivilegeId) {
+                        let subPrivilege = subPrivilegeRes[j];
                         if (subPrivilege.childPrivileges !== null) {
                           let childLen = subPrivilege.childPrivileges.length;
                           for (let p = 0; p < childLen; p++) {
                             if (subPrivilege.id === subPrivilege.childPrivileges[p].subPrivillageId) {
-                              //  subPrivilege.childPrivileges[p].push({selectedindex:1})
-                              subPrivilege.childPrivileges[p].selectedindex = 1;
+                              subPrivilege.childPrivileges[p].selectedindex = 1
+                              var temp = { id: subPrivilege.childPrivileges[p].id };
+                              childIds.push(temp);
                             }
                           }
                         }
-                        // console.log("child privilage dataa", subPrivilege.childPrivileges);
+                        const selectedMobileSubPrvlg = {
+                          id: subPrivilege.id,
+                          parentId: privilege.id,
+                          childPrivillages: childIds
+                        };
+                        this.state.selectedMobileSubPrvlgs.push(selectedMobileSubPrvlg)
+                        subprivilagesArray.push({ name: subPrivilege.name, selectedindex: 1, description: subPrivilege.description, subPrivilege: subPrivilege });
+                      }
+                    }
+                  }
+                }
+                const obj = {
+                  id: privilege.id
+                }
+                this.state.selectedMobileParentPrvlgs.push(obj)
+                this.state.mobilePrivileges.push({ title: previlagename, selectedindex: 1, data: subprivilagesArray, id: privilege.id });
+                this.setState({ mobilePrivileges: this.state.mobilePrivileges },
+                );
+              }
+            }
+          }
+          else {
+            let mobileRes = res.data.mobilePrivileges;
+            let len = mobileRes.length;
+            if (len > 0) {
+              this.setState({ loading: false });
+              for (let i = 0; i < len; i++) {
+                let privilege = mobileRes[i];
+                let previlagename = mobileRes[i].name;
+                if (privilege.subPrivileges !== null) {
+                  let subPrivilegeRes = privilege.subPrivileges;
+                  let subLen = subPrivilegeRes.length;
+                  var subprivilagesArray = [];
+                  if (subLen > 0) {
+                    for (let j = 0; j < subLen; j++) {
+                      if (privilege.id === subPrivilegeRes[j].parentPrivilegeId) {
+                        let subPrivilege = subPrivilegeRes[j];
+                        if (subPrivilege.childPrivileges !== null) {
+                          let childLen = subPrivilege.childPrivileges.length;
+                          for (let p = 0; p < childLen; p++) {
+                            if (subPrivilege.id === subPrivilege.childPrivileges[p].subPrivillageId) {
+                              subPrivilege.childPrivileges[p].selectedindex = 0
+                            }
+                          }
+                        }
                         subprivilagesArray.push({ name: subPrivilege.name, selectedindex: 0, description: subPrivilege.description, subPrivilege: subPrivilege });
                       }
                     }
                   }
                 }
+                this.state.mobilePrivileges.push({ title: previlagename, selectedindex: 0, data: subprivilagesArray, id: privilege.id });
+                this.setState({ mobilePrivileges: this.state.mobilePrivileges },
+                );
               }
-              this.state.mobilePrivileges.push({ title: previlagename, selectedindex: 0, data: subprivilagesArray, child: childPrivillagesArray, id: privilege.id });
-              this.setState({ mobilePrivileges: this.state.mobilePrivileges },
-                // console.error(this.state.mobilePrivileges)
-              );
-              this.setState({ subMobileList: this.state.subMobileList });
             }
           }
         }
@@ -269,7 +277,7 @@ export default class Privilages extends Component {
           for (let j = 0; sel[i].childPrivillages && j < sel[i].childPrivillages.length; j++) {
             //Finding the unselected child privilage
             if (sel[i].childPrivillages[j].id === childItem.id) {
-              console.log("in else", sel[i].childPrivillages[j], childItem.id);
+              // console.log("in else", sel[i].childPrivillages[j], childItem.id);
               //Removing  from the state
               sel[i].childPrivillages.splice(j, 1);
               found = true;
@@ -300,78 +308,96 @@ export default class Privilages extends Component {
     this.setState({ loading: true });
     UrmService.getAllPrivillages().then((res) => {
       if (res) {
-        // console.log(res.data);
         if (res.data) {
-          let webRes = res.data.webPrivileges;
-          // console.log({ webRes });
-          let len = webRes.length;
-          // console.log({ len });
-          if (len > 0) {
+          if (this.state.isEdit === true) {
+            //exising Privilages from API
             this.setState({ loading: false });
-            for (let i = 0; i < len; i++) {
-              let privilege = webRes[i];
-              let previlagename = webRes[i].name;
-              //console.log({ previlagename });
-              // Sub Privileges
-              if (privilege.subPrivileges !== null) {
-                let subPrivilegeRes = privilege.subPrivileges;
-                let subLen = subPrivilegeRes.length;
-                //console.log({ subPrivilegeRes });
-                var subprivilagesArray = [];
-                var childPrivillagesArray = [];
-                var namesArray = [];
-                var parentArray = [];
-                if (subLen > 0) {
-                  for (let j = 0; j < subLen; j++) {
-                    if (privilege.id === subPrivilegeRes[j].parentPrivilegeId) {
-                      let subPrivilege = subPrivilegeRes[j];
-                      for (let k = 0; k < this.state.parentlist.length; k++) {
-                        if (this.state.parentlist[k].name === privilege.name) {
-                          if (this.state.parentlist.includes(privilege.name)) { }
-                          else {
-                            parentArray.push(privilege.name);
-                          }
-                        }
-                      }//parent list computation completed
-                      //console.log({ parentArray });
-                      // SubParent Privileges
-                      if (parentArray.includes(privilege.name)) {
-                        for (let m = 0; m < this.state.child.length; m++) {
-                          if (subPrivilege.name === this.state.child[m].name) {
-                            if (namesArray.includes(subPrivilege.name)) { }
-                            else {
-                              subPrivilege.childPrivileges !== null && subPrivilege.childPrivileges.map((item) => {
-                              })
-                              this.state.subWebList.push({ title: subPrivilege.name, description: subPrivilege.description, parent: privilege.name, id: privilege.id, subPrivileges: subPrivilege });
-                              subprivilagesArray.push({ name: subPrivilege.name, selectedindex: 1, description: subPrivilege.description, subPrivilege: subPrivilege });
-                              namesArray.push(subPrivilege.name);
+            let existingPrivilages = this.state.editWebPrivileges;
+            let len = existingPrivilages.length;
+            let totalPrivilages = res.data.webPrivileges;
+            for (let i = 0; i < totalPrivilages.length; i++) {
+              for (let j = 0; j < existingPrivilages.length; j++) {
+                if (totalPrivilages[i].id == existingPrivilages[j].id) {
+                  totalPrivilages[i].selectedindex = 1;
+                  let totalSubPrvlgs = totalPrivilages[i].subPrivileges;
+                  let exisingSubPrvlgs = existingPrivilages[j].subPrivileges
+                  for (let k = 0; totalSubPrvlgs !== null && k < totalSubPrvlgs.length; k++) {
+                    for (let m = 0; exisingSubPrvlgs !== null && m < exisingSubPrvlgs.length; m++) {
+                      if (totalSubPrvlgs[k].id === exisingSubPrvlgs[m].id) {
+                        totalSubPrvlgs[k].selectedindex = 1
+                        let totalChildPrvlgs = totalSubPrvlgs[k].childPrivileges
+                        let exisingChildPrvlgs = exisingSubPrvlgs[m].childPrivileges
+                        for (let g = 0; totalChildPrvlgs !== null && g < totalChildPrvlgs.length; g++) {
+                          for (let h = 0; exisingChildPrvlgs !== null && h < exisingChildPrvlgs.length; h++) {
+                            if (totalChildPrvlgs[g].id === exisingChildPrvlgs[h].id) {
+                              totalChildPrvlgs[g].selectedindex = 1
                             }
                           }
                         }
                       }
-                      else { }
-                      if (privilege.subPrivileges[j].childPrivileges !== null) {
-                        let childLen = privilege.subPrivileges[j].childPrivileges.length;
-                        for (let p = 0; p < childLen; p++) {
-                          // console.log("child length :" + childLen + "sub privileage  : " + subPrivilegeRes[j].id + " child privilage : " + JSON.stringify(subPrivilegeRes[j].childPrivileges[p].subPrivillageId))
-                          if (subPrivilegeRes[j].id === subPrivilegeRes[j].childPrivileges[p].subPrivillageId) {
-                            childPrivillagesArray.push({
-                              name: subPrivilegeRes[j].childPrivileges[p].name, selectedindex: 1,
-                              description: subPrivilegeRes[j].childPrivileges[p].description,
-                              id: subPrivilegeRes[j].childPrivileges[p].id
-                            });
-                          }
-                        }
-                      }
-                      // console.log({ childPrivillagesArray });
-                      if (namesArray.includes(subPrivilege.name)) { }
-                      else {
+                    }
+                  }
+                }
+              }
+            }
+            // console.log("total Privilages:"+JSON.stringify(totalPrivilages))
+            // existingPrivilages && existingPrivilages.map((parentPrvlgs) => {
+            //   parentPrvlgs.selectedindex = 1
+            //   var childIds = [];
+            //   parentPrvlgs.subPrivileges !== null && parentPrvlgs.subPrivileges.map((subPrvlgs) => {
+            //     subPrvlgs.selectedindex = 1
+            //     subPrvlgs.childPrivileges !== null && subPrvlgs.childPrivileges.map((childPrvlgs) => {
+            //       childPrvlgs.selectedindex = 1
+            //     })
+            //   })
+            //   let merged = { ...existingPrivilages, ...totalPrivilages };
+            //   console.log("Merged prvlgs : " + JSON.stringify(merged));
+              // this.state.webPrivileges.push({ title: previlagename, selectedindex: 0, data: subprivilagesArray, id: privilege.id });
+              this.setState({ webPrivileges: totalPrivilages })
+              // parentPrvlgs.map((privilegeItem) => {
+              //   privilegeItem.selectedindex = 1;
+              //   privilegeItem.subPrivilege.childPrivileges !== null && privilegeItem.subPrivilege.childPrivileges.map((childItem) => {
+              //     childItem.selectedindex = 1;
+              //     var temp = { id: childItem.id };
+              //     childIds.push(temp);
+              //   })
+              //   const selectedWebSubPrvlg = {
+              //     id: privilegeItem.subPrivilege.id,
+              //     parentId: privilegeItem.subPrivilege.parentPrivilegeId,
+              //     childPrivillages: childIds
+              //   };
+
+              //   this.state.selectedSubPrvlgs.push(selectedWebSubPrvlg)
+              // });
+              // const obj = {
+              //   id: item.id
+              // }
+              // this.state.selectedParentPrvlgs.push(obj)
+            // });
+
+          }
+          // data creation for add privilage
+          else {
+            let webRes = res.data.webPrivileges;
+            let len = webRes.length;
+            if (len > 0) {
+              this.setState({ loading: false });
+              for (let i = 0; i < len; i++) {
+                let privilege = webRes[i];
+                let previlagename = webRes[i].name;
+                if (privilege.subPrivileges !== null) {
+                  let subPrivilegeRes = privilege.subPrivileges;
+                  let subLen = subPrivilegeRes.length;
+                  var subprivilagesArray = [];
+                  if (subLen > 0) {
+                    for (let j = 0; j < subLen; j++) {
+                      if (privilege.id === subPrivilegeRes[j].parentPrivilegeId) {
+                        let subPrivilege = subPrivilegeRes[j];
                         if (subPrivilege.childPrivileges !== null) {
                           let childLen = subPrivilege.childPrivileges.length;
                           for (let p = 0; p < childLen; p++) {
                             if (subPrivilege.id === subPrivilege.childPrivileges[p].subPrivillageId) {
-                              //  subPrivilege.childPrivileges[p].push({selectedindex:1})
-                              subPrivilege.childPrivileges[p].selectedindex = 0;
+                              subPrivilege.childPrivileges[p].selectedindex = 0
                             }
                           }
                         }
@@ -380,11 +406,11 @@ export default class Privilages extends Component {
                     }
                   }
                 }
+                console.log("sub privilages Array",subprivilagesArray);
+                this.state.webPrivileges.push({ title: previlagename, selectedindex: 0, data: subprivilagesArray, id: privilege.id });
+                this.setState({ webPrivileges: this.state.webPrivileges });
+                this.setState({ subWebList: this.state.subWebList });
               }
-              this.state.webPrivileges.push({ title: previlagename, selectedindex: 0, data: subprivilagesArray, child: childPrivillagesArray, id: privilege.id });
-              this.setState({ webPrivileges: this.state.webPrivileges });
-              // console.log("web privilages array", JSON.stringify(this.state.webPrivileges[0].child));
-              this.setState({ subWebList: this.state.subWebList });
             }
           }
         }
@@ -519,7 +545,7 @@ export default class Privilages extends Component {
           for (let j = 0; sel[i].childPrivillages && j < sel[i].childPrivillages.length; j++) {
             //Finding the unselected child privilage
             if (sel[i].childPrivillages[j].id === childItem.id) {
-              console.log("in else", sel[i].childPrivillages[j], childItem.id);
+              // console.log("in else", sel[i].childPrivillages[j], childItem.id);
               //Removing  from the state
               sel[i].childPrivillages.splice(j, 1);
               found = true;
@@ -684,7 +710,6 @@ export default class Privilages extends Component {
         }
       }
     }
-    // console.log("webParentPrivileges ids", JSON.stringify(webParentPrivileges));
     this.setState({ subWebList: this.state.subWebList });
     global.mobilePrivilages = this.state.subMobileList;
     global.webPrivilages = this.state.subWebList;
@@ -696,11 +721,9 @@ export default class Privilages extends Component {
     this.props.navigation.goBack();
   }
 
-
-
   render() {
-    // console.log("selected Parent Prvlgs", JSON.stringify(this.state.selectedParentPrvlgs), "select sub prvlgs : " + JSON.stringify(this.state.selectedSubPrvlgs));
-    // console.log("selected mobile Parent Prvlgs", JSON.stringify(this.state.selectedMobileParentPrvlgs), "select Mobile sub prvlgs : " + JSON.stringify(this.state.selectedMobileSubPrvlgs));
+    // console.log("selected Parent Prvlgs in render", JSON.stringify(this.state.selectedParentPrvlgs), "select sub prvlgs : " + JSON.stringify(this.state.selectedSubPrvlgs));
+    // console.log("selected mobile Parent Prvlgs in render", JSON.stringify(this.state.selectedMobileParentPrvlgs), "select Mobile sub prvlgs : " + JSON.stringify(this.state.selectedMobileSubPrvlgs));
     return (
       <View style={styles.mainContainer}>
         {this.state.loading &&
@@ -734,6 +757,7 @@ export default class Privilages extends Component {
         </View>
         <FlatList
           data={this.state.webPrivileges}
+          keyExtractor={(item, i) => i.toString()}
           renderItem={({ item, index }) => (
             <View>
               {this.state.viewWeb && (
@@ -746,7 +770,7 @@ export default class Privilages extends Component {
                       {item.selectedindex === 0 && (
                         <Image source={require('../assets/images/langunselect.png')} style={{ left: 20, top: 5 }} />
                       )}
-                      <Text style={scss.section_headers}>{item.title}</Text>
+                      <Text style={scss.section_headers}>{item.title ? item.title : item.name}</Text>
                     </View>
                   </TouchableOpacity>
                   {item.selectedindex === 1 &&
@@ -876,7 +900,7 @@ export default class Privilages extends Component {
           )
           }
         />
-        < View style={forms.action_buttons_container} >
+        <View style={forms.action_buttons_container} >
           <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
             onPress={() => this.saveRole()}>
             <Text style={forms.submit_btn_text} >{I18n.t("SAVE")}</Text>

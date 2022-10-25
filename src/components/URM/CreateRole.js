@@ -47,8 +47,10 @@ export default class CreateRole extends Component {
       roleValid: true,
       domainValid: true,
       descriptionValid: true,
+      mobilePrvlgs: []
     };
   }
+
 
   async componentDidMount() {
     // Client Id
@@ -58,15 +60,15 @@ export default class CreateRole extends Component {
     console.log({ clientId, userId });
     // check for Edit OR Create Roles
     this.setState({ isEdit: this.props.route.params.isEdit, userId: userId });
+    // console.log("edit data", this.props.route.params.editParentPrivilegesResult.mobile);
     if (this.state.isEdit === true) {
-      let editItems = this.props.route.params;
-      console.log({ editItems });
       this.setState({
         description: this.props.route.params.item.description,
         role: this.props.route.params.item.roleName,
         roles: this.props.route.params.item.subPrivilege,
         parentlist: this.props.route.params.item.parentPrivileges,
-        roleId: this.props.route.params.item.id,
+        mobilePrvlgs: this.props.route.params.editParentPrivilegesResult.mobile,
+        roleId: this.props.route.params.item.id
       });
       this.setState({ navtext: "Edit Role" });
     } else {
@@ -128,8 +130,8 @@ export default class CreateRole extends Component {
 
   // Saving Role
   saveRole() {
-    console.log(this.state.parentlist);
-    console.log(this.state.childlist);
+    // console.log(this.state.parentlist);
+    // console.log(this.state.childlist);
     const isFormValid = this.validationForm();
     let parentPrivilegesList = [];
     let subPrivilegesList = [];
@@ -179,12 +181,12 @@ export default class CreateRole extends Component {
           description: this.state.description,
           clientId: this.state.clientId,
           createdBy: this.state.userId,
-          parentPrivileges: this.state.parentlist,
-          subPrivileges: this.state.roles,
+          parentPrivileges: parentPrivilegesList,
+          subPrivileges: subPrivilegesList,
           roleId: this.state.roleId,
         };
 
-        console.log({ saveObj });
+        console.log("save Obj params", saveObj);
         this.setState({ loading: true });
         UrmService.editRole(saveObj)
           .then((res) => {
@@ -208,10 +210,13 @@ export default class CreateRole extends Component {
   // Privileges Mapping Action
   privilageMapping() {
     global.privilages = [];
+    var editParentPrivileges = this.props.route.params.editParentPrivilegesResult
     this.props.navigation.navigate("Privilages", {
+      editParentPrivileges: editParentPrivileges,
       domain: this.state.domain,
       child: this.state.roles,
       parentlist: this.state.parentlist,
+      isEdit: this.state.isEdit,
       onGoBack: () => this.refresh(),
     });
   }
@@ -346,17 +351,20 @@ export default class CreateRole extends Component {
           </View>
 
           <ScrollView>
+            <View>
+              <Text style={{}}>{I18n.t("Mobile Privileges")}</Text>
+              <></>
+            </View>
             <FlatList
-              data={this.state.roles}
+              data={this.state.mobilePrvlgs}
               style={{ marginTop: 20 }}
               onEndReached={this.onEndReached.bind(this)}
               ref={(ref) => {
                 this.listRef = ref;
               }}
-              keyExtractor={(item) => item}
+              keyExtractor={(item, i) => i.toString()}
               renderItem={({ item, index }) => (
                 <View style={scss.flatListContainer}>
-                  {console.log({ item })}
                   <View style={scss.model_subbody}>
                     <View style={scss.textContainer}>
                       <Text style={scss.textStyleLight}>PRIVILEGE: {"\n"}<Text style={scss.textStyleMedium}>{item.name}</Text> </Text>
