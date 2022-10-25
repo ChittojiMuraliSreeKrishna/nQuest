@@ -20,7 +20,7 @@ import UrmService from "../services/UrmService";
 import {
   inputHeading
 } from "../Styles/FormFields";
-
+import IconAD from 'react-native-vector-icons/AntDesign'
 
 var deviceWidth = Dimensions.get("window").width;
 
@@ -47,7 +47,10 @@ export default class CreateRole extends Component {
       roleValid: true,
       domainValid: true,
       descriptionValid: true,
-      mobilePrvlgs: []
+      mobilePrvlgs: [],
+      viewMobile: false,
+      viewWeb: false,
+      webPrvlgs: []
     };
   }
 
@@ -68,6 +71,7 @@ export default class CreateRole extends Component {
         roles: this.props.route.params.item.subPrivilege,
         parentlist: this.props.route.params.item.parentPrivileges,
         mobilePrvlgs: this.props.route.params.editParentPrivilegesResult.mobile,
+        webPrvlgs: this.props.route.params.editParentPrivilegesResult.web,
         roleId: this.props.route.params.item.id
       });
       this.setState({ navtext: "Edit Role" });
@@ -130,8 +134,6 @@ export default class CreateRole extends Component {
 
   // Saving Role
   saveRole() {
-    // console.log(this.state.parentlist);
-    // console.log(this.state.childlist);
     const isFormValid = this.validationForm();
     let parentPrivilegesList = [];
     let subPrivilegesList = [];
@@ -186,7 +188,7 @@ export default class CreateRole extends Component {
           roleId: this.state.roleId,
         };
 
-        console.log("save Obj params", saveObj);
+        console.log("save Obj params", JSON.stringify(saveObj));
         this.setState({ loading: true });
         UrmService.editRole(saveObj)
           .then((res) => {
@@ -276,6 +278,13 @@ export default class CreateRole extends Component {
     this.setState({ description: value });
   };
 
+  handleViewMobile() {
+    this.setState({ viewMobile: !this.state.viewMobile });
+  }
+  handleViewWeb() {
+    this.setState({ viewWeb: !this.state.viewWeb });
+  }
+
   render() {
     const roleValid = this.state.roleValid;
     const descriptionValid = this.state.descriptionValid;
@@ -350,42 +359,113 @@ export default class CreateRole extends Component {
             </TouchableOpacity>
           </View>
 
-          <ScrollView>
-            <View>
-              <Text style={{}}>{I18n.t("Mobile Privileges")}</Text>
-              <></>
-            </View>
-            <FlatList
-              data={this.state.mobilePrvlgs}
-              style={{ marginTop: 20 }}
-              onEndReached={this.onEndReached.bind(this)}
-              ref={(ref) => {
-                this.listRef = ref;
-              }}
-              keyExtractor={(item, i) => i.toString()}
-              renderItem={({ item, index }) => (
-                <View style={scss.flatListContainer}>
-                  <View style={scss.model_subbody}>
-                    <View style={scss.textContainer}>
-                      <Text style={scss.textStyleLight}>PRIVILEGE: {"\n"}<Text style={scss.textStyleMedium}>{item.name}</Text> </Text>
-                      <Text style={scss.textStyleLight}></Text>
-                    </View>
-                    <View style={scss.textContainer}>
-                      <Text style={scss.textStyleLight}>DESCRIPTION: {"\n"}{item.description}</Text>
-                      <Text style={scss.textStyleLight}>#{index + 1}</Text>
-                    </View>
-                  </View>
-                </View>
-              )}
-            />
-            <View style={styles.messageContainer}>
-              <Text style={styles.message}>
-                {I18n.t(
-                  "add more privileges by clicking on Privilege Mapping button",
+          {this.state.isEdit === true && (
+            <ScrollView>
+              {/* web privileges */}
+              <TouchableOpacity style={styles.subHeadingStyle} onPress={() => this.handleViewWeb()}>
+                <Text style={{ fontSize: RF(14) }}>Web Privileges</Text>
+                <IconAD
+                  name={this.state.viewWeb ? 'up' : 'down'}
+                  size={25}
+                  color="#000"
+                />
+              </TouchableOpacity>
+              <FlatList
+                data={this.state.webPrvlgs}
+                style={{ marginTop: 20 }}
+                onEndReached={this.onEndReached.bind(this)}
+                ref={(ref) => {
+                  this.listRef = ref;
+                }}
+                keyExtractor={(item, i) => i.toString()}
+                ListEmptyComponent={
+                  <Text
+                    style={{
+                      color: "#cc241d",
+                      textAlign: "center",
+                      fontFamily: "bold",
+                      fontSize: RF(14)
+                    }}
+                  >
+                    &#9888; Records Not Found
+                  </Text>
+                }
+                renderItem={({ item, index }) => (
+                  <>
+                    {this.state.viewWeb && (
+                      <View style={scss.flatListContainer}>
+                        <View style={scss.model_subbody}>
+                          <View style={scss.textContainer}>
+                            <Text style={scss.textStyleLight}>PRIVILEGE: {"\n"}<Text style={scss.textStyleMedium}>{item.name}</Text> </Text>
+                            <Text style={scss.textStyleLight}></Text>
+                          </View>
+                          <View style={scss.textContainer}>
+                            <Text style={scss.textStyleLight}>DESCRIPTION: {"\n"}{item.description}</Text>
+                            <Text style={scss.textStyleLight}>#{index + 1}</Text>
+                          </View>
+                        </View>
+                      </View>
+                    )}</>
                 )}
-              </Text>
-            </View>
-          </ScrollView>
+              />
+              {/* mobile privileges */}
+              <TouchableOpacity style={styles.subHeadingStyle} onPress={() => this.handleViewMobile()}>
+                <Text style={{ fontSize: RF(14) }}>Mobile Privileges</Text>
+                <IconAD
+                  name={this.state.viewMobile ? 'up' : 'down'}
+                  size={25}
+                  color="#000"
+                />
+              </TouchableOpacity>
+              <FlatList
+                data={this.state.mobilePrvlgs}
+                style={{ marginTop: 20 }}
+                onEndReached={this.onEndReached.bind(this)}
+                ref={(ref) => {
+                  this.listRef = ref;
+                }}
+                keyExtractor={(item, i) => i.toString()}
+                ListEmptyComponent={
+                  <Text
+                    style={{
+                      color: "#cc241d",
+                      textAlign: "center",
+                      fontFamily: "bold",
+                      fontSize: RF(14)
+                    }}
+                  >
+                    &#9888; Records Not Found
+                  </Text>
+                }
+                renderItem={({ item, index }) => (
+                  <>
+                    {this.state.viewMobile && (
+                      <View style={scss.flatListContainer}>
+                        <View style={scss.model_subbody}>
+                          <View style={scss.textContainer}>
+                            <Text style={scss.textStyleLight}>PRIVILEGE: {"\n"}<Text style={scss.textStyleMedium}>{item.name}</Text> </Text>
+                            <Text style={scss.textStyleLight}></Text>
+                          </View>
+                          <View style={scss.textContainer}>
+                            <Text style={scss.textStyleLight}>DESCRIPTION: {"\n"}{item.description}</Text>
+                            <Text style={scss.textStyleLight}>#{index + 1}</Text>
+                          </View>
+                        </View>
+                      </View>
+                    )}</>
+                )}
+              />
+            </ScrollView>
+          )}
+          
+          <View style={styles.messageContainer}>
+            <Text style={styles.message}>
+              {I18n.t(
+                "add more privileges by clicking on Privilege Mapping button",
+              )}
+            </Text>
+          </View>
+
           <View style={forms.action_buttons_container}>
             <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
               onPress={() => this.saveRole()}>
@@ -447,6 +527,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: RH(5),
   },
+  subHeadingStyle: {
+    flexDirection: 'row', justifyContent: 'space-between', padding: RW(20),
+  }
 });
 
 const poolflats = StyleSheet.create({
