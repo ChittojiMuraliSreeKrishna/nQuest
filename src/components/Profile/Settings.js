@@ -5,9 +5,12 @@ import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View
 import DatePicker from "react-native-date-picker";
 import Device from "react-native-device-detection";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import Modal from "react-native-modal";
 import { Appbar, Button, TextInput } from 'react-native-paper';
 import RNPickerSelect from "react-native-picker-select";
 import { Chevron } from "react-native-shapes";
+import IconFA from 'react-native-vector-icons/FontAwesome';
+import popUp from '../../commonUtils/assets/styles/Bars.scss';
 import scss from '../../commonUtils/assets/styles/Settings.scss';
 import Message from '../Errors/Message';
 import ProfileService from '../services/ProfileService';
@@ -40,7 +43,9 @@ export default class Settings extends Component {
       mobileNumberValid: false,
       emailValid: false,
       errors: {},
-      isEdit: false
+      isEdit: false,
+      storeName: "",
+      showStores: false
     };
   }
   clearAllData () {
@@ -124,6 +129,9 @@ export default class Settings extends Component {
     const username = await AsyncStorage.getItem("username");
     const roleName = await AsyncStorage.getItem("rolename");
     const phonenumber = await AsyncStorage.getItem("phone_number");
+    AsyncStorage.getItem("storeName").then((value) => {
+      this.setState({ storeName: value });
+    });
     this.setState({ loading: true });
     axios.get(ProfileService.getUser() + username).then(res => {
       if (res?.data) {
@@ -182,6 +190,10 @@ export default class Settings extends Component {
     return true;
   }
 
+  handleViewStores () {
+    this.setState({ showStores: !this.state.showStores });
+  }
+
   render () {
     const { mobileNumberValid, emailValid, errors } = this.state;
     return (
@@ -205,15 +217,48 @@ export default class Settings extends Component {
               <View style={scss.profileSubView}>
                 <Text style={scss.normalText}>Mobile-No:{"\n"} <Text style={scss.boldText}><Text style={{ color: '#ED1c24' }}>+91</Text> {this.state.mobileNumber.split("+91")}</Text> </Text>
                 <Text style={scss.normalText}>Email-Id:{"\n"} <Text style={scss.boldText}>{this.state.emailId}</Text></Text>
-                <Text style={scss.normalText}>Stores:{"\n"} {this.state.stores.map((item, index) => {
-                  return (
-                    <Text style={scss.boldText}>{item.name}</Text>
-                  );
-                })}</Text>
+                <Text style={scss.normalText}>Stores:</Text>
+                <TouchableOpacity style={{ flexDirection: 'row' }} onPress={() => this.handleViewStores()}
+                >
+                  <Text style={scss.boldText}> {this.state.storeName} </Text>
+                  <IconFA
+                    name='eye'
+                    size={20}
+                    color="#000"
+                  />
+                </TouchableOpacity>
               </View>
             </View>
           </View>
         </View>}
+        {this.state.showStores && (
+          <View>
+            <Modal
+              isVisible={this.state.showStores}
+              onBackdropPress={() => this.handleViewStores()}
+              style={{ margin: 0 }}>
+              <View style={[ popUp.popUp ]}>
+                <Text style={popUp.popUp_decorator}></Text>
+                <View style={[ popUp.popupModelContainer ]}>
+                  <Text>
+                    {this.state.stores.map((item, index) => {
+                      return (
+                        <Text style={scss.boldText}>{index + 1}. {item.name}{"\n"}</Text>
+                      );
+                    })}
+                  </Text>
+                </View>
+                <IconFA
+                  name='close'
+                  color='#bbb'
+                  size={30}
+                  style={{ paddingBottom: 20 }}
+                  onPress={() => this.handleViewStores()}
+                />
+              </View>
+            </Modal>
+          </View>
+        )}
         <Button onPress={() => this.editUser()}>
           <Text style={scss.highText}>{this.state.isEdit ? "Close" : "Edit"}</Text>
         </Button>

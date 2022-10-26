@@ -21,6 +21,7 @@ export default class CreateTaxMaster extends Component {
       modalVisible: true,
       taxList: [],
       loading: false,
+      isFetching: false,
     };
   }
 
@@ -76,6 +77,10 @@ export default class CreateTaxMaster extends Component {
     });
   }
 
+  refresh () {
+    this.getTaxMaster();
+  }
+
   render () {
     return (
       <View>
@@ -91,6 +96,8 @@ export default class CreateTaxMaster extends Component {
               ></IconIA>
             </View>
           }
+          refreshing={this.state.isFetching}
+          onRefresh={() => this.refresh()}
           data={this.state.taxList}
           style={{ backgroundColor: '#FFF' }}
           scrollEnabled={true}

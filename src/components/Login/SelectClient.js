@@ -24,7 +24,7 @@ export class SelectClient extends Component {
     console.log({ userId });
     this.getAllClients(userId);
     let clientId = await AsyncStorage.getItem("custom:clientId1");
-    this.setState({ clientId: clientId, });
+    this.setState({ clientId: clientId, selectedItem: null });
   }
 
   getAllClients (userId) {
@@ -71,11 +71,22 @@ export class SelectClient extends Component {
     }
   }
 
+  handleGoBack () {
+    AsyncStorage.getItem("Home").then((value) => {
+      if (value !== null) {
+        this.props.navigation.push("HomeNavigation");
+      } else {
+        this.props.navigation.goBack();
+      }
+    });
+    return true;
+  }
+
   render () {
     return (
       <View>
         <Appbar mode="center-aligned">
-          <Appbar.BackAction onPress={() => this.props.navigation.goBack()} />
+          <Appbar.BackAction onPress={() => this.handleGoBack()} />
           <Appbar.Content title="Select Client" />
         </Appbar>
         <FlatList
@@ -99,7 +110,7 @@ export class SelectClient extends Component {
         <Button mode='elevated' style={forms.continue_btn} onPress={() => this.continueAction()}>
           <Text style={forms.submit_btn_text}>Continue</Text>
         </Button>
-        <Button mode='elevated' style={forms.cancel_full_btn} onPress={() => this.props.navigation.goBack()}>
+        <Button mode='elevated' style={forms.cancel_full_btn} onPress={() => this.handleGoBack()}>
           <Text style={forms.cancel_btn_text}>Cancel</Text>
         </Button>
       </View>
