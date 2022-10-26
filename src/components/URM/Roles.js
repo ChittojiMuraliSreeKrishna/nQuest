@@ -76,7 +76,7 @@ export default class Roles extends Component {
     UrmService.getAllRoles(clientId, pageNumber).then((res) => {
       if (res) {
         let response = res.data;
-        console.log({ response });
+        // console.log({ response });
         this.setState({ rolesData: res.data, loading: false });
       } else {
         this.setState({ loading: false });
@@ -152,12 +152,12 @@ export default class Roles extends Component {
       createdBy: createdBy ? createdBy : null,
       createdDate: createdDate ? createdDate : null,
     };
-    console.log(searchRole);
+    // console.log(searchRole);
     UrmService.getRolesBySearch(searchRole).then((res) => {
-      console.log(res.data);
+      // console.log(res.data);
       if (res && res.data && res.data['status'] === 200) {
         let rolesList = res.data.result;
-        console.log({ rolesList });
+        // console.log({ rolesList });
         this.setState({ filterRolesData: rolesList, filterActive: true });
       }
       else {
@@ -167,9 +167,29 @@ export default class Roles extends Component {
     });
   }
 
+  groupBySubPrivileges(array) {
+    let initialValue = {
+      mobile: [],
+      web: []
+    };
+    return array.reduce((accumulator, current) => {
+      (current.previlegeType === 'Mobile') ? accumulator.mobile.push(current) : accumulator.web.push(current);
+      return accumulator;
+    }, initialValue);
+  }
+
   // Edit Role Action
-  handleeditrole(item, index) {
+  async handleeditrole(item, index) {
+    var parentPrivilegesResult
+    await UrmService.getPrivillagesByRoleName(item.roleName).then(async (res) => {
+      if (res) {
+        if (res.data) {
+          parentPrivilegesResult = this.groupBySubPrivileges(res.data.parentPrivileges);
+        }
+      }
+    })
     this.props.navigation.navigate("CreateRole", {
+      editParentPrivilegesResult: parentPrivilegesResult,
       item: item,
       isEdit: true,
       navText: "Edit Role",
@@ -185,6 +205,7 @@ export default class Roles extends Component {
         {this.state.loading && <Loader loading={this.state.loading} />}
         <FlatList
           style={scss.flatListBody}
+          keyExtractor={(item, i) => i.toString()}
           ListHeaderComponent={
             <View style={scss.headerContainer}>
               <Text style={flatListTitle}>
