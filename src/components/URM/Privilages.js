@@ -3,10 +3,10 @@ import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View }
 import I18n from 'react-native-i18n';
 import { Appbar, RadioButton } from 'react-native-paper';
 import IconFa from 'react-native-vector-icons/FontAwesome';
+import forms from "../../commonUtils/assets/styles/formFields.scss";
 import scss from '../../commonUtils/assets/styles/Privileges.scss';
 import Loader from '../../commonUtils/loader';
 import UrmService from '../services/UrmService';
-import forms from "../../commonUtils/assets/styles/formFields.scss";
 
 var deviceWidth = Dimensions.get('window').width;
 var deviceWidth = Dimensions.get('window').width;
@@ -44,25 +44,25 @@ export default class Privilages extends Component {
   }
 
   // Handle Go Back
-  handleBackButtonClick() {
+  handleBackButtonClick () {
     this.props.navigation.goBack(null);
     return true;
   }
 
-  async componentDidMount() {
+  async componentDidMount () {
     const editPriv = this.props.route.params;
     this.setState({
       editWebPrivileges: editPriv.editParentPrivileges && editPriv.editParentPrivileges.web,
       editMobilePrivileges: editPriv.editParentPrivileges && editPriv.editParentPrivileges.mobile,
       isEdit: editPriv.isEdit
     });
-    this.state.selectedMobileSubPrvlgs
+    this.state.selectedMobileSubPrvlgs;
     this.getWebPrivileges();
     this.getMobilePrivileges();
   }
 
   // Mobile Privileges Functions
-  getMobilePrivileges() {
+  getMobilePrivileges () {
     global.mobilePrivilages = [];
     this.setState({ loading: true });
     UrmService.getAllPrivillages().then((res) => {
@@ -74,31 +74,31 @@ export default class Privilages extends Component {
           let stateSubPrivilages = [];
           for (let i = 0; i < totalPrivilages.length; i++) {
             for (let j = 0; existingPrivilages !== null && existingPrivilages !== undefined && j < existingPrivilages.length; j++) {
-              if (totalPrivilages[i].id === existingPrivilages[j].id) {
-                this.handleViewMobile()
+              if (totalPrivilages[ i ].id === existingPrivilages[ j ].id) {
+                this.handleViewMobile();
                 let obj = {
-                  id: existingPrivilages[j].id
-                }
+                  id: existingPrivilages[ j ].id
+                };
                 stateParentPrivilages.push(obj);
-                totalPrivilages[i].selectedindex = 1;
-                let totalSubPrvlgs = totalPrivilages[i].subPrivileges;
-                let exisingSubPrvlgs = existingPrivilages[j].subPrivileges
+                totalPrivilages[ i ].selectedindex = 1;
+                let totalSubPrvlgs = totalPrivilages[ i ].subPrivileges;
+                let exisingSubPrvlgs = existingPrivilages[ j ].subPrivileges;
                 for (let k = 0; totalSubPrvlgs !== null && k < totalSubPrvlgs.length; k++) {
                   for (let m = 0; exisingSubPrvlgs !== null && m < exisingSubPrvlgs.length; m++) {
-                    if (totalSubPrvlgs[k].id === exisingSubPrvlgs[m].id) {
+                    if (totalSubPrvlgs[ k ].id === exisingSubPrvlgs[ m ].id) {
                       let temp = {
-                        parentId: exisingSubPrvlgs[m].parentPrivilegeId,
-                        id: exisingSubPrvlgs[m].id,
+                        parentId: exisingSubPrvlgs[ m ].parentPrivilegeId,
+                        id: exisingSubPrvlgs[ m ].id,
                       };
-                      totalSubPrvlgs[k].selectedindex = 1
-                      let totalChildPrvlgs = totalSubPrvlgs[k].childPrivileges
-                      let exisingChildPrvlgs = exisingSubPrvlgs[m].childPrivileges;
+                      totalSubPrvlgs[ k ].selectedindex = 1;
+                      let totalChildPrvlgs = totalSubPrvlgs[ k ].childPrivileges;
+                      let exisingChildPrvlgs = exisingSubPrvlgs[ m ].childPrivileges;
                       let childPrivilages = [];
                       for (let g = 0; totalChildPrvlgs !== null && g < totalChildPrvlgs.length; g++) {
                         for (let h = 0; exisingChildPrvlgs !== null && h < exisingChildPrvlgs.length; h++) {
-                          if (totalChildPrvlgs[g].id === exisingChildPrvlgs[h].id) {
-                            totalChildPrvlgs[g].selectedindex = 1;
-                            childPrivilages.push({ id: exisingChildPrvlgs[h].id });
+                          if (totalChildPrvlgs[ g ].id === exisingChildPrvlgs[ h ].id && exisingChildPrvlgs[ h ].isEnabeld === true) {
+                            totalChildPrvlgs[ g ].selectedindex = 1;
+                            childPrivilages.push({ id: exisingChildPrvlgs[ h ].id });
                           }
                         }
                       }
@@ -109,9 +109,9 @@ export default class Privilages extends Component {
                 }
               }
             }
-            this.setState({ selectedMobileParentPrvlgs: stateParentPrivilages, selectedMobileSubPrvlgs: stateSubPrivilages })
+            this.setState({ selectedMobileParentPrvlgs: stateParentPrivilages, selectedMobileSubPrvlgs: stateSubPrivilages });
           }
-          this.setState({ mobilePrivileges: totalPrivilages })
+          this.setState({ mobilePrivileges: totalPrivilages });
         }
       } else {
         this.setState({ loading: false });
@@ -127,49 +127,49 @@ export default class Privilages extends Component {
       item.selectedindex = 1;
       item.subPrivileges.map((subPrvlItem) => {
         var childIds = [];
-        subPrvlItem.selectedindex = 1
+        subPrvlItem.selectedindex = 1;
         subPrvlItem.childPrivileges !== null && subPrvlItem.childPrivileges.map((childItem) => {
-          childItem.selectedindex = 1
+          childItem.selectedindex = 1;
           var temp = { id: childItem.id };
           childIds.push(temp);
-        })
+        });
         const selectedSubPrvlg = {
           id: subPrvlItem.id,
           parentId: subPrvlItem.parentPrivilegeId,
           childPrivillages: childIds
         };
-        this.state.selectedMobileSubPrvlgs.push(selectedSubPrvlg)
-      })
+        this.state.selectedMobileSubPrvlgs.push(selectedSubPrvlg);
+      });
       const obj = {
         id: item.id
-      }
-      this.state.selectedMobileParentPrvlgs.push(obj)
+      };
+      this.state.selectedMobileParentPrvlgs.push(obj);
     }
     //Before selected, now unselected
     else {
       item.selectedindex = 0;
-      let parentPrvlgs = this.state.selectedMobileParentPrvlgs
+      let parentPrvlgs = this.state.selectedMobileParentPrvlgs;
       for (let i = 0; i < parentPrvlgs.length; i++) {
-        if (parentPrvlgs[i].id === item.id) {
-          parentPrvlgs.splice(i, 1)
-          break
+        if (parentPrvlgs[ i ].id === item.id) {
+          parentPrvlgs.splice(i, 1);
+          break;
         }
       }
       item.subPrivileges.map((subPrvlItem) => {
-        subPrvlItem.selectedindex = 0
+        subPrvlItem.selectedindex = 0;
         subPrvlItem.childPrivileges !== null && subPrvlItem.childPrivileges.map((childItem) => {
-          childItem.selectedindex = 0
-        })
+          childItem.selectedindex = 0;
+        });
         var sel = this.state.selectedSubPrvlgs;
         for (let i = 0; i < sel.length; i++) {
-          if (sel[i].id === subPrvlItem.id) {
+          if (sel[ i ].id === subPrvlItem.id) {
             sel.splice(i, 1);
           }
         }
         const list = this.state.subWebList;
         list.splice(index, 1);
         this.setState({ subWebList: list, isAllWebChecked: false, selectedMobileParentPrvlgs: parentPrvlgs, selectedMobileSubPrvlgs: sel });
-      })
+      });
     }
     this.setState({ mobilePrivileges: this.state.mobilePrivileges });
   };
@@ -179,27 +179,27 @@ export default class Privilages extends Component {
       item.selectedindex = 1;
       var childIds = [];
       item.childPrivileges !== null && item.childPrivileges.map((childItem) => {
-        childItem.selectedindex = 1
+        childItem.selectedindex = 1;
         var temp = { id: childItem.id };
         childIds.push(temp);
-      })
+      });
       const selectedSubPrvlg = {
         id: item.id,
         parentId: item.parentPrivilegeId,
         childPrivillages: childIds
       };
-      this.state.selectedMobileSubPrvlgs.push(selectedSubPrvlg)
+      this.state.selectedMobileSubPrvlgs.push(selectedSubPrvlg);
     }
     else {
       item.selectedindex = 0;
       item.childPrivileges !== null && item.childPrivileges.map((childItem) => {
-        childItem.selectedindex = 0
-      })
+        childItem.selectedindex = 0;
+      });
       var sel = this.state.selectedMobileSubPrvlgs;
       for (let i = 0; i < sel.length; i++) {
-        if (sel[i].id === item.id) {
+        if (sel[ i ].id === item.id) {
           sel.splice(i, 1);
-          break
+          break;
         }
       }
       const list = this.state.subMobileList;
@@ -215,30 +215,30 @@ export default class Privilages extends Component {
       var sel = this.state.selectedMobileSubPrvlgs;
       if (sel.length > 0) {
         for (let i = 0; i < sel.length; i++) {
-          if (sel[i].id == childItem.subPrivillageId) {
+          if (sel[ i ].id == childItem.subPrivillageId) {
             //childIds = sel[i].childPrivillages;
-            sel[i].childPrivillages.push({ id: childItem.id });
+            sel[ i ].childPrivillages.push({ id: childItem.id });
             //sel.
             break;
           }
         }
       }
-      this.setState({ selectedSubPrvlgs: sel })
+      this.setState({ selectedSubPrvlgs: sel });
     }
     else {
-      childItem.selectedindex = 0
+      childItem.selectedindex = 0;
       var sel = this.state.selectedMobileSubPrvlgs;
       let found = false;
       //Looping subprivilages to remove the selected child privilage
       for (let i = 0; i < sel.length; i++) {
         //Checking for which Subprivilage unselected child Privilage belongs
-        if (sel[i].id === childItem.subPrivillageId) {
-          for (let j = 0; sel[i].childPrivillages && j < sel[i].childPrivillages.length; j++) {
+        if (sel[ i ].id === childItem.subPrivillageId) {
+          for (let j = 0; sel[ i ].childPrivillages && j < sel[ i ].childPrivillages.length; j++) {
             //Finding the unselected child privilage
-            if (sel[i].childPrivillages[j].id === childItem.id) {
+            if (sel[ i ].childPrivillages[ j ].id === childItem.id) {
               // console.log("in else", sel[i].childPrivillages[j], childItem.id);
               //Removing  from the state
-              sel[i].childPrivillages.splice(j, 1);
+              sel[ i ].childPrivillages.splice(j, 1);
               found = true;
               break;
             }
@@ -255,14 +255,14 @@ export default class Privilages extends Component {
       this.setState({ subMobileList: list, isAllMobileChecked: false, selectedMobileSubPrvlgs: sel });
     }
     this.setState({ mobilePrivileges: this.state.mobilePrivileges });
-  }
+  };
 
-  handleViewMobile() {
+  handleViewMobile () {
     this.setState({ viewMobile: !this.state.viewMobile });
   }
 
   // Web Privileges Functions
-  getWebPrivileges() {
+  getWebPrivileges () {
     global.webPrivilages = [];
     this.setState({ loading: true });
     UrmService.getAllPrivillages().then((res) => {
@@ -275,31 +275,31 @@ export default class Privilages extends Component {
           let stateSubPrivilages = [];
           for (let i = 0; i < totalPrivilages.length; i++) {
             for (let j = 0; existingPrivilages !== null && existingPrivilages !== undefined && j < existingPrivilages.length; j++) {
-              if (totalPrivilages[i].id === existingPrivilages[j].id) {
-                this.handleViewWeb()
+              if (totalPrivilages[ i ].id === existingPrivilages[ j ].id) {
+                this.handleViewWeb();
                 let obj = {
-                  id: existingPrivilages[j].id
-                }
+                  id: existingPrivilages[ j ].id
+                };
                 stateParentPrivilages.push(obj);
-                totalPrivilages[i].selectedindex = 1;
-                let totalSubPrvlgs = totalPrivilages[i].subPrivileges;
-                let exisingSubPrvlgs = existingPrivilages[j].subPrivileges
+                totalPrivilages[ i ].selectedindex = 1;
+                let totalSubPrvlgs = totalPrivilages[ i ].subPrivileges;
+                let exisingSubPrvlgs = existingPrivilages[ j ].subPrivileges;
                 for (let k = 0; totalSubPrvlgs !== null && k < totalSubPrvlgs.length; k++) {
                   for (let m = 0; exisingSubPrvlgs !== null && m < exisingSubPrvlgs.length; m++) {
-                    if (totalSubPrvlgs[k].id === exisingSubPrvlgs[m].id) {
+                    if (totalSubPrvlgs[ k ].id === exisingSubPrvlgs[ m ].id) {
                       let temp = {
-                        parentId: exisingSubPrvlgs[m].parentPrivilegeId,
-                        id: exisingSubPrvlgs[m].id,
+                        parentId: exisingSubPrvlgs[ m ].parentPrivilegeId,
+                        id: exisingSubPrvlgs[ m ].id,
                       };
-                      totalSubPrvlgs[k].selectedindex = 1
-                      let totalChildPrvlgs = totalSubPrvlgs[k].childPrivileges
-                      let exisingChildPrvlgs = exisingSubPrvlgs[m].childPrivileges;
+                      totalSubPrvlgs[ k ].selectedindex = 1;
+                      let totalChildPrvlgs = totalSubPrvlgs[ k ].childPrivileges;
+                      let exisingChildPrvlgs = exisingSubPrvlgs[ m ].childPrivileges;
                       let childPrivilages = [];
                       for (let g = 0; totalChildPrvlgs !== null && g < totalChildPrvlgs.length; g++) {
                         for (let h = 0; exisingChildPrvlgs !== null && h < exisingChildPrvlgs.length; h++) {
-                          if (totalChildPrvlgs[g].id === exisingChildPrvlgs[h].id) {
-                            totalChildPrvlgs[g].selectedindex = 1;
-                            childPrivilages.push({ id: exisingChildPrvlgs[h].id });
+                          if (totalChildPrvlgs[ g ].id === exisingChildPrvlgs[ h ].id && exisingChildPrvlgs[ h ].isEnabeld === true) {
+                            totalChildPrvlgs[ g ].selectedindex = 1;
+                            childPrivilages.push({ id: exisingChildPrvlgs[ h ].id });
                           }
                         }
                       }
@@ -310,9 +310,9 @@ export default class Privilages extends Component {
                 }
               }
             }
-            this.setState({ selectedParentPrvlgs: stateParentPrivilages, selectedSubPrvlgs: stateSubPrivilages })
+            this.setState({ selectedParentPrvlgs: stateParentPrivilages, selectedSubPrvlgs: stateSubPrivilages });
           }
-          this.setState({ webPrivileges: totalPrivilages })
+          this.setState({ webPrivileges: totalPrivilages });
         }
       } else {
         this.setState({ loading: false });
@@ -328,23 +328,23 @@ export default class Privilages extends Component {
       item.selectedindex = 1;
       item.subPrivileges.map((subPrvlItem) => {
         var childIds = [];
-        subPrvlItem.selectedindex = 1
+        subPrvlItem.selectedindex = 1;
         subPrvlItem.childPrivileges !== null && subPrvlItem.childPrivileges.map((childItem) => {
-          childItem.selectedindex = 1
+          childItem.selectedindex = 1;
           var temp = { id: childItem.id };
           childIds.push(temp);
-        })
+        });
         const selectedWebSubPrvlg = {
           id: subPrvlItem.id,
           parentId: subPrvlItem.parentPrivilegeId,
           childPrivillages: childIds
         };
-        this.state.selectedSubPrvlgs.push(selectedWebSubPrvlg)
-      })
+        this.state.selectedSubPrvlgs.push(selectedWebSubPrvlg);
+      });
       const obj = {
         id: item.id
-      }
-      this.state.selectedParentPrvlgs.push(obj)
+      };
+      this.state.selectedParentPrvlgs.push(obj);
       // console.log("selected Sub Prvlgs in parent prvl select", JSON.stringify(this.state.selectedParentPrvlgs))
       //
     }
@@ -352,28 +352,28 @@ export default class Privilages extends Component {
     else {
       item.selectedindex = 0;
       let index = -1;
-      let parentPrvlgs = this.state.selectedParentPrvlgs
+      let parentPrvlgs = this.state.selectedParentPrvlgs;
       for (let i = 0; i < parentPrvlgs.length; i++) {
-        if (parentPrvlgs[i].id === item.id) {
-          parentPrvlgs.splice(i, 1)
-          break
+        if (parentPrvlgs[ i ].id === item.id) {
+          parentPrvlgs.splice(i, 1);
+          break;
         }
       }
       item.subPrivileges.map((subPrvlItem, i) => {
         subPrvlItem.selectedindex = 0;
         subPrvlItem.childPrivileges !== null && subPrvlItem.childPrivileges.map((childItem) => {
-          childItem.selectedindex = 0
-        })
+          childItem.selectedindex = 0;
+        });
         var sel = this.state.selectedSubPrvlgs;
         for (let i = 0; i < sel.length; i++) {
-          if (sel[i].id === subPrvlItem.id) {
+          if (sel[ i ].id === subPrvlItem.id) {
             sel.splice(i, 1);
           }
         }
         const list = this.state.subWebList;
         list.splice(index, 1);
-        this.setState({ subWebList: list, isAllWebChecked: false, selectedParentPrvlgs: parentPrvlgs, selectedSubPrvlgs: sel })
-      })
+        this.setState({ subWebList: list, isAllWebChecked: false, selectedParentPrvlgs: parentPrvlgs, selectedSubPrvlgs: sel });
+      });
     }
     this.setState({ mobilePrivileges: this.state.mobilePrivileges });
   };
@@ -387,30 +387,30 @@ export default class Privilages extends Component {
         childItem.selectedindex = 1;
         var temp = { id: childItem.id };
         childIds.push(temp);
-      })
+      });
       const selectedWebSubPrvlg = {
         id: item.id,
         parentId: item.parentPrivilegeId,
         childPrivillages: childIds
       };
-      this.state.selectedSubPrvlgs.push(selectedWebSubPrvlg)
+      this.state.selectedSubPrvlgs.push(selectedWebSubPrvlg);
     }
     //Before selected, now unselected
     else {
       item.selectedindex = 0;
       item.childPrivileges !== null && item.childPrivileges.map((childItem) => {
-        childItem.selectedindex = 0
-      })
+        childItem.selectedindex = 0;
+      });
       var sel = this.state.selectedSubPrvlgs;
       for (let i = 0; i < sel.length; i++) {
-        if (sel[i].id === item.id) {
+        if (sel[ i ].id === item.id) {
           sel.splice(i, 1);
-          break
+          break;
         }
       }
       const list = this.state.subWebList;
       list.splice(index, 1);
-      this.setState({ subWebList: list, isAllWebChecked: false, selectedSubPrvlgs: sel })
+      this.setState({ subWebList: list, isAllWebChecked: false, selectedSubPrvlgs: sel });
     }
     this.setState({ mobilePrivileges: this.state.mobilePrivileges });
   };
@@ -422,15 +422,15 @@ export default class Privilages extends Component {
       var sel = this.state.selectedSubPrvlgs;
       if (sel.length > 0) {
         for (let i = 0; i < sel.length; i++) {
-          if (sel[i].id == childItem.subPrivillageId) {
+          if (sel[ i ].id == childItem.subPrivillageId) {
             //childIds = sel[i].childPrivillages;
-            sel[i].childPrivillages.push({ id: childItem.id });
+            sel[ i ].childPrivillages.push({ id: childItem.id });
             //sel.
             break;
           }
         }
       }
-      this.setState({ selectedSubPrvlgs: sel })
+      this.setState({ selectedSubPrvlgs: sel });
     }
     //changing "selected" to "not selected" state
     else {
@@ -440,13 +440,13 @@ export default class Privilages extends Component {
       //Looping subprivilages to remove the selected child privilage
       for (let i = 0; i < sel.length; i++) {
         //Checking for which Subprivilage unselected child Privilage belongs
-        if (sel[i].id === childItem.subPrivillageId) {
-          for (let j = 0; sel[i].childPrivillages && j < sel[i].childPrivillages.length; j++) {
+        if (sel[ i ].id === childItem.subPrivillageId) {
+          for (let j = 0; sel[ i ].childPrivillages && j < sel[ i ].childPrivillages.length; j++) {
             //Finding the unselected child privilage
-            if (sel[i].childPrivillages[j].id === childItem.id) {
+            if (sel[ i ].childPrivillages[ j ].id === childItem.id) {
               // console.log("in else", sel[i].childPrivillages[j], childItem.id);
               //Removing  from the state
-              sel[i].childPrivillages.splice(j, 1);
+              sel[ i ].childPrivillages.splice(j, 1);
               found = true;
               break;
             }
@@ -462,18 +462,18 @@ export default class Privilages extends Component {
       this.setState({ subWebList: list, isAllWebChecked: false, selectedSubPrvlgs: sel });
     }
     this.setState({ mobilePrivileges: this.state.mobilePrivileges });
-  }
+  };
 
-  handleViewWeb() {
+  handleViewWeb () {
     this.setState({ viewWeb: !this.state.viewWeb });
   }
 
   // Select All Functions
-  handleWebSelectAll() {
+  handleWebSelectAll () {
     this.setState({ isAllWebChecked: true }, () => {
-      this.handleViewWeb()
+      this.handleViewWeb();
       this.state.webPrivileges.map((item) => {
-        item.selectedindex = 1
+        item.selectedindex = 1;
         var childIds = [];
         item.subPrivileges.map((privilegeItem) => {
           privilegeItem.selectedindex = 1;
@@ -481,46 +481,46 @@ export default class Privilages extends Component {
             childItem.selectedindex = 1;
             var temp = { id: childItem.id };
             childIds.push(temp);
-          })
+          });
           const selectedWebSubPrvlg = {
             id: privilegeItem.id,
             parentId: privilegeItem.parentPrivilegeId,
             childPrivillages: childIds
           };
 
-          this.state.selectedSubPrvlgs.push(selectedWebSubPrvlg)
+          this.state.selectedSubPrvlgs.push(selectedWebSubPrvlg);
         });
         const obj = {
           id: item.id
-        }
-        this.state.selectedParentPrvlgs.push(obj)
+        };
+        this.state.selectedParentPrvlgs.push(obj);
       });
       this.setState({ privilages: this.state.webPrivileges });
     });
   }
 
-  handleWebUnSelectAll() {
+  handleWebUnSelectAll () {
     this.setState({ isAllWebChecked: false }, () => {
-      this.handleViewWeb()
+      this.handleViewWeb();
       this.state.webPrivileges.map((item) => {
-        item.selectedindex = 0
+        item.selectedindex = 0;
         item.subPrivileges.map((subPrivilegeItem) => {
           subPrivilegeItem.selectedindex = 0;
           subPrivilegeItem.childPrivileges !== null && subPrivilegeItem.childPrivileges.map((childItem) => {
             childItem.selectedindex = 0;
-          })
+          });
         });
-        this.setState({ selectedSubPrvlgs: [], selectedParentPrvlgs: [] })
+        this.setState({ selectedSubPrvlgs: [], selectedParentPrvlgs: [] });
       });
       this.setState({ privilages: this.state.webPrivileges });
     });
   }
 
-  handleMobileSelectAll() {
+  handleMobileSelectAll () {
     this.setState({ isAllMobileChecked: true }, () => {
-      this.handleViewMobile()
+      this.handleViewMobile();
       this.state.mobilePrivileges.map((item) => {
-        item.selectedindex = 1
+        item.selectedindex = 1;
         var childIds = [];
         item.subPrivileges.map((subPrivilegeItem) => {
           subPrivilegeItem.selectedindex = 1;
@@ -528,36 +528,36 @@ export default class Privilages extends Component {
             childItem.selectedindex = 1;
             var temp = { id: childItem.id };
             childIds.push(temp);
-          })
+          });
           const selectedWebSubPrvlg = {
             id: subPrivilegeItem.id,
             parentId: subPrivilegeItem.parentPrivilegeId,
             childPrivillages: childIds
           };
 
-          this.state.selectedMobileSubPrvlgs.push(selectedWebSubPrvlg)
+          this.state.selectedMobileSubPrvlgs.push(selectedWebSubPrvlg);
         });
         const obj = {
           id: item.id
-        }
-        this.state.selectedMobileParentPrvlgs.push(obj)
+        };
+        this.state.selectedMobileParentPrvlgs.push(obj);
       });
       this.setState({ privilages: this.state.mobilePrivileges });
     });
   }
 
-  handleMobileUnSelectAll() {
+  handleMobileUnSelectAll () {
     this.setState({ isAllMobileChecked: false }, () => {
-      this.handleViewMobile()
+      this.handleViewMobile();
       this.state.mobilePrivileges.map((item) => {
-        item.selectedindex = 0
+        item.selectedindex = 0;
         item.subPrivileges.map((subPrivilegeItem) => {
           subPrivilegeItem.selectedindex = 0;
           subPrivilegeItem.childPrivileges !== null && subPrivilegeItem.childPrivileges.map((childItem) => {
             childItem.selectedindex = 0;
-          })
+          });
         });
-        this.setState({ selectedMobileParentPrvlgs: [], selectedMobileSubPrvlgs: [] })
+        this.setState({ selectedMobileParentPrvlgs: [], selectedMobileSubPrvlgs: [] });
       });
 
       this.setState({ privilages: this.state.mobilePrivileges });
@@ -565,16 +565,16 @@ export default class Privilages extends Component {
   }
 
   // Save Role
-  saveRole() {
-    global.selectedParentPrvlgs = this.state.selectedParentPrvlgs
-    global.selectedSubPrvlgs = this.state.selectedSubPrvlgs
-    global.selectedMobileParentPrvlgs = this.state.selectedMobileParentPrvlgs
-    global.selectedMobileSubPrvlgs = this.state.selectedMobileSubPrvlgs
+  saveRole () {
+    global.selectedParentPrvlgs = this.state.selectedParentPrvlgs;
+    global.selectedSubPrvlgs = this.state.selectedSubPrvlgs;
+    global.selectedMobileParentPrvlgs = this.state.selectedMobileParentPrvlgs;
+    global.selectedMobileSubPrvlgs = this.state.selectedMobileSubPrvlgs;
     this.props.route.params.onGoBack();
     this.props.navigation.goBack();
   }
 
-  render() {
+  render () {
     // console.log("web Privileges", JSON.stringify(this.state.mobilePrivileges));
     // console.log("selected mobile Parent Prvlgs in render", JSON.stringify(this.state.selectedMobileParentPrvlgs), "select Mobile sub prvlgs : " + JSON.stringify(this.state.selectedMobileSubPrvlgs));
     return (
@@ -632,7 +632,7 @@ export default class Privilages extends Component {
                         return (
                           <View style={{ paddingLeft: 15, padding: 5 }}>
                             <TouchableOpacity onPress={() => this.selectedWebSubPrivilage(item, index)}>
-                              <View style={[{ flexDirection: 'row' }]}>
+                              <View style={[ { flexDirection: 'row' } ]}>
                                 {item.selectedindex === 1 && (
                                   <Image source={require('../assets/images/selected.png')} style={{ left: 20, top: 5 }} />
                                 )}
@@ -716,7 +716,7 @@ export default class Privilages extends Component {
                         return (
                           <View style={{ paddingLeft: 8, padding: 2 }}>
                             <TouchableOpacity onPress={() => this.selectedMobileSubPrivilage(item, index)} style={scss.item}>
-                              <View style={[{ flexDirection: 'row' }]}>
+                              <View style={[ { flexDirection: 'row' } ]}>
                                 {item.selectedindex === 1 && (
                                   <Image source={require('../assets/images/selected.png')} style={{ left: 20, top: 5 }} />
                                 )}
@@ -754,11 +754,11 @@ export default class Privilages extends Component {
           }
         />
         <View style={forms.action_buttons_container} >
-          <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+          <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
             onPress={() => this.saveRole()}>
             <Text style={forms.submit_btn_text} >{I18n.t("SAVE")}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+          <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
             onPress={() => this.handleBackButtonClick()}>
             <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
           </TouchableOpacity>
