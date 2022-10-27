@@ -142,7 +142,7 @@ export default class Stores extends Component {
           if (res.data[ "result" ][ i ].stateId === this.state.stateId) {
             console.log("stateId is" + this.state.statesArray[ i ].name);
             this.setState({ storeState: this.state.statesArray[ i ].name });
-            this.getMasterDistrictsList();
+            // this.getMasterDistrictsList();
             this.getGSTNumber();
           }
         }
@@ -161,9 +161,9 @@ export default class Stores extends Component {
   };
 
   // Store Districts
-  getMasterDistrictsList () {
-    this.setState({ loading: false, dictricts: [], dictrictArray: [] });
-    UrmService.getDistricts(this.state.statecode).then((res) => {
+  getMasterDistrictsList (id) {
+    this.setState({ loading: true, dictricts: [], dictrictArray: [] });
+    UrmService.getDistricts(id).then((res) => {
       if (res.data[ "result" ]) {
         this.setState({ loading: false });
         let dictricts = [];
@@ -172,16 +172,19 @@ export default class Stores extends Component {
             value: res.data.result[ i ].districtId,
             label: res.data.result[ i ].districtName,
           });
+          console.log({ dictricts });
           this.setState({
             dictricts: dictricts,
           });
-          this.setState({ dictrictArray: this.state.dictrictArray });
-          if (this.state.dictrictArray[ i ].id === this.state.districtId) {
-            console.log("district name  is" + this.state.dictrictArray[ i ].name);
-            this.setState({ storeDistrict: this.state.dictrictArray[ i ].name });
-          }
+          this.setState({ dictrictArray: this.state.dictrictArray },
+            () => { this.setState({ loading: false }); });
         }
+      } else {
+        this.setState({ loading: false });
       }
+    }).catch((err) => {
+      console.error({ err });
+      this.setState({ loading: false });
     });
   }
   handleDistrict = (value) => {

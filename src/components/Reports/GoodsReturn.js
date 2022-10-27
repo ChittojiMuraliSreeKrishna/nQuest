@@ -55,6 +55,7 @@ export class GoodsReturn extends Component {
       loadNextActive: true,
       viewGoods: [],
       flagViewGoods: false,
+      viewItems: []
     };
   }
 
@@ -242,6 +243,8 @@ export class GoodsReturn extends Component {
 
   handleViewGoods (item, index) {
     const rtNumber = item.rtNumber;
+    let items = [];
+    items.push(item);
     console.log({ item }, rtNumber);
     ReportsService.getReturnSlipDetails(rtNumber).then((res) => {
       if (res?.data?.result) {
@@ -271,7 +274,7 @@ export class GoodsReturn extends Component {
           detailsArr.push(obj);
         });
         console.log({ detailsArr });
-        this.setState({ viewGoods: detailsArr, flagViewGoods: true });
+        this.setState({ viewGoods: detailsArr, flagViewGoods: true, viewItems: items });
       }
     });
   }
@@ -397,17 +400,35 @@ export class GoodsReturn extends Component {
               <View style={forms.filterModelContainer}>
                 <Text style={forms.popUp_decorator}>-</Text>
                 <View style={forms.filterModelSub}>
+                  <View>
+                    {this.state.viewItems.map((data) => {
+                      return (
+                        <View style={scss.model_text_container}>
+                          <TEXT selectable={true} variant='titleMedium' style={{color: '#bbb'}}>Return Memo No:{"\n"}<TEXT style={{ color: '#ed1c24' }}>{data.rtNumber}</TEXT></TEXT>
+                          <TEXT variant='titleMedium' style={{color: '#bbb'}}>DATE:{"\n"}<TEXT style={{color: '#000'}}>{formatDate(data.createdInfo)}</TEXT></TEXT>
+                        </View>
+                      );
+                    })}
+                  </View>
                   <FlatList
                     data={this.state.viewGoods}
                     removeClippedSubviews={false}
                     renderItem={({ item, index }) => (
-                      <View>
+                      <View style={{ borderBottomWidth: 1, borderBottomColor: '#bbb', backgroundColor: '#ddd' }}>
                         <View style={scss.model_text_container}>
-                          <TEXT style={scss.highText} selectable={true}>{item.rtNumber}</TEXT>
+                          <TEXT>RTNO: {item.rtNo}</TEXT>
                         </View>
                         <View style={scss.model_text_container}>
-                          <TEXT variant='titleLight'>Date:{"\n"}{formatDate(item.createdInfo)}</TEXT>
-                          <TEXT variant='titleLight'>CustomerName: {item.customerName}</TEXT>
+                          <TEXT variant='titleLight'>Date:{"\n"}{formatDate(item.createdDate)}</TEXT>
+                          <TEXT variant='titleLight' style={{ textAlign: 'right' }}>CustomerName:{"\n"}{item.customerName}</TEXT>
+                        </View>
+                        <View style={scss.model_text_container}>
+                          <TEXT variant='titleLight'>Barcode:{"\n"}{item.barCode}</TEXT>
+                          <TEXT variant='titleLight' style={{ textAlign: 'right' }}>Amount:{"\n"}{item.amount}</TEXT>
+                        </View>
+                        <View style={scss.model_text_container}>
+                          <TEXT variant='titleLight'>EMPID:{"\n"}{item.createdBy}</TEXT>
+                          <TEXT variant='titleLight' style={{ textAlign: 'right' }}>Mobile:{"\n"}{item.mobileNumber}</TEXT>
                         </View>
                       </View>
                     )}

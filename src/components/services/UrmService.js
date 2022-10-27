@@ -5,42 +5,42 @@ import { BASE_URL } from "../../commonUtils/Base";
 class UrmService {
   // User Services
   // Register Client
-  registerUser(obj) {
+  registerUser (obj) {
     let registerUser = BASE_URL + LOGIN_URL.registerUser;
     console.log({ registerUser, obj });
     return axios.post(registerUser, obj);
   }
 
   // Edit User
-  editUser() {
+  editUser () {
     let editUser = BASE_URL + USER_MANAGEMENT_URL.editUser;
     console.log({ editUser });
     return editUser;
   }
 
   // Save User
-  saveUser(saveObj) {
+  saveUser (saveObj) {
     let saveUser = BASE_URL + USER_MANAGEMENT_URL.saveUser;
     console.log({ saveUser, saveObj });
     return axios.post(saveUser, saveObj);
   }
 
   // Change Password
-  changePassword(obj) {
+  changePassword (obj) {
     let changePass = BASE_URL + LOGIN_URL.changePassword;
     console.log({ changePass, obj });
     return axios.post(changePass, obj);
   }
 
   // Get all Privileges
-  getAllPrivillages() {
+  getAllPrivillages () {
     const getPrivileges = BASE_URL + USER_MANAGEMENT_URL.getAllPrivileges;
     console.log({ getPrivileges });
     return axios.get(getPrivileges);
   }
 
   // Getting User Details
-  getUserDetails(user, pageNumber = 0) {
+  getUserDetails (user, pageNumber = 0) {
     const param = "?page=" + pageNumber + "&size=10";
     let userDetails = BASE_URL + USER_MANAGEMENT_URL.getUserBySearch;
     console.log({ userDetails, param });
@@ -48,7 +48,7 @@ class UrmService {
   }
 
   // Get Privileges By RoleName
-  getPrivillagesByRoleName(value) {
+  getPrivillagesByRoleName (value) {
     let assignedRoles = BASE_URL + USER_MANAGEMENT_URL.getPrivilegesByRoleName;
     let param = "/" + value;
     console.log({ assignedRoles });
@@ -56,15 +56,15 @@ class UrmService {
   }
 
   // Getting Roles
-  getRolesByDomainId(clientId) {
+  getRolesByDomainId (clientId) {
     const param = "/" + clientId;
     let getDomainRoles = BASE_URL + USER_MANAGEMENT_URL.getAllRoles;
     console.log({ getDomainRoles, param });
-    return axios.get(getDomainRoles + param);
+    return axios.get(BASE_URL + USER_MANAGEMENT_URL.getAllRoles + param);
   }
 
   // Get All Users
-  getAllUsers(clientId, pageNumber) {
+  getAllUsers (clientId, pageNumber) {
     const param = "/" + parseInt(clientId);
     const pages = "?page=" + pageNumber + "&size=10";
     let getUsers = BASE_URL + USER_MANAGEMENT_URL.getAllUsers;
@@ -73,7 +73,7 @@ class UrmService {
   }
 
   // Filter Users
-  getUserBySearch(list, page) {
+  getUserBySearch (list, page) {
     let userSearch = BASE_URL + USER_MANAGEMENT_URL.getUserBySearch;
     const param2 = "?page=" + page;
     console.log({ userSearch, list, param2 });
@@ -82,21 +82,21 @@ class UrmService {
 
   // Store Services
   // Save Store
-  saveStore() {
+  saveStore () {
     let saveStore = BASE_URL + USER_MANAGEMENT_URL.saveStore;
     console.log({ saveStore });
     return saveStore;
   }
 
   // Edit Store
-  editStore() {
+  editStore () {
     let editStore = BASE_URL + USER_MANAGEMENT_URL.editStore;
     console.log({ editStore });
     return editStore;
   }
 
   // Get All Stores
-  getAllStores(clientId, pageNumber, isActive) {
+  getAllStores (clientId, pageNumber, isActive) {
     const param = "?clientId=" + clientId + "&isActive=false";
     let storesPath = BASE_URL + USER_MANAGEMENT_URL.getAllStores;
     console.log({ storesPath, param });
@@ -104,14 +104,14 @@ class UrmService {
   }
 
   // Get States
-  getStates() {
+  getStates () {
     let getStates = BASE_URL + USER_MANAGEMENT_URL.getStates;
     console.log({ getStates });
     return axios.get(getStates);
   }
 
   // Get Disctricts
-  getDistricts(value) {
+  getDistricts (value) {
     const params = "?stateCode=" + value;
     let getDistricts = BASE_URL + USER_MANAGEMENT_URL.getDistricts;
     console.log({ getDistricts, params });
@@ -119,23 +119,23 @@ class UrmService {
   }
 
   // Filter Stores
-  getStoresBySearch(list) {
+  getStoresBySearch (list) {
     let filterStores = BASE_URL + USER_MANAGEMENT_URL.getStoresBySearch;
     console.log({ filterStores, list });
     return axios.post(filterStores, list);
   }
 
   // Get Gst Number for store edit
-  getGSTNumber(clientId, statecode) {
+  getGSTNumber (clientId, statecode) {
     let gstNumber = BASE_URL + USER_MANAGEMENT_URL.getGSTNumber;
-    const params = '?clientId=' + clientId + '&stateCode=' + statecode
+    const params = '?clientId=' + clientId + '&stateCode=' + statecode;
     console.log({ gstNumber, params });
     return axios.get(gstNumber + params);
   }
 
   // Roles Services
   // Get All Roles
-  getAllRoles(clientId, pageNumber) {
+  getAllRoles (clientId, pageNumber) {
     const params = "/" + clientId;
     const pages = "?page=" + pageNumber + "&size=10";
     let getRoles = BASE_URL + USER_MANAGEMENT_URL.getAllRoles;
@@ -143,19 +143,19 @@ class UrmService {
     return axios.get(getRoles + params + pages);
   }
 
-  getRolesBySearch(data) {
+  getRolesBySearch (data) {
     return axios.post(BASE_URL + USER_MANAGEMENT_URL.getRolesBySearch, data);
   }
 
   // Save Role
-  saveRole(saveObj) {
+  saveRole (saveObj) {
     let saveRole = BASE_URL + USER_MANAGEMENT_URL.saveRole;
     console.log({ saveRole, saveObj });
     return axios.post(saveRole, saveObj);
   }
 
   // Edit Role
-  editRole(saveObj) {
+  editRole (saveObj) {
     let editRole = BASE_URL + USER_MANAGEMENT_URL.editRole;
     console.log({ editRole, saveObj });
     return axios.put(editRole, saveObj);

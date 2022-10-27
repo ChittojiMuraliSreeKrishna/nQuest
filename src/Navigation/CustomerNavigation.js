@@ -1,5 +1,6 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import React, { Component } from "react";
+import { BackHandler } from "react-native";
 import AddCustomer from '../components/CustomerPortal/AddCustomer';
 import DayClosure from '../components/CustomerPortal/DayClosure';
 import GenerateEstimationSlip from "../components/CustomerPortal/GenerateEstimationSlip";
@@ -13,6 +14,17 @@ import ScanBarCode from "../components/Newsale/ScanBarCode";
 
 const Stack = createStackNavigator();
 export default class CustomerNavigation extends Component {
+
+
+  componentDidMount () {
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", this.backAction());
+    return () => backHandler.remove();
+  }
+
+  backAction () {
+    return true;
+  }
+
   render () {
     return (
       <>

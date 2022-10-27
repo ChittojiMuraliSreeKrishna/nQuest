@@ -11,10 +11,8 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import DatePicker from "react-native-date-picker";
 import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Modal from "react-native-modal";
 import { TextInput } from "react-native-paper";
 import forms from '../../commonUtils/assets/styles/formFields.scss';
@@ -22,19 +20,15 @@ import scss from "../../commonUtils/assets/styles/style.scss";
 import EmptyList from "../Errors/EmptyList";
 import UrmService from "../services/UrmService";
 import {
-  datePicker,
-  datePickerBtnText,
-  datePickerButton1,
-  datePickerButton2,
   datePickerContainer,
   dateSelector,
   dateText
 } from "../Styles/FormFields";
 
+import DateSelector from "../../commonUtils/DateSelector";
 import Loader from "../../commonUtils/loader";
 import { RH } from "../../Responsive";
 import { filterBtn, flatListTitle } from "../Styles/Styles";
-import DateSelector from "../../commonUtils/DateSelector";
 
 var deviceheight = Dimensions.get("window").height;
 var deviceWidth = Dimensions.get("window").width;
@@ -52,25 +46,29 @@ export default class Roles extends Component {
       createdDate: "",
       date: new Date(),
       role: '',
-      loading: false
+      loading: false,
+      isFetching: false
     };
   }
 
-  async componentDidMount() {
+  async componentDidMount () {
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     this.setState({ clientId: clientId });
     this.getRolesList();
+    this.props.navigation.addListener('focus', () => {
+      this.getRolesList();
+    });
   }
 
   // Refreshing the List
-  refresh() {
+  refresh () {
     this.setState({ rolesData: [] }, () => {
       this.getRolesList();
     });
   }
 
   // Getting Roles List
-  getRolesList() {
+  getRolesList () {
     this.setState({ rolesData: [], loading: true });
     const { clientId, pageNumber } = this.state;
     UrmService.getAllRoles(clientId, pageNumber).then((res) => {
@@ -87,12 +85,12 @@ export default class Roles extends Component {
   }
 
   // Filter Section
-  filterAction() {
+  filterAction () {
     this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
   // Create Role Navigation
-  navigateToCreateRoles() {
+  navigateToCreateRoles () {
     this.props.navigation.navigate("CreateRole", {
       isEdit: false,
       navText: "Add Role",
@@ -102,13 +100,13 @@ export default class Roles extends Component {
   }
 
   // Filter Clear Action
-  clearFilterAction() {
-    this.setState({ filterActive: false });
+  clearFilterAction () {
+    this.setState({ filterActive: false, createdDate: '', role: '', createdBy: '' });
     this.getRolesList();
   }
 
   // Filter Cancel Action
-  modelCancel() {
+  modelCancel () {
     this.setState({ modalVisible: false });
   }
 
@@ -123,7 +121,7 @@ export default class Roles extends Component {
   };
 
   // Created Date Action
-  datepickerClicked() {
+  datepickerClicked () {
     this.setState({ datepickerOpen: true });
   }
 
@@ -144,7 +142,7 @@ export default class Roles extends Component {
   };
 
   // Apply Filter Action
-  applyRoleFilter() {
+  applyRoleFilter () {
     const { role, createdBy, createdDate } = this.state;
     this.setState({ loading: true });
     const searchRole = {
@@ -155,7 +153,7 @@ export default class Roles extends Component {
     // console.log(searchRole);
     UrmService.getRolesBySearch(searchRole).then((res) => {
       // console.log(res.data);
-      if (res && res.data && res.data['status'] === 200) {
+      if (res && res.data && res.data[ 'status' ] === 200) {
         let rolesList = res.data.result;
         // console.log({ rolesList });
         this.setState({ filterRolesData: rolesList, filterActive: true });
@@ -167,7 +165,7 @@ export default class Roles extends Component {
     });
   }
 
-  groupBySubPrivileges(array) {
+  groupBySubPrivileges (array) {
     let initialValue = {
       mobile: [],
       web: []
@@ -179,15 +177,15 @@ export default class Roles extends Component {
   }
 
   // Edit Role Action
-  async handleeditrole(item, index) {
-    var parentPrivilegesResult
+  async handleeditrole (item, index) {
+    var parentPrivilegesResult;
     await UrmService.getPrivillagesByRoleName(item.roleName).then(async (res) => {
       if (res) {
         if (res.data) {
           parentPrivilegesResult = this.groupBySubPrivileges(res.data.parentPrivileges);
         }
       }
-    })
+    });
     this.props.navigation.navigate("CreateRole", {
       editParentPrivilegesResult: parentPrivilegesResult,
       item: item,
@@ -198,7 +196,7 @@ export default class Roles extends Component {
     });
   }
 
-  render() {
+  render () {
     const { filterActive, rolesData, filterRolesData } = this.state;
     return (
       <View>
@@ -206,6 +204,8 @@ export default class Roles extends Component {
         <FlatList
           style={scss.flatListBody}
           keyExtractor={(item, i) => i.toString()}
+          refreshing={this.state.isFetching}
+          onRefresh={() => this.refresh()}
           ListHeaderComponent={
             <View style={scss.headerContainer}>
               <Text style={flatListTitle}>
@@ -275,7 +275,7 @@ export default class Roles extends Component {
                       <Text style={scss.footerText}>
                         Date:{" "}
                         {item.createdDate
-                          ? item.createdDate.toString().split(/T/)[0]
+                          ? item.createdDate.toString().split(/T/)[ 0 ]
                           : item.createdDate}
                       </Text>
                       <TouchableOpacity
@@ -303,7 +303,7 @@ export default class Roles extends Component {
                 <Text
                   style={forms.popUp_decorator}
                 ></Text>
-                <KeyboardAwareScrollView enableOnAndroid={true}>
+                <View>
                   <TextInput
                     mode="outlined"
                     outlineColor="#b9b9b9"
@@ -355,16 +355,16 @@ export default class Roles extends Component {
                     </View>
                   )}
                   <View style={forms.action_buttons_container}>
-                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                    <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
                       onPress={() => this.applyRoleFilter()}>
                       <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                    <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
                       onPress={() => this.modelCancel()}>
                       <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                     </TouchableOpacity>
                   </View>
-                </KeyboardAwareScrollView>
+                </View>
               </View>
             </Modal>
           </View>

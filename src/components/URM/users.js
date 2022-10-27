@@ -47,7 +47,8 @@ export default class Users extends Component {
       role: "",
       branch: "",
       userType: "",
-      loading: false
+      loading: false,
+      isFetching: false
     };
   }
 
@@ -56,6 +57,9 @@ export default class Users extends Component {
     this.setState({ clientId: clientId });
     console.log({ clientId });
     this.getAllUsers();
+    this.props.navigation.addListener('focus', () => {
+      this.getAllUsers();
+    });
   }
 
   // Refresh Users
@@ -178,6 +182,8 @@ export default class Users extends Component {
         {this.state.loading && <Loader loading={this.state.loading} />}
         <FlatList
           style={scss.flatListBody}
+          refreshing={this.state.isFetching}
+          onRefresh={() => this.refresh()}
           ListHeaderComponent={
             <View style={scss.headerContainer}>
               <Text style={scss.flat_heading}>

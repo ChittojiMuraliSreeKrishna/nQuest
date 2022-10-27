@@ -1,5 +1,6 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import React, { Component } from "react";
+import { BackHandler } from "react-native";
 import AccountingDashboard from '../components/Accounting/AccountingDashboard';
 import AddCreditNotes from "../components/Accounting/AddCreditNotes";
 import AddDebitNotes from "../components/Accounting/AddDebitNotes";
@@ -16,6 +17,16 @@ import Blank from "../components/Home/Blank";
 
 const Stack = createStackNavigator();
 export default class AccountingNaviagtion extends Component {
+
+  componentDidMount () {
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", this.backAction());
+    return () => backHandler.remove();
+  }
+
+  backAction () {
+    return true;
+  }
+
   render () {
     return (
       <>

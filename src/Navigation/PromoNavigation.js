@@ -1,5 +1,6 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
+import { BackHandler } from "react-native";
 import Blank from '../components/Home/Blank';
 import AddLoyalty from "../components/Promotions/AddLoyalty";
 import AddPool from "../components/Promotions/AddPool";
@@ -9,6 +10,16 @@ import ListOfPromo from "../components/Promotions/listOfPromotions";
 import Promo from "../components/Promotions/Promo";
 const Stack = createStackNavigator();
 export default class ProductsNavigation extends React.Component {
+
+  componentDidMount () {
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", this.backAction());
+    return () => backHandler.remove();
+  }
+
+  backAction () {
+    return true;
+  }
+
   render () {
     return (
       <>

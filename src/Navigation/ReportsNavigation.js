@@ -1,5 +1,6 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import React, { Component } from "react";
+import { BackHandler } from "react-native";
 import Blank from '../components/Home/Blank';
 import { GoodsReturn } from "../components/Reports/GoodsReturn";
 import { ListOfBarcodes } from "../components/Reports/ListOfBarcodes";
@@ -12,6 +13,16 @@ import TaxReport from "../components/Reports/TaxReport";
 
 const Stack = createStackNavigator();
 export default class ReportsNavigation extends Component {
+
+  componentDidMount () {
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", this.backAction());
+    return () => backHandler.remove();
+  }
+
+  backAction () {
+    return true;
+  }
+
   render () {
     return (
       <>
