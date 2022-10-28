@@ -108,7 +108,9 @@ class TextilePayment extends Component {
       isCredit: false,
       isCreditAmount: false,
       balanceCreditAmount: "",
-      isreturnCreditCash: false
+      isreturnCreditCash: false,
+      isTaxIncluded: '',
+      barCodeList:[]
     };
   }
 
@@ -170,7 +172,9 @@ class TextilePayment extends Component {
       CGST: this.props.route.params.CGST,
       SGST: this.props.route.params.SGST,
       discountAmount: this.props.route.params.discountAmount,
-      creditAmount: this.props.route.params.creditAmount
+      creditAmount: this.props.route.params.creditAmount,
+      isTaxIncluded: this.props.route.params.isTaxIncluded,
+      barCodeList:this.props.route.params.barCodeList
     });
     this.setState({ isTagCustomer: this.props.route.params.customerPhoneNumber.length >= 10 ? true : false });
   }
@@ -863,7 +867,7 @@ class TextilePayment extends Component {
       "sgst": this.state.SGST,
       "cgst": this.state.CGST,
       "dlSlip": this.state.dsNumberList,
-      "lineItemsReVo": null,
+      "lineItemsReVo": this.state.barCodeList,
       "createdBy": this.state.createdBy,
       "recievedAmount": this.state.recievedAmount,
       "returnAmount": this.state.returnAmount,
@@ -1925,43 +1929,46 @@ class TextilePayment extends Component {
                 }}>
                   ₹ {parseInt(this.state.totalPayAmount)} </Text>
               </View>
-              <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
-                <Text style={{
-                  color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                  fontSize: Device.isTablet ? 19 : 14,
-                }}>
-                  CGST </Text>
-                <Text style={{
-                  color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+              {this.state.isTaxIncluded !== 'null' &&
+                <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                    fontSize: Device.isTablet ? 19 : 14,
+                  }}>
+                    CGST </Text>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
 
-                  fontSize: Device.isTablet ? 19 : 14,
-                }}>
-                  ₹ {this.state.CGST} </Text>
-              </View>
-              <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
-                <Text style={{
-                  color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                  fontSize: Device.isTablet ? 19 : 14,
-                }}>
-                  SGST </Text>
-                <Text style={{
-                  color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                  fontSize: Device.isTablet ? 19 : 14,
-                }}>
-                  ₹  {this.state.SGST} </Text>
-              </View>
-              <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
-                <Text style={{
-                  color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                  fontSize: Device.isTablet ? 19 : 14,
-                }}>
-                  Bill Level Discount </Text>
-                <Text style={{
-                  color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                  fontSize: Device.isTablet ? 19 : 14,
-                }}>
-                  ₹  {this.props.route.params.discountAmount} </Text>
-              </View>
+                    fontSize: Device.isTablet ? 19 : 14,
+                  }}>
+                    ₹ {this.state.CGST} </Text>
+                </View>}
+              {this.state.isTaxIncluded !== 'null' &&
+                <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                    fontSize: Device.isTablet ? 19 : 14,
+                  }}>
+                    SGST </Text>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                    fontSize: Device.isTablet ? 19 : 14,
+                  }}>
+                    ₹  {this.state.SGST} </Text>
+                </View>}
+              {this.props.route.params.discountAmount !== 0 &&
+                <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                    fontSize: Device.isTablet ? 19 : 14,
+                  }}>
+                    Bill Level Discount </Text>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                    fontSize: Device.isTablet ? 19 : 14,
+                  }}>
+                    ₹  {this.props.route.params.discountAmount} </Text>
+                </View>}
               <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
                 <Text style={{
                   color: "#2ADC09", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
