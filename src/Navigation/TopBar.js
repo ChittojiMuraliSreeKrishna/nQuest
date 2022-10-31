@@ -381,7 +381,7 @@ export class TopBar extends Component {
       this.setState({ privilages: this.state.privilages }, () => {
         const { privilages } = this.state;
         console.log({ privilages });
-        this.props.navigation.navigate(String(value));
+        this.props.navigation.replace(String(value));
       });
     }
   }

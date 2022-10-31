@@ -115,12 +115,15 @@ class EditBarcode extends Component {
       reBar: false,
       navText: "",
       barcodeId: null,
+      isTaxIncluded: ''
     };
   }
 
   async componentDidMount () {
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     this.setState({ clientId: clientId });
+    const isTaxIncluded = await AsyncStorage.getItem('custom:isTaxIncluded');
+    this.setState({ isTaxIncluded: isTaxIncluded });
     const storeId = AsyncStorage.getItem("storeId");
     console.log({ storeId: storeId });
     const editBcode = this.props.route.params;
@@ -335,7 +338,7 @@ class EditBarcode extends Component {
         this.setState({ listPriceValid: false });
       }
     }
-    if (this.state.hsnId === null) {
+    if (this.state.isTaxIncluded === "true" && this.state.isTaxIncluded !== "null" && this.state.hsnId === null) {
       isFormValid = false;
       errors[ "hsn" ] = inventoryErrorMessages.hsnCode;
       this.setState({ hsnValid: false });
@@ -712,39 +715,41 @@ class EditBarcode extends Component {
           {!uomValid && (
             <Message imp={true} message={this.state.errors[ "uom" ]} />
           )}
-          <Text style={inputHeading}>
-            {I18n.t("HSN Code")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
-          </Text>
-          <View
-            style={[
-              rnPickerContainer,
-              { borderColor: hsnValid ? "#8F9EB7" : "#dd0000" },
-            ]}
-          >
-            <RNPickerSelect
-              placeholder={{
-                label: "HSN Code",
-              }}
-              Icon={() => {
-                return (
-                  <Chevron
-                    style={styles.imagealign}
-                    size={1.5}
-                    color={hsnValid ? "gray" : "#dd0000"}
-                  />
-                );
-              }}
-              disabled={this.state.reBar ? false : true}
-              items={this.state.hsnCodesList}
-              onValueChange={(value) => this.handleHSNCode(value)}
-              style={hsnValid ? rnPicker : rnPickerError}
-              value={this.state.hsnCode}
-              useNativeAndroidPickerStyle={false}
-            />
-          </View>
-          {!hsnValid && (
-            <Message imp={true} message={this.state.errors[ "hsn" ]} />
-          )}
+          {this.state.isTaxIncluded === "true" && this.state.isTaxIncluded !== "nll" && (<View>
+            <Text style={inputHeading}>
+              {I18n.t("HSN Code")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
+            </Text>
+            <View
+              style={[
+                rnPickerContainer,
+                { borderColor: hsnValid ? "#8F9EB7" : "#dd0000" },
+              ]}
+            >
+              <RNPickerSelect
+                placeholder={{
+                  label: "HSN Code",
+                }}
+                Icon={() => {
+                  return (
+                    <Chevron
+                      style={styles.imagealign}
+                      size={1.5}
+                      color={hsnValid ? "gray" : "#dd0000"}
+                    />
+                  );
+                }}
+                disabled={this.state.reBar ? false : true}
+                items={this.state.hsnCodesList}
+                onValueChange={(value) => this.handleHSNCode(value)}
+                style={hsnValid ? rnPicker : rnPickerError}
+                value={this.state.hsnCode}
+                useNativeAndroidPickerStyle={false}
+              />
+            </View>
+            {!hsnValid && (
+              <Message imp={true} message={this.state.errors[ "hsn" ]} />
+            )}
+          </View>)}
           <Text style={inputHeading}>
             {I18n.t("EMP ID")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
