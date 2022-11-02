@@ -333,6 +333,7 @@ export default class AddStore extends Component {
           stateCode: this.state.statecode,
           gstNumber: this.state.gstNumber,
           clientId: this.state.clientId,
+          isActive: true,
         };
         console.log("params are" + JSON.stringify(saveObj));
         this.setState({ loading: true });
@@ -566,37 +567,71 @@ export default class AddStore extends Component {
           <Text style={inputHeading}>
             Status <Text style={{ color: "#aa0000" }}>*</Text>
           </Text>
-          <View
-            style={[
-              rnPickerContainer,
-              { borderColor: statusValid ? "#8f9eb718" : "#dd0000" },
-            ]}
-          >
-            <RNPickerSelect
-              placeholder={{
-                label: "Active",
-                value: "true",
-              }}
-              disabled={this.state.isEdit ? false : true}
-              Icon={() => {
-                return (
-                  <Chevron
-                    style={styles.imagealign}
-                    size={1.5}
-                    color={statusValid ? "gray" : "#dd0000"}
-                  />
-                );
-              }}
-              items={[
-                { label: "InActive", value: false },
+          {this.state.isEdit ?
+            <View
+              style={[
+                rnPickerContainer,
+                { borderColor: statusValid ? "#8f9eb718" : "#dd0000" },
               ]}
-              onValueChange={(value) => this.handleStatus(value)}
-              style={statusValid ? rnPicker : rnPickerError}
-              value={this.state.storeStatus}
-              useNativeAndroidPickerStyle={false}
-            />
-          </View>
-          {!statusValid && (
+            >
+              <RNPickerSelect
+                placeholder={{
+                  label: "Status",
+                  value: "",
+                }}
+                disabled={false}
+                Icon={() => {
+                  return (
+                    <Chevron
+                      style={styles.imagealign}
+                      size={1.5}
+                      color={statusValid ? "gray" : "#dd0000"}
+                    />
+                  );
+                }}
+                items={[
+                  { label: "Active", value: true },
+                  { label: "InActive", value: false },
+                ]}
+                onValueChange={(value) => this.handleStatus(value)}
+                style={statusValid ? rnPicker : rnPickerError}
+                value={this.state.storeStatus}
+                useNativeAndroidPickerStyle={false}
+              />
+            </View>
+            :
+            <View
+              style={[
+                rnPickerContainer,
+                { borderColor: statusValid ? "#8f9eb718" : "#dd0000" },
+              ]}
+            >
+              <RNPickerSelect
+                placeholder={{
+                  label: "Active",
+                  value: "true",
+                }}
+                disabled={true}
+                Icon={() => {
+                  return (
+                    <Chevron
+                      style={styles.imagealign}
+                      size={1.5}
+                      color={statusValid ? "gray" : "#dd0000"}
+                    />
+                  );
+                }}
+                items={[
+                  { label: "InActive", value: false },
+                ]}
+                onValueChange={(value) => this.handleStatus(value)}
+                style={statusValid ? rnPicker : rnPickerError}
+                value={this.state.storeStatus}
+                useNativeAndroidPickerStyle={false}
+              />
+            </View>
+          }
+          {this.state.isEdit && !statusValid && (
             <Message imp={true} message={this.state.errors[ "status" ]} />
           )}
           <Text style={inputHeading}>

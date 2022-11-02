@@ -63,6 +63,8 @@ class AddBarcode extends Component {
       store: "",
       empId: "",
       quantity: "",
+      designCode: "",
+      barcode: "",
       divisionArray: [],
       divisionsList: [],
       secionArray: [],
@@ -134,6 +136,7 @@ class AddBarcode extends Component {
           size.push({
             value: item,
             label: item,
+            data: res.data
           })
         ) : nulll;
         // }
@@ -289,7 +292,8 @@ class AddBarcode extends Component {
     }
   };
 
-  handleSize = (value) => {
+  handleSize = (value, data) => {
+    console.log({ value, data });
     this.setState({ size: value });
   };
 
@@ -426,6 +430,21 @@ class AddBarcode extends Component {
     }
   };
 
+  // Design Code Actions
+  handleDesignCode = (value) => {
+    this.setState({ designCode: value });
+  };
+  handleDesignCodeValid = () => {
+    if (String(this.state.designCode).length > 0) {
+      this.setState({ designCodeValid: true });
+    }
+  };
+
+  // Barcode Actions
+  handleBarcode = (value) => {
+    this.setState({ barcode: value });
+  };
+
   // Date Actions
   datepickerClicked () {
     this.setState({ datepickerOpen: true });
@@ -539,7 +558,7 @@ class AddBarcode extends Component {
         uom: this.state.uomName,
         domainType: this.state.selectedDomain,
         vendorTax: this.state.vendorTax,
-
+        barcode: this.state.barcode ? this.state.barcode : null
       };
       console.log({ params });
       this.setState({ loading: true });
@@ -809,7 +828,7 @@ class AddBarcode extends Component {
                     );
                   }}
                   items={this.state.dynamicAttributes}
-                  onValueChange={this.handleSize}
+                  onValueChange={(value, data) => this.handleSize(value, data)}
                   style={rnPicker}
                   value={this.state.size}
                   useNativeAndroidPickerStyle={false}
@@ -1127,6 +1146,48 @@ class AddBarcode extends Component {
             value={this.state.quantity}
             onBlur={this.handleQuantityValid}
             onChangeText={this.handleQuantity}
+          />
+          <Text style={inputHeading}>
+            Design Code <Text style={{ color: "#aa0000" }}>*</Text>{" "}
+          </Text>
+          <TextInput
+            activeOutlineColor="#000"
+            mode="outlined"
+            outlineColor={"#d6d6d6"}
+            style={[
+              forms.input_fld,
+              forms.active_fld,
+            ]}
+            underlineColorAndroid="transparent"
+            placeholder="Design Code"
+            placeholderTextColor={"#676767"}
+            textAlignVertical="center"
+            maxLength={12}
+            autoCapitalize="none"
+            value={this.state.designCode}
+            onBlur={() => this.handleDesignCodeValid()}
+            onChangeText={() => this.handleDesignCode()}
+          />
+          <Text style={inputHeading}>
+            Barcode
+          </Text>
+          <TextInput
+            activeOutlineColor="#000"
+            mode="outlined"
+            outlineColor={"#d6d6d6"}
+            style={[
+              forms.input_fld,
+              forms.active_fld,
+            ]}
+            underlineColorAndroid="transparent"
+            placeholder="BarCode"
+            placeholderTextColor={"#676767"}
+            textAlignVertical="center"
+            maxLength={12}
+            autoCapitalize="none"
+            value={this.state.barcode}
+            onBlur={() => this.handleBarcodeValid()}
+            onChangeText={() => this.handleBarcode()}
           />
           <View style={forms.action_buttons_container}>
             <TouchableOpacity style={[ forms.action_buttons, { backgroundColor: this.state.saveButtonDisabled ? color.accent : color.disableBackGround } ]}

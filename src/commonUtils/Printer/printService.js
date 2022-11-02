@@ -170,7 +170,7 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       printer.addPulse();
       printer.send();
     }
-    console.log('Success:', status);
+    console.log('Success:', printer);
   } catch (e) {
     console.log('Error:', e);
   }

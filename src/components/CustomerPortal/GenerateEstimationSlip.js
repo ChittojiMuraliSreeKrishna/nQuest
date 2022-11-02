@@ -13,6 +13,7 @@ import { Chevron } from 'react-native-shapes';
 import { openDatabase } from 'react-native-sqlite-storage';
 import { default as MinusIcon, default as PlusIcon, default as ScanIcon } from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
+import Loader from '../../commonUtils/loader';
 import PrintService from '../../commonUtils/Printer/printService';
 import { RF } from '../../Responsive';
 import { customerErrorMessages } from '../Errors/errors';
@@ -255,7 +256,12 @@ class GenerateEstimationSlip extends Component {
         if (res) {
           console.log(res.data);
           this.setState({ resultModel: true, resultData: res.data, modalVisible: true, resultDsNumber: res.data });
-          PrintService('DSNUM', res.data, this.state.barList);
+          PrintService('DSNUM', res.data, this.state.barList).then(() => {
+            this.setState({ loading: false });
+          }).catch((err) => {
+            this.setState({ loading: false });
+            alert(err);
+          });
           // alert(res.data.message);
           this.setState({
             barList: [],
@@ -526,7 +532,12 @@ class GenerateEstimationSlip extends Component {
   connectPrinter () {
     AsyncStorage.setItem("printerIp", String(this.state.printerIp)).then(() => {
       this.setState({ showPrinter: false, loading: true });
-      PrintService('start', 'print');
+      PrintService('start', 'print').then(() => {
+        this.setState({ loading: false });
+      }).catch((err) => {
+        this.setState({ loading: false });
+        alert(err);
+      });
     });
   }
 
@@ -541,6 +552,7 @@ class GenerateEstimationSlip extends Component {
     console.log("ES Number", this.state.resultDsNumber);
     return (
       <View style={styles.container}>
+        {this.state.loading && <Loader loading={this.state.loading} />}
         {this.state.flagone && (
           <ScrollView>
             < View
@@ -609,8 +621,8 @@ class GenerateEstimationSlip extends Component {
                     /><Text>Remember Sales Man</Text>
                   </View>
                 </View>
-                <TouchableOpacity style={{ width: '90%', marginHorizontal: '5%', height: 35, borderWidth: 2, borderColor: '#00aa00', borderRadius: 5 }} onPress={() => this.handleViewPrinter()}>
-                  <Text style={{ textAlign: 'center', marginVertical: 5, fontSize: 16, fontWeight: 'bold', color: '#00aa00' }}>Connect Printer</Text>
+                <TouchableOpacity style={{ width: '90%', marginHorizontal: '5%', height: 35, borderWidth: 2, borderColor: '#6f6f6f', borderRadius: 5 }} onPress={() => this.handleViewPrinter()}>
+                  <Text style={{ textAlign: 'center', marginVertical: 5, fontSize: 16, fontWeight: 'bold', color: '#6f6f6f' }}>Connect Printer</Text>
                 </TouchableOpacity>
                 {!this.state.barcodeIdValid && (
                   <Message imp={true} message={this.state.errors[ "barcodeId" ]} />
