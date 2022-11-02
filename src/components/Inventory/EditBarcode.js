@@ -115,7 +115,9 @@ class EditBarcode extends Component {
       reBar: false,
       navText: "",
       barcodeId: null,
-      isTaxIncluded: ''
+      isTaxIncluded: '',
+      barcode: "",
+      designCode: "",
     };
   }
 
@@ -167,7 +169,9 @@ class EditBarcode extends Component {
         reBar: editBcode.reBar,
         empId: String(editBcode.item.empId),
         barcodeId: parseInt(editBcode.item.id),
-        selectedStatus: editBcode.item.status
+        selectedStatus: editBcode.item.status,
+        barcode: editBcode.item.barcode,
+        designCode: editBcode.item.designcode
       },
       () => {
         const { selectedDomain } = this.state;
@@ -829,6 +833,50 @@ class EditBarcode extends Component {
           {!qtyValid && (
             <Message imp={true} message={this.state.errors[ "qty" ]} />
           )}
+          <Text style={inputHeading}>
+            Design Code <Text style={{ color: "#aa0000" }}>*</Text>{" "}
+          </Text>
+          <TextInput
+            activeOutlineColor="#000"
+            mode="outlined"
+            outlineColor={"#d6d6d6"}
+            style={[
+              forms.input_fld,
+              forms.inactive_fld,
+            ]}
+            underlineColorAndroid="transparent"
+            placeholder="Design Code"
+            placeholderTextColor={"#676767"}
+            textAlignVertical="center"
+            editable={false}
+            maxLength={12}
+            autoCapitalize="none"
+            value={this.state.designCode}
+            onBlur={() => this.handleDesignCodeValid()}
+            onChangeText={() => this.handleDesignCode()}
+          />
+          <Text style={inputHeading}>
+            Barcode
+          </Text>
+          <TextInput
+            activeOutlineColor="#000"
+            mode="outlined"
+            outlineColor={"#d6d6d6"}
+            style={[
+              forms.input_fld,
+              forms.inactive_fld,
+            ]}
+            editable={false}
+            underlineColorAndroid="transparent"
+            placeholder="BarCode"
+            placeholderTextColor={"#676767"}
+            textAlignVertical="center"
+            maxLength={12}
+            autoCapitalize="none"
+            value={this.state.barcode}
+            onBlur={() => this.handleBarcodeValid()}
+            onChangeText={() => this.handleBarcode()}
+          />
           <View style={forms.action_buttons_container}>
             <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
               onPress={() => this.saveBarcode()}>
