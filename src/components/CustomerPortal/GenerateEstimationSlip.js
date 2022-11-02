@@ -109,15 +109,26 @@ class GenerateEstimationSlip extends Component {
       smnumberValid: true,
       barcodeIdValid: true,
       errors: {},
-      printerIp: "",
+      printerIp: "10.80.2.53",
+      showPrinter: false,
+      printBtn: false
     };
   }
 
 
-  async componentDidMount () {
+  async componentWillMount () {
     const storeId = await AsyncStorage.getItem("storeId");
     console.log("stroeiddd", storeId);
-    this.setState({ storeId: storeId });
+    this.setState({ storeId: storeId, printBtn: false });
+    const prinStat = await AsyncStorage.getItem("prinStat");
+    if (prinStat === "ok") {
+      this.setState({ printBtn: true, loading: false });
+    } else if (printStat === "no") {
+      alert("failed to connect");
+      this.setState({ loading: false });
+    } else {
+      this.setState({ loading: false });
+    }
   }
 
 
@@ -244,6 +255,7 @@ class GenerateEstimationSlip extends Component {
         if (res) {
           console.log(res.data);
           this.setState({ resultModel: true, resultData: res.data, modalVisible: true, resultDsNumber: res.data });
+          PrintService('DSNUM', res.data, this.state.barList);
           // alert(res.data.message);
           this.setState({
             barList: [],
@@ -502,13 +514,19 @@ class GenerateEstimationSlip extends Component {
     console.log('bar code is' + this.state.barcodeId);
   }
 
+  // Printer Functions
+  handleViewPrinter () {
+    this.setState({ showPrinter: true });
+  }
+
   handlePrinterIp = (text) => {
     this.setState({ printerIp: text });
   };
 
   connectPrinter () {
     AsyncStorage.setItem("printerIp", String(this.state.printerIp)).then(() => {
-      PrintService('start');
+      this.setState({ showPrinter: false, loading: true });
+      PrintService('start', 'print');
     });
   }
 
@@ -528,8 +546,6 @@ class GenerateEstimationSlip extends Component {
             < View
               style={{
                 flex: 1,
-                paddingHorizontal: 0,
-                paddingVertical: 0,
                 marginTop: 10,
               }}>
               <View>
@@ -593,6 +609,9 @@ class GenerateEstimationSlip extends Component {
                     /><Text>Remember Sales Man</Text>
                   </View>
                 </View>
+                <TouchableOpacity style={{ width: '90%', marginHorizontal: '5%', height: 35, borderWidth: 2, borderColor: '#00aa00', borderRadius: 5 }} onPress={() => this.handleViewPrinter()}>
+                  <Text style={{ textAlign: 'center', marginVertical: 5, fontSize: 16, fontWeight: 'bold', color: '#00aa00' }}>Connect Printer</Text>
+                </TouchableOpacity>
                 {!this.state.barcodeIdValid && (
                   <Message imp={true} message={this.state.errors[ "barcodeId" ]} />
                 )}
