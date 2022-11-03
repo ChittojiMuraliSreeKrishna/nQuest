@@ -110,7 +110,7 @@ class TextilePayment extends Component {
       balanceCreditAmount: "",
       isreturnCreditCash: false,
       isTaxIncluded: '',
-      barCodeList:[]
+      barCodeList: []
     };
   }
 
@@ -174,7 +174,7 @@ class TextilePayment extends Component {
       discountAmount: this.props.route.params.discountAmount,
       creditAmount: this.props.route.params.creditAmount,
       isTaxIncluded: this.props.route.params.isTaxIncluded,
-      barCodeList:this.props.route.params.barCodeList
+      barCodeList: this.props.route.params.barCodeList
     });
     this.setState({ isTagCustomer: this.props.route.params.customerPhoneNumber.length >= 10 ? true : false });
   }
@@ -314,18 +314,17 @@ class TextilePayment extends Component {
   confirmKathaModel() {
     const obj = {
       "paymentType": "PKTPENDING",
-      "paymentAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
+      "paymentAmount": this.state.khataAmount
     };
     this.state.paymentType.push(obj);
     if (this.state.isRTApplied) {
-      this.setState({ payingAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString() + this.state.rtAmount });
+      this.setState({ totalAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString() + this.state.rtAmount });
     }
     this.setState({
       isPayment: false,
-      payingAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
+      totalAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString() - this.state.khataAmount
     }, () => {
       this.cancelKathaModel();
-      this.pay();
     });
   }
 
@@ -515,7 +514,7 @@ class TextilePayment extends Component {
       isUpi: false,
       isGv: false,
       isKhata: true,
-      payButtonEnable: true,
+      payButtonEnable: this.state.totalAmount === 0 ? true : false,
       isCredit: false,
       recievedAmount: 0,
       returnAmount: 0
@@ -885,7 +884,6 @@ class TextilePayment extends Component {
       if (res.data && res.data["isSuccess"] === "true") {
         // const cardAmount = this.state.isCard || this.state.isCardOrCash ? JSON.stringify(Math.round(this.state.ccCardCash)) : JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString());
         alert("Order created " + res.data["result"]);
-        this.clearStateFields()
         if (this.state.isKhata === true) {
           this.props.route.params.onGoBack();
           this.props.navigation.goBack();
@@ -1809,8 +1807,17 @@ class TextilePayment extends Component {
                           style={forms.input_fld}
                           underlineColor="transparent"
                           activeUnderlineColor='#000'
-                          editable={false} selectTextOnFocus={false}
-                          value={(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()}
+                          // editable={false} selectTextOnFocus={false}
+                          // value={(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()}
+                          value={this.state.khataAmount}
+                          onChangeText={(value) =>
+                            this.setState({ khataAmount: value }, () => {
+                              if (this.state.khataAmount < (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()) {
+                                let khataReturn = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString() - this.state.khataAmount.toString();
+                                this.setState({ totalAmount: khataReturn });
+                              }
+                            })
+                          }
                         />
                         <View style={forms.action_buttons_container}>
                           <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
