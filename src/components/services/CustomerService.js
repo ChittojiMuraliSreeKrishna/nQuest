@@ -125,5 +125,21 @@ class CustomerService {
     return axios.delete(BASE_URL + "/new-sale/newsale/deletedeliveryslip" + param2);
   }
 
+  getAllLoyaltyPoints() {
+    return axios.get(BASE_URL + "/new-sale/newsale/getAllLoyaltyPoints");
+  }
+
+  searchLoyaltyPoints(obj) {
+    return axios.post(BASE_URL + "/new-sale/newsale/searchLoyaltyPoints", obj);
+  }
+
+  getInvoiceDetails(invoiceNum) {
+    const param = `?orderNumber=${invoiceNum}`;
+    return axios.get(BASE_URL + "/new-sale/newsale/getinvoicedata" + param);
+  }
+
+  saveLoyaltyPoints(obj) {
+    return axios.post(BASE_URL + "/new-sale/newsale/saveLoyaltyPoints", obj);
+  }
 }
 export default new CustomerService();
