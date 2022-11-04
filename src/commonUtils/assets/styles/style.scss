@@ -260,3 +260,13 @@
   color: $secondary-color;
   border-color: $secondary-color;
 }
+
+.radio_group{
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.radio_item{
+	flex-direction: row;
+	align-items: center;
+}
