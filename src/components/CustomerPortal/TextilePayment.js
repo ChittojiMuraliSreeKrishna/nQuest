@@ -7,7 +7,7 @@ import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from "react-native-modal";
-import { Appbar, TextInput } from 'react-native-paper';
+import { Appbar, RadioButton, TextInput } from 'react-native-paper';
 import RazorpayCheckout from 'react-native-razorpay';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
@@ -63,7 +63,6 @@ class TextilePayment extends Component {
       couponDiscount: 0,
       grossAmount: 0,
       totalPromoDisc: 0,
-      totalPayAmount: 0,
       CGST: 0,
       SGST: 0,
       manualDisc: 0,
@@ -110,7 +109,11 @@ class TextilePayment extends Component {
       balanceCreditAmount: "",
       isreturnCreditCash: false,
       isTaxIncluded: '',
-      barCodeList: []
+      barCodeList: [],
+      cardAutoModel: false,
+      cardModelVisible: false,
+      cardPaymentType: 'Manual',
+      cardManual: false
     };
   }
 
@@ -151,7 +154,7 @@ class TextilePayment extends Component {
     console.log('total amount is,', this.props.route.params);
     this.setState({
       totalAmount: this.props.route.params.totalAmount,
-      totalPayAmount: this.props.route.params.totalAmount,
+      netPayableAmount: this.props.route.params.netPayableAmount,
       grossAmount: this.props.route.params.grossAmount,
       totalPromoDisc: this.props.route.params.totalPromoDisc,
       manualDisc: this.props.route.params.manualDisc,
@@ -321,8 +324,7 @@ class TextilePayment extends Component {
       this.setState({ totalAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString() + this.state.rtAmount });
     }
     this.setState({
-      isPayment: false,
-      totalAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString() - this.state.khataAmount
+      totalAmount: parseFloat(this.state.totalAmount)  - parseFloat(this.state.khataAmount)
     }, () => {
       this.cancelKathaModel();
     });
@@ -376,6 +378,51 @@ class TextilePayment extends Component {
     this.setState({ creditModelVisible: false });
   }
 
+  saveCard() {
+    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
+    if (this.state.cardPaymentType === "Automatic") {
+      this.getCardModel()
+      this.cancelCardModel()
+    } else {
+      this.setState({ cashAmount: grandNetAmount })
+      this.manualCardPayment()
+    }
+  }
+
+  getCardModel = () => {
+    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
+    this.setState({ totalAmount: grandNetAmount })
+    this.setState({
+      isCard: true,
+    },
+      () => {
+        if (this.state.isreturnCreditCash) {
+          this.setState({ totalAmount: this.state.balanceCreditAmount })
+        }
+      });
+    if (this.state.isRTApplied) {
+      this.setState({ payingAmount: grandNetAmount + this.state.rtAmount });
+    }
+    this.pay();
+    // this.setState({
+    //   isCardSelected: true,
+    // });
+  };
+
+  manualCardPayment = () => {
+    this.setState({ isCard: false, cardManual: true })
+    const obj = {
+      "paymentType": "Card",
+      "paymentAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
+    }
+    this.state.paymentType.push(obj);
+    this.cancelCardModel();
+  }
+
+  cancelCardModel() {
+    this.setState({ cardModelVisible: false, cardAutoModel: false });
+  }
+
   handleBackButtonClick() {
     this.props.navigation.goBack(null);
     return true;
@@ -408,7 +455,9 @@ class TextilePayment extends Component {
       payButtonEnable: true,
       isCredit: false,
       recievedAmount: 0,
-      returnAmount: 0
+      returnAmount: 0,
+      cardAutoModel: true,
+      cardModelVisible: true
     });
   }
   handleredeemPoints = (text) => {
@@ -877,14 +926,16 @@ class TextilePayment extends Component {
       "gvNumber": couponCode,
       "totalAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
     };
-
     console.log(" payment cash method data", obj);
+    if (this.state.isCard === true) {
+      delete obj.paymentAmountType
+    }
     axios.post(NewSaleService.createOrder(), obj).then((res) => {
       console.log("Invoice data", JSON.stringify(res.data));
       if (res.data && res.data["isSuccess"] === "true") {
         // const cardAmount = this.state.isCard || this.state.isCardOrCash ? JSON.stringify(Math.round(this.state.ccCardCash)) : JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString());
         alert("Order created " + res.data["result"]);
-        if (this.state.isKhata === true) {
+        if (this.state.isKhata === true || this.state. cardManual === true) {
           this.props.route.params.onGoBack();
           this.props.navigation.goBack();
         }
@@ -1203,13 +1254,6 @@ class TextilePayment extends Component {
     }
   }
 
-  // validationCheckForPay() {
-  //   if (this.state.isCash === true || this.state.isCard === true || this.state.isCardOrCash === true || this.state.isUpi === true || this.state.isKhata === true) {
-  //     this.pay();
-  //   } else {
-  //     alert("Please Select any payment method");
-  //   }
-  // }
   render() {
     return (
       <View style={styles.mainContainer}>
@@ -1813,8 +1857,7 @@ class TextilePayment extends Component {
                           onChangeText={(value) =>
                             this.setState({ khataAmount: value }, () => {
                               if (this.state.khataAmount < (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()) {
-                                let khataReturn = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString() - this.state.khataAmount.toString();
-                                this.setState({ totalAmount: khataReturn });
+                                this.setState({khataAmount:value}) 
                               }
                             })
                           }
@@ -1919,6 +1962,58 @@ class TextilePayment extends Component {
               </View>
             )}
 
+            {this.state.cardAutoModel && (
+              <View>
+                <Modal isVisible={this.state.cardModelVisible} style={{ margin: 0 }}
+                  onBackButtonPress={() => this.cancelCardModel()}
+                  onBackdropPress={() => this.cancelCardModel()} >
+                  <View style={forms.filterModelContainer} >
+                    <Text style={forms.popUp_decorator}>-</Text>
+                    <View style={forms.filterModelSub}>
+                      <KeyboardAwareScrollView >
+                        <View>
+                          <Text style={scss.textStyleMedium}>Card Payment:</Text>
+                          <TextInput
+                            style={forms.input_fld}
+                            underlineColor="transparent"
+                            activeUnderlineColor='#000'
+                            editable={false} selectTextOnFocus={false}
+                            value={(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()}
+                          />
+                          <View style={ scss.radio_group}>
+                            <View style={scss.radio_item}>
+                              <RadioButton
+                                value="Automatic"
+                                status={this.state.cardPaymentType === 'Automatic' ? 'checked' : 'unchecked'}
+                                onPress={() => this.setState({ cardPaymentType: 'Automatic' })}
+                              />
+                              <Text >Automatic</Text>
+                            </View>
+                            <View style={scss.radio_item}>
+                              <RadioButton
+                                value="Manual"
+                                status={this.state.cardPaymentType === 'Manual' ? 'checked' : 'unchecked'}
+                                onPress={() => this.setState({ cardPaymentType: 'Manual' })}
+                              />
+                              <Text>Manual</Text>
+                            </View>
+                          </View>
+                        </View>
+                        <View style={forms.action_buttons_container}>
+                          <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                            onPress={() => { this.saveCard() }}>
+                            <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                            onPress={() => this.cancelCardModel()}>
+                            <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </KeyboardAwareScrollView>
+                    </View>
+                  </View>
+                </Modal>
+              </View>)}
 
             <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 10 }}> {('PRICE SUMMARY')} </Text>
 
@@ -1934,7 +2029,7 @@ class TextilePayment extends Component {
                   color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
                   fontSize: Device.isTablet ? 19 : 14,
                 }}>
-                  ₹ {parseInt(this.state.totalPayAmount)} </Text>
+                  ₹ {parseInt(this.state.netPayableAmount)} </Text>
               </View>
               {this.state.isTaxIncluded !== 'null' &&
                 <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>

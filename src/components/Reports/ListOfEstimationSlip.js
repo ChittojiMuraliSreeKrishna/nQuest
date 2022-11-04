@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import moment from 'moment';
 import React, { Component } from 'react';
 import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import DatePicker from 'react-native-date-picker';
@@ -266,11 +267,13 @@ export class ListOfEstimationSlip extends Component {
                 <View style={scss.flatListSubContainer}>
                   <View style={scss.textContainer}>
                     <Text style={scss.highText} >S.NO: {index + 1} </Text>
-                    <Text style={scss.textStyleLight} >{I18n.t("DS STATUS")}: {"\n"}{item.status} </Text>
+                    <Text style={scss.textStyleLight} >{I18n.t("ES STATUS")}: {"\n"}{item.status} </Text>
                   </View>
                   <View style={scss.textContainer}>
-                    <Text style={scss.textStyleMedium}> {I18n.t("DS NUMBER")}: {"\n"} {item.dsNumber}</Text>
-                    <Text style={scss.textStyleLight}>{I18n.t("DS DATE")}: {"\n"} {item.lastModified} </Text>
+                    <Text style={scss.textStyleMedium}> {I18n.t("ES NUMBER")}: {"\n"} {item.dsNumber}</Text>
+                    <Text style={scss.textStyleLight}>{I18n.t("ES DATE")}: {"\n"}
+                    {moment.utc(item.createdDate, "YYYY-MM-DDTHH:mm:ss Z").format('DD-MM-YYYY hh:mm:ss')}
+                    </Text>
                   </View>
                   <View style={scss.textContainer}>
                     <Text style={scss.textStyleLight}>{I18n.t("GROSS AMOUNT")}: {"\n"} ₹{item.netAmount}</Text>
