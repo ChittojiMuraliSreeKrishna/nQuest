@@ -107,7 +107,7 @@ export default class CreditNotes extends Component {
     };
     AccountingService.getCreditNotes(reqOb).then((res) => {
       if (res) {
-        console.log({ res });
+        console.log({ res }, res.data.content);
         this.setState({ creditNotes: res.data.content });
       }
       this.setState({ loading: false });

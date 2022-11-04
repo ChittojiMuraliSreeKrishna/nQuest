@@ -77,7 +77,7 @@ export default class ReportsDashboard extends Component {
     }).catch((err) => {
       this.setState({ loading: false });
       console.log('There is error getting storeId');
-      alert(err);
+      // alert(err);
     });
 
 
@@ -126,7 +126,7 @@ export default class ReportsDashboard extends Component {
             });
         }
       }
-    }).catch(error => alert(error));
+    }).catch(error => console.log(error));
   }
 
   getSalesSummary () {

@@ -121,7 +121,7 @@ export default class CreateHSNCode extends Component {
                     </Text>
                   </View>
                   <View style={scss.textContainer}>
-                    <Text style={textStyleLight}>SLAB: {item.slabBased}</Text>
+                    <Text style={textStyleLight}>SLAB: {item.taxAppliedType === "Priceslab" ? 'Yes' : 'No'}</Text>
                   </View>
                   <View style={scss.flatListFooter}>
                     <Text style={scss.footerText}>

@@ -113,6 +113,7 @@ class AddBarcode extends Component {
     const storeId = AsyncStorage.getItem("storeId");
     console.log({ storeId: storeId });
     const isTaxIncluded = await AsyncStorage.getItem('custom:isTaxIncluded');
+    console.log({ isTaxIncluded });
     this.setState({ isTaxIncluded: isTaxIncluded });
     this.getAllstores();
     this.getAllHSNCodes();
@@ -442,8 +443,13 @@ class AddBarcode extends Component {
 
   // Barcode Actions
   handleBarcode = (value) => {
+    console.log({ value });
     this.setState({ barcode: value });
   };
+
+  handleBarcodeValid () {
+
+  }
 
   // Date Actions
   datepickerClicked () {
@@ -506,7 +512,7 @@ class AddBarcode extends Component {
     if (this.state.uomId === null) {
       isFormValid = false;
     }
-    if (this.state.isTaxIncluded === "true" && this.state.isTaxIncluded !== "null") {
+    if ((this.state.isTaxIncluded === "true" || this.state.isTaxIncluded === "false") && this.state.isTaxIncluded !== "null") {
       if (this.state.hsnId === null) {
         isFormValid = false;
       }
@@ -1044,7 +1050,7 @@ class AddBarcode extends Component {
               useNativeAndroidPickerStyle={false}
             />
           </View>
-          {this.state.isTaxIncluded === "true" && this.state.isTaxIncluded !== null && (<View >
+          {(this.state.isTaxIncluded === "true" || this.state.isTaxIncluded === "false") && this.state.isTaxIncluded !== null && (<View >
             <Text style={inputHeading}>
               {I18n.t("HSN Code")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
             </Text>
@@ -1187,7 +1193,7 @@ class AddBarcode extends Component {
             autoCapitalize="none"
             value={this.state.barcode}
             onBlur={() => this.handleBarcodeValid()}
-            onChangeText={() => this.handleBarcode()}
+            onChangeText={(value) => this.handleBarcode(value)}
           />
           <View style={forms.action_buttons_container}>
             <TouchableOpacity style={[ forms.action_buttons, { backgroundColor: this.state.saveButtonDisabled ? color.accent : color.disableBackGround } ]}
