@@ -127,7 +127,7 @@ export class GoodsReturn extends Component {
     };
     console.log('params are' + JSON.stringify(obj), pageNumber);
     ReportsService.returnSlips(obj, pageNumber).then((res) => {
-      console.log("returnSlips response", res.data);
+      console.log("returnSlips response", res.data, res.data.result.content);
       console.log(res.data.result.length);
       if (res.data) {
         if (res.data.result.length !== 0) {
@@ -404,8 +404,8 @@ export class GoodsReturn extends Component {
                     {this.state.viewItems.map((data) => {
                       return (
                         <View style={scss.model_text_container}>
-                          <TEXT selectable={true} variant='titleMedium' style={{color: '#bbb'}}>Return Memo No:{"\n"}<TEXT style={{ color: '#ed1c24' }}>{data.rtNumber}</TEXT></TEXT>
-                          <TEXT variant='titleMedium' style={{color: '#bbb'}}>DATE:{"\n"}<TEXT style={{color: '#000'}}>{formatDate(data.createdInfo)}</TEXT></TEXT>
+                          <TEXT selectable={true} variant='titleMedium' style={{ color: '#bbb' }}>Return Memo No:{"\n"}<TEXT style={{ color: '#ed1c24' }}>{data.rtNumber}</TEXT></TEXT>
+                          <TEXT variant='titleMedium' style={{ color: '#bbb' }}>DATE:{"\n"}<TEXT style={{ color: '#000' }}>{formatDate(data.createdInfo)}</TEXT></TEXT>
                         </View>
                       );
                     })}

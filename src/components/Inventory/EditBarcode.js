@@ -849,7 +849,6 @@ class EditBarcode extends Component {
             placeholderTextColor={"#676767"}
             textAlignVertical="center"
             editable={false}
-            maxLength={12}
             autoCapitalize="none"
             value={this.state.designCode}
             onBlur={() => this.handleDesignCodeValid()}
@@ -871,7 +870,6 @@ class EditBarcode extends Component {
             placeholder="BarCode"
             placeholderTextColor={"#676767"}
             textAlignVertical="center"
-            maxLength={12}
             autoCapitalize="none"
             value={this.state.barcode}
             onBlur={() => this.handleBarcodeValid()}

@@ -186,15 +186,12 @@ export default class AddProductCombo extends Component {
       if (listOfProducts.length > 0) {
         InventoryService.addProductCombo(requestObj).then((res) => {
           if (res?.data.isSuccess === "true") {
-            alert(res.data.message);
             this.setState({
               listOfProducts: [],
               comboName: "",
               comboPrice: "",
               comboQty: "",
             });
-          } else {
-            alert(res.data.message);
           }
           this.props.navigation.goBack();
           this.props.route.params.onGoBack();

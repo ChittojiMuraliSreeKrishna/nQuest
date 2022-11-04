@@ -13,7 +13,7 @@ import IconFA from 'react-native-vector-icons/FontAwesome';
 import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
-import { dateFormat, formatMonth } from '../../commonUtils/DateFormate';
+import { dateFormat, formatDate, formatMonth } from '../../commonUtils/DateFormate';
 import ReportsService from '../services/ReportsService';
 
 var deviceWidth = Dimensions.get("window").width;
@@ -285,7 +285,7 @@ export default class NewSaleReport extends Component {
                     <Text style={scss.textStyleMedium}>INVOICE NUMBER: {"\n"} {item.invoiceNumber}</Text>
                   </View>
                   <View style={scss.textContainer}>
-                    <Text style={scss.textStyleLight}>{I18n.t("EMP ID")}: {item.userId} </Text>
+                    <Text style={scss.textStyleLight}>{I18n.t("EMP ID")}: {item.empId} </Text>
                     <Text style={scss.textStyleLight}> {item.status}</Text>
                   </View>
 
@@ -295,8 +295,7 @@ export default class NewSaleReport extends Component {
                   <View style={scss.flatListFooter}>
                     <Text style={scss.footerText}>
                       {I18n.t("DATE")}:
-                      {item.createdDate ? item.createdDate.toString().split(/T/)[ 0 ]
-                        : item.createdDate}
+                      {formatDate(item.createdDate)}
                     </Text>
                     <View style={scss.buttonContainer}>
                       <IconFA
@@ -573,41 +572,40 @@ export default class NewSaleReport extends Component {
                         </View>
                         <View style={scss.model_text_container}>
                           <Txt style={{ textAlign: 'left' }} variant='bodyLarge'>Mobile: {"\n"}{item.mobileNumber}</Txt>
-                          <Txt style={{ textAlign: 'right' }} variant='bodyLarge'>Date: {"\n"}{item.createdDate ? item.createdDate.toString().split(/T/)[ 0 ]
-                            : item.createdDate}</Txt>
+                          <Txt style={{ textAlign: 'right' }} variant='bodyLarge'>Date: {"\n"}{formatDate(item.createdDate)}</Txt>
                         </View>
                         <View style={scss.model_subContainer}>
                           <ScrollView>
-                            {item.lineItemsReVo.map((item, index) => {
+                            {item.lineItemsReVo.map((data, index) => {
                               return (
                                 <View id={index} style={scss.model_subbody}>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>Barcode: {"\n"}{item.barCode}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Section: {item.section}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>Barcode: {"\n"}{data.barCode}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Section: {data.section}</Txt>
                                   </View>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>HsnCode: {item.hsnCode}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>EmpId: {item.userId}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>HsnCode: {data.hsnCode}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>EmpId: {item.empId}</Txt>
                                   </View>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>QTY: {item.quantity}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>MRP: {item.itemPrice}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>QTY: {data.quantity}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>MRP: {data.itemPrice}</Txt>
                                   </View>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>DISC: {item.discount}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Approved By: {item.approvedBy}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>DISC: {data.discount}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Approved By: {data.approvedBy}</Txt>
                                   </View>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>Reason: {item.reason}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Tax Amount: {item.taxValue}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>Reason: {data.reason}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Tax Amount: {data.taxValue}</Txt>
                                   </View>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>CGST: {item.cgst}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>SGST: {item.sgst}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>CGST: {data.cgst}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>SGST: {data.sgst}</Txt>
                                   </View>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>IGST: {item.igst}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>NET: {item.netValue}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>IGST: {data.igst}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>NET: {data.netValue}</Txt>
                                   </View>
                                 </View>
                               );

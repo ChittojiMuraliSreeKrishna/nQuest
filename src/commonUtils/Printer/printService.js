@@ -4,7 +4,7 @@ import EscPosPrinter from 'react-native-esc-pos-printer';
 
 
 const PrintService = async (type, barcode, object, invoiceTax) => {
-  console.log({ type, object });
+  console.log({ type, object, barcode, invoiceTax });
   // var object = [ { sno: 1, barcode: 'bar-enca93', quantity: 4, itemMrp: 4000, itemDiscount: 5000, totalMrp: 11000 } ];
   try {
     const printers = await EscPosPrinter.discover();
@@ -106,18 +106,23 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       printer.smooth(true);
       printer.bold(true);
       printer.line('EASY RETAIL');
-      printer.line('ESTIMATION SLIP');
       printer.line('OTSI - Hi-tech city');
       printer.smooth(false);
       printer.size(1, 1);
+      printer.align('left');
+      printer.text('GST no: \n');
+      printer.size(2, 1);
+      printer.align('center');
+      printer.text('*Invoice* \n');
+      printer.size(0, 0);
       printer.text('Date: ' + moment(new Date()).format("DD-MM-YYYY HH:mm::ss").toString());
       printer.newline();
-      printer.text('SmNumber: ' + '\n');
-      printer.line('________________________________________________');
       printer.align('left');
+      printer.text('SmNumber: ' + '\n');
+      printer.text('________________________________________________\n');
       printer.text('CUSTOMER NAME: ' + invoiceTax.tagCustomerName + '\n');
       printer.text('Mobile: ' + invoiceTax.mobileNumber + '\n');
-      printer.line('________________________________________________');
+      printer.text('________________________________________________\n');
       printer.bold(false);
       printer.align('center');
       printer.text('* ITEMS LIST * \n');
@@ -142,19 +147,23 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
         '\n');
       printer.text('Manual Discount: ' + invoiceTax.totalManualDisc +
         '\n');
-      { invoiceTax.returnSlipAmount > 0 && printer.text('RT Amount: ' + invoiceTax.returnSlipAmount + '\n'); }
-      { invoiceTax.gvAppliedAmount > 0 && printer.text('Coupon Amount: ' + invoiceTax.gvAppliedAmount + '\n'); }
-      printer.line('________________________________________________');
-      printer.newline();
-      printer.text('Total Amount: ' + invoiceTax.netPayableAmount + '\n');
-      printer.line('________________________________________________');
-      printer.text('Tax  \n');
-      printer.line('________________________________________________');
-      printer.text('SGST: ' + invoiceTax.sgst + '\n');
-      printer.text('CGST: ' + invoiceTax.cgst + '\n');
-      printer.line('________________________________________________');
-      printer.text('Net Total(tax inc): ' + invoiceTax.netPayableAmount + '\n');
-      printer.line('________________________________________________');
+      if (invoiceTax.returnSlipAmount > 0) {
+        printer.text('RT Amount: ' + invoiceTax.returnSlipAmount + '\n');
+      }
+      // if (invoiceTax.gvAppliedAmount > 0) {
+      // printer.text('Coupon Amount: ' + invoiceTax.gvAppliedAmount + '\n');
+      // }
+      // printer.line('________________________________________________');
+      // printer.newline();
+      // printer.text('Total Amount: ' + invoiceTax.netPayableAmount + '\n');
+      // printer.line('________________________________________________');
+      // printer.text('Tax  \n');
+      // printer.line('________________________________________________');
+      // printer.text('SGST: ' + invoiceTax.sgst + '\n');
+      // printer.text('CGST: ' + invoiceTax.cgst + '\n');
+      // printer.line('________________________________________________');
+      // printer.text('Net Total(tax inc): ' + invoiceTax.netPayableAmount + '\n');
+      // printer.line('________________________________________________');
       printer.barcode({
         value: esNum,
         type: 'EPOS2_BARCODE_CODE93',

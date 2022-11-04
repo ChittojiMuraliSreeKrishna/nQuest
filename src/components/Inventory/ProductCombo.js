@@ -163,7 +163,6 @@ export default class ProductCombo extends Component {
           this.continuePagination();
         } else {
           this.setState({ modalVisible: false });
-          alert(res.data.message);
         }
         console.log(this.state.filteredProductsList, "Filter");
       },
