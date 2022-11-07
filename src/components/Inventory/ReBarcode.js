@@ -16,6 +16,7 @@ import IconFA from 'react-native-vector-icons/FontAwesome';
 import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from "../../commonUtils/assets/styles/style.scss";
+import { formatListDates } from "../../commonUtils/DateFormate";
 import DateSelector from "../../commonUtils/DateSelector";
 import Loader from "../../commonUtils/loader";
 import { RH, RW } from "../../Responsive";
@@ -460,10 +461,8 @@ export default class ReBarcode extends Component {
                                 </View>
                               )}
                               <View style={scss.model_text_container}>
-                                <Text variant="bodyMedium">CreatedDate:{" "}
-                                  {item.createdDate
-                                    ? item.createdDate.toString().split(/T/)[ 0 ]
-                                    : item.createdDate}</Text>
+                                <Text variant="bodyMedium">CreatedDate: {" "}
+                                  {formatListDates(item.createdDate)}</Text>
                                 <Text variant="bodyMedium"></Text>
                               </View>
                             </View>

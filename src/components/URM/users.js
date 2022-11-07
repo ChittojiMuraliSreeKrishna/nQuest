@@ -20,6 +20,7 @@ import RNPickerSelect from "react-native-picker-select";
 import { Chevron } from "react-native-shapes";
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from "../../commonUtils/assets/styles/style.scss";
+import { formatDate } from "../../commonUtils/DateFormate";
 import Loader from "../../commonUtils/loader";
 import { RH } from "../../Responsive";
 import EmptyList from "../Errors/EmptyList";
@@ -286,9 +287,7 @@ export default class Users extends Component {
                     <View style={scss.flatListFooter}>
                       <Text style={scss.footerText}>
                         Date:{" "}
-                        {item.createdDate
-                          ? item.createdDate.toString().split(/T/)[ 0 ]
-                          : item.createdDate}
+                        {formatDate(item.createdDate)}
                       </Text>
                       <TouchableOpacity
                         style={scss.footerSingleBtn}

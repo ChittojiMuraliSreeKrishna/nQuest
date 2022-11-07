@@ -19,6 +19,7 @@ import IconFA from 'react-native-vector-icons/FontAwesome';
 import IconMA from 'react-native-vector-icons/MaterialIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from "../../commonUtils/assets/styles/style.scss";
+import { formatDate } from "../../commonUtils/DateFormate";
 import Loader from "../../commonUtils/loader";
 import UrmService from "../services/UrmService";
 import {
@@ -363,9 +364,7 @@ export default class Stores extends Component {
                     <View style={scss.flatListFooter}>
                       <Text style={scss.footerText}>
                         {I18n.t("Date")} :{" "}
-                        {item.createdDate
-                          ? item.createdDate.toString().split(/T/)[ 0 ]
-                          : item.createdDate}
+                        {formatDate(item.createdDate)}
                       </Text>
                       <IconFA
                         name="edit"

@@ -5,11 +5,7 @@ export function formatDate (d) {
 }
 
 export function formatListDates (d) {
-  console.log('++++++++++', d.split('T')[ 1 ]);
-  let date = new Date(d);
-  console.log({ date });
-  console.log(date.getHours(), "Hours");
-  return date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes();
+  return moment.utc(d, "YYYY-MM-DD Z").format('DD-MM-YYYY');
 }
 
 export function formatMonth (number) {

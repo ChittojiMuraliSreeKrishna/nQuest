@@ -19,6 +19,7 @@ import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconMAA from 'react-native-vector-icons/MaterialIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from "../../commonUtils/assets/styles/style.scss";
+import { formatListDates } from "../../commonUtils/DateFormate";
 import DateSelector from "../../commonUtils/DateSelector";
 import Loader from "../../commonUtils/loader";
 import { RH, RW } from "../../Responsive";
@@ -377,9 +378,7 @@ export default class Barcode extends Component {
                       <View style={scss.flatListFooter}>
                         <Text style={scss.footerText}>
                           CreatedDate:{" "}
-                          {item.createdDate
-                            ? item.createdDate.toString().split(/T/)[ 0 ]
-                            : item.createdDate}
+                          {formatListDates(item.createdDate)}
                         </Text>
                         <View style={scss.buttonContainer}>
                           <IconMA

@@ -10,6 +10,7 @@ import IconFA from 'react-native-vector-icons/FontAwesome';
 import IconIA from 'react-native-vector-icons/Ionicons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from "../../commonUtils/assets/styles/style.scss";
+import { formatListDates } from '../../commonUtils/DateFormate';
 import DateSelector from '../../commonUtils/DateSelector';
 import Loader from '../../commonUtils/loader';
 import { RH, RW } from '../../Responsive';
@@ -248,9 +249,7 @@ export default class DebitNotes extends Component {
                   <View style={scss.flatListFooter}>
                     <Text style={scss.footerText}>
                       Date:{" "}
-                      {item.createdDate
-                        ? item.createdDate.toString().split(/T/)[ 0 ]
-                        : item.createdDate}
+                      {formatListDates(item.createdDate)}
                     </Text>
                     <View style={scss.buttonContainer}>
                       <IconFA
@@ -377,9 +376,7 @@ export default class DebitNotes extends Component {
                           </View>
                           <View style={scss.model_text_container}>
                             <Text style={scss.textStyleLight}>AMOUNT: {item.amount}</Text>
-                            <Text style={scss.textStyleLight}>DATE: {item.createdDate
-                              ? item.createdDate.toString().split(/T/)[ 0 ]
-                              : item.createdDate}</Text>
+                            <Text style={scss.textStyleLight}>DATE: {formatListDates(item.createdDate)}</Text>
                           </View>
                         </View>
                       )}

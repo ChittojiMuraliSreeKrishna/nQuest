@@ -6,6 +6,7 @@ import {
 import IconFA from 'react-native-vector-icons/FontAwesome';
 import IconMA from 'react-native-vector-icons/Ionicons';
 import scss from "../../commonUtils/assets/styles/style.scss";
+import { formatDate } from "../../commonUtils/DateFormate";
 import Loader from "../../commonUtils/loader";
 import AccountingService from "../services/AccountingService";
 import { textStyleLight } from "../Styles/Styles";
@@ -126,9 +127,7 @@ export default class CreateHSNCode extends Component {
                   <View style={scss.flatListFooter}>
                     <Text style={scss.footerText}>
                       Date :{" "}
-                      {item.createdDate
-                        ? item.createdDate.toString().split(/T/)[ 0 ]
-                        : item.createdDate}
+                      {formatDate(item.createdDate)}
                     </Text>
                     <IconFA
                       name="edit"

@@ -25,6 +25,7 @@ import {
   dateText
 } from "../Styles/FormFields";
 
+import { formatDate } from "../../commonUtils/DateFormate";
 import DateSelector from "../../commonUtils/DateSelector";
 import Loader from "../../commonUtils/loader";
 import { RH } from "../../Responsive";
@@ -274,9 +275,7 @@ export default class Roles extends Component {
                     <View style={scss.flatListFooter}>
                       <Text style={scss.footerText}>
                         Date:{" "}
-                        {item.createdDate
-                          ? item.createdDate.toString().split(/T/)[ 0 ]
-                          : item.createdDate}
+                        {formatDate(item.createdDate)}
                       </Text>
                       <TouchableOpacity
                         style={scss.footerSingleBtn}

@@ -1,12 +1,13 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, FlatList, Text, View } from 'react-native';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
-import { flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleLight, textStyleMedium } from '../Styles/Styles';
-import { RH, RF, RW } from '../../Responsive';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { formatDate } from '../../commonUtils/DateFormate';
+import { RF, RH } from '../../Responsive';
 import LoginService from '../services/LoginService';
+import { flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleLight, textStyleMedium } from '../Styles/Styles';
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceHeight = Dimensions.get("window").height;
@@ -14,49 +15,49 @@ var deviceHeight = Dimensions.get("window").height;
 export default class Domain extends Component {
 
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       domainsList: [],
       channelsList: [],
       channelFull: false,
-    }
+    };
   }
 
-  componentDidMount() {
-    this.getDomainsList()
+  componentDidMount () {
+    this.getDomainsList();
   }
 
 
-  async getDomainsList() {
+  async getDomainsList () {
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     this.setState({ loading: true });
     axios.get(LoginService.getDomainsList() + clientId).then((res) => {
       if (res) {
-        this.setState({ domainsList: res.data.result })
-        this.getChannelsList()
+        this.setState({ domainsList: res.data.result });
+        this.getChannelsList();
       }
     }).catch(() => {
       this.setState({ loading: false });
       if (this.state.flagDomain === true) {
-        this.setState({ domainError: "Records Not Found" })
+        this.setState({ domainError: "Records Not Found" });
         //    alert("There is an Error while getting Domains");
       }
     });
   }
 
-  getChannelsList() {
+  getChannelsList () {
     axios.get(LoginService.channelsList()).then(res => {
       if (res) {
-        this.setState({ channelsList: res.data.result })
+        this.setState({ channelsList: res.data.result });
         if (this.state.domainsList.length === this.state.channelsList.length) {
-          this.setState({ channelFull: true })
+          this.setState({ channelFull: true });
         }
       }
-    })
+    });
   }
 
-  render() {
-    const { channelFull } = this.state
+  render () {
+    const { channelFull } = this.state;
     return (
       <View>
         <FlatList
@@ -79,7 +80,7 @@ export default class Domain extends Component {
                 </View>
                 <View style={textContainer}>
                   <Text style={textStyleMedium}>{I18n.t("CREATED BY")}: {item.createdBy}</Text>
-                  <Text style={textStyleLight}>{I18n.t("CREATED DATE")}: {item.createdDate ? item.createdDate.toString().split(/T/)[0] : item.createdDate}  </Text>
+                  <Text style={textStyleLight}>{I18n.t("CREATED DATE")}: {formatDate(item.createdDate)}  </Text>
                 </View>
                 <View style={textContainer}>
                   <Text style={textStyleLight}>{I18n.t("DESCRIPTION")}: {item.discription}  </Text>
@@ -102,7 +103,7 @@ const domainFull = {
   fontFamily: "bold",
   fontSize: RF(17),
   marginTop: Device.isTablet ? RH(20) : RH(10)
-}
+};
 
 const domainEmpty = {
   color: '#cc241d',
@@ -110,4 +111,4 @@ const domainEmpty = {
   fontFamily: "bold",
   fontSize: RF(17),
   marginTop: deviceHeight / 3
-}
+};

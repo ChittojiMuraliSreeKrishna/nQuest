@@ -1,10 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import moment from 'moment';
 import React, { Component } from 'react';
 import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
 import scss from '../../commonUtils/assets/styles/style.scss';
+import { formatDate } from '../../commonUtils/DateFormate';
 import Loader from '../../commonUtils/loader';
 import { RF, RH, RW } from '../../Responsive';
 import CustomerService from '../services/CustomerService';
@@ -112,7 +112,7 @@ export default class DayClosure extends Component {
                     <Text style={scss.highText}>S.No: {index + 1}</Text>
                     <Text style={scss.textStyleLight}>Created Date :
                       <Text style={scss.textStyleMedium}>{"\n"}
-                        {moment.utc(item.createdDate, "YYYY-MM-DDTHH:mm:ss Z").format('DD-MM-YYYY hh:mm:ss')}
+                        {formatDate(item.createdDate)}
                       </Text>
                     </Text>
                   </View>
