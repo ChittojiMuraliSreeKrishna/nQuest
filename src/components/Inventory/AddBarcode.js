@@ -564,7 +564,8 @@ class AddBarcode extends Component {
         uom: this.state.uomName,
         domainType: this.state.selectedDomain,
         vendorTax: this.state.vendorTax,
-        barcode: this.state.barcode ? this.state.barcode : null
+        barcode: this.state.barcode ? this.state.barcode : null,
+        
       };
       console.log({ params });
       this.setState({ loading: true });

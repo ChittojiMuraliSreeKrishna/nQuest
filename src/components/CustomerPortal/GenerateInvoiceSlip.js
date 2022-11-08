@@ -12,10 +12,10 @@ import Modal from "react-native-modal";
 import { TextInput } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
-import { openDatabase } from 'react-native-sqlite-storage';
 import { default as MinusIcon, default as PlusIcon, default as ScanIcon } from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
+import PrivilagesList from '../../commonUtils/PrivilagesList';
 import { RF, RW } from '../../Responsive';
 import { customerErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
@@ -23,7 +23,6 @@ import CustomerService from '../services/CustomerService';
 import { color } from '../Styles/colorStyles';
 import { inputField } from '../Styles/FormFields';
 import { listEmptyMessage } from '../Styles/Styles';
-import PrivilagesList from '../../commonUtils/PrivilagesList'
 
 var deviceWidth = Dimensions.get('window').width;
 var deviceHeight = Dimensions.get('window').height;
@@ -210,14 +209,14 @@ class GenerateInvoiceSlip extends Component {
     const isTaxIncluded = await AsyncStorage.getItem('custom:isTaxIncluded');
     this.setState({ isTaxIncluded: isTaxIncluded })
     this.getallDates();
-    const childPrivileges =  PrivilagesList('Generate Invoice');
+    const childPrivileges = PrivilagesList('Generate Invoice');
     childPrivileges.then((res) => {
-      if(res) {
-        const result = res.sort((a , b) => a.id - b.id);
+      if (res) {
+        const result = res.sort((a, b) => a.id - b.id);
         this.setState({
-          tagcustomerPrivilege:  result[0],
+          tagcustomerPrivilege: result[0],
           checkpromodiscountPrivilege: result[1],
-          billleveldiscountPrivilege: result[2]           
+          billleveldiscountPrivilege: result[2]
         });
       }
     });
@@ -583,7 +582,7 @@ class GenerateInvoiceSlip extends Component {
           }
           this.calculateTotal();
         }
-        // this.getTaxAmount();
+        this.getTaxAmount();
       });
     } else {
       this.setState({ loading: false, dsNumber: "" });
@@ -1146,8 +1145,8 @@ class GenerateInvoiceSlip extends Component {
 
               {this.state.barCodeList.length !== 0 && (
                 <ScrollView horizontal style={{ flexDirection: 'row' }}>
-                  <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.customerTagging || this.state.handleBillDiscount ? color.disableBackGround : color.accent }]}
-                    disabled={this.state.customerTagging || this.state.handleBillDiscount}
+                  <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.customerTagging ? color.disableBackGround : color.accent }]}
+                    disabled={this.state.customerTagging}
                     onPress={() => {
                       this.setState({ customerTagging: true, modalVisible: true, handleBillDiscount: false, handleCheckPromo: false })
                     }}>
@@ -1469,7 +1468,7 @@ class GenerateInvoiceSlip extends Component {
               <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
               //  onBackButtonPress={() => this.modelCancel()}
               //   onBackdropPress={() => this.modelCancel()}
-                 >
+              >
                 <View style={forms.filterModelContainer}>
                   <Text style={forms.popUp_decorator}>-</Text>
                   <View style={forms.filterModelSub}>
@@ -1516,10 +1515,10 @@ class GenerateInvoiceSlip extends Component {
         {
           this.state.handleBillDiscount && (
             <View>
-              <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible} 
+              <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
               // onBackButtonPress={() => this.billDiscountModelCancel()}
               //   onBackdropPress={() => this.billDiscountModelCancel()} 
-                >
+              >
                 <View style={[forms.filterModelContainer, { width: '100%' }]}>
                   <Text style={forms.popUp_decorator}>-</Text>
                   <View style={forms.filterModelSub}>

@@ -118,10 +118,14 @@ class EditBarcode extends Component {
       isTaxIncluded: '',
       barcode: "",
       designCode: "",
+      vendorTax: "",
+      dynamicAttributes: [],
+      dynamicAttributesName: "",
+      size: ""
     };
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     this.setState({ clientId: clientId });
     const isTaxIncluded = await AsyncStorage.getItem('custom:isTaxIncluded');
@@ -140,6 +144,7 @@ class EditBarcode extends Component {
       loading: true,
     });
     console.log({ editBcode });
+    // alert(editBcode.item.vendorTax)
     this.setState(
       {
         selectedDomain: editBcode.item.domainType,
@@ -171,7 +176,8 @@ class EditBarcode extends Component {
         barcodeId: parseInt(editBcode.item.id),
         selectedStatus: editBcode.item.status,
         barcode: editBcode.item.barcode,
-        designCode: editBcode.item.designcode
+        designCode: editBcode.item.designcode,
+        vendorTax: String(editBcode.item.vendorTax)
       },
       () => {
         const { selectedDomain } = this.state;
@@ -187,7 +193,7 @@ class EditBarcode extends Component {
   }
 
   // Go Back Actions
-  handleBackButtonClick () {
+  handleBackButtonClick() {
     this.props.navigation.goBack(null);
     this.props.route.params.onGoBack(null);
     return true;
@@ -210,15 +216,15 @@ class EditBarcode extends Component {
 
 
   // Category Actions
-  getAllCatogiries (data) {
+  getAllCatogiries(data) {
     this.setState({ categoriesList: [] });
     let categories = [];
     InventoryService.getAllCategories(data).then((res) => {
       if (res?.data) {
         for (let i = 0; i < res.data.length; i++) {
           categories.push({
-            value: res.data[ i ].id,
-            label: res.data[ i ].name,
+            value: res.data[i].id,
+            label: res.data[i].name,
           });
         }
         console.log({ categories });
@@ -234,8 +240,13 @@ class EditBarcode extends Component {
   };
 
 
+  handleSize = (value, data) => {
+    console.log({ value, data });
+    this.setState({ size: value });
+  };
+
   // HSNCodes Actions
-  getAllHSNCodes () {
+  getAllHSNCodes() {
     this.setState({ hsnCodesList: [] });
     let hsnList = [];
     InventoryService.getAllHsnList().then((res) => {
@@ -243,8 +254,8 @@ class EditBarcode extends Component {
         console.log("HSNS", res.data);
         for (let i = 0; i < res.data.result.length; i++) {
           hsnList.push({
-            value: res.data.result[ i ].hsnCode,
-            label: res.data.result[ i ].hsnCode,
+            value: res.data.result[i].hsnCode,
+            label: res.data.result[i].hsnCode,
           });
         }
         console.log({ hsnList });
@@ -260,7 +271,7 @@ class EditBarcode extends Component {
   };
 
   // Store Actions
-  async getAllstores () {
+  async getAllstores() {
     this.setState({ storesList: [] });
     let storesList = [];
     const { clientId } = this.state;
@@ -270,8 +281,8 @@ class EditBarcode extends Component {
       if (res?.data) {
         for (let i = 0; i < res.data.length; i++) {
           storesList.push({
-            value: res.data[ i ].id,
-            label: res.data[ i ].name,
+            value: res.data[i].id,
+            label: res.data[i].name,
           });
         }
         console.log({ storesList });
@@ -283,6 +294,10 @@ class EditBarcode extends Component {
     console.warn({ value });
     this.setState({ storeId: value, store: value });
   };
+
+  handleVendorTax = (value) => {
+    this.setState({ vendorTax: value })
+  }
 
 
   // List Price Actions
@@ -306,7 +321,7 @@ class EditBarcode extends Component {
   };
 
   // Date Actions
-  datepickerClicked () {
+  datepickerClicked() {
     this.setState({ datepickerOpen: true });
   }
 
@@ -327,29 +342,29 @@ class EditBarcode extends Component {
   };
 
   // Validations For Barcode Fields
-  validationForm () {
+  validationForm() {
     let isFormValid = true;
     let errors = {};
     if (this.state.reBar === true) {
       if (this.state.costPrice === null) {
         isFormValid = false;
-        errors[ "costPrice" ] = inventoryErrorMessages.costPrice;
+        errors["costPrice"] = inventoryErrorMessages.costPrice;
         this.setState({ costPriceValid: false });
       }
       if (this.state.listPrice === null) {
         isFormValid = false;
-        errors[ "listPrice" ] = inventoryErrorMessages.listPrice;
+        errors["listPrice"] = inventoryErrorMessages.listPrice;
         this.setState({ listPriceValid: false });
       }
     }
     if (this.state.isTaxIncluded === "true" && this.state.isTaxIncluded !== "null" && this.state.hsnId === null) {
       isFormValid = false;
-      errors[ "hsn" ] = inventoryErrorMessages.hsnCode;
+      errors["hsn"] = inventoryErrorMessages.hsnCode;
       this.setState({ hsnValid: false });
     }
     if (String(this.state.quantity).length === 0) {
       isFormValid = false;
-      errors[ "qty" ] = inventoryErrorMessages.qty;
+      errors["qty"] = inventoryErrorMessages.qty;
       this.setState({ qtyValid: false });
     }
     this.setState({ errors: errors });
@@ -357,7 +372,7 @@ class EditBarcode extends Component {
   }
 
   // Saving Barcode
-  saveBarcode () {
+  saveBarcode() {
     console.log(this.state.store);
     this.setState({ loading: true });
     const { selectedDomain, isEdit, reBar } = this.state;
@@ -386,6 +401,7 @@ class EditBarcode extends Component {
         uom: this.state.uomName,
         domainType: this.state.selectedDomain,
         id: this.state.barcodeId,
+
       };
       this.setState({ loading: true });
       console.log({ params });
@@ -417,11 +433,11 @@ class EditBarcode extends Component {
   }
 
   // Cancel Add Barcode
-  cancel () {
+  cancel() {
     this.props.navigation.goBack(null);
   }
 
-  render () {
+  render() {
     const {
       divisionValid,
       sectionValid,
@@ -475,7 +491,7 @@ class EditBarcode extends Component {
                 value={this.state.selectedDivision}
               />
               {!divisionValid && (
-                <Message imp={true} message={this.state.errors[ "divison" ]} />
+                <Message imp={true} message={this.state.errors["divison"]} />
               )}
               <Text style={inputHeading}>
                 {I18n.t("Section")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -490,7 +506,7 @@ class EditBarcode extends Component {
                 value={this.state.section}
               />
               {!sectionValid && (
-                <Message imp={true} message={this.state.errors[ "section" ]} />
+                <Message imp={true} message={this.state.errors["section"]} />
               )}
               <Text style={inputHeading}>
                 {I18n.t("Sub Section")}{" "}
@@ -506,7 +522,7 @@ class EditBarcode extends Component {
                 value={this.state.subSection}
               />
               {!subSectionValid && (
-                <Message imp={true} message={this.state.errors[ "subSection" ]} />
+                <Message imp={true} message={this.state.errors["subSection"]} />
               )}
               <Text style={inputHeading}>
                 {I18n.t("Category")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -521,7 +537,7 @@ class EditBarcode extends Component {
                 value={this.state.category}
               />
               {!categoryValid && (
-                <Message imp={true} message={this.state.errors[ "category" ]} />
+                <Message imp={true} message={this.state.errors["category"]} />
               )}
             </View>
           )}
@@ -608,7 +624,7 @@ class EditBarcode extends Component {
             onChangeText={this.handleColour}
           />
           {!colorValid && (
-            <Message imp={true} message={this.state.errors[ "color" ]} />
+            <Message imp={true} message={this.state.errors["color"]} />
           )}
           <Text style={inputHeading}>
             {" "}
@@ -632,7 +648,7 @@ class EditBarcode extends Component {
             onChangeText={this.handleName}
           />
           {!nameValid && (
-            <Message imp={true} message={this.state.errors[ "name" ]} />
+            <Message imp={true} message={this.state.errors["name"]} />
           )}
           <Text style={inputHeading}>
             {I18n.t("Batch No")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -655,7 +671,38 @@ class EditBarcode extends Component {
             onChangeText={this.handleBatchNo}
           />
           {!batchNoValid && (
-            <Message imp={true} message={this.state.errors[ "batchNo" ]} />
+            <Message imp={true} message={this.state.errors["batchNo"]} />
+          )}
+          {this.state.dynamicAttributes.length > 0 && (
+            <View>
+              <Text style={inputHeading}>{this.state.dynamicAttributesName}</Text>
+              <View
+                style={[
+                  rnPickerContainer,
+                  { borderColor: "#d6d6d6" },
+                ]}
+              >
+                <RNPickerSelect
+                  placeholder={{
+                    label: "Select",
+                  }}
+                  Icon={() => {
+                    return (
+                      <Chevron
+                        style={styles.imagealign}
+                        size={1.5}
+                        color={"gray"}
+                      />
+                    );
+                  }}
+                  items={this.state.dynamicAttributes}
+                  onValueChange={(value, data) => this.handleSize(value, data)}
+                  style={rnPicker}
+                  value={this.state.size}
+                  useNativeAndroidPickerStyle={false}
+                />
+              </View>
+            </View>
           )}
           <Text style={inputHeading}>
             {I18n.t("Cost Price")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -680,7 +727,7 @@ class EditBarcode extends Component {
             onChangeText={this.handleCostPrice}
           />
           {!costPriceValid && (
-            <Message imp={true} message={this.state.errors[ "costPrice" ]} />
+            <Message imp={true} message={this.state.errors["costPrice"]} />
           )}
           <Text style={inputHeading}>
             {I18n.t("MRP")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -704,20 +751,44 @@ class EditBarcode extends Component {
             onChangeText={this.handleListPrice}
             onBlur={this.handleListPriceValid}
           />
+          <Text style={inputHeading}>
+            {I18n.t("Vendor Tax")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
+          </Text>
+          <TextInput
+            activeOutlineColor="#d6d6d6"
+            mode="outlined"
+            outlineColor={"#d6d6d6"}
+            style={[
+              forms.input_fld,
+              forms.inactive_fld,
+            ]}
+            underlineColorAndroid="transparent"
+            placeholder={I18n.t("Vendor Tax")}
+            keyboardType={"numeric"}
+            textContentType="telephoneNumber"
+            placeholderTextColor={"#676767"}
+            textAlignVertical="center"
+            autoCapitalize="none"
+            editable={false}
+            maxLength={10}
+            value={this.state.vendorTax}
+            onChangeText={this.handleVendorTax}
+          // onBlur={this.handleVendorTaxValid}
+          />
           {!listPriceValid && (
-            <Message imp={true} message={this.state.errors[ "listPrice" ]} />
+            <Message imp={true} message={this.state.errors["listPrice"]} />
           )}
           <Text style={inputHeading}>
             {I18n.t("UOM")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
             editable={false}
-            style={[ forms.inactive_fld, forms.input_fld ]}
+            style={[forms.inactive_fld, forms.input_fld]}
             placeholder="Uom"
             value={this.state.uomName}
           />
           {!uomValid && (
-            <Message imp={true} message={this.state.errors[ "uom" ]} />
+            <Message imp={true} message={this.state.errors["uom"]} />
           )}
           {this.state.isTaxIncluded === "true" && this.state.isTaxIncluded !== "nll" && (<View>
             <Text style={inputHeading}>
@@ -751,7 +822,7 @@ class EditBarcode extends Component {
               />
             </View>
             {!hsnValid && (
-              <Message imp={true} message={this.state.errors[ "hsn" ]} />
+              <Message imp={true} message={this.state.errors["hsn"]} />
             )}
           </View>)}
           <Text style={inputHeading}>
@@ -775,7 +846,7 @@ class EditBarcode extends Component {
             onChangeText={this.handleEMPId}
           />
           {!empValid && (
-            <Message imp={true} message={this.state.errors[ "emp" ]} />
+            <Message imp={true} message={this.state.errors["emp"]} />
           )}
           <Text style={inputHeading}>
             {I18n.t("Store")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -809,7 +880,7 @@ class EditBarcode extends Component {
             />
           </View>
           {!storeValid && (
-            <Message imp={true} message={this.state.errors[ "store" ]} />
+            <Message imp={true} message={this.state.errors["store"]} />
           )}
           <Text style={inputHeading}>
             QTY <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -831,7 +902,7 @@ class EditBarcode extends Component {
             onChangeText={this.handleQuantity}
           />
           {!qtyValid && (
-            <Message imp={true} message={this.state.errors[ "qty" ]} />
+            <Message imp={true} message={this.state.errors["qty"]} />
           )}
           <Text style={inputHeading}>
             Design Code <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -876,11 +947,11 @@ class EditBarcode extends Component {
             onChangeText={() => this.handleBarcode()}
           />
           <View style={forms.action_buttons_container}>
-            <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+            <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
               onPress={() => this.saveBarcode()}>
               <Text style={forms.submit_btn_text} >{I18n.t("SAVE")}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+            <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
               onPress={() => this.cancel()}>
               <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
             </TouchableOpacity>

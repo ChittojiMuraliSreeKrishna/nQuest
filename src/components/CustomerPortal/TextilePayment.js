@@ -324,7 +324,7 @@ class TextilePayment extends Component {
       this.setState({ totalAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString() + this.state.rtAmount });
     }
     this.setState({
-      totalAmount: parseFloat(this.state.totalAmount)  - parseFloat(this.state.khataAmount)
+      totalAmount: parseFloat(this.state.totalAmount) - parseFloat(this.state.khataAmount)
     }, () => {
       this.cancelKathaModel();
     });
@@ -935,7 +935,7 @@ class TextilePayment extends Component {
       if (res.data && res.data["isSuccess"] === "true") {
         // const cardAmount = this.state.isCard || this.state.isCardOrCash ? JSON.stringify(Math.round(this.state.ccCardCash)) : JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString());
         alert("Order created " + res.data["result"]);
-        if (this.state.isKhata === true || this.state. cardManual === true) {
+        if (this.state.isKhata === true || this.state.cardManual === true) {
           this.props.route.params.onGoBack();
           this.props.navigation.goBack();
         }
@@ -1857,7 +1857,7 @@ class TextilePayment extends Component {
                           onChangeText={(value) =>
                             this.setState({ khataAmount: value }, () => {
                               if (this.state.khataAmount < (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()) {
-                                this.setState({khataAmount:value}) 
+                                this.setState({ khataAmount: value })
                               }
                             })
                           }
@@ -1980,7 +1980,7 @@ class TextilePayment extends Component {
                             editable={false} selectTextOnFocus={false}
                             value={(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()}
                           />
-                          <View style={ scss.radio_group}>
+                          <View style={scss.radio_group}>
                             <View style={scss.radio_item}>
                               <RadioButton
                                 value="Automatic"
@@ -2024,7 +2024,7 @@ class TextilePayment extends Component {
                   color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
                   fontSize: Device.isTablet ? 19 : 14,
                 }}>
-                  Total Amount </Text>
+                  Payable Amount </Text>
                 <Text style={{
                   color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
                   fontSize: Device.isTablet ? 19 : 14,
@@ -2089,7 +2089,7 @@ class TextilePayment extends Component {
                   color: "#353C40", fontFamily: "bold", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
                   fontSize: 20,
                 }}>
-                  Payable Amount </Text>
+                  Total Amount </Text>
                 <Text style={{
                   color: "#353C40", fontFamily: "bold", alignItems: 'center', fontSize: 20, justifyContent: 'center', textAlign: 'center',
                   fontSize: 20,

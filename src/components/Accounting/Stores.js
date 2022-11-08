@@ -58,7 +58,7 @@ export default class Stores extends Component {
     };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.getStoresList();
     this.getMasterStatesList();
     this.getMasterDistrictsList();
@@ -68,7 +68,7 @@ export default class Stores extends Component {
   }
 
   // Edit Store Navigation
-  handleeditStore (item, index) {
+  handleeditStore(item, index) {
     console.log(item);
     this.props.navigation.navigate("AddStore", {
       item: item,
@@ -79,7 +79,7 @@ export default class Stores extends Component {
   }
 
   // Create Store Navigation
-  handleCreateStore (item, index) {
+  handleCreateStore(item, index) {
     this.props.navigation.navigate("AddStore", {
       isEdit: false,
       onGoBack: () => this.refresh(),
@@ -88,14 +88,14 @@ export default class Stores extends Component {
   }
 
   // Refreshing Stores
-  refresh () {
+  refresh() {
     this.setState({ storesList: [] }, () => {
       this.getStoresList();
     });
   }
 
   // Get All Stores
-  async getStoresList () {
+  async getStoresList() {
     this.setState({ storesList: [] });
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     console.log({ clientId });
@@ -128,21 +128,21 @@ export default class Stores extends Component {
 
   // Filter Actions
   // Store States
-  getMasterStatesList () {
+  getMasterStatesList() {
     this.setState({ states: [] });
     this.setState({ loading: false });
     var states = [];
     UrmService.getStates().then((res) => {
-      if (res.data[ "result" ]) {
-        for (var i = 0; i < res.data[ "result" ].length; i++) {
+      if (res.data["result"]) {
+        for (var i = 0; i < res.data["result"].length; i++) {
           states.push({
-            value: res.data.result[ i ].stateCode,
-            label: res.data.result[ i ].stateName,
+            value: res.data.result[i].stateCode,
+            label: res.data.result[i].stateName,
           });
 
-          if (res.data[ "result" ][ i ].stateId === this.state.stateId) {
-            console.log("stateId is" + this.state.statesArray[ i ].name);
-            this.setState({ storeState: this.state.statesArray[ i ].name });
+          if (res.data["result"][i].stateId === this.state.stateId) {
+            console.log("stateId is" + this.state.statesArray[i].name);
+            this.setState({ storeState: this.state.statesArray[i].name });
             // this.getMasterDistrictsList();
             this.getGSTNumber();
           }
@@ -162,16 +162,16 @@ export default class Stores extends Component {
   };
 
   // Store Districts
-  getMasterDistrictsList (id) {
+  getMasterDistrictsList(id) {
     this.setState({ loading: true, dictricts: [], dictrictArray: [] });
     UrmService.getDistricts(id).then((res) => {
-      if (res.data[ "result" ]) {
+      if (res.data["result"]) {
         this.setState({ loading: false });
         let dictricts = [];
-        for (var i = 0; i < res.data[ "result" ].length; i++) {
+        for (var i = 0; i < res.data["result"].length; i++) {
           dictricts.push({
-            value: res.data.result[ i ].districtId,
-            label: res.data.result[ i ].districtName,
+            value: res.data.result[i].districtId,
+            label: res.data.result[i].districtName,
           });
           console.log({ dictricts });
           this.setState({
@@ -197,13 +197,13 @@ export default class Stores extends Component {
     this.setState({ storeName: value });
   };
 
-  refresh () {
+  refresh() {
     this.setState({ pageNumber: 0 });
     this.getStoresList();
   }
 
   // Applying Filter
-  applyStoreFilter () {
+  applyStoreFilter() {
     const searchStore = {
       stateId: this.state.statecode ? this.state.statecode : null,
       cityId: null,
@@ -232,18 +232,18 @@ export default class Stores extends Component {
   }
 
   // Filter Cancel Actions
-  filterAction () {
+  filterAction() {
     this.setState({ flagFilterOpen: true, modalVisible: true });
   }
-  clearFilterAction () {
-    this.setState({ filterActive: false });
+  clearFilterAction() {
+    this.setState({ filterActive: false, statecode: "", districtId: '', storeName: '', storeState: "", storeDistrict: "" });
     this.getStoresList();
   }
-  modelCancel () {
+  modelCancel() {
     this.setState({ modalVisible: false, flagFilterOpen: false });
   }
 
-  render () {
+  render() {
     return (
       <View style={scss.mainContainer}>
         {this.state.loading && <Loader loading={this.state.loading} />}
@@ -267,7 +267,7 @@ export default class Stores extends Component {
                 {!this.state.filterActive && (
                   <IconFA
                     name="sliders"
-                    style={[ { marginRight: 10 }, scss.action_icons ]}
+                    style={[{ marginRight: 10 }, scss.action_icons]}
                     size={25}
                     onPress={() => this.filterAction()}
                   ></IconFA>
@@ -320,7 +320,7 @@ export default class Stores extends Component {
                       <Text style={(scss.textStyleLight, scss.text_right)}>
                         {I18n.t("Store Id")}
                         {"\n"}
-                        <Text style={[ scss.textStyleMedium, scss.text_right ]}>
+                        <Text style={[scss.textStyleMedium, scss.text_right]}>
                           {item.id}{" "}
                         </Text>
                       </Text>
@@ -336,7 +336,7 @@ export default class Stores extends Component {
                           <Text style={scss.textStyleLight}>
                             Status{"\n"}
                             <Text
-                              style={[ scss.textStyleMedium, scss.active_txt ]}
+                              style={[scss.textStyleMedium, scss.active_txt]}
                             >
                               Active
                             </Text>
@@ -444,11 +444,11 @@ export default class Stores extends Component {
                       onChangeText={this.handleStoreName}
                     />
                     <View style={forms.action_buttons_container}>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                         onPress={() => this.applyStoreFilter()}>
                         <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
                         onPress={() => this.modelCancel()}>
                         <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>
