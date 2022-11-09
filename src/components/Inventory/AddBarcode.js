@@ -104,7 +104,7 @@ class AddBarcode extends Component {
     };
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     var domainStringId = "";
     var storeStringId = "";
     this.setState({ isEdit: this.props.route.params.isEdit });
@@ -120,7 +120,7 @@ class AddBarcode extends Component {
   }
 
   // Go Back Actions
-  handleBackButtonClick () {
+  handleBackButtonClick() {
     this.props.navigation.goBack(null);
     return true;
   }
@@ -133,7 +133,7 @@ class AddBarcode extends Component {
       if (res.data) {
         let size = [];
         // for (let i = 0; i < res.data.length; i++) {
-        res.data.length > 0 ? res.data[ 0 ].values.map((item) =>
+        res.data.length > 0 ? res.data[0].values.map((item) =>
           size.push({
             value: item,
             label: item,
@@ -141,7 +141,7 @@ class AddBarcode extends Component {
           })
         ) : nulll;
         // }
-        this.setState({ dynamicAttributes: size, dynamicAttributesName: res.data[ 0 ].name, loading: false });
+        this.setState({ dynamicAttributes: size, dynamicAttributesName: res.data[0].name, loading: false });
       } else {
         this.setState({ loading: false });
       }
@@ -167,14 +167,14 @@ class AddBarcode extends Component {
   };
 
   // Division Actions
-  getAllDivisions (data) {
+  getAllDivisions(data) {
     let divisions = [];
     InventoryService.getAllDivisions(data).then((res) => {
       if (res?.data) {
         for (let i = 0; i < res.data.length; i++) {
           divisions.push({
-            value: res.data[ i ].id,
-            label: res.data[ i ].name,
+            value: res.data[i].id,
+            label: res.data[i].name,
           });
         }
         console.log({ divisions });
@@ -193,15 +193,15 @@ class AddBarcode extends Component {
   };
 
   // Section Actions
-  getAllSections (id, data) {
+  getAllSections(id, data) {
     this.setState({ sectionsList: [] });
     let section = [];
     InventoryService.getAllSections(id, data).then((res) => {
       if (res?.data) {
         for (let i = 0; i < res.data.length; i++) {
           section.push({
-            value: res.data[ i ].id,
-            label: res.data[ i ].name,
+            value: res.data[i].id,
+            label: res.data[i].name,
           });
         }
         console.log({ section });
@@ -219,16 +219,16 @@ class AddBarcode extends Component {
   };
 
   // SubSection Actions
-  getAllSubsections (id, data) {
+  getAllSubsections(id, data) {
     this.setState({ subSectionsList: [] });
     let subSection = [];
     InventoryService.getAllSections(id, data).then((res) => {
       if (res?.data) {
         for (let i = 0; i < res.data.length; i++) {
           subSection.push({
-            value: res.data[ i ].id,
-            label: res.data[ i ].name,
-            id: res.data[ i ].id,
+            value: res.data[i].id,
+            label: res.data[i].name,
+            id: res.data[i].id,
           });
         }
         console.log({ subSection });
@@ -244,16 +244,16 @@ class AddBarcode extends Component {
   };
 
   // Category Actions
-  getAllCatogiries (data) {
+  getAllCatogiries(data) {
     this.setState({ categoriesList: [] });
     let categories = [];
     InventoryService.getAllCategories(data).then((res) => {
       if (res?.data) {
         for (let i = 0; i < res.data.length; i++) {
           categories.push({
-            value: res.data[ i ].id,
-            label: res.data[ i ].name,
-            id: res.data[ i ].id,
+            value: res.data[i].id,
+            label: res.data[i].name,
+            id: res.data[i].id,
           });
         }
         console.log({ categories });
@@ -269,7 +269,7 @@ class AddBarcode extends Component {
   };
 
   // UOM Actions
-  getAllUOM () {
+  getAllUOM() {
     this.setState({ uomList: [] });
     let uomList = [];
     InventoryService.getUOM().then((res) => {
@@ -277,8 +277,8 @@ class AddBarcode extends Component {
         console.log("UOMS", res.data);
         for (let i = 0; i < res.data.length; i++) {
           uomList.push({
-            value: res.data[ i ].uomName,
-            label: res.data[ i ].uomName,
+            value: res.data[i].uomName,
+            label: res.data[i].uomName,
           });
         }
         console.log({ uomList });
@@ -299,7 +299,7 @@ class AddBarcode extends Component {
   };
 
   // HSNCodes Actions
-  getAllHSNCodes () {
+  getAllHSNCodes() {
     this.setState({ hsnCodesList: [] });
     let hsnList = [];
     InventoryService.getAllHsnList().then((res) => {
@@ -307,8 +307,8 @@ class AddBarcode extends Component {
         console.log("HSNS", res.data);
         for (let i = 0; i < res.data.result.length; i++) {
           hsnList.push({
-            value: res.data.result[ i ].hsnCode,
-            label: res.data.result[ i ].hsnCode,
+            value: res.data.result[i].hsnCode,
+            label: res.data.result[i].hsnCode,
           });
         }
         console.log({ hsnList });
@@ -324,7 +324,7 @@ class AddBarcode extends Component {
   };
 
   // Store Actions
-  async getAllstores () {
+  async getAllstores() {
     this.setState({ storesList: [] });
     let storesList = [];
     const { clientId } = this.state;
@@ -333,8 +333,8 @@ class AddBarcode extends Component {
       if (res?.data) {
         for (let i = 0; i < res.data.length; i++) {
           storesList.push({
-            value: res.data[ i ].id,
-            label: res.data[ i ].name,
+            value: res.data[i].id,
+            label: res.data[i].name,
           });
         }
         console.log({ storesList });
@@ -447,12 +447,12 @@ class AddBarcode extends Component {
     this.setState({ barcode: value });
   };
 
-  handleBarcodeValid () {
+  handleBarcodeValid() {
 
   }
 
   // Date Actions
-  datepickerClicked () {
+  datepickerClicked() {
     this.setState({ datepickerOpen: true });
   }
 
@@ -477,7 +477,7 @@ class AddBarcode extends Component {
   };
 
   // Validations For Barcode Fields
-  validationForm () {
+  validationForm() {
     let isFormValid = true;
     let errors = {};
     if (this.state.name.length < errorLength.name) {
@@ -536,7 +536,7 @@ class AddBarcode extends Component {
   };
 
   // Saving Barcode
-  saveBarcode () {
+  saveBarcode() {
     // console.log(this.state.store);
     // this.setState({ loading: true });
     const { selectedDomain, isEdit } = this.state;
@@ -565,7 +565,7 @@ class AddBarcode extends Component {
         domainType: this.state.selectedDomain,
         vendorTax: this.state.vendorTax,
         barcode: this.state.barcode ? this.state.barcode : null,
-        
+
       };
       console.log({ params });
       this.setState({ loading: true });
@@ -593,11 +593,11 @@ class AddBarcode extends Component {
   }
 
   // Cancel Add Barcode
-  cancel () {
+  cancel() {
     this.props.navigation.goBack(null);
   }
 
-  render () {
+  render() {
     return (
       <View>
         {this.state.loading && <Loader loading={this.state.loading} />}
@@ -757,7 +757,7 @@ class AddBarcode extends Component {
           {this.state.selectedDomain === "Retail" && ( // For Retail Domain only
             <View>
               <Text style={inputHeading}>
-                {I18n.t("status")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
+                {I18n.t("stock status")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
               </Text>
               <View
                 style={[
@@ -1197,12 +1197,12 @@ class AddBarcode extends Component {
             onChangeText={(value) => this.handleBarcode(value)}
           />
           <View style={forms.action_buttons_container}>
-            <TouchableOpacity style={[ forms.action_buttons, { backgroundColor: this.state.saveButtonDisabled ? color.accent : color.disableBackGround } ]}
+            <TouchableOpacity style={[forms.action_buttons, { backgroundColor: this.state.saveButtonDisabled ? color.accent : color.disableBackGround }]}
               disabled={!this.state.saveButtonDisabled}
               onPress={() => this.saveBarcode()}>
               <Text style={forms.submit_btn_text} >{I18n.t("SAVE")}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+            <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
               onPress={() => this.cancel()}>
               <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
             </TouchableOpacity>

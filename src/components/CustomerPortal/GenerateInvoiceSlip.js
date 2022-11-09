@@ -193,7 +193,8 @@ class GenerateInvoiceSlip extends Component {
       totalQuantity: 0,
       creditAmount: 0,
       isTaxIncluded: '',
-      handleCheckPromo: false
+      handleCheckPromo: false,
+      mrpAmount: 0
     };
   }
 
@@ -332,8 +333,9 @@ class GenerateInvoiceSlip extends Component {
             }
           });
         });
-        this.setState({ barList: this.state.barList });
-        this.calculateTotal();
+        this.setState({ barList: this.state.barList }, () => {
+          this.calculateTotal();
+        });
       } else {
         alert("No Promo Available");
       }
@@ -359,6 +361,7 @@ class GenerateInvoiceSlip extends Component {
       "dsNumber": this.state.dsNumber.trim(),
     };
     this.state.dsNumberList.push(obj);
+    console.log(this.state.dsNumberList)
     const isEsSlipEnabled = await AsyncStorage.getItem('custom:isEsSlipEnabled');
     const isTaxIncluded = await AsyncStorage.getItem('custom:isTaxIncluded');
     if (dayCloseDates.length !== 0) {
@@ -413,6 +416,7 @@ class GenerateInvoiceSlip extends Component {
             var combineList = {};
 
             barList.forEach((itm) => {
+              console.log({ itm })
               var barCode = itm.barCode;
               itm.quantity = parseInt(itm.quantity);
               itm.netValue = parseInt(itm.netValue);
@@ -438,7 +442,7 @@ class GenerateInvoiceSlip extends Component {
             if (isEstimationEnable) {
               this.setState({ barCodeList: res.data.lineItems, dsNumber: '', dsNumberList2: [] });
             } else {
-              this.setState({ barCodeList: res.data.barcode, dsNumber: '', dsNumberList2: [] });
+              // this.setState({ barCodeList: res.data.barcode, dsNumber: '', dsNumberList2: [] });
             }
           }
           this.state.barCodeList.forEach((barCode, index) => {
@@ -475,12 +479,26 @@ class GenerateInvoiceSlip extends Component {
           }
         } else {
           let count = false;
-          if (this.state.dlslips.length === 0) {
-            this.state.dlslips.push(res.data.lineItems);
-            const flattened = this.state.dlslips.flatMap(barCode => barCode);
-            this.setState({ barCodeList: flattened });
-          }
-          else {
+          let barcodesList = []
+          // if (this.state.dlslips.length === 0) {
+          this.state.dlslips.push(res.data.lineItems);
+          const flattened = this.state.dlslips.flatMap(barCode => barCode);
+          const barList = flattened.filter(
+            (test, index, array) =>
+              index ===
+              array.findIndex((findTest) => findTest.barCode === test.barCode)
+          );
+          this.setState({ barCodeList: barList });
+          // alert(this.state.dlslips.length)
+          // }
+          if (this.state.dlslips.length > 1) {
+            console.log({ flattened })
+            const barList = flattened.filter(
+              (test, index, array) =>
+                index ===
+                array.findIndex((findTest) => findTest.barCode === test.barCode)
+            );
+
             for (let i = 0; i < this.state.barCodeList.length; i++) {
               if (
                 this.state.barCodeList[i].barCode ===
@@ -501,7 +519,7 @@ class GenerateInvoiceSlip extends Component {
               if (!count) {
                 this.state.dlslips.push(res.data.lineItems);
                 const flattened = this.state.dlslips.flatMap(barCode => barCode);
-                this.setState({ barCodeList: flattened });
+                // this.setState({ barCodeList: flattened });
                 const barList = this.state.barCodeList.filter(
                   (test, index, array) =>
                     index ===
@@ -510,8 +528,10 @@ class GenerateInvoiceSlip extends Component {
                 this.setState({ barCodeList: barList });
               }
             }
+          } else {
+            this.setState({ barCodeList: res.data.lineItems })
           }
-          this.setState({ barCodeList: this.state.barCodeList, dsNumber: '' });
+          this.setState({ dsNumber: '' });
           this.state.barCodeList.forEach((barCode, index) => {
             costPrice = costPrice + barCode.itemPrice;
             promoDiscValue = promoDiscValue + barCode.promoDiscount;
@@ -531,7 +551,6 @@ class GenerateInvoiceSlip extends Component {
             // scgtTotal = total + barCode.sgst + barCode.cgst;
             scgtTotal = Math.round(barCode.sgst);
             cgstTotal = Math.round(barCode.cgst);
-
           });
 
           this.state.barCodeList.forEach((element, ind) => {
@@ -747,6 +766,7 @@ class GenerateInvoiceSlip extends Component {
       totalQty: this.state.totalQty.toString(),
       onGoBack: () => this.invoiceUpdate(),
     };
+    // alert(String(this.state.mrpAmount))
     this.props.navigation.navigate('TextilePayment', obj);
     this.invoiceUpdate();
     console.log({ obj });
@@ -792,6 +812,7 @@ class GenerateInvoiceSlip extends Component {
       axios.get(CustomerService.getCustomerMobile() + "/" + obj.phoneNo).then((res) => {
         if (res) {
           const mobileData = res.data.result;
+          console.log({ mobileData }, res)
           this.setState({
             userId: res.data.result.userId, customerFullName: res.data.result.userName
           });
@@ -1058,7 +1079,9 @@ class GenerateInvoiceSlip extends Component {
       totalPromoDisc: promoDiscValue,
       grossAmount: costPrice,
     });
-    this.setState({ totalQuantity: totalqty });
+    this.setState({ totalQuantity: totalqty }, () => {
+      this.calculateTotal()
+    });
     this.state.totalQuantity = (parseInt(this.state.totalQuantity) + 1);
   }
 
@@ -1095,18 +1118,22 @@ class GenerateInvoiceSlip extends Component {
       this.setState({ barCodeList: qtyarr });
     } else {
       // this.state.barCodeList.splice(index, 1);
-      this.setState({ barCodeList: this.state.barCodeList });
-      this.calculateTotal();
+      this.setState({ barCodeList: this.state.barCodeList }, () => {
+        this.calculateTotal();
+      });
     }
   }
 
   calculateTotal() {
     let totalAmount = 0;
     let totalqty = 0;
+    const qtyarr = [...this.state.barCodeList]
+    console.log({ qtyarr })
     this.state.barCodeList.forEach(barCode => {
-      totalAmount = totalAmount + barCode.totalMrp;
-      totalqty = totalqty + parseInt(barCode.qty);
+      totalAmount = parseInt(barCode.itemMrp) * parseInt(barCode.qty);
+      totalqty = parseInt(totalqty) + parseInt(barCode.qty);
     });
+    console.log({ totalAmount, totalqty })
     this.setState({ mrpAmount: totalAmount, totalQuantity: totalqty }
     );
   }
@@ -1355,7 +1382,7 @@ class GenerateInvoiceSlip extends Component {
                             <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("Discount")}{"\n"}<Text style={[scss.textStyleMedium, { color: '#2ADC09', }]}>₹{item.promoDiscount ? item.promoDiscount + '.00' : 0}</Text></Text>
                           </View>
                           <View style={scss.flatListFooter}>
-                            <Text style={scss.footerText}>{I18n.t("GROSS")} :  ₹{item.grossValue + '.00'}</Text>
+                            <Text style={scss.footerText}>{I18n.t("GROSS")} :  ₹{item.itemPrice}</Text>
                             {/* <IconMA
                           name='trash-can-outline'
                           size={25}

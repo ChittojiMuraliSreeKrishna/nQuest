@@ -544,7 +544,7 @@ class EditBarcode extends Component {
           {this.state.selectedDomain === "Retail" && ( // For Retail Domain only
             <View>
               <Text style={inputHeading}>
-                {I18n.t("status")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
+                {I18n.t("stock status")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
               </Text>
               <View
                 style={[
@@ -574,7 +574,7 @@ class EditBarcode extends Component {
                 />
               </View>
               <Text style={inputHeading}>
-                Product Validaty <Text style={{ color: "#aa0000" }}>*</Text>{" "}
+                stock Validity <Text style={{ color: "#aa0000" }}>*</Text>{" "}
               </Text>
               <TouchableOpacity
                 style={dateSelector}

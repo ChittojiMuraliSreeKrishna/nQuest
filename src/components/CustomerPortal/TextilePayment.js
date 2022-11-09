@@ -41,7 +41,7 @@ class TextilePayment extends Component {
       totalAmount: 0,
       totalDiscount: 0,
       recievedAmount: 0,
-      verifiedCash: "",
+      verifiedCash: 0,
       ccCardCash: 0,
       domainId: 0,
       storeId: 0,
@@ -113,7 +113,8 @@ class TextilePayment extends Component {
       cardAutoModel: false,
       cardModelVisible: false,
       cardPaymentType: 'Manual',
-      cardManual: false
+      cardManual: false,
+      khataAmount: 0
     };
   }
 
@@ -180,6 +181,25 @@ class TextilePayment extends Component {
       barCodeList: this.props.route.params.barCodeList
     });
     this.setState({ isTagCustomer: this.props.route.params.customerPhoneNumber.length >= 10 ? true : false });
+    var qtyarr = [...this.state.barCodeList]
+    let cgst = 0
+    let sgst = 0
+    let totalAmount = 0
+    qtyarr.forEach(barCode => {
+      console.log({ barCode })
+      cgst = cgst + barCode.cgst * barCode.qty
+      sgst = sgst + barCode.sgst * barCode.qty
+      totalAmount = totalAmount + barCode.itemPrice * barCode.qty
+    })
+    const { isTaxIncluded } = this.state
+    console.log({ isTaxIncluded })
+    if (this.state.isTaxIncluded === 'false') {
+      this.setState({ CGST: cgst, SGST: sgst, totalAmount: totalAmount + cgst + sgst, netPayableAmount: this.state.netPayableAmount + cgst + sgst })
+    }
+    if (isTaxIncluded === 'null') {
+      this.setState({ CGST: 0, SGST: 0, totalAmount: totalAmount, netPayableAmount: totalAmount })
+    }
+
   }
 
 
@@ -323,11 +343,13 @@ class TextilePayment extends Component {
     if (this.state.isRTApplied) {
       this.setState({ totalAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString() + this.state.rtAmount });
     }
-    this.setState({
-      totalAmount: parseFloat(this.state.totalAmount) - parseFloat(this.state.khataAmount)
-    }, () => {
-      this.cancelKathaModel();
-    });
+    if (this.state.totalAmount > 0) {
+      this.setState({
+        totalAmount: parseFloat(this.state.totalAmount) - parseFloat(this.state.khataAmount)
+      }, () => {
+        this.cancelKathaModel();
+      });
+    }
   }
 
   cancelKathaModel() {
@@ -343,32 +365,40 @@ class TextilePayment extends Component {
   }
 
   confirmCreditModel() {
-    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
-    if (this.state.creditAmount < grandNetAmount) {
-      const amount = grandNetAmount - this.state.creditAmount;
-      this.setState({ isPayment: true, isreturnCreditCash: true, balanceCreditAmount: amount, grandNetAmount: amount }, () => {
+    // alert(this.state.creditAmount > -1 ? "true" : "false")
+
+    if (parseInt(this.state.creditAmount) > 0) {
+      var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
+      if (this.state.payCreditAmount > grandNetAmount) {
+        alert("please check the value")
+      } else if (this.state.creditAmount < grandNetAmount) {
+        const amount = grandNetAmount - this.state.creditAmount;
+        this.setState({ isPayment: true, isreturnCreditCash: true, balanceCreditAmount: amount, grandNetAmount: amount }, () => {
+          const obj = {
+            "paymentType": "PKTADVANCE",
+            "paymentAmount": grandAmount
+          }
+          this.state.paymentType.push(obj);
+          if (this.state.isRTApplied) {
+            this.setState({ payingAmount: this.state.creditAmount + this.state.rtAmount })
+          }
+        })
+      } else {
+        this.setState({ isPayment: false })
         const obj = {
           "paymentType": "PKTADVANCE",
-          "paymentAmount": this.state.creditAmount
+          "paymentAmount": this.state.payCreditAmount
         }
         this.state.paymentType.push(obj);
-        if (this.state.isRTApplied) {
-          this.setState({ payingAmount: this.state.creditAmount + this.state.rtAmount })
-        }
-      })
-    } else {
-      this.setState({ isPayment: false })
-      const obj = {
-        "paymentType": "PKTADVANCE",
-        "paymentAmount": grandNetAmount
       }
-      this.state.paymentType.push(obj);
-    }
-    this.setState({ recievedAmount: grandNetAmount, payingAmount: grandNetAmount })
-    const grandAmount = grandNetAmount >= this.state.payCreditAmount ? grandNetAmount - this.state.payCreditAmount : 0
-    this.setState({ isCreditAmount: true, grandNetAmount: grandAmount });
-    if (this.state.isRTApplied) {
-      this.setState({ payingAmount: grandNetAmount + this.state.rtAmount })
+      this.setState({ recievedAmount: grandNetAmount, payingAmount: grandNetAmount, netPayableAmount: this.state.netPayableAmount - this.state.payCreditAmount })
+      const grandAmount = grandNetAmount >= this.state.payCreditAmount ? grandNetAmount - this.state.payCreditAmount : 0
+      this.setState({ isCreditAmount: true, grandNetAmount: grandAmount });
+      if (this.state.isRTApplied) {
+        this.setState({ payingAmount: grandNetAmount + this.state.rtAmount, netPayableAmount: this.state.netPayableAmount - payCreditAmount })
+      }
+    } else {
+      alert("you dont have any credit balance")
     }
     this.cancelCreditModel();
     // this.pay()
@@ -390,7 +420,7 @@ class TextilePayment extends Component {
   }
 
   getCardModel = () => {
-    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
+    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10) - parseFloat(this.state.verifiedCash)).toString()
     this.setState({ totalAmount: grandNetAmount })
     this.setState({
       isCard: true,
@@ -413,7 +443,7 @@ class TextilePayment extends Component {
     this.setState({ isCard: false, cardManual: true })
     const obj = {
       "paymentType": "Card",
-      "paymentAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
+      "paymentAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10) - parseFloat(this.state.verifiedCash)).toString()
     }
     this.state.paymentType.push(obj);
     this.cancelCardModel();
@@ -605,9 +635,7 @@ class TextilePayment extends Component {
   };
 
   handlerecievedAmount = (text) => {
-
     this.setState({ recievedAmount: text });
-
   };
 
   handleGVNumber = (text) => {
@@ -616,18 +644,18 @@ class TextilePayment extends Component {
 
   verifycash() {
     if (this.state.isCash === true && this.state.isCardOrCash === false) {
-      if ((parseFloat(this.state.recievedAmount) < (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)))) {
+      if ((parseFloat(this.state.recievedAmount) < (parseFloat(this.state.netPayableAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)))) {
         alert('Please collect sufficient amount');
       }
       else {
-        this.setState({ returnAmount: parseFloat(this.state.recievedAmount) - parseFloat(this.state.totalAmount) });
-        this.setState({ verifiedCash: parseFloat(this.state.totalAmount) });
+        this.setState({ returnAmount: parseFloat(this.state.recievedAmount) - parseFloat(this.state.netPayableAmount) });
+        this.setState({ verifiedCash: parseFloat(this.state.netPayableAmount) });
       }
     }
     else if (this.state.isCardOrCash === true)
-      if ((parseFloat(this.state.recievedAmount) < (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)))) {
+      if ((parseFloat(this.state.recievedAmount) < (parseFloat(this.state.netPayableAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)))) {
         let ccReturn = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)) - parseFloat(this.state.recievedAmount);
-        this.setState({ ccCardCash: ccReturn, verifiedCash: this.state.recievedAmount });
+        this.setState({ cardModelVisible: true, cardAutoModel: true, verifiedCash: this.state.recievedAmount });
       }
   }
 
@@ -907,7 +935,7 @@ class TextilePayment extends Component {
       "discApprovedBy": this.state.approvedBy,
       "discType": this.state.reasonDiscount,
       "approvedBy": null,
-      "netPayableAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString(),
+      "netPayableAmount": (parseFloat(this.state.netPayableAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString(),
       "offlineNumber": null,
       "mobileNumber": this.state.customerPhoneNumber,
       "customerFullName": this.state.customerFullName,
@@ -1590,7 +1618,9 @@ class TextilePayment extends Component {
               <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 10 }}> {('CASH SUMMARY')} </Text>
 
             )}
-            {this.state.isCash === true && this.state.verifiedCash !== "" && (
+            {/* {alert(this.state.verifiedCash)} */}
+            {this.state.isCash === true && this.state.verifiedCash > 1 && (
+
               <TouchableOpacity
                 style={{ borderRadius: 5, width: 90, height: 20, alignSelf: 'flex-end', marginTop: -20 }}
                 onPress={() => this.clearCashSammary()} >
@@ -1610,7 +1640,7 @@ class TextilePayment extends Component {
             )}
 
 
-            {this.state.isCash === true && this.state.giftvoucher === "" && this.state.loyaltyPoints === "" && this.state.verifiedCash === "" && (
+            {this.state.isCash === true && this.state.giftvoucher === "" && this.state.loyaltyPoints === "" && this.state.verifiedCash === 0 && (
               <TouchableOpacity
                 style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
                 onPress={() => this.verifycash()} >
@@ -1618,7 +1648,7 @@ class TextilePayment extends Component {
               </TouchableOpacity>
             )}
 
-            {this.state.isCash === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash === "" && (
+            {this.state.isCash === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash === 0 && (
               <TouchableOpacity
                 style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
                 onPress={() => this.verifycash()} >
@@ -1626,7 +1656,7 @@ class TextilePayment extends Component {
               </TouchableOpacity>
             )}
 
-            {this.state.isCash === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints === "" && this.state.verifiedCash === "" && (
+            {this.state.isCash === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints === "" && this.state.verifiedCash === 0 && (
               <TouchableOpacity
                 style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
                 onPress={() => this.verifycash()} >
@@ -1634,7 +1664,7 @@ class TextilePayment extends Component {
               </TouchableOpacity>
             )}
 
-            {this.state.isCash === true && this.state.giftvoucher === "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash === "" && (
+            {this.state.isCash === true && this.state.giftvoucher === "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash === 0 && (
               <TouchableOpacity
                 style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
                 onPress={() => this.verifycash()} >
@@ -1643,7 +1673,7 @@ class TextilePayment extends Component {
             )}
 
 
-            {this.state.isCash === true && this.state.giftvoucher === "" && this.state.loyaltyPoints === "" && this.state.verifiedCash !== "" && (
+            {this.state.isCash === true && this.state.giftvoucher === "" && this.state.loyaltyPoints === "" && this.state.verifiedCash !== 0 && (
               <TouchableOpacity
                 style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
               >
@@ -1654,7 +1684,7 @@ class TextilePayment extends Component {
               </TouchableOpacity>
             )}
 
-            {this.state.isCash === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash !== "" && (
+            {this.state.isCash === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash !== 0 && (
               <TouchableOpacity
                 style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
               >
@@ -1665,7 +1695,7 @@ class TextilePayment extends Component {
               </TouchableOpacity>
             )}
 
-            {this.state.isCash === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints === "" && this.state.verifiedCash !== "" && (
+            {this.state.isCash === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints === "" && this.state.verifiedCash !== 0 && (
               <TouchableOpacity
                 style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
               >
@@ -1676,7 +1706,7 @@ class TextilePayment extends Component {
               </TouchableOpacity>
             )}
 
-            {this.state.isCash === true && this.state.giftvoucher === "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash !== "" && (
+            {this.state.isCash === true && this.state.giftvoucher === "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash !== 0 && (
               <TouchableOpacity
                 style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
               >
@@ -1689,7 +1719,7 @@ class TextilePayment extends Component {
 
 
 
-            {this.state.isCash === true && this.state.verifiedCash !== "" && (
+            {this.state.isCash === true && this.state.verifiedCash !== 0 && (
               <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
                 <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10 }}> RETURN AMOUNT  ₹{this.state.returnAmount} </Text>
 
@@ -1977,8 +2007,8 @@ class TextilePayment extends Component {
                             style={forms.input_fld}
                             underlineColor="transparent"
                             activeUnderlineColor='#000'
-                            editable={false} selectTextOnFocus={false}
-                            value={(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()}
+                            editable={this.state.isCardOrCash ? true : false} selectTextOnFocus={false}
+                            value={(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10) - parseInt(this.state.verifiedCash)).toString()}
                           />
                           <View style={scss.radio_group}>
                             <View style={scss.radio_item}>
@@ -2024,12 +2054,12 @@ class TextilePayment extends Component {
                   color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
                   fontSize: Device.isTablet ? 19 : 14,
                 }}>
-                  Payable Amount </Text>
+                  Total Amount </Text>
                 <Text style={{
                   color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
                   fontSize: Device.isTablet ? 19 : 14,
                 }}>
-                  ₹ {parseInt(this.state.netPayableAmount)} </Text>
+                  ₹ {(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()} </Text>
               </View>
               {this.state.isTaxIncluded !== 'null' &&
                 <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
@@ -2089,12 +2119,12 @@ class TextilePayment extends Component {
                   color: "#353C40", fontFamily: "bold", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
                   fontSize: 20,
                 }}>
-                  Total Amount </Text>
+                  payable Amount </Text>
                 <Text style={{
                   color: "#353C40", fontFamily: "bold", alignItems: 'center', fontSize: 20, justifyContent: 'center', textAlign: 'center',
                   fontSize: 20,
                 }}>
-                  ₹ {(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()} </Text>
+                  ₹ {(parseFloat(this.state.netPayableAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()} </Text>
               </View>
               {
                 this.state.isCreditAmount && (
