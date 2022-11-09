@@ -90,7 +90,7 @@ class GenerateInvoiceSlip extends Component {
       },
       openn: false,
       isSubOpen: false,
-      dsNumber: "ES2022931504",
+      dsNumber: "",
       manualDisc: 0,
       isCash: false,
       isCard: false,
@@ -315,32 +315,108 @@ class GenerateInvoiceSlip extends Component {
 
 
   checkPromo() {
+    let costPrice = 0;
+    let discount = 0;
+    let total = 0;
+    let discAppliedTotal = 0;
     const { storeId, domainId, barCodeList } = this.state;
-    CustomerService.getCheckPromoAmount(storeId, domainId, barCodeList).then(res => {
-      let calculatedDisc = res.data.result.calculatedDiscountVo;
-      if (res?.data && res?.data?.result[0].calculatedDiscountVo) {
-        this.setState({ promoDisc: res?.data?.result });
-        this.state.barCodeList.forEach(barcodeData => {
-          this.state.promoDisc.forEach(promo => {
-            if (barcodeData.barcode === promo.barcode) {
-              if (promo.calculatedDiscountVo) {
-                if (promo.calculatedDiscountVo.discountAvailable) {
-                  barcodeData.itemDiscount = parseInt(promo.calculatedDiscountVo.calculatedDiscount);
-                  barcodeData.totalMrp = barcodeData.totalMrp - barcodeData.itemDiscount;
-                }
-              } else {
-                barcodeData.itamDiscount = "No discount";
-              }
-            }
-          });
-        });
-        this.setState({ barList: this.state.barList }, () => {
-          this.calculateTotal();
-        });
-      } else {
-        alert("No Promo Available");
-      }
+    const requestObj = barCodeList.map((item) => {
+      let obj = {};
+      obj.actualValue = item.actualValue;
+      obj.barCode = item.barCode;
+      obj.cgst = item.cgst;
+      obj.discount = item.promoDiscount;
+      obj.division = item.division;
+      obj.domainId = item.domainId;
+      obj.grossValue = item.grossValue;
+      obj.hsnCode = item.hsnCode;
+      obj.itemPrice = item.itemPrice;
+      obj.lineItemId = item.lineItemId;
+      obj.netValue = item.netValue;
+      obj.quantity = item.quantity;
+      obj.section = item.section;
+      obj.sgst = item.sgst;
+      obj.storeId = item.storeId;
+      obj.subSection = item.subSection;
+      obj.taxValue = item.taxValue;
+      obj.userId = item.userId;
+      obj.costPrice = item.costPrice;
+      obj.uom = item.uom;
+      obj.originalBarcodeCreatedAt = item.createdDate;
+      obj.batchNo = item.batchNo;
+      obj.promoDiscount = 0;
+      return obj;
     });
+    if (this.state.isEstimationEnable === "true") {
+      CustomerService.getinvoiceLevelCheckPro(1, storeId, requestObj,).then((res) => {
+        if (res.status === 200) {
+          this.setState({
+            barCodeList: res.data.result,
+            isCheckPromo: true,
+          });
+
+          this.state.barCodeList.forEach((barCode, index) => {
+            costPrice = costPrice + barCode.itemPrice;
+            discount = discount + barCode.promoDiscount;
+            total = total + barCode.netValue;
+          });
+
+          discount = discount + this.state.manualDisc;
+          discAppliedTotal = this.state.grandNetAmount - discount;
+          this.setState({
+            netPayableAmount: total,
+            totalPromoDisc: discount,
+            grossAmount: costPrice,
+            grandNetAmount: discAppliedTotal
+          });
+          if (this.state.barCodeList.length > 0) {
+            this.setState({ enablePayment: true });
+          }
+
+          // this.getTaxAmount();
+        } else {
+          alert("no Promo Available");
+          this.setState({ isCheckPromo: true });
+        }
+      });
+    } else {
+      CustomerService.getCheckPromoAmount(storeId, domainId, barCodeList).then(res => {
+        let calculatedDisc = res.data.result.calculatedDiscountVo;
+        if (response.status === 200) {
+          this.setState({
+            isCheckPromo: true
+          });
+        }
+        if (res?.data && res?.data?.result[0].calculatedDiscountVo) {
+          this.setState({ promoDisc: res?.data?.result });
+          this.state.barCodeList.forEach(barcodeData => {
+            this.state.promoDisc.forEach(promo => {
+              if (barcodeData.barcode === promo.barcode) {
+                if (promo.calculatedDiscountVo) {
+                  if (promo.calculatedDiscountVo.discountAvailable) {
+                    if (promo.calculatedDiscountsVo.thisFixedAmountDiscount) {
+                      barcodeData.itemDiscount = parseInt(promo.calculatedDiscountVo.calculatedDiscount);
+                      barcodeData.totalMrp = barcodeData.totalMrp - barcodeData.itemDiscount;
+                    }
+                    else {
+                      barcodeData.itemDiscount = parseInt(promo.calculatedDiscountsVo.calculatedDiscount);
+                      barcodeData.totalMrp = barcodeData.totalMrp - barcodeData.itemDiscount;
+                    }
+                  }
+                } else {
+                  barCodeData.itemDiscount = "No discount";
+                }
+              }
+            });
+          });
+          // this.setState({ barList: this.state.barList }, () => {
+          this.calculateTotal();
+          // });
+        } else {
+          alert("No Promo Available");
+        }
+      });
+    }
   }
 
   async getDeliverySlipDetails() {
@@ -365,7 +441,6 @@ class GenerateInvoiceSlip extends Component {
     console.log(this.state.dsNumberList)
     const isEsSlipEnabled = await AsyncStorage.getItem('custom:isEsSlipEnabled');
     const isTaxIncluded = await AsyncStorage.getItem('custom:isTaxIncluded');
-    console.log("isTaxIncluded", isTaxIncluded)
     if (dayCloseDates.length !== 0) {
       if (isEsSlipEnabled === "true") {
         isEstimationEnable = true;
@@ -485,9 +560,9 @@ class GenerateInvoiceSlip extends Component {
               grandNetAmount: (total) - promoDiscValue,
               totalPromoDisc: promoDiscValue,
               grossAmount: costPrice,
-              grandNetAmount: (total) - promoDiscValue,
+              totalAmount: total,
               stateGST: Math.round(stateGST),
-              centralGST: Math.round(centralGST)
+              centralGST: Math.round(centralGST),
             });
 
           } else {
@@ -747,6 +822,7 @@ class GenerateInvoiceSlip extends Component {
 
   pay() {
     let obj = {
+      grandNetAmount: this.state.grandNetAmount,
       totalAmount: this.state.totalAmount,
       netPayableAmount: this.state.netPayableAmount,
       grossAmount: this.state.grossAmount,
@@ -1486,12 +1562,12 @@ class GenerateInvoiceSlip extends Component {
                                   {"\n"}
                                   <Text style={scss.textStyleMedium}>{('0' + item.quantity).slice(-2)}</Text>
                                 </Text>}
-                              {!this.state.isEstimationEnable && 
-                              // (this.state.handleBillDiscount || this.state.handleCheckPromo) ?
-                              //   <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("QTY")}
-                              //     {"\n"}
-                              //     <Text style={scss.textStyleMedium}>{String(item.qty)}</Text>
-                              //   </Text> :
+                              {!this.state.isEstimationEnable &&
+                                // (this.state.handleBillDiscount || this.state.handleCheckPromo) ?
+                                //   <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("QTY")}
+                                //     {"\n"}
+                                //     <Text style={scss.textStyleMedium}>{String(item.qty)}</Text>
+                                //   </Text> :
                                 <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("QTY")}
                                   {"\n"}
                                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -1524,12 +1600,12 @@ class GenerateInvoiceSlip extends Component {
                               <View>
                                 <Text style={scss.textStyleLight}>{I18n.t("CGST")}
                                   {"\n"}
-                                  <Text style={scss.textStyleMedium}>{item.cgst ? item.cgst : 0}</Text>
+                                  <Text style={scss.textStyleMedium}>{item.cgst ? Math.round(item.cgst) : 0}</Text>
                                 </Text>
                               </View>
                               <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("SGST")}
                                 {"\n"}
-                                <Text style={scss.textStyleMedium}>{item.sgst ? item.sgst : 0}</Text>
+                                <Text style={scss.textStyleMedium}>{item.sgst ? Math.round(item.sgst) : 0}</Text>
                               </Text>
                             </View>
                           }
