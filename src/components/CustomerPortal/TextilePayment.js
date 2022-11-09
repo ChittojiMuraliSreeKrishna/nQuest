@@ -178,28 +178,27 @@ class TextilePayment extends Component {
       discountAmount: this.props.route.params.discountAmount,
       creditAmount: this.props.route.params.creditAmount,
       isTaxIncluded: this.props.route.params.isTaxIncluded,
-      barCodeList: this.props.route.params.barCodeList
+      barCodeList: this.props.route.params.barCodeList,
+      isCreditFlag:this.props.route.params.isCredit
     });
     this.setState({ isTagCustomer: this.props.route.params.customerPhoneNumber.length >= 10 ? true : false });
-    var qtyarr = [...this.state.barCodeList]
-    let cgst = 0
-    let sgst = 0
-    let totalAmount = 0
-    qtyarr.forEach(barCode => {
-      console.log({ barCode })
-      cgst = cgst + barCode.cgst * barCode.qty
-      sgst = sgst + barCode.sgst * barCode.qty
-      totalAmount = totalAmount + barCode.itemPrice * barCode.qty
-    })
-    const { isTaxIncluded } = this.state
-    console.log({ isTaxIncluded })
-    if (this.state.isTaxIncluded === 'false') {
-      this.setState({ CGST: cgst, SGST: sgst, totalAmount: totalAmount + cgst + sgst, netPayableAmount: this.state.netPayableAmount + cgst + sgst })
-    }
-    if (isTaxIncluded === 'null') {
-      this.setState({ CGST: 0, SGST: 0, totalAmount: totalAmount, netPayableAmount: totalAmount })
-    }
-
+    // var qtyarr = [...this.state.barCodeList]
+    // let cgst = 0
+    // let sgst = 0
+    // let totalAmount = 0
+    // qtyarr.forEach(barCode => {
+    //   console.log({ barCode })
+    //   cgst = cgst + barCode.cgst * barCode.qty
+    //   sgst = sgst + barCode.sgst * barCode.qty
+    //   totalAmount = totalAmount + barCode.itemPrice * barCode.qty
+    // })
+    // const { isTaxIncluded } = this.state
+    // if (this.state.isTaxIncluded === 'false') {
+    //   this.setState({ CGST: cgst, SGST: sgst, totalAmount: totalAmount , netPayableAmount: this.state.netPayableAmount + cgst + sgst })
+    // }
+    // if (isTaxIncluded === 'null') {
+    //   this.setState({ CGST: 0, SGST: 0, totalAmount: totalAmount, netPayableAmount: totalAmount })
+    // }
   }
 
 
@@ -391,11 +390,11 @@ class TextilePayment extends Component {
         }
         this.state.paymentType.push(obj);
       }
-      this.setState({ recievedAmount: grandNetAmount, payingAmount: grandNetAmount, netPayableAmount: this.state.netPayableAmount - this.state.payCreditAmount })
+      this.setState({ recievedAmount: grandNetAmount, payingAmount: grandNetAmount, totalAmount: this.state.totalAmount - this.state.payCreditAmount })
       const grandAmount = grandNetAmount >= this.state.payCreditAmount ? grandNetAmount - this.state.payCreditAmount : 0
       this.setState({ isCreditAmount: true, grandNetAmount: grandAmount });
       if (this.state.isRTApplied) {
-        this.setState({ payingAmount: grandNetAmount + this.state.rtAmount, netPayableAmount: this.state.netPayableAmount - payCreditAmount })
+        this.setState({ payingAmount: grandNetAmount + this.state.rtAmount, totalAmount: this.state.totalAmount - payCreditAmount })
       }
     } else {
       alert("you dont have any credit balance")
@@ -644,16 +643,16 @@ class TextilePayment extends Component {
 
   verifycash() {
     if (this.state.isCash === true && this.state.isCardOrCash === false) {
-      if ((parseFloat(this.state.recievedAmount) < (parseFloat(this.state.netPayableAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)))) {
+      if ((parseFloat(this.state.recievedAmount) < (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)))) {
         alert('Please collect sufficient amount');
       }
       else {
-        this.setState({ returnAmount: parseFloat(this.state.recievedAmount) - parseFloat(this.state.netPayableAmount) });
-        this.setState({ verifiedCash: parseFloat(this.state.netPayableAmount) });
+        this.setState({ returnAmount: parseFloat(this.state.recievedAmount) - parseFloat(this.state.totalAmount) });
+        this.setState({ verifiedCash: parseFloat(this.state.totalAmount) });
       }
     }
     else if (this.state.isCardOrCash === true)
-      if ((parseFloat(this.state.recievedAmount) < (parseFloat(this.state.netPayableAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)))) {
+      if ((parseFloat(this.state.recievedAmount) < (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)))) {
         let ccReturn = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)) - parseFloat(this.state.recievedAmount);
         this.setState({ cardModelVisible: true, cardAutoModel: true, verifiedCash: this.state.recievedAmount });
       }
@@ -935,7 +934,7 @@ class TextilePayment extends Component {
       "discApprovedBy": this.state.approvedBy,
       "discType": this.state.reasonDiscount,
       "approvedBy": null,
-      "netPayableAmount": (parseFloat(this.state.netPayableAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString(),
+      "netPayableAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString(),
       "offlineNumber": null,
       "mobileNumber": this.state.customerPhoneNumber,
       "customerFullName": this.state.customerFullName,
@@ -1419,7 +1418,7 @@ class TextilePayment extends Component {
 
                   </View>;
                 }
-                if (item.key === 6 && this.state.isTagCustomer) {
+                if (item.key === 6 && this.state.isCreditFlag) {
                   return <View style={{
                     height: Device.isTablet ? 80 : 50,
                     width: Device.isTablet ? 80 : 50,
@@ -2059,7 +2058,7 @@ class TextilePayment extends Component {
                   color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
                   fontSize: Device.isTablet ? 19 : 14,
                 }}>
-                  ₹ {(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()} </Text>
+                  ₹ {this.state.netPayableAmount} </Text>
               </View>
               {this.state.isTaxIncluded !== 'null' &&
                 <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
@@ -2119,12 +2118,12 @@ class TextilePayment extends Component {
                   color: "#353C40", fontFamily: "bold", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
                   fontSize: 20,
                 }}>
-                  payable Amount </Text>
+                  Payable Amount </Text>
                 <Text style={{
                   color: "#353C40", fontFamily: "bold", alignItems: 'center', fontSize: 20, justifyContent: 'center', textAlign: 'center',
                   fontSize: 20,
                 }}>
-                  ₹ {(parseFloat(this.state.netPayableAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()} </Text>
+                  ₹ {(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()} </Text>
               </View>
               {
                 this.state.isCreditAmount && (
