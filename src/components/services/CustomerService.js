@@ -13,6 +13,11 @@ class CustomerService {
     return axios.post(BASE_URL + NEW_SALE_URL.getLineItems + param, lineItem);
   }
 
+  getinvoiceLevelCheckPro(domainId, storeId, reqObj) {
+    const param = '?storeId=' + storeId + '&domainId=' + domainId;
+    return axios.post(BASE_URL + "/connection-pool/promo/invoiceLevelCheckPromtionTextile" + param, reqObj);
+  }
+
   getCheckPromoAmount(storeId, domainId, reqObj) {
     const param = '?storeId=' + storeId + '&domainId=' + domainId;
     return axios.post(BASE_URL + NEW_SALE_URL.getPromoDiscount + param, reqObj);
