@@ -470,7 +470,8 @@ class TextilePayment extends Component {
       payButtonEnable: true,
       isCredit: false,
       recievedAmount: 0,
-      returnAmount: 0
+      returnAmount: 0,
+      verifiedCash: 0
     });
   }
 
@@ -538,7 +539,7 @@ class TextilePayment extends Component {
 
   qrAction() {
     this.setState({
-      isCash: true,
+      isCash: false,
       isCard: false,
       isCardOrCash: true,
       isUpi: false,
@@ -547,7 +548,8 @@ class TextilePayment extends Component {
       payButtonEnable: true,
       isCredit: false,
       recievedAmount: 0,
-      returnAmount: 0
+      returnAmount: 0,
+      verifiedCash: 0
     });
   }
 
@@ -656,7 +658,7 @@ class TextilePayment extends Component {
         this.setState({ grandNetAmount: this.state.balanceCreditAmount })
       }
     }
-    else if (this.state.isCardOrCash === true)
+    else if (this.state.isCardOrCash === true) {
       if ((parseFloat(this.state.recievedAmount) < (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)))) {
         this.setState({
           cardModelVisible: true,
@@ -664,7 +666,11 @@ class TextilePayment extends Component {
           cardAutoModel: true, verifiedCash: this.state.recievedAmount,
           grandNetAmount: 0
         });
+      } else {
+        alert(" Collected Cash Should be less than payable amount when it comes to Cash & Card Payment")
       }
+
+    }
     if (this.state.isreturnCreditCash) {
       this.setState({ grandNetAmount: this.state.balanceCreditAmount })
     }
@@ -676,7 +682,7 @@ class TextilePayment extends Component {
       gvNumber: this.state.promocode
     };
     gvNumbers.push(obj);
-    console.log("promo params", this.state.clientId, gvNumbers);
+    // console.log("promo params", this.state.clientId, gvNumbers);
     if (this.state.promocode !== "") {
       NewSaleService.getCoupons(this.state.clientId, gvNumbers).then(res => {
         if (Array.isArray(res.data.result)) {
@@ -746,7 +752,7 @@ class TextilePayment extends Component {
   }
 
   clearCashSammary() {
-    this.setState({ verifiedCash: "", recievedAmount: "", returnAmount: 0 });
+    this.setState({ verifiedCash: 0, recievedAmount: "", returnAmount: 0 });
   }
 
 
@@ -872,7 +878,7 @@ class TextilePayment extends Component {
           'Authorization': 'Bearer' + ' ' + token,
         }
       }).then(response => {
-        console.log("UPI response", response);
+        // console.log("UPI response", response);
         if (response.data) {
           this.setState({ upiToCustomerModel: false });
         }
@@ -1005,7 +1011,7 @@ class TextilePayment extends Component {
           };
 
         }
-        console.log('params aresdasd', obj);
+        // console.log('params aresdasd', obj);
         axios.post(NewSaleService.payment(), obj).then((res) => {
           // this.setState({isPayment: false});
           const data = JSON.parse(res.data["result"]);
@@ -1025,7 +1031,7 @@ class TextilePayment extends Component {
             },
             theme: { color: '#F37254' }
           };
-          console.log("options data", options);
+          // console.log("options data", options);
           RazorpayCheckout.open(options).then((data) => {
             // handle success
             this.setState({ tableData: [] });
@@ -1344,11 +1350,11 @@ class TextilePayment extends Component {
                     <TouchableOpacity style={{
                       marginLeft: 0, marginTop: 0,
                     }} onPress={() => this.cashAction()}>
-                      <Image source={this.state.isCash && this.state.isCardOrCash === false ? require('../assets/images/cashselect.png') : require('../assets/images/cashunselect.png')} style={{
+                      <Image source={this.state.isCash ? require('../assets/images/cashselect.png') : require('../assets/images/cashunselect.png')} style={{
                         marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
                       }} />
                     </TouchableOpacity>
-                    <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: Device.isTablet ? 19 : 14, color: this.state.isCash && this.state.isCardOrCash === false ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
+                    <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: Device.isTablet ? 19 : 14, color: this.state.isCash ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
                       CASH
                     </Text>
 
@@ -1641,12 +1647,11 @@ class TextilePayment extends Component {
             )}
 
 
-            {this.state.isCash === true && (
+            {(this.state.isCash === true || this.state.isCardOrCash === true) && (
               <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 10 }}> {('CASH SUMMARY')} </Text>
-
             )}
-            {/* {alert(this.state.verifiedCash)} */}
-            {this.state.isCash === true && this.state.verifiedCash > 1 && (
+
+            {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.verifiedCash > 1 && (
 
               <TouchableOpacity
                 style={{ borderRadius: 5, width: 90, height: 20, alignSelf: 'flex-end', marginTop: -20 }}
@@ -1655,7 +1660,7 @@ class TextilePayment extends Component {
               </TouchableOpacity>
             )}
 
-            {this.state.isCash === true && (
+            {(this.state.isCash === true || this.state.isCardOrCash === true) && (
               <TextInput style={styles.input}
                 underlineColor="transparent"
                 activeUnderlineColor='#000'
@@ -1666,8 +1671,7 @@ class TextilePayment extends Component {
               // onEndEditing={() => this.endEditing()}
             )}
 
-
-            {this.state.isCash === true && this.state.giftvoucher === "" && this.state.loyaltyPoints === "" && this.state.verifiedCash === 0 && (
+            {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.giftvoucher === "" && this.state.loyaltyPoints === "" && this.state.verifiedCash === 0 && (
               <TouchableOpacity
                 style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
                 onPress={() => this.verifycash()} >
@@ -1675,7 +1679,7 @@ class TextilePayment extends Component {
               </TouchableOpacity>
             )}
 
-            {this.state.isCash === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash === 0 && (
+            {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.giftvoucher !== "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash === 0 && (
               <TouchableOpacity
                 style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
                 onPress={() => this.verifycash()} >
@@ -1683,7 +1687,7 @@ class TextilePayment extends Component {
               </TouchableOpacity>
             )}
 
-            {this.state.isCash === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints === "" && this.state.verifiedCash === 0 && (
+            {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.giftvoucher !== "" && this.state.loyaltyPoints === "" && this.state.verifiedCash === 0 && (
               <TouchableOpacity
                 style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
                 onPress={() => this.verifycash()} >
@@ -1691,7 +1695,7 @@ class TextilePayment extends Component {
               </TouchableOpacity>
             )}
 
-            {this.state.isCash === true && this.state.giftvoucher === "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash === 0 && (
+            {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.giftvoucher === "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash === 0 && (
               <TouchableOpacity
                 style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
                 onPress={() => this.verifycash()} >
@@ -1699,8 +1703,7 @@ class TextilePayment extends Component {
               </TouchableOpacity>
             )}
 
-
-            {this.state.isCash === true && this.state.giftvoucher === "" && this.state.loyaltyPoints === "" && this.state.verifiedCash !== 0 && (
+            {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.giftvoucher === "" && this.state.loyaltyPoints === "" && this.state.verifiedCash !== 0 && (
               <TouchableOpacity
                 style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
               >
@@ -1711,7 +1714,7 @@ class TextilePayment extends Component {
               </TouchableOpacity>
             )}
 
-            {this.state.isCash === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash !== 0 && (
+            {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.giftvoucher !== "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash !== 0 && (
               <TouchableOpacity
                 style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
               >
@@ -1722,7 +1725,7 @@ class TextilePayment extends Component {
               </TouchableOpacity>
             )}
 
-            {this.state.isCash === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints === "" && this.state.verifiedCash !== 0 && (
+            {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.giftvoucher !== "" && this.state.loyaltyPoints === "" && this.state.verifiedCash !== 0 && (
               <TouchableOpacity
                 style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
               >
@@ -1733,7 +1736,7 @@ class TextilePayment extends Component {
               </TouchableOpacity>
             )}
 
-            {this.state.isCash === true && this.state.giftvoucher === "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash !== 0 && (
+            {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.giftvoucher === "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash !== 0 && (
               <TouchableOpacity
                 style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
               >
@@ -1744,14 +1747,107 @@ class TextilePayment extends Component {
               </TouchableOpacity>
             )}
 
-
-
-            {this.state.isCash === true && this.state.verifiedCash !== 0 && (
+            {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.verifiedCash !== 0 && (
               <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
                 <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10 }}> RETURN AMOUNT  ₹{this.state.returnAmount} </Text>
 
               </View>
             )}
+
+            {/* {this.state.isCardOrCash === true && (
+              <TextInput style={styles.input}
+                underlineColor="transparent"
+                activeUnderlineColor='#000'
+                label="Recieved Amount"
+                value={this.state.recievedAmount}
+                //  onEndEditing
+                onChangeText={(text) => this.handlerecievedAmount(text)} />
+              // onEndEditing={() => this.endEditing()}
+            )}
+
+            {this.state.isCardOrCash === true && this.state.giftvoucher === "" && this.state.loyaltyPoints === "" && this.state.verifiedCash === 0 && (
+              <TouchableOpacity
+                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
+                onPress={() => this.verifycash()} >
+                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>
+              </TouchableOpacity>
+            )}
+
+            {this.state.isCardOrCash === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash === 0 && (
+              <TouchableOpacity
+                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
+                onPress={() => this.verifycash()} >
+                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>
+              </TouchableOpacity>
+            )}
+
+            {this.state.isCardOrCash === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints === "" && this.state.verifiedCash === 0 && (
+              <TouchableOpacity
+                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
+                onPress={() => this.verifycash()} >
+                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>
+              </TouchableOpacity>
+            )}
+
+            {this.state.isCardOrCash === true && this.state.giftvoucher === "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash === 0 && (
+              <TouchableOpacity
+                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
+                onPress={() => this.verifycash()} >
+                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>
+              </TouchableOpacity>
+            )}
+
+            {this.state.isCardOrCash === true && this.state.giftvoucher === "" && this.state.loyaltyPoints === "" && this.state.verifiedCash !== 0 && (
+              <TouchableOpacity
+                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
+              >
+                <Image style={{ position: 'absolute', right: Device.isTablet ? 83 : 68, top: Device.isTablet ? 11 : 9 }} source={require('../assets/images/applied.png')} />
+
+                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
+
+              </TouchableOpacity>
+            )}
+
+            {this.state.isCardOrCash === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash !== 0 && (
+              <TouchableOpacity
+                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
+              >
+                <Image style={{ position: 'absolute', right: Device.isTablet ? 83 : 68, top: Device.isTablet ? 11 : 9 }} source={require('../assets/images/applied.png')} />
+
+                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
+
+              </TouchableOpacity>
+            )}
+
+            {this.state.isCardOrCash === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints === "" && this.state.verifiedCash !== 0 && (
+              <TouchableOpacity
+                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
+              >
+                <Image style={{ position: 'absolute', right: Device.isTablet ? 83 : 68, top: Device.isTablet ? 11 : 9 }} source={require('../assets/images/applied.png')} />
+
+                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
+
+              </TouchableOpacity>
+            )}
+
+            {this.state.isCardOrCash === true && this.state.giftvoucher === "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash !== 0 && (
+              <TouchableOpacity
+                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
+              >
+                <Image style={{ position: 'absolute', right: Device.isTablet ? 83 : 68, top: Device.isTablet ? 11 : 9 }} source={require('../assets/images/applied.png')} />
+
+                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
+
+              </TouchableOpacity>
+            )}
+
+            {this.state.isCardOrCash === true && this.state.verifiedCash !== 0 && (
+              <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
+                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10 }}> RETURN AMOUNT  ₹{this.state.returnAmount} </Text>
+
+              </View>
+            )} */}
+
 
             {this.state.flagredeem && (
               <View>
@@ -2132,12 +2228,12 @@ class TextilePayment extends Component {
 
               <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
                 <Text style={{
-                  color: "#2ADC09", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                  color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
                   fontSize: Device.isTablet ? 19 : 14,
                 }}>
                   Total Amount </Text>
                 <Text style={{
-                  color: "#2ADC09", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                  color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
                   fontSize: Device.isTablet ? 19 : 14,
                 }}>
                   ₹  {(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()} </Text>
