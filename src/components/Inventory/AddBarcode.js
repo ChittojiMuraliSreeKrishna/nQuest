@@ -757,7 +757,7 @@ class AddBarcode extends Component {
           {this.state.selectedDomain === "Retail" && ( // For Retail Domain only
             <View>
               <Text style={inputHeading}>
-                {I18n.t("stock status")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
+                {I18n.t("Status Type")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
               </Text>
               <View
                 style={[
@@ -785,7 +785,7 @@ class AddBarcode extends Component {
                 />
               </View>
               <Text style={inputHeading}>
-                Stock Date <Text style={{ color: "#aa0000" }}>*</Text>{" "}
+                Stock Validity <Text style={{ color: "#aa0000" }}>*</Text>{" "}
               </Text>
               <TouchableOpacity
                 style={dateSelector}

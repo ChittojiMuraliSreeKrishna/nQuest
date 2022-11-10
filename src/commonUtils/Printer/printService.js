@@ -7,7 +7,6 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
   console.log({ type, object, barcode, invoiceTax });
   // var object = [ { sno: 1, barcode: 'bar-enca93', quantity: 4, itemMrp: 4000, itemDiscount: 5000, totalMrp: 11000 } ];
   try {
-    const printers = await EscPosPrinter.discover();
     const targetIp = await AsyncStorage.getItem("printerIp");
     console.log(`TCP:${targetIp}`);
 
@@ -54,7 +53,7 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       printer.line('________________________________________________');
       printer.newline();
       for (let i = 0; i < object.length; i++) {
-        printer.line(' ' + String(parseInt(i) + 1) + '    ' + object[ i ].barcode + '      ' + object[ i ].quantity + '     ' + object[ i ].itemMrp + '     ' + object[ i ].itemDiscount + '      ' + object[ i ].totalMrp);
+        printer.line(' ' + String(parseInt(i) + 1) + '    ' + object[i].barcode + '      ' + object[i].quantity + '     ' + object[i].itemMrp + '     ' + object[i].itemDiscount + '      ' + object[i].totalMrp);
         printer.line('------------------------------------------------');
       }
       // printer.newline();
@@ -133,7 +132,7 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       printer.size(0, 0);
       printer.newline();
       for (let i = 0; i < object.length; i++) {
-        printer.line(' ' + String(parseInt(i) + 1) + '    ' + object[ i ].barcode + '      ' + object[ i ].quantity + '     ' + object[ i ].itemMrp + '     ' + object[ i ].itemDiscount + '      ' + object[ i ].totalMrp);
+        printer.line(' ' + String(parseInt(i) + 1) + '    ' + object[i].barcode + '      ' + object[i].quantity + '     ' + object[i].itemMrp + '     ' + object[i].itemDiscount + '      ' + object[i].totalMrp);
         printer.line('------------------------------------------------');
       }
       printer.newline();

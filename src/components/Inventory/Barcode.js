@@ -65,7 +65,7 @@ export default class Barcode extends Component {
     };
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     const storeId = await AsyncStorage.getItem("storeId");
     const newstoreId = await AsyncStorage.getItem("newstoreId");
     this.setState({ storeId: storeId });
@@ -80,24 +80,24 @@ export default class Barcode extends Component {
   }
 
   // Filter Action
-  filterAction () {
+  filterAction() {
     this.setState({ flagFilterOpen: true, modalVisible: true, filterBarcodesList: [] });
   }
 
-  clearFilterAction () {
+  clearFilterAction() {
     this.setState({ flagFilterOpen: false, filterActive: false, barcodesList: [], startDate: "", endDate: "", barCodeId: "", filterBarcodesList: [], pageNo: 0, filterPageNo: 0 });
     this.getAllBarcodes();
   }
 
   // Refresh Barcodes
-  refresh () {
+  refresh() {
     this.setState({ barcodesList: [], filterBarcodesList: [], pageNo: 0, filterPageNo: 0, loadPrevActive: false }, () => {
       this.getAllBarcodes();
     });
   }
 
   // Getting Barcodes Functions
-  getAllBarcodes (pageNumber) {
+  getAllBarcodes(pageNumber) {
     this.setState({ loading: true, loadMoreActive: false });
     const params = {
       fromDate: "",
@@ -129,7 +129,7 @@ export default class Barcode extends Component {
   }
 
   // Edit Barcodes Function
-  handleeditbarcode (item, index, value) {
+  handleeditbarcode(item, index, value) {
     this.props.navigation.navigate("EditBarcode", {
       item: item,
       isEdit: true,
@@ -140,7 +140,7 @@ export default class Barcode extends Component {
   }
 
   // Delete Barcode Function
-  handlebarcodedeleteaction (item, index) {
+  handlebarcodedeleteaction(item, index) {
     this.setState({
       inventoryDelete: true,
       modalVisible: true,
@@ -171,7 +171,7 @@ export default class Barcode extends Component {
     }
   };
 
-  continuePagination () {
+  continuePagination() {
     if (this.state.filterActive) {
       if (this.state.totalPages > 1) {
         this.setState({ loadMoreActive: true });
@@ -189,19 +189,19 @@ export default class Barcode extends Component {
   }
 
   // Filter Functions
-  modelCancel () {
+  modelCancel() {
     this.setState({ modalVisible: false, flagFilterOpen: false });
   }
 
   // Dates filter
 
-  datepickerClicked () {
+  datepickerClicked() {
     this.setState({ datepickerOpen: true });
   }
 
 
 
-  datepickerEndClicked () {
+  datepickerEndClicked() {
     this.setState({ datepickerendOpen: true });
   }
 
@@ -230,7 +230,7 @@ export default class Barcode extends Component {
     this.setState({ barCodeId: value.trim() });
   };
 
-  applyBarcodeFilter (pageNumber) {
+  applyBarcodeFilter(pageNumber) {
     this.setState({ loading: true, loadMoreActive: false });
     let list = {};
     list = {
@@ -270,7 +270,7 @@ export default class Barcode extends Component {
 
 
   // Add Barcode
-  handleAddBarcode () {
+  handleAddBarcode() {
     this.props.navigation.navigate("AddBarcode", {
       isEdit: false,
       onGoBack: () => this.refresh(),
@@ -278,7 +278,7 @@ export default class Barcode extends Component {
     });
   }
 
-  deleteInventory (id) {
+  deleteInventory(id) {
     InventoryService.deleteBarcode(id).then((res) => {
       if (res?.data) {
         alert(res.data.result);
@@ -289,7 +289,7 @@ export default class Barcode extends Component {
   }
 
 
-  render () {
+  render() {
     return (
       <View>
         {this.state.loading && <Loader loading={this.state.loading} />}
@@ -366,7 +366,7 @@ export default class Barcode extends Component {
                       </View>
                       <View style={scss.textContainer}>
                         <Text style={scss.textStyleLight}>
-                          {I18n.t("LIST PRICE")}: ₹{item.itemMrp}
+                          {I18n.t("MRP")}: ₹{item.itemMrp}
                         </Text>
                         <Text style={scss.textStyleLight}>QTY: {item.qty}</Text>
                       </View>
@@ -393,7 +393,7 @@ export default class Barcode extends Component {
                           </IconMA>
                           <IconFA
                             name="edit"
-                            style={[ scss.action_icons, { paddingRight: 5 } ]}
+                            style={[scss.action_icons, { paddingRight: 5 }]}
                             size={25}
                             color="#000"
                             onPress={() =>
@@ -427,14 +427,14 @@ export default class Barcode extends Component {
                     {this.state.loadPrevActive && (
                       <View style={scss.page_navigation_subcontainer}>
                         <IconMA
-                          style={[ scss.pag_nav_btn ]}
+                          style={[scss.pag_nav_btn]}
                           color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                           onPress={() => this.loadMoreList(0)}
                           name="chevron-double-left"
                           size={25}
                         />
                         <IconMA
-                          style={[ scss.pag_nav_btn ]}
+                          style={[scss.pag_nav_btn]}
                           color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                           onPress={() => this.loadMoreList(this.state.pageNo - 1)}
                           name="chevron-left"
@@ -446,13 +446,13 @@ export default class Barcode extends Component {
                     {this.state.loadNextActive && (
                       <View style={scss.page_navigation_subcontainer}>
                         <IconMA
-                          style={[ scss.pag_nav_btn ]}
+                          style={[scss.pag_nav_btn]}
                           onPress={() => this.loadMoreList(this.state.pageNo + 1)}
                           name="chevron-right"
                           size={25}
                         />
                         <IconMA
-                          style={[ scss.pag_nav_btn ]}
+                          style={[scss.pag_nav_btn]}
                           onPress={() => this.loadMoreList(this.state.totalPages - 1)}
                           name="chevron-double-right"
                           size={25}
@@ -539,11 +539,11 @@ export default class Barcode extends Component {
                       onChangeText={this.handlebarCodeId}
                     />
                     <View style={forms.action_buttons_container}>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                         onPress={() => { this.setState({ pageNo: 0, loadPrevActive: false, loadNextActive: true }, () => this.applyBarcodeFilter(0)); }}>
                         <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
                         onPress={() => this.modelCancel()}>
                         <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>

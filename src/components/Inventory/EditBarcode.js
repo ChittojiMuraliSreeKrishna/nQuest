@@ -461,7 +461,7 @@ class EditBarcode extends Component {
           <Appbar.BackAction
             onPress={() => this.handleBackButtonClick()}
           />
-          <Appbar.Content title="Rebarcode" />
+          <Appbar.Content title={this.state.reBar ? "Rebarcode" : "Edit Barcode"} />
         </Appbar>
         <KeyboardAwareScrollView>
           <Text style={inputHeading}>
@@ -544,7 +544,7 @@ class EditBarcode extends Component {
           {this.state.selectedDomain === "Retail" && ( // For Retail Domain only
             <View>
               <Text style={inputHeading}>
-                {I18n.t("stock status")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
+                {I18n.t("Status Type")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
               </Text>
               <View
                 style={[
@@ -574,7 +574,7 @@ class EditBarcode extends Component {
                 />
               </View>
               <Text style={inputHeading}>
-                stock Validity <Text style={{ color: "#aa0000" }}>*</Text>{" "}
+                Stock Validity <Text style={{ color: "#aa0000" }}>*</Text>{" "}
               </Text>
               <TouchableOpacity
                 style={dateSelector}
@@ -794,33 +794,15 @@ class EditBarcode extends Component {
             <Text style={inputHeading}>
               {I18n.t("HSN Code")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
             </Text>
-            <View
+            <TextInput
+              editable={false}
               style={[
-                rnPickerContainer,
-                { borderColor: hsnValid ? "#8F9EB7" : "#dd0000" },
+                forms.inactive_fld,
+                forms.input_fld
               ]}
-            >
-              <RNPickerSelect
-                placeholder={{
-                  label: "HSN Code",
-                }}
-                Icon={() => {
-                  return (
-                    <Chevron
-                      style={styles.imagealign}
-                      size={1.5}
-                      color={hsnValid ? "gray" : "#dd0000"}
-                    />
-                  );
-                }}
-                disabled={this.state.reBar ? false : true}
-                items={this.state.hsnCodesList}
-                onValueChange={(value) => this.handleHSNCode(value)}
-                style={hsnValid ? rnPicker : rnPickerError}
-                value={this.state.hsnCode}
-                useNativeAndroidPickerStyle={false}
-              />
-            </View>
+              placeholder="Division"
+              value={this.state.hsnCode}
+            />
             {!hsnValid && (
               <Message imp={true} message={this.state.errors["hsn"]} />
             )}
