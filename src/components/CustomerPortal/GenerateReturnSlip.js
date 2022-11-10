@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import moment from 'moment/moment';
 import React, { Component } from 'react';
 import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
@@ -59,25 +60,43 @@ export default class GenerateReturnSlip extends Component {
       errors: {},
       isItemSelected: true,
       itemsList: [],
+      dayCloseDates: [],
+      toDay: moment(new Date()).format("YYYY-MM-DD").toString(),
     };
   }
 
-  async componentDidMount () {
+  // async componentDidMount() {
+  //   const userId = await AsyncStorage.getItem("userId");
+  //   this.setState({ userId: userId });
+  //   AsyncStorage.getItem("storeId").then((value) => {
+  //     storeStringId = value;
+  //     this.setState({ storeId: parseInt(storeStringId) });
+  //     console.log("Store Id", this.state.storeId);
+  //   }).catch(() => {
+  //     this.setState({ loading: false });
+  //     console.log('There is error getting storeId');
+  //     // alert('There is error getting storeId');
+  //   });
+  // }
+
+  async componentWillMount() {
     const userId = await AsyncStorage.getItem("userId");
-    this.setState({ userId: userId });
-    console.log(userId, "userId");
-    AsyncStorage.getItem("storeId").then((value) => {
-      storeStringId = value;
-      this.setState({ storeId: parseInt(storeStringId) });
-      console.log("Store Id", this.state.storeId);
-    }).catch(() => {
-      this.setState({ loading: false });
-      console.log('There is error getting storeId');
-      // alert('There is error getting storeId');
+    const storeId = await AsyncStorage.getItem("storeId");
+    this.setState({ userId: userId, storeId: storeId });
+    this.getallDates();
+  }
+
+  getallDates() {
+    CustomerService.getDates(this.state.storeId).then(res => {
+      if (res) {
+        if (res.data.length > 0) {
+          this.setState({ dayCloseDates: res.data });
+        }
+      }
     });
   }
 
-  handleReasonDesc (text) {
+  handleReasonDesc(text) {
     this.setState({ reasonDesc: text });
   }
 
@@ -85,27 +104,27 @@ export default class GenerateReturnSlip extends Component {
     this.setState({ reason: value });
   };
 
-  handleInvoiceNumber (text) {
+  handleInvoiceNumber(text) {
     this.setState({ invoiceNumber: text });
   }
 
-  handleMobileNumber (text) {
+  handleMobileNumber(text) {
     this.setState({ mobileNumber: text.trim() });
   }
 
-  validationForm () {
+  validationForm() {
     let isFormValid = true;
     let errors = {};
     if (this.state.invoiceNumber === '') {
       isFormValid = false;
-      errors[ "invoiceNumber" ] = customerErrorMessages.invoiceNumber;
+      errors["invoiceNumber"] = customerErrorMessages.invoiceNumber;
       this.setState({ invoiceNumberValid: false });
     }
     this.setState({ errors: errors });
     return isFormValid;
   }
 
-  endEditing () {
+  endEditing() {
     const isFormValid = this.validationForm();
     if (isFormValid) {
       this.searchInvoice();
@@ -118,130 +137,246 @@ export default class GenerateReturnSlip extends Component {
     const obj = {
       invoiceNo: this.state.invoiceNumber.trim(),
       mobileNo: this.state.mobileNumber,
-      storeId: this.state.storeId,
+      storeId: this.state.storeId ? this.state.storeId : null,
       domianId: 1
     };
-    console.log(this.state.invoiceNumber);
-    axios.post(CustomerService.getReturnSlip(), obj).then(res => {
-      console.log(res.data.result);
-      let items = res.data.result;
-      for (let i = 0; i < items.length; i++) {
-        returnInvoiceArray.push({ barCode: items[ i ].barcode, value: items[ i ].netValue, quantity: items[ i ].quantity, isSelected: false, mrp: items[ i ].mrp, returnQty: 0, promoValue: items[ i ].promoDiscount, manualValue: items[ i ].manualDiscount, gvValue: items[ i ].gvAppiled });
-      }
-      this.setState({ returnInvoice: returnInvoiceArray }, () => {
-        let costprice = 0;
-        let quantity = 0;
-        this.state.returnInvoice.forEach(element => {
-          costprice = costprice + element.netValue;
-          quantity = quantity + element.quantity;
+    // axios.post(CustomerService.getReturnSlip(), obj).then(res => {
+    //   console.log(res.data.result);
+    //   let items = res.data.result;
+    //   for (let i = 0; i < items.length; i++) {
+    //     returnInvoiceArray.push({ barCode: items[i].barcode, value: items[i].netValue, quantity: items[i].quantity, isSelected: false, mrp: items[i].mrp, returnQty: 0, promoValue: items[i].promoDiscount, manualValue: items[i].manualDiscount, gvValue: items[i].gvAppiled });
+    //   }
+    //   this.setState({ returnInvoice: returnInvoiceArray }, () => {
+    //     let costprice = 0;
+    //     let quantity = 0;
+    //     this.state.returnInvoice.forEach(element => {
+    //       costprice = costprice + element.netValue;
+    //       quantity = quantity + element.quantity;
+    //     });
+    //     this.setState({ netValue: costprice, quantity: quantity, isChecked: false, itemsReturn: true });
+    //   });
+    // }).catch((err) => {
+    //   this.setState({ loading: false });
+    //   console.log(err);
+    //   alert('Unable to get the Invoice Details');
+    // });
+    if (this.state.dayCloseDates.length !== 0) {
+      if (this.state.dayCloseDates.length === 1 && this.state.dayCloseDates[0].dayClose.split("T")[0] === this.state.toDay) {
+        CustomerService.getReturnSlipDetails(obj).then((res) => {
+          if (res) {
+            const allreturnslipsList = res.data.result
+            this.setState(
+              {
+                // returnslipsList: res.data.result,
+              },
+              () => {
+                let costprice = 0;
+                let quantity = 0;
+                var combineList = {};
+                allreturnslipsList.forEach((itm) => {
+                  var barcode = itm.barcode;
+                  itm.quantity = parseInt(itm.quantity)
+                  itm.netValue = parseInt(itm.netValue)
+                  itm.manualDiscount = parseInt(itm.manualDiscount)
+                  itm.promoDiscount = parseInt(itm.promoDiscount)
+                  itm.gvAppiled = parseInt(itm.gvAppiled)
+
+                  if (!combineList[barcode]) {
+                    return combineList[barcode] = itm
+                  }
+                  return combineList[barcode].quantity = combineList[barcode].quantity + itm.quantity,
+                    combineList[barcode].netValue = combineList[barcode].netValue + itm.netValue,
+                    combineList[barcode].grossValue = combineList[barcode].grossValue + itm.grossValue,
+                    combineList[barcode].manualDiscount = combineList[barcode].manualDiscount + itm.manualDiscount,
+                    combineList[barcode].promoDiscount = combineList[barcode].manualDiscount + itm.promoDiscount,
+                    combineList[barcode].gvAppiled = combineList[barcode].gvAppiled + itm.gvAppiled
+
+
+                })
+                console.log("combineList", combineList)
+                var combineList2 = []
+                Object.keys(combineList).forEach((key) => {
+                  combineList2.push(combineList[key])
+                })
+                const clearList = [...combineList2]
+                console.log("clearList", clearList)
+                this.state.returnInvoice = clearList
+                console.log("returnslipsList", this.state.returnInvoice)
+
+                this.state.returnInvoice.forEach((element) => {
+                  costprice = costprice + element.mrp;
+                  quantity = quantity + element.quantity;
+                  if (element.quantity >= 1) {
+                    element.returnQty = parseInt("0");
+                    element.returnedAmout = parseInt("0")
+                  }
+                  console.log("+quantity+++", quantity, element.quantity)
+
+
+                  element.isChecked = false;
+                });
+                if (this.state.returnInvoice.length === 1 && quantity === 1) {
+                  this.setState({ returnSlipTotal: costprice });
+                }
+
+                this.setState({
+                  netValue: costprice,
+                  quantity: quantity,
+                  amount: costprice,
+                });
+                console.log("+res+++", this.state.returnInvoice, quantity, this.state.quantity)
+              }
+
+            );
+
+
+          }
         });
-        this.setState({ netValue: costprice, quantity: quantity, isChecked: false, itemsReturn: true });
-        console.log("Return Items", this.state.returnInvoice, this.state.itemsReturn);
-      });
-    }).catch((err) => {
-      this.setState({ loading: false });
-      console.log(err);
-      alert('Unable to get the Invoice Details');
-    });
+        this.setState({ returnedAmout: "" });
+      } else {
+        alert("Please Close Previous Days");
+      }
+    } else {
+      alert("Unable To Return Today Daycloser Is Done");
+    }
   };
 
-  itemSelected (e, index, item) {
-    if (item.isSelected === true) {
-      item.isSelected = false;
-      let index = this.state.netValueList.findIndex(ele => ele.barCode === item.barCode);
-      this.state.netValueList.splice(index, 1);
-    }
-    else {
-      item.isSelected = true;
+  itemSelected(e, index, selectedElement) {
+    if (item.isChecked === true) {
+      if (selectedElement.quantity === 1) {
+        selectedElement.returnQty = selectedElement.quantity;
+        selectedElement.returnedAmout = selectedElement.netValue
+      }
       const obj = {
-        amount: item.value,
-        barCode: item.barCode,
-        qty: item.quantity
+        netValue: selectedElement.netValue,
+        barCode: selectedElement.barcode,
+        quantity: selectedElement.quantity,
+        mrp: selectedElement.mrp,
+        returnQty: selectedElement.returnQty,
       };
       this.state.netValueList.push(obj);
+      item.isChecked = false;
+      // let index = this.state.netValueList.findIndex(ele => ele.barCode === item.barCode);
+      // this.state.netValueList.splice(index, 1);
+    }
+    else {
+      item.isChecked = true;
+      // const obj = {
+      //   amount: item.value,
+      //   barCode: item.barCode,
+      //   qty: item.quantity
+      // };
+      // this.state.netValueList.push(obj);
+      selectedElement.returnQty = 0;
+      selectedElement.returnedAmout = 0
     }
     // alert(itemPrice)
-    const netValueList = this.removeDuplicates(this.state.netValueList, "barCode");
-    this.setState({ netValueList: netValueList }, () => {
-      let returnSlipTotal = 0;
-      console.log("netvalueList", this.state.netValueList);
+    // const netValueList = this.removeDuplicates(this.state.netValueList, "barCode");
+    // this.setState({ netValueList: netValueList }, () => {
+    //   let returnSlipTotal = 0;
+    //   console.log("netvalueList", this.state.netValueList);
+    // });
+    this.state.returnInvoice.forEach((element, ind) => {
+      if (element.returnQty && element.returnQty !== 0 && ind == index) {
+        element.returnedAmout = (parseInt(element.returnQty) * element.netValue) / element.quantity
+      } else {
+        element.returnedAmout = parseInt(element.returnQty) * element.netValue
+      }
+      element.returnedAmout = (parseInt(element.returnQty) * element.netValue) / element.quantity
     });
+    let sumreturnedAmout = this.state.returnInvoice.reduce((accumulator, curValue) => {
+      if (curValue.returnQty && curValue.returnQty !== '0') {
+        accumulator = accumulator + curValue.returnedAmout;
+      }
+      return accumulator;
+
+    }, 0);
+    this.setState({ returnSlipTotal: (sumreturnedAmout).toFixed(2) });
+
   }
 
-  removeDuplicates (array, key) {
+  removeDuplicates(array, key) {
     const lookup = new Set();
-    return array.filter(obj => !lookup.has(obj[ key ]) && lookup.add(obj[ key ]));
+    return array.filter(obj => !lookup.has(obj[key]) && lookup.add(obj[key]));
   }
 
-  validationForReturnSlip () {
+  validationForReturnSlip() {
     let isFormValid = true;
     let errors = {};
     if (this.state.reason === "") {
       isFormValid = false;
-      errors[ "reason" ] = customerErrorMessages.reason;
+      errors["reason"] = customerErrorMessages.reason;
       this.setState({ reasonValid: false });
     }
     this.setState({ errors: errors });
     return isFormValid;
   }
 
-  generateNewSlip (item, index) {
+  generateNewSlip(item, index) {
     console.log(this.state.storeId);
-    const qtyarr = [ ...this.state.returnInvoice ];
-    let finallist = [];
-    qtyarr.forEach((item, index) => {
-      if (item.returnQty > 0) {
-        finallist.push({
-          barCode: item.barCode,
-          amount: item.value,
-          qty: item.quantity,
-          returnQty: item.returnQty,
-          returnAmount: item.value / item.quantity * item.returnQty
-        });
-      }
-    });
-    console.log("returnSlipList", this.state.netValueList);
+    // const qtyarr = [...this.state.returnInvoice];
+    // let finallist = [];
+    // qtyarr.forEach((item, index) => {
+    //   if (item.returnQty > 0) {
+    //     finallist.push({
+    //       barCode: item.barCode,
+    //       amount: item.value,
+    //       qty: item.quantity,
+    //       returnQty: item.returnQty,
+    //       returnAmount: item.value / item.quantity * item.returnQty
+    //     });
+    //   }
+    // });
+    // console.log("returnSlipList", this.state.netValueList);
     // const isFormValid = this.validationForReturnSlip()
+    let barList = [];
+    if (this.state.returnInvoice.length >= 1 && this.state.quantity > 1) {
+      this.state.returnInvoice.forEach((element) => {
+        const obj = {
+          amount: element.netValue,
+          barCode: element.barcode,
+          qty: element.quantity,
+          returnQty: element.returnQty ? parseInt(element.returnQty) : 0,
+          returnAmount: element.returnedAmout ? parseInt(element.returnedAmout) : 0
+        };
+        barList.push(obj);
+      });
+    }
+    else if (this.state.returnInvoice.length === 1 && this.state.quantity === 1) {
+      this.state.returnInvoice.forEach((element) => {
+        const obj = {
+          amount: element.netValue,
+          barCode: element.barcode,
+          qty: element.quantity,
+          returnQty: element.quantity ? parseInt(element.quantity) : 0,
+          returnAmount: element.mrp ? parseInt(element.mrp) : 0
+        };
+        barList.push(obj);
+        this.setState({ retBarList: barList })
+      });
+    }
     const saveObj = {
-      barcodes: finallist,
+      barcodes: barList.filter((it) => it.returnQty && it.returnQty !== '0'),
       mobileNumber: this.state.mobileNumber ? this.state.mobileNumber : null,
       invoiceNumber: this.state.invoiceNumber,
       reason: this.state.reason,
       customerId: parseInt(this.state.userId),
       storeId: parseInt(this.state.storeId),
       totalAmount: parseInt(this.state.returnSlipTotal),
-      createdBy: this.state.createdBy,
-      comments: this.state.reasonDesc
+      createdBy: parseInt(this.state.userId),
+      comments: this.state.reasonDesc,
+      returnQty: this.state.returnQty,
     };
     // if (isFormValid) {
     console.log(saveObj, "params");
-    if (this.state.netValueList.length > 0) {
-      axios.post(CustomerService.saveRetunSlip(), saveObj).then((res) => {
-        console.log("return slip data,res", JSON.stringify(res.data));
-        if (res) {
-          alert(res.data.message);
-          this.setState({
-            resultData: res.data.message,
-            // resultModel: true,
-            modelVisible: true,
-            netValueList: [],
-            returnSlipTotal: 0,
-            returnInvoice: [],
-            mobileNumber: '',
-            invoiceNumber: "",
-            netValue: 0,
-            quantity: 0,
-            reason: "",
-            customerNumber: "",
-            createdBy: null,
-            itemsReturn: false
-          });
-
-        }
-        this.setState({ returnModel: false, modelVisible: false, loading: false, itemsReturn: false });
-      }).catch((err) => {
+    axios.post(CustomerService.saveRetunSlip(), saveObj).then((res) => {
+      console.log("return slip data,res", JSON.stringify(res.data));
+      if (res) {
+        alert(res.data.message);
         this.setState({
-          returnModel: false, modelVisible: false, loading: false,
+          resultData: res.data.message,
+          // resultModel: true,
+          modelVisible: true,
           netValueList: [],
           returnSlipTotal: 0,
           returnInvoice: [],
@@ -254,10 +389,25 @@ export default class GenerateReturnSlip extends Component {
           createdBy: null,
           itemsReturn: false
         });
+
+      }
+      this.setState({ returnModel: false, modelVisible: false, loading: false, itemsReturn: false });
+    }).catch((err) => {
+      this.setState({
+        returnModel: false, modelVisible: false, loading: false,
+        netValueList: [],
+        returnSlipTotal: 0,
+        returnInvoice: [],
+        mobileNumber: '',
+        invoiceNumber: "",
+        netValue: 0,
+        quantity: 0,
+        reason: "",
+        customerNumber: "",
+        createdBy: null,
+        itemsReturn: false
       });
-    } else {
-      alert("Please Select Atleast One Barcode");
-    }
+    });
   }
 
   handleCutomerTagging = () => {
@@ -265,11 +415,11 @@ export default class GenerateReturnSlip extends Component {
     this.setState({ customerTagging: true, modelVisible: true });
   };
 
-  modelCancel () {
+  modelCancel() {
     this.setState({ modelVisible: false, returnModel: false, customerTagging: false, resultModel: false });
   }
 
-  navigateToScanCode () {
+  navigateToScanCode() {
     global.barcodeId = 'something';
     this.props.navigation.navigate('ScanBarCode', {
       isFromNewSale: false, isFromAddProduct: true,
@@ -277,12 +427,12 @@ export default class GenerateReturnSlip extends Component {
     });
   }
 
-  validationField () {
+  validationField() {
     let isFormValid = true;
     let errors = {};
     if (this.state.customerNumber.length === 0 || this.state.customerNumber.length < 10) {
       isFormValid = false;
-      errors[ "customerNumber" ] = customerErrorMessages.customerNumber;
+      errors["customerNumber"] = customerErrorMessages.customerNumber;
       this.setState({ customerNumberValid: false });
     }
     this.setState({ errors: errors });
@@ -291,76 +441,122 @@ export default class GenerateReturnSlip extends Component {
 
   updateQty = (text, index, item) => {
     const Qty = /^[0-9\b]+$/;
-    const qtyarr = [ ...this.state.returnInvoice ];
-    console.log(qtyarr[ index ].returnQty);
+    const qtyarr = [...this.state.returnInvoice];
+    console.log(qtyarr[index].returnQty);
     let addItem = '';
     let value = text === '' ? 1 : text;
     if (value !== '' && Qty.test(value) === false) {
       addItem = 1;
-      qtyarr[ index ].returnQty = addItem.toString();
+      qtyarr[index].returnQty = addItem.toString();
     } else {
-      if (parseInt(value) < parseInt(qtyarr[ index ].quantity)) {
+      if (parseInt(value) < parseInt(qtyarr[index].quantity)) {
         addItem = value;
-        qtyarr[ index ].returnQty = addItem.toString();
+        qtyarr[index].returnQty = addItem.toString();
       } else {
-        addItem = qtyarr[ index ].quantity;
-        qtyarr[ index ].returnQty = addItem.toString();
+        addItem = qtyarr[index].quantity;
+        qtyarr[index].returnQty = addItem.toString();
       }
     }
-    let totalcostMrp = item.itemMrp * parseInt(qtyarr[ index ].returnQty);
+    let totalcostMrp = item.itemMrp * parseInt(qtyarr[index].returnQty);
     item.totalMrp = totalcostMrp;
-    this.setState({ returnInvoice: qtyarr });
-    console.error("TEXT", value);
-    let grandTotal = 0;
-    let totalqty = 0;
-    this.state.returnInvoice.forEach(bardata => {
-      grandTotal = grandTotal + bardata.value / bardata.quantity * String(bardata.returnQty);
-      totalqty = totalqty + parseInt(bardata.returnQty);
+    // this.setState({ returnInvoice: qtyarr });
+    this.state.returnInvoice.forEach((element, ind) => {
+      if (element.returnQty && element.returnQty !== 0 && ind == index) {
+        element.returnedAmout = (parseInt(element.returnQty) * element.netValue) / element.quantity
+      } else if (element.returnQty === '' && element.returnQty === 0 && ind == index) {
+        element.returnedAmout = 0
+        element.isChecked = false;
+      }
+      element.returnedAmout = parseInt(element.returnQty) * element.netValue / element.quantity
     });
-    this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty, returnSlipTotal: grandTotal });
-    this.state.totalQuantity = (parseInt(this.state.totalQuantity) + 1);
+    let sumreturnedAmout = this.state.returnInvoice.reduce((accumulator, curValue) => {
+      if (curValue.returnQty && curValue.returnQty !== '0') {
+        accumulator = accumulator + curValue.returnedAmout;
+      }
+      return accumulator;
+
+    }, 0);
+    this.setState({ returnSlipTotal: (sumreturnedAmout).toFixed(2) });
+    // let grandTotal = 0;
+    // let totalqty = 0;
+    // this.state.returnInvoice.forEach(bardata => {
+    //   grandTotal = grandTotal + bardata.value / bardata.quantity * String(bardata.returnQty);
+    //   totalqty = totalqty + parseInt(bardata.returnQty);
+    // });
+    // this.setState({ totalQuantity: totalqty,  });
+    // this.state.totalQuantity = (parseInt(this.state.totalQuantity) + 1);
     // this.setState({ itemsList: qtyarr });
   };
 
   incrementForTable = (item, index) => {
-    const qtyarr = [ ...this.state.returnInvoice ];
-    console.log(qtyarr[ index ].quantity);
+    const qtyarr = [...this.state.returnInvoice];
+    console.log(qtyarr[index].quantity);
     console.log({ qtyarr });
-    if (parseInt(qtyarr[ index ].returnQty) < parseInt(qtyarr[ index ].quantity)) {
-      var additem = parseInt(qtyarr[ index ].returnQty) + 1;
-      qtyarr[ index ].returnQty = additem.toString();
+    if (parseInt(qtyarr[index].returnQty) < parseInt(qtyarr[index].quantity)) {
+      var additem = parseInt(qtyarr[index].returnQty) + 1;
+      qtyarr[index].returnQty = additem.toString();
     } else {
-      var additem = parseInt(qtyarr[ index ].returnQty);
-      qtyarr[ index ].returnQty = additem.toString();
+      var additem = parseInt(qtyarr[index].returnQty);
+      qtyarr[index].returnQty = additem.toString();
       alert(`only ${additem} items are in this barcode`);
     }
     this.setState({ returnInvoice: qtyarr });
 
-    let grandTotal = 0;
-    let totalqty = 0;
-    this.state.returnInvoice.forEach(bardata => {
-      grandTotal = grandTotal + bardata.value / bardata.quantity * bardata.returnQty;
-      totalqty = totalqty + parseInt(bardata.returnQty);
+    // let grandTotal = 0;
+    // let totalqty = 0;
+    // this.state.returnInvoice.forEach(bardata => {
+    //   grandTotal = grandTotal + bardata.value / bardata.quantity * bardata.returnQty;
+    //   totalqty = totalqty + parseInt(bardata.returnQty);
+    // });
+    this.state.returnInvoice.forEach((element, ind) => {
+      if (element.returnQty && element.returnQty !== 0 && ind == index) {
+        element.returnedAmout = (parseInt(element.returnQty) * element.netValue) / element.quantity
+      } else if (element.returnQty === '' && element.returnQty === 0 && ind == index) {
+        element.returnedAmout = 0
+        element.isChecked = false;
+      }
+      element.returnedAmout = parseInt(element.returnQty) * element.netValue / element.quantity
     });
-    this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty, returnSlipTotal: grandTotal });
-    this.state.totalQuantity = (parseInt(this.state.totalQuantity) + 1);
+    let sumreturnedAmout = this.state.returnInvoice.reduce((accumulator, curValue) => {
+      if (curValue.returnQty && curValue.returnQty !== '0') {
+        accumulator = accumulator + curValue.returnedAmout;
+      }
+      return accumulator;
+
+    }, 0);
+    this.setState({ returnSlipTotal: (sumreturnedAmout).toFixed(2) });
+    // this.setState({ totalQuantity: totalqty });
+    // this.state.totalQuantity = (parseInt(this.state.totalQuantity) + 1);
   };
 
-  decreamentForTable (item, index) {
-    const qtyarr = [ ...this.state.returnInvoice ];
-    if (qtyarr[ index ].returnQty > 0) {
-      var additem = parseInt(qtyarr[ index ].returnQty) - 1;
-      qtyarr[ index ].returnQty = additem.toString();
-      let totalcostMrp = item.itemMrp * parseInt(qtyarr[ index ].returnQty);
+  decreamentForTable(item, index) {
+    const qtyarr = [...this.state.returnInvoice];
+    if (qtyarr[index].returnQty > 0) {
+      var additem = parseInt(qtyarr[index].returnQty) - 1;
+      qtyarr[index].returnQty = additem.toString();
+      let totalcostMrp = item.itemMrp * parseInt(qtyarr[index].returnQty);
       item.totalMrp = totalcostMrp;
-      this.state.totalQuantity = (parseInt(this.state.totalQuantity) - 1);
+      // this.state.totalQuantity = (parseInt(this.state.totalQuantity) - 1);
       let grandTotal = 0;
       let totalqty = 0;
-      this.state.returnInvoice.forEach(bardata => {
-        grandTotal = grandTotal + bardata.value / bardata.quantity * bardata.returnQty;
-        totalqty = totalqty + parseInt(bardata.returnQty);
+      this.state.returnInvoice.forEach((element, ind) => {
+        if (element.returnQty && element.returnQty !== 0 && ind == index) {
+          element.returnedAmout = (parseInt(element.returnQty) * element.netValue) / element.quantity
+        } else if (element.returnQty === '' && element.returnQty === 0 && ind == index) {
+          element.returnedAmout = 0
+          element.isChecked = false;
+        }
+        element.returnedAmout = parseInt(element.returnQty) * element.netValue / element.quantity
       });
-      this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty, returnSlipTotal: grandTotal });
+      let sumreturnedAmout = this.state.returnInvoice.reduce((accumulator, curValue) => {
+        if (curValue.returnQty && curValue.returnQty !== '0') {
+          accumulator = accumulator + curValue.returnedAmout;
+        }
+        return accumulator;
+
+      }, 0);
+      this.setState({ returnSlipTotal: (sumreturnedAmout).toFixed(2) });
+      // this.setState({  totalQuantity: totalqty });
       this.setState({ returnInvoice: qtyarr });
     } else {
       this.state.returnInvoice.splice(index, 1);
@@ -368,7 +564,7 @@ export default class GenerateReturnSlip extends Component {
     }
   }
 
-  customerTag () {
+  customerTag() {
     const isFormValid = this.validationField();
     if (isFormValid) {
       const obj = {
@@ -413,11 +609,11 @@ export default class GenerateReturnSlip extends Component {
     }
   }
 
-  handleCustomerNumber (text) {
+  handleCustomerNumber(text) {
     this.setState({ customerNumber: text.trim() });
   }
 
-  refresh () {
+  refresh() {
     if (global.barcodeId != 'something') {
       this.setState({ invoiceNumber: global.barcodeId },
         () => {
@@ -429,13 +625,12 @@ export default class GenerateReturnSlip extends Component {
   }
 
 
-  render () {
-    console.log("this.state.item", !this.state.itemsReturn);
+  render() {
     return (
       <View style={{ backgroundColor: color.white }}>
         <ScrollView>
           <View style={{ flexDirection: 'row', width: Device.isTablet ? deviceWidth - 20 : deviceWidth - 10, justifyContent: 'space-between', marginTop: 20 }}>
-            <TextInput style={[ Device.isTablet ? styles.input_tablet : inputField, { width: Device.isTablet ? deviceWidth / 1.3 : deviceWidth / 1.25, borderColor: '#8F9EB717', marginRight: RW(0) } ]}
+            <TextInput style={[Device.isTablet ? styles.input_tablet : inputField, { width: Device.isTablet ? deviceWidth / 1.3 : deviceWidth / 1.25, borderColor: '#8F9EB717', marginRight: RW(0) }]}
               mode="flat"
               activeUnderlineColor='#000'
               underlineColor={'#6f6f6f'}
@@ -449,7 +644,7 @@ export default class GenerateReturnSlip extends Component {
             </TouchableOpacity>
           </View>
           {!this.state.invoiceNumberValid && (
-            <Message imp={true} message={this.state.errors[ "invoiceNumber" ]} />
+            <Message imp={true} message={this.state.errors["invoiceNumber"]} />
           )}
           {/* <TextInput
           style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
@@ -480,12 +675,12 @@ export default class GenerateReturnSlip extends Component {
               {I18n.t("SEARCH")}
             </Text>
           </TouchableOpacity> */}
-            <TouchableOpacity style={checkPromoDiscountBtn} onPress={this.handleCutomerTagging} >
+            {/* <TouchableOpacity style={checkPromoDiscountBtn} onPress={this.handleCutomerTagging} >
               <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
                 <Image source={require('../../commonUtils/assets/Images/tag_customer_icon.png')} />
                 <Text style={Device.isTablet ? styles.cancelButtonText_tablet : styles.cancelButtonText_mobile}>{I18n.t("CUSTOMER TAGGING")}</Text>
               </View>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
           {this.state.customerTagging && (
             <View>
@@ -515,14 +710,14 @@ export default class GenerateReturnSlip extends Component {
                       onChangeText={(text) => this.handleCustomerNumber(text)}
                     />
                     {!this.state.customerNumberValid && (
-                      <Message imp={true} message={this.state.errors[ "customerNumber" ]} />
+                      <Message imp={true} message={this.state.errors["customerNumber"]} />
                     )}
                     <View style={forms.action_buttons_container}>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                         onPress={() => this.customerTag()}>
                         <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
                         onPress={() => this.modelCancel()}>
                         <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>
@@ -532,12 +727,12 @@ export default class GenerateReturnSlip extends Component {
               </Modal>
             </View>
           )}
-          {this.state.itemsReturn && (
+          {this.state.returnInvoice && this.state.returnInvoice.length > 0 && (
             <>
               <>
                 <View style={{ flex: 1, flexDirection: 'row' }}>
                   <Text style={Device.isTablet ? styles.headerText_tablet : styles.hederText_mobile}>{I18n.t("List Of Items For Return -")} </Text>
-                  <Text style={[ textStyle, { color: color.accent, fontSize: RF(16) } ]}>{('0' + this.state.returnInvoice.length).slice(-2)} </Text>
+                  <Text style={[textStyle, { color: color.accent, fontSize: RF(16) }]}>{('0' + this.state.returnInvoice.length).slice(-2)} </Text>
                 </View>
                 <FlatList
                   style={{ marginTop: 20, marginBottom: 20 }}
@@ -545,104 +740,93 @@ export default class GenerateReturnSlip extends Component {
                   scrollEnabled={true}
                   renderItem={({ item, index }) => (
                     <>
-                      <View style={[ flatListMainContainer, { backgroundColor: color.white } ]}>
-                        <TouchableOpacity onPress={(e) => this.itemSelected(e, index, item)} style={{ width: 20, height: 20 }}>
-                          <Image style={{}} source={
-                            //require('../assets/images/chargeunselect.png')}
-                            item.isSelected ?
-                              require('../../commonUtils/assets/Images/checkbox_checked.png') :
-                              require('../../commonUtils/assets/Images/checkbox_uncheck.png')} />
-                        </TouchableOpacity>
+                      <View style={[flatListMainContainer, { backgroundColor: color.white }]}>
+                        {this.state.returnInvoice.length > 1 && quantity >= 1 &&
+                          <TouchableOpacity onPress={(e) => this.itemSelected(e, index, item)} style={{ width: 20, height: 20 }}>
+                            <Image style={{}} source={
+                              //require('../assets/images/chargeunselect.png')}
+                              item.isChecked ?
+                                require('../../commonUtils/assets/Images/checkbox_checked.png') :
+                                require('../../commonUtils/assets/Images/checkbox_uncheck.png')} />
+                          </TouchableOpacity>}
                         <View style={flatlistSubContainer}>
                           <View style={textContainer}>
                             <Text style={textStyleMediumColor}>{I18n.t("Item")}</Text>
-                            <Text style={textStyleMedium}>{item.barCode}</Text>
+                            <Text style={textStyleMediumColor}>{I18n.t("Barcode")} :
+                              <Text style={textStyleMedium}>{" " + item.barcode}</Text></Text>
                           </View>
                           <View style={textContainer}>
                             <Text style={textStyleMediumColor}> {I18n.t("QTY")}</Text>
-                            {item.isSelected && (
-                              <Text style={textStyleMediumColor}> return</Text>
-                            )}
-                            <Text style={textStyleMediumColor}>{I18n.t("MRP")}</Text>
+                            {this.state.returnInvoice.length >= 1 && this.state.quantity >= 1 &&
+                              <Text style={textStyleMediumColor}> {I18n.t("RETURN QTY")}</Text>}
                           </View>
                           <View style={textContainer}>
                             <Text style={textStyleMedium}>{item.quantity}</Text>
-                            {item.isSelected && (
-                              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <TouchableOpacity
-                                  onPress={() => this.incrementForTable(item, index)}>
-                                  <IconMA name="plus-circle-outline" size={20} color={"red"} />
-                                </TouchableOpacity>
-                                <TextInput
-                                  style={{
-                                    justifyContent: 'center',
-                                    // height: Device.isTablet ? 50 : 30,
-                                    // width: Device.isTablet ? 50 : 30,
-                                    color: '#ED1C24',
-                                    fontFamily: 'regular',
-                                    fontSize: Device.isTablet ? 22 : 12,
-                                  }}
-                                  underlineColorAndroid="transparent"
-                                  placeholderTextColor="#ED1C24"
-                                  value={('0' + item.returnQty).slice(-2)}
-                                  onChangeText={(text) => this.updateQty(text, index, item)}
-
-                                />
-                                <TouchableOpacity
-                                  onPress={() => this.decreamentForTable(item, index)}>
-                                  <IconMA name="minus-circle-outline" size={20} color={"red"} />
-                                </TouchableOpacity>
-                              </View>
-                            )}
-                            <Text style={textStyleMedium}>₹ {item.value + '.00'}</Text>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                              {this.state.returnInvoice.length > 1 && item.quantity >= 1 &&
+                                <Text style={textStyleMedium}>{item.returnQty}</Text>
+                              }
+                              {this.state.returnInvoice.length === 1 && item.quantity > 1 &&
+                                <>
+                                  <TouchableOpacity
+                                    onPress={() => this.incrementForTable(item, index)}>
+                                    <IconMA name="plus-circle-outline" size={20} color={"red"} />
+                                  </TouchableOpacity>
+                                  <TextInput
+                                    style={{
+                                      justifyContent: 'center',
+                                      // height: Device.isTablet ? 50 : 30,
+                                      // width: Device.isTablet ? 50 : 30,
+                                      color: '#ED1C24',
+                                      fontFamily: 'regular',
+                                      fontSize: Device.isTablet ? 22 : 12,
+                                    }}
+                                    underlineColorAndroid="transparent"
+                                    placeholderTextColor="#ED1C24"
+                                    value={('0' + item.returnQty).slice(-2)}
+                                    onChangeText={(text) => this.updateQty(text, index, item)}
+                                  />
+                                  <TouchableOpacity
+                                    onPress={() => this.decreamentForTable(item, index)}>
+                                    <IconMA name="minus-circle-outline" size={20} color={"red"} />
+                                  </TouchableOpacity>
+                                </>
+                              }
+                              {this.state.returnInvoice.length === 1 && (item.quantity === 1) && this.state.quantity === 1 &&
+                                <Text style={textStyleMedium}>{item.quantity}</Text>}
+                            </View>
                           </View>
                           <View style={textContainer}>
-                            <Text style={textStyleMediumColor}>MRP</Text>
-                            <Text style={textStyleMediumColor}>Promo</Text>
-                            <Text style={textStyleMediumColor}>GV</Text>
-                            <Text style={textStyleMediumColor}>Manual</Text>
+                            <Text style={textStyleMediumColor}>{I18n.t("MRP")}</Text>
+                            <Text style={textStyleMediumColor}>{I18n.t("PROMO")}</Text>
+                            <Text style={textStyleMediumColor}>{I18n.t("GV")}</Text>
+                            <Text style={textStyleMediumColor}>{I18n.t("MANUAL")}</Text>
                           </View>
                           <View style={textContainer}>
-                            <Text style={textStyleMedium}>{item.mrp}</Text>
-                            <Text style={textStyleMedium}>{item.promoDiscount ? item.promoDiscount : 0}</Text>
-                            <Text style={textStyleMedium}>{item.gvAppiled ? item.gvAppiled : 0}</Text>
-                            <Text style={textStyleMedium}>{item.manualDiscount ? item.manualDiscount : 0}</Text>
+                            <Text style={textStyleMedium}>₹{item.mrp}</Text>
+                            <Text style={textStyleMedium}>₹{item.promoDiscount ? item.promoDiscount : 0}</Text>
+                            <Text style={textStyleMedium}>₹{item.gvAppiled ? item.gvAppiled : 0}</Text>
+                            <Text style={textStyleMedium}>₹{item.manualDiscount ? item.manualDiscount : 0}</Text>
+                          </View>
+                          <View style={textContainer}>
+                            <Text style={textStyleMediumColor}> {I18n.t("VALUE")}</Text>
+                            <Text style={textStyleMediumColor}> {I18n.t("PER/QUANTITY")}</Text>
+                          </View>
+                          <View style={textContainer}>
+                            <Text style={textStyleMedium}>₹{item.netValue}</Text>
+                            <Text style={textStyleMedium}>₹{item.netValue / item.quantity}</Text>
                           </View>
                         </View>
                       </View>
-                      {/* <View style={Device.isTablet ? flats.flatlistContainer_tablet : flats.flatlistContainer_mobile} >
-                    <View style={Device.isTablet ? flats.flatlistSubContainer_tablet : flats.flatlistSubContainer_mobile}>
-                      <View style={flats.text}>
-                        <TouchableOpacity onPress={(e) => this.itemSelected(e, index, item)} style={{ position: 'relative', top: 60, left: 10, width: 20, height: 20 }}>
-                          <Image style={{ position: 'absolute', top: 0, left: 0, }} source={
-                            //require('../assets/images/chargeunselect.png')}
-                            item.isSelected ? require('../assets/images/selected.png') : require('../assets/images/langunselect.png')} />
-                        </TouchableOpacity>
-                        <View style={{ marginLeft: 60 }}>
-                          <Image source={require('../assets/images/default.jpeg')}
-                            //source={{ uri: item.image }}
-                            style={{
-                              width: Device.isTablet ? 140 : 90, height: Device.isTablet ? 140 : 90,
-                            }} />
-                          <Text style={[Device.isTablet ? flats.flatlistTextAccent_tablet : flats.flatlistTextAccent_mobile, { marginLeft: 30, marginTop: 10 }]}>S.NO: {index + 1}</Text>
-                        </View>
-                      </View>
-                      <View style={[flats.text, { marginRight: Device.isTablet ? 20 : 0 }]}>
-                        <Text style={Device.isTablet ? flats.flatlistTextCommon_tablet : flats.flatlistTextCommon_mobile}>BARCODE: {item.barCode}</Text>
-                        <Text style={Device.isTablet ? flats.flatlistTextCommon_tablet : flats.flatlistTextCommon_mobile}>QTY: {item.quantity}</Text>
-                        <Text style={Device.isTablet ? flats.flatlistText_tablet : flats.flatlistText_mobile}>PRICE: {item.value}</Text>
-                      </View>
-                    </View>
-                  </View> */}
                     </>
                   )}
                 />
               </>
               <View style={{ backgroundColor: "#F8F8F8" }}>
-                <Text style={[ styles.textAccentStyle, { alignSelf: 'center', marginLeft: RF(0) } ]}>{I18n.t("Return summary")}</Text>
+                <Text style={[styles.textAccentStyle, { alignSelf: 'center', marginLeft: RF(0) }]}>{I18n.t("Return summary")}</Text>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text style={[ styles.textAccentStyle, { color: color.black, fontSize: RF(14), marginLeft: RF(10) } ]}>{I18n.t("Retrun Amount")} </Text>
-                  <Text style={[ styles.textAccentStyle, { color: color.black, fontSize: RF(14), marginRight: RF(10) } ]}> ₹ {this.state.returnSlipTotal + '.00'} </Text>
+                  <Text style={[styles.textAccentStyle, { color: color.black, fontSize: RF(14), marginLeft: RF(10) }]}>{I18n.t("Retrun Amount")} </Text>
+                  <Text style={[styles.textAccentStyle, { color: color.black, fontSize: RF(14), marginRight: RF(10) }]}> ₹ {this.state.returnSlipTotal} </Text>
                 </View>
                 <Text style={styles.headings}>{I18n.t("Return For Reason")} </Text>
                 <View style={Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile}>
@@ -665,7 +849,7 @@ export default class GenerateReturnSlip extends Component {
                   />
                 </View>
                 {!this.state.reasonValid && (
-                  <Message imp={true} message={this.state.errors[ "reason" ]} />
+                  <Message imp={true} message={this.state.errors["reason"]} />
                 )}
                 <Text style={styles.headings}>{I18n.t("Comments")}</Text>
                 <TextInput
@@ -680,7 +864,7 @@ export default class GenerateReturnSlip extends Component {
                   onChangeText={(text) => this.handleReasonDesc(text)}
                 />
                 <TouchableOpacity
-                  style={[ Device.isTablet ? styles.signInButton_tablet : styles.signInButton_mobile, { width: deviceWidth - 40, height: Device.isTablet ? 60 : 50 } ]}
+                  style={[Device.isTablet ? styles.signInButton_tablet : styles.signInButton_mobile, { width: deviceWidth - 40, height: Device.isTablet ? 60 : 50 }]}
                   onPress={(item, index) => this.generateNewSlip(item, index)}
                 >
                   <Text
@@ -758,7 +942,7 @@ export default class GenerateReturnSlip extends Component {
               <Modal style={{ margin: 0 }} isVisible={this.state.modelVisible}
                 onBackButtonPress={() => this.modelCancel()}
                 onBackdropPress={() => this.modelCancel()} >
-                <View style={[ Device.isTablet ? styles.filterMainContainer_tablet : styles.filterMainContainer_mobile, { height: Device.isTablet ? 300 : 250, backgroundColor: '#00aa00', marginTop: Device.isTablet ? deviceheight - 300 : deviceheight - 250 } ]}>
+                <View style={[Device.isTablet ? styles.filterMainContainer_tablet : styles.filterMainContainer_mobile, { height: Device.isTablet ? 300 : 250, backgroundColor: '#00aa00', marginTop: Device.isTablet ? deviceheight - 300 : deviceheight - 250 }]}>
                   <View>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
                       <View>
@@ -781,9 +965,9 @@ export default class GenerateReturnSlip extends Component {
                       <Text style={{ fontSize: Device.isTablet ? 24 : 19, fontFamily: 'medium', }} selectable={true}>{this.state.resultData}</Text>
                     </View>
                     <TouchableOpacity
-                      style={[ Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile, { borderColor: '#00aa00', } ]} onPress={() => this.modelCancel()}
+                      style={[Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile, { borderColor: '#00aa00', }]} onPress={() => this.modelCancel()}
                     >
-                      <Text style={[ Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile, { color: '#00aa00' } ]}  > {I18n.t("BACK TO DASHBOARD")} </Text>
+                      <Text style={[Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile, { color: '#00aa00' }]}  > {I18n.t("BACK TO DASHBOARD")} </Text>
                     </TouchableOpacity>
                   </View>
                 </View>

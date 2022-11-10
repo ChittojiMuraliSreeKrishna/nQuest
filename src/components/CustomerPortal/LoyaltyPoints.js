@@ -258,7 +258,7 @@ export default class LoyaltyPoints extends Component {
                                             <View style={scss.textContainer}>
                                                 <Text style={scss.textStyleLight}> {I18n.t("NAME")}:
                                                     <Text style={scss.textStyleMedium}>
-                                                        {item.customerName}
+                                                        {" "+item.customerName}
                                                     </Text>
                                                 </Text>
                                                 <Text style={scss.textStyleLight}>
@@ -268,6 +268,9 @@ export default class LoyaltyPoints extends Component {
                                             <View style={scss.textContainer}>
                                                 <Text style={scss.textStyleLight}>
                                                     {I18n.t("LOYALTY POINTS	")}: ₹{item.loyaltyPoints}
+                                                </Text>
+                                                <Text style={scss.textStyleLight}>
+                                                    {I18n.t("POINTS VALUE")}: 0
                                                 </Text>
                                             </View>
                                             {/* <View style={scss.textContainer}>

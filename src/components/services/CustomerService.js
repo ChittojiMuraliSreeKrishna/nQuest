@@ -93,8 +93,8 @@ class CustomerService {
     return axios.post(BASE_URL + "/new-sale/newsale/saveGv", saveobj);
   }
 
-  getReturnSlip() {
-    return BASE_URL + "/new-sale/newsale/getInvoiceDetails";
+  getReturnSlipDetails(obj) {
+    return axios.post(BASE_URL + "/new-sale/newsale/getInvoiceDetails", obj);
   }
 
   saveRetunSlip() {

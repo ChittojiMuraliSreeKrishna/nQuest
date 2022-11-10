@@ -1728,8 +1728,8 @@ class GenerateInvoiceSlip extends Component {
           this.state.customerTagging && (
             <View style={{ backgroundColor: color.white }}>
               <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
-              //  onBackButtonPress={() => this.modelCancel()}
-              //   onBackdropPress={() => this.modelCancel()}
+               onBackButtonPress={() => this.modelCancel()}
+                onBackdropPress={() => this.modelCancel()}
               >
                 <View style={forms.filterModelContainer}>
                   <Text style={forms.popUp_decorator}>-</Text>
@@ -1778,8 +1778,8 @@ class GenerateInvoiceSlip extends Component {
           this.state.handleBillDiscount && (
             <View>
               <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
-              // onBackButtonPress={() => this.billDiscountModelCancel()}
-              //   onBackdropPress={() => this.billDiscountModelCancel()} 
+              onBackButtonPress={() => this.billDiscountModelCancel()}
+                onBackdropPress={() => this.billDiscountModelCancel()} 
               >
                 <View style={[forms.filterModelContainer, { width: '100%' }]}>
                   <Text style={forms.popUp_decorator}>-</Text>
