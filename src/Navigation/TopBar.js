@@ -66,11 +66,12 @@ export class TopBar extends Component {
       refresh: true,
       privilages: [],
       headerNames: [],
-      isClient: false
+      isClient: false,
+      storeName: ""
     };
   }
 
-  _renderItem (previlage) {
+  _renderItem(previlage) {
     return (
       <TouchableOpacity
         style={scss.dropdown_items}
@@ -79,7 +80,7 @@ export class TopBar extends Component {
           global.homeButtonClicked = false;
           global.profileButtonClicked = false;
           this.props.navigation.navigate(
-            screenMapping[ currentSelection ],
+            screenMapping[currentSelection],
             this.refresh(),
           );
           this.renderSubHeadings(previlage.item);
@@ -96,7 +97,7 @@ export class TopBar extends Component {
   }
 
   //Before screen render
-  async componentWillMount () {
+  async componentWillMount() {
     currentSelection = "";
     var storeStringId = "";
     displayName = "";
@@ -104,7 +105,11 @@ export class TopBar extends Component {
     var domainStringId = "";
     // this.props.navigation.navigate('Login')
   }
-  async componentDidMount () {
+  async componentDidMount() {
+    AsyncStorage.getItem("storeName").then((value) => {
+      console.log({ value }, "storeNme")
+      this.setState({ storeName: storeName })
+    })
     AsyncStorage.getItem("storeId")
       .then((value) => {
         storeStringId = value;
@@ -141,7 +146,7 @@ export class TopBar extends Component {
     this.getPrivileges();
   }
 
-  async getPrivileges () {
+  async getPrivileges() {
     await AsyncStorage.getItem("roleType").then((value) => {
       if (value === "super_admin") {
         let privilegesSet = new Set();
@@ -171,14 +176,14 @@ export class TopBar extends Component {
                 let len = mobilePriv.length;
                 if (len > 0) {
                   this.setState({
-                    firstDisplayName: mobilePriv[ 0 ].name,
+                    firstDisplayName: mobilePriv[0].name,
                   });
                   const firstDisplayName = this.state.firstDisplayName;
                   console.log({ firstDisplayName });
-                  firstDisplayRoute = mobilePriv[ 0 ].name;
+                  firstDisplayRoute = mobilePriv[0].name;
                   var privilegesSet = new Set();
                   for (let i = 0; i < len; i++) {
-                    let previlage = mobilePriv[ i ];
+                    let previlage = mobilePriv[i];
                     if (previlage.name === "Dashboard") {
                       global.previlage1 = "Dashboard";
                     }
@@ -234,30 +239,30 @@ export class TopBar extends Component {
     }, initialValue);
   };
 
-  async getData () {
+  async getData() {
     const { firstDisplayName, firstDisplayNameScreen } = this.state;
     console.log("data in get data", firstDisplayName, currentSelection);
     this.setState({ privilages: [] }, () => {
       if (currentSelection === "") {
         currentSelection = firstDisplayName;
         this.setState({
-          firstDisplayNameScreen: screenMapping[ firstDisplayName ],
+          firstDisplayNameScreen: screenMapping[firstDisplayName],
           privilages: []
         });
         this.props.navigation.navigate(
-          screenMapping[ firstDisplayName ],
+          screenMapping[firstDisplayName],
           this.renderSubHeadings(firstDisplayName)
         );
       } else if (firstDisplayRoute === currentSelection) {
         this.props.navigation.navigate(
-          screenMapping[ firstDisplayRoute ],
+          screenMapping[firstDisplayRoute],
           this.renderSubHeadings(firstDisplayName)
         );
       }
     });
   }
 
-  async renderSubHeadings (privilegeName) {
+  async renderSubHeadings(privilegeName) {
     console.log({ privilegeName });
     this.setState({ headerNames: [], privilages: [] }, async () => {
       await AsyncStorage.getItem("rolename").then(value => {
@@ -270,15 +275,15 @@ export class TopBar extends Component {
               var mobileSubPriv = isClient ? finalSubResult.web : finalSubResult.mobile;
               let len = mobileSubPriv.length;
               for (let i = 0; i < len; i++) {
-                let privilege = mobileSubPriv[ i ];
+                let privilege = mobileSubPriv[i];
                 if (privilege.name === String(privilegeName)) {
                   let privilegeId = privilege.id;
                   let sublen = privilege.subPrivileges.length;
                   let subPrivileges = privilege.subPrivileges;
                   console.log(subPrivileges, "TopSubPrev");
                   for (let i = 0; i < sublen; i++) {
-                    if (privilegeId === subPrivileges[ i ].parentPrivilegeId) {
-                      let routes = subPrivileges[ i ].name;
+                    if (privilegeId === subPrivileges[i].parentPrivilegeId) {
+                      let routes = subPrivileges[i].name;
                       this.state.headerNames.push({ name: routes });
                       console.log("Header Names", this.state.headerNames);
                     }
@@ -288,18 +293,18 @@ export class TopBar extends Component {
                       if (j === 0) {
                         this.state.privilages.push({
                           bool: true,
-                          name: this.state.headerNames[ j ].name,
+                          name: this.state.headerNames[j].name,
                         });
                       } else {
                         this.state.privilages.push({
                           bool: false,
-                          name: this.state.headerNames[ j ].name,
+                          name: this.state.headerNames[j].name,
                         });
                       }
                     }
                   });
                   await this.setState({ privilages: this.state.privilages }, () => {
-                    this.props.navigation.navigate(String(this.state.privilages[ 0 ].name));
+                    this.props.navigation.navigate(String(this.state.privilages[0].name));
                     console.log(this.state.privilages, "TopPtiv");
                   });
                 }
@@ -311,7 +316,7 @@ export class TopBar extends Component {
     });
   }
 
-  groupBySubPrivileges (array) {
+  groupBySubPrivileges(array) {
     let initialValue = {
       mobile: [],
       web: []
@@ -322,61 +327,61 @@ export class TopBar extends Component {
     }, initialValue);
   }
 
-  async componentWillUnmount () {
+  async componentWillUnmount() {
     await this.setState({ privilages: [] });
   }
 
-  modalHandle () {
+  modalHandle() {
     this.setState({ modalVisibleData: !this.state.modalVisibleData });
   }
 
-  refresh () {
+  refresh() {
     console.log("inside refresh");
     this.setState({ refresh: !this.state.refresh });
   }
 
-  modalHandle () {
+  modalHandle() {
     this.setState({ modalVisibleData: !this.state.modalVisibleData });
   }
 
-  popupHandle () {
+  popupHandle() {
     this.setState({ popupModel: !this.state.popupModel });
   }
 
 
-  openProfilePopup () {
+  openProfilePopup() {
     this.setState({ popupModel: true });
   }
 
-  settingsNavigate () {
+  settingsNavigate() {
     this.props.navigation.push("Settings");
     this.setState({ popupModel: false });
   }
 
-  selectStoreNavigate () {
+  selectStoreNavigate() {
     this.props.navigation.navigate("SelectStore");
     this.setState({ popupModel: false });
   }
 
-  selectClientNavigate () {
+  selectClientNavigate() {
     this.props.navigation.navigate("SelectClient");
     this.setState({ popupModel: false });
   }
 
-  logoutNavigation () {
+  logoutNavigation() {
     this.props.navigation.push("Login");
     this.setState({ popupModel: false });
   }
 
-  handleSubHeaderNavigation (value, index) {
-    if (this.state.privilages[ index ].bool === true) {
-      this.state.privilages[ index ].bool = false;
+  handleSubHeaderNavigation(value, index) {
+    if (this.state.privilages[index].bool === true) {
+      this.state.privilages[index].bool = false;
     } else {
-      this.state.privilages[ index ].bool = true;
+      this.state.privilages[index].bool = true;
     }
     for (let i = 0; i < this.state.privilages.length; i++) {
       if (index != i) {
-        this.state.privilages[ i ].bool = false;
+        this.state.privilages[i].bool = false;
       }
       this.setState({ privilages: this.state.privilages }, () => {
         const { privilages } = this.state;
@@ -387,7 +392,7 @@ export class TopBar extends Component {
   }
 
 
-  render () {
+  render() {
     displayName =
       currentSelection === "" ? this.state.firstDisplayName : currentSelection;
     console.log(
@@ -409,7 +414,7 @@ export class TopBar extends Component {
             <View style={scss.titleSubContainer}>
               <TouchableOpacity onPress={() => this.openProfilePopup()}
                 style={scss.profileToggleBtn}>
-                <Text style={[ scss.heading_title, { fontWeight: "bold" } ]}>
+                <Text style={[scss.heading_title, { fontWeight: "bold" }]}>
                   {global.username}
                 </Text>
                 <Icon
@@ -433,6 +438,9 @@ export class TopBar extends Component {
               <View style={scss.popUp}>
                 <Text style={scss.popUp_decorator}>-</Text>
                 <View style={scss.popupModelContainer}>
+                  <View style={scss.popUpButtons}>
+                    <TEXT variant="labelMedium" style={[scss.popUpText, { textAlign: 'left' }]}>Role: <Text style={{ color: '#ED1C24' }}>{global.userrole}</Text> </TEXT>
+                  </View>
                   <TouchableOpacity onPress={() => this.settingsNavigate()} style={scss.popUpButtons}>
                     <IconMA
                       name="person-outline"
@@ -442,32 +450,32 @@ export class TopBar extends Component {
                     <TEXT variant="labelMedium" style={scss.popUpText}>Profile</TEXT>
                   </TouchableOpacity>
                   {global.userrole === "client_support" ?
-                    <TouchableOpacity style={[ scss.popUpButtons ]} onPress={() => this.selectClientNavigate()}>
+                    <TouchableOpacity style={[scss.popUpButtons]} onPress={() => this.selectClientNavigate()}>
                       <IconMA
                         name="people-outline"
                         size={25}
                         style={scss.popUpIcons}
                       ></IconMA>
-                      <TEXT variant="labelMedium" style={[ scss.popUpText ]}>Select Client</TEXT>
-                    </TouchableOpacity >
+                      <TEXT variant="labelMedium" style={[scss.popUpText]}>Select Client</TEXT>
+                    </TouchableOpacity>
                     :
                     <TouchableOpacity onPress={() => this.selectStoreNavigate()}
-                      style={[ scss.popUpButtons ]}>
+                      style={[scss.popUpButtons]}>
                       <IconMA
                         name="storefront"
                         size={25}
                         style={scss.popUpIcons}
                       ></IconMA>
-                      <TEXT variant="labelMedium" style={[ scss.popUpText ]}>Select Store</TEXT>
+                      <TEXT variant="labelMedium" style={[scss.popUpText]}>Select Store</TEXT>
                     </TouchableOpacity>}
-                  <TouchableOpacity onPress={() => this.logoutNavigation()} style={[ scss.popUpButtons ]}>
+                  <TouchableOpacity onPress={() => this.logoutNavigation()} style={[scss.popUpButtons]}>
                     <IconMA
                       name="logout"
                       color="#ED1C24"
                       size={25}
                       style={scss.popUpIcons}
                     ></IconMA>
-                    <TEXT variant="labelMedium" style={[ scss.popUpText, { color: "#ED1C24" } ]}>Logout</TEXT>
+                    <TEXT variant="labelMedium" style={[scss.popUpText, { color: "#ED1C24" }]}>Logout</TEXT>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -535,10 +543,10 @@ export class TopBar extends Component {
             style={headers.pageNavigationContainer}
             renderItem={({ item, index }) => (
               <View>
-                <TouchableOpacity style={[ headers.pageNavigationBtn, {
+                <TouchableOpacity style={[headers.pageNavigationBtn, {
                   borderColor: item.bool ? "#ed1c24" : "#d7d7d7",
                   borderBottomWidth: item.bool ? 3 : 0
-                } ]} onPress={() => this.handleSubHeaderNavigation(item.name, index)}>
+                }]} onPress={() => this.handleSubHeaderNavigation(item.name, index)}>
                   <Text style={headers.pageNavigationBtnText}>{item.name}</Text>
                 </TouchableOpacity>
               </View>

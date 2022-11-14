@@ -27,12 +27,12 @@ export default class SelectStore extends React.Component {
     };
   }
 
-  handleBackButtonClick () {
+  handleBackButtonClick() {
     this.props.navigation.goBack();
     return true;
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     const userId = await AsyncStorage.getItem("userId");
     this.setState({ userId: userId }, () => {
       this.getstores();
@@ -42,7 +42,7 @@ export default class SelectStore extends React.Component {
     this.setState({ storeId: storeId });
   }
 
-  async getstores () {
+  async getstores() {
     LoginService.getSelectStores(this.state.userId).then(res => {
       if (res?.data) {
         let stores = [];
@@ -58,7 +58,7 @@ export default class SelectStore extends React.Component {
     });
   }
 
-  getSelected () {
+  getSelected() {
     this.state.storesData.map((item, index) => {
       if (parseInt(item.id) === parseInt(this.state.storeId)) {
         this.setState({ selectedItem: index });
@@ -66,7 +66,7 @@ export default class SelectStore extends React.Component {
     });
   }
 
-  letsGoButtonAction () {
+  letsGoButtonAction() {
     if (this.state.selectedItem === null) {
       alert("Select Atleast one Store");
     } else {
@@ -77,6 +77,12 @@ export default class SelectStore extends React.Component {
 
   selectStoreName = (item, index) => {
     this.setState({ selectedItem: index });
+    console.log({ item })
+    AsyncStorage.setItem("storeName", String(item.name)).then((value) => {
+    }).catch(() => {
+      this.setState({ loading: false });
+      console.log('There is error saving storeName');
+    });
     AsyncStorage.setItem("storeId", String(item.id)).then((value) => {
     }).catch(() => {
       this.setState({ loading: false });
@@ -94,7 +100,7 @@ export default class SelectStore extends React.Component {
   };
 
 
-  render () {
+  render() {
     console.log(this.state.storesData);
     return (
       <View>

@@ -48,7 +48,7 @@ class CustomerService {
     let params = esnumber + flag + storeId;
     console.log({ params });
     if (flag) {
-      const param = '?dsNumber=' + esnumber;
+      const param = '?dsNumber=' + esnumber + '&storeId=' + storeId;
       const url = BASE_URL + NEW_SALE_URL.getDslipData + param
       console.log("url get Dsslip", url);
       return axios.get(url);
