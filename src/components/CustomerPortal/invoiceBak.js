@@ -518,6 +518,8 @@ class GenerateInvoiceSlip extends Component {
           } else {
             if (isEstimationEnable) {
               this.setState({ barCodeList: res.data.lineItems, dsNumber: '', dsNumberList2: [] });
+            } else {
+              this.setState({ barCodeList: res.data.barcode, dsNumber: '', dsNumberList2: [] });
             }
           }
           this.state.barCodeList.forEach((barCode, index) => {
@@ -578,24 +580,12 @@ class GenerateInvoiceSlip extends Component {
         } else {
           let count = false;
           let barcodesList = []
-          this.state.dlslips.push(res.data.lineItems);
-          const flattened = this.state.dlslips.flatMap(barCode => barCode);
-          const barList = flattened.filter(
-            (test, index, array) =>
-              index ===
-              array.findIndex((findTest) => findTest.barCode === test.barCode)
-          );
-          this.setState({ barCodeList: barList });
-          // alert(this.state.dlslips.length)
-          // }
-          if (this.state.dlslips.length > 1) {
-            console.log({ flattened })
-            const barList = flattened.filter(
-              (test, index, array) =>
-                index ===
-                array.findIndex((findTest) => findTest.barCode === test.barCode)
-            );
-
+          if (this.state.dlslips.length === 0) {
+            this.state.dlslips.push(res.data.lineItems);
+            const flattened = this.state.dlslips.flatMap(barCode => barCode);
+            this.setState({ barCodeList: flattened })
+          }
+          else {
             for (let i = 0; i < this.state.barCodeList.length; i++) {
               if (
                 this.state.barCodeList[i].barCode ===
@@ -625,10 +615,7 @@ class GenerateInvoiceSlip extends Component {
                 this.setState({ barCodeList: barList });
               }
             }
-          } else {
-            this.setState({ barCodeList: res.data.lineItems })
           }
-          // this.setState({ dsNumber: '' });
           this.setState({ barCodeList: this.state.barCodeList, dsNumber: '' });
           this.state.barCodeList.forEach((barCode, index) => {
             if (barCode.qty > 1) {
@@ -1658,7 +1645,7 @@ class GenerateInvoiceSlip extends Component {
                     color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 30, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
                     fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
                   }}>
-                    { this.state.barCodeList.length} </Text>
+                    {this.state.isEstimationEnable ? this.state.barCodeList.length : this.state.totalQuantity || 0} </Text>
                   <Text style={{
                     color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 60, justifyContent: 'center', textAlign: 'center', marginTop: 10,
                     fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
