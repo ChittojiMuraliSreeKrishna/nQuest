@@ -16,6 +16,7 @@ import { Chevron } from 'react-native-shapes';
 import { default as MinusIcon, default as PlusIcon, default as ScanIcon } from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
+import PrintService from '../../commonUtils/Printer/printService';
 import PrivilagesList from '../../commonUtils/PrivilagesList';
 import { RF, RW } from '../../Responsive';
 import { customerErrorMessages } from '../Errors/errors';
@@ -23,6 +24,7 @@ import Message from '../Errors/Message';
 import CustomerService from '../services/CustomerService';
 import { color } from '../Styles/colorStyles';
 import { inputField } from '../Styles/FormFields';
+import { sucessBtn, sucessBtnText } from '../Styles/PopupStyles';
 import { listEmptyMessage } from '../Styles/Styles';
 
 var deviceWidth = Dimensions.get('window').width;
@@ -198,10 +200,10 @@ class GenerateInvoiceSlip extends Component {
       handleCheckPromo: false,
       mrpAmount: 0,
       isCredit: false,
-
-      customerTagAllow: false
-
-      toDay: moment(new Date()).format("YYYY-MM-DD").toString()
+      customerTagAllow: false,
+      toDay: moment(new Date()).format("YYYY-MM-DD").toString(),
+      showPrinter: false,
+      printerIp: "",
 
     };
   }
@@ -1418,6 +1420,27 @@ class GenerateInvoiceSlip extends Component {
     );
   }
 
+  // Printer Functions
+  handleViewPrinter() {
+    this.setState({ showPrinter: true });
+  }
+
+  handlePrinterIp = (text) => {
+    this.setState({ printerIp: text });
+  };
+
+  connectPrinter() {
+    AsyncStorage.setItem("printerIp", String(this.state.printerIp)).then(() => {
+      this.setState({ showPrinter: false, loading: true });
+      PrintService('start', 'print').then(() => {
+        this.setState({ loading: false, printEnabled: true });
+      }).catch((err) => {
+        this.setState({ loading: false, printEnabled: false });
+        alert(err);
+      });
+    });
+  }
+
   render() {
     return (
       <View style={{ flex: 1 }}>
@@ -1449,6 +1472,40 @@ class GenerateInvoiceSlip extends Component {
                   <Message imp={true} message={this.state.errors["dsNumber"]} />
                 )}
               </View>
+              <TouchableOpacity style={{ width: '90%', marginHorizontal: '5%', height: 35, borderWidth: 2, borderColor: '#6f6f6f', borderRadius: 5 }} onPress={() => this.handleViewPrinter()}>
+                <Text style={{ textAlign: 'center', marginVertical: 5, fontSize: 16, fontWeight: 'bold', color: '#6f6f6f' }}>Connect Printer</Text>
+              </TouchableOpacity>
+
+              {this.state.showPrinter && (
+                <View>
+                  <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
+                    onBackButtonPress={() => this.modelCancel()}
+                    onBackdropPress={() => this.modelCancel()} >
+                    <View style={forms.filterModelContainer}>
+                      <Text style={forms.popUp_decorator}>-</Text>
+                      <View style={forms.filterModelSub}>
+                        <View style={{ alignItems: 'center', marginTop: 20 }}>
+                          <Text>Printer IP:</Text>
+                          <Text></Text>
+                          <TextInput style={{ width: '90%', marginLeft: '5%', marginRight: '5%' }}
+                            mode="flat"
+                            activeUnderlineColor='#000'
+                            underlineColor='#6f6f6f'
+                            placeholder="Printer ip"
+                            keyboardType={'number-pad'}
+                            value={this.state.printerIp}
+                            onChangeText={(text) => this.handlePrinterIp(text)} />
+                        </View>
+                        <TouchableOpacity
+                          style={sucessBtn} onPress={() => this.connectPrinter()}
+                        >
+                          <Text style={sucessBtnText}  > {I18n.t("Connect")} </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </Modal>
+                </View>
+              )}
 
               {this.state.barCodeList.length !== 0 && (
                 <ScrollView horizontal style={{ flexDirection: 'row' }}>
@@ -1704,7 +1761,7 @@ class GenerateInvoiceSlip extends Component {
                     color: "#2ADC09", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 60, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
                     fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
                   }}>
-                    ₹ {this.state.totalPromoDisc } </Text>
+                    ₹ {this.state.totalPromoDisc} </Text>
 
                   <Text style={{
                     color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 90, fontSize: 20, justifyContent: 'center', textAlign: 'center', marginTop: 10,

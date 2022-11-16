@@ -12,10 +12,12 @@ import RazorpayCheckout from 'react-native-razorpay';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import Loader from '../../commonUtils/loader';
+import PrintService from '../../commonUtils/Printer/printService';
 import LoginService from '../services/LoginService';
 import NewSaleService from '../services/NewSaleService';
 import PromotionsService from '../services/PromotionsService';
 import { color } from '../Styles/colorStyles';
+
 
 var deviceWidth = Dimensions.get('window').width;
 var deviceWidth = Dimensions.get('window').width;
@@ -1046,7 +1048,11 @@ class TextilePayment extends Component {
 
         // const cardAmount = this.state.isCard || this.state.isCardOrCash ? JSON.stringify(Math.round(this.state.ccCardCash)) : JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString());
         alert("Order created " + res.data["result"]);
-        if (this.state.isKhata === true || this.state.cardManual === true) {
+        if (this.state.isKhata === true) {
+          this.props.route.params.onGoBack();
+          this.props.navigation.goBack();
+        }
+        if (this.state.cardManual === true) {
           this.props.route.params.onGoBack();
           this.props.navigation.goBack();
         }
