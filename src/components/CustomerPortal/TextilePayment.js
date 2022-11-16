@@ -12,7 +12,6 @@ import RazorpayCheckout from 'react-native-razorpay';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import Loader from '../../commonUtils/loader';
-import PrintService from '../../commonUtils/Printer/printService';
 import LoginService from '../services/LoginService';
 import NewSaleService from '../services/NewSaleService';
 import PromotionsService from '../services/PromotionsService';
@@ -119,7 +118,7 @@ class TextilePayment extends Component {
       payingAmount: 0,
       grandNetAmount: 0,
       sufCash: true,
-      billLevelDisc: 0
+      billLevelDisc: 0,
     };
   }
 
@@ -419,7 +418,7 @@ class TextilePayment extends Component {
       this.getCardModel()
       this.cancelCardModel()
     } else {
-      this.setState({ cashAmount: grandNetAmount })
+      this.setState({ cashAmount: parseFloat(grandNetAmount) })
       this.manualCardPayment()
     }
   }
@@ -643,6 +642,10 @@ class TextilePayment extends Component {
 
   handlerecievedAmount = (text) => {
     this.setState({ recievedAmount: text });
+    if (this.state.isCardOrCash === true) {
+      let grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10))
+      this.setState({ ccCardCash: grandNetAmount - text })
+    }
   };
 
   handleGVNumber = (text) => {
@@ -673,11 +676,13 @@ class TextilePayment extends Component {
       else if (this.state.isCardOrCash === true) {
         if ((parseFloat(this.state.recievedAmount) < (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)))) {
           this.setState({
-            cardModelVisible: true,
+            // cardModelVisible: true,
             payingAmount: grandNetAmount,
-            cardAutoModel: true, verifiedCash: this.state.recievedAmount,
+            // cardAutoModel: true, 
+            verifiedCash: this.state.recievedAmount,
             grandNetAmount: 0
           });
+          this.pay()
         } else {
           alert(" Collected Cash Should be less than payable amount when it comes to Cash & Card Payment")
         }
@@ -697,49 +702,84 @@ class TextilePayment extends Component {
       gvNumber: this.state.promocode
     };
     gvNumbers.push(obj);
-    // console.log("promo params", this.state.clientId, gvNumbers);
+    let count = 0
+    this.state.giftCouponsList.length > 0 && this.state.giftCouponsList.map((item) => {
+      if (item.gvNumber === this.state.promocode) {
+        return count = 1
+      }
+    })
     if (this.state.promocode !== "") {
-      NewSaleService.getCoupons(this.state.clientId, gvNumbers).then(res => {
-        if (Array.isArray(res.data.result)) {
-          let grandAmount = this.state.totalAmount;
-          const couponsListList = res.data.result.map((item) => {
-            if (grandAmount > item.value) {
-              grandAmount = grandAmount - item.value;
-            } else if (grandAmount <= item.value) {
-              alert("Please purchase greater than coupon amount");
-              // this.setState({ promocode: "" });
-            }
-            this.setState({
-              totalAmount: grandAmount,
-              grandNetAmount: this.state.grandNetAmount - item.value,
-              couponAmount: this.state.couponAmount + item.value
-            });
-            let obj = {};
-            obj.gvNumber = item.gvNumber;
-            obj.value = item.value;
-            return obj;
-          })
-          this.setState({
-            giftCouponsList: [...this.state.giftCouponsList, couponsListList[0]],
-            promocode: ''
-          }, () => {
-            this.setState({
-              giftCouponsList: [...new Map(this.state.giftCouponsList.map((m) => [m.gvNumber, m])).values()]
+      if (count != 1) {
+        NewSaleService.getCoupons(this.state.clientId, gvNumbers).then(res => {
+          if (Array.isArray(res.data.result)) {
+            let grandAmount = this.state.totalAmount;
+            const couponsListList = res.data.result.map((item) => {
+              if (grandAmount > item.value) {
+                grandAmount = grandAmount - item.value;
+              } else if (grandAmount <= item.value) {
+                alert("Please purchase greater than coupon amount");
+                // this.setState({ promocode: "" });
+              }
+              this.setState({
+                totalAmount: grandAmount,
+                grandNetAmount: this.state.grandNetAmount - item.value,
+                couponAmount: this.state.couponAmount + item.value
+              });
+              let obj = {};
+              obj.gvNumber = item.gvNumber;
+              obj.value = item.value;
+              return obj;
             })
-          })
-        }
-        else {
-          alert(res.data.message);
-          this.setState({
-            promocode: ''
-          })
-        }
-        // }
-      });
+            this.setState({
+              giftCouponsList: [...this.state.giftCouponsList, couponsListList[0]],
+              promocode: ''
+            }, () => {
+              this.setState({
+                giftCouponsList: [...new Map(this.state.giftCouponsList.map((m) => [m.gvNumber, m])).values()]
+              })
+            })
+            // this.gvAccumulation()
+          }
+          else {
+            alert(res.data.message);
+            this.setState({
+              promocode: ''
+            })
+          }
+          // }
+        });
+      } else {
+        this.setState({ promocode: '' })
+      }
     } else {
       alert("Please Enter GV Number");
       this.setState({ promocode: '' })
     }
+  }
+
+  gvAccumulation() {
+    let grandAmount = this.state.totalAmount;
+    let sum = this.state.giftCouponsList.reduce((accumulator, current) => {
+      return accumulator += current.value;
+    }, 0);
+    this.setState({}, () => {
+      if (grandAmount > sum) {
+        this.setState({
+          totalAmount: grandAmount,
+          grandNetAmount: this.state.grandNetAmount - sum,
+          couponAmount: this.state.couponAmount + sum
+        });
+      }
+      else if (grandAmount === sum) {
+        this.setState({
+          couponAmount: sum,
+          grandNetAmount: grandAmount - sum,
+        }, () => {
+        });
+      } else {
+        toast.error("Please purchase greater than coupon amount")
+      }
+    });
   }
 
   applyRedem() {
@@ -807,6 +847,7 @@ class TextilePayment extends Component {
       dsNumber: ''
     });
   }
+
   pay = () => {
     var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString();
     var obj;
@@ -921,20 +962,12 @@ class TextilePayment extends Component {
       };
       this.state.paymentType.push(obj);
     }
-    else if (this.state.isCardOrCash === true) {
-      const obj = {
-        "paymentAmountType": [
-          {
-            "paymentType": "Cash",
-            "paymentAmount": parseFloat(this.state.verifiedCash)
-          },
-          {
-            "paymentType": "Card",
-            "paymentAmount": this.state.ccCardCash
-          }]
-      };
-      this.state.paymentType.push(obj);
-    }
+    // else if (this.state.isCardOrCash === true) {
+    //   const obj = {
+
+    //   };
+    //   this.state.paymentType.push(obj);
+    // }
     // else if (this.state.isKhata === true) {
     //   const obj = {
     //     "paymentType": "PKTPENDING",
@@ -983,7 +1016,16 @@ class TextilePayment extends Component {
       "createdBy": this.state.createdBy,
       "recievedAmount": this.state.recievedAmount,
       "returnAmount": this.state.returnAmount,
-      "paymentAmountType": this.state.paymentType,
+      "paymentAmountType": this.state.isCardOrCash === true ?
+        [{
+          "paymentType": "Cash",
+          "paymentAmount": parseFloat(this.state.recievedAmount)
+        },
+        {
+          "paymentType": "Card",
+          "paymentAmount": this.state.ccCardCash
+        }]
+        : this.state.paymentType,
       "returnSlipNumbers": this.state.numRtList,
       "returnSlipAmount": (this.state.rtAmount === null ? 0 : this.state.rtAmount),
       "gvAppliedAmount": (this.state.couponAmount === null ? 0 : this.state.couponAmount),
@@ -997,7 +1039,6 @@ class TextilePayment extends Component {
     axios.post(NewSaleService.createOrder(), obj).then((res) => {
       console.log("Invoice data", JSON.stringify(res.data));
       if (res.data && res.data["isSuccess"] === "true") {
-        PrintService('INVOICE', res.data.result, this.state.barCodeList, obj)
         // const cardAmount = this.state.isCard || this.state.isCardOrCash ? JSON.stringify(Math.round(this.state.ccCardCash)) : JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString());
         alert("Order created " + res.data["result"]);
         if (this.state.isKhata === true || this.state.cardManual === true) {
@@ -1671,15 +1712,6 @@ class TextilePayment extends Component {
               <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 10 }}> {('CASH SUMMARY')} </Text>
             )}
 
-            {/* {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.verifiedCash > 1 && (
-
-              <TouchableOpacity
-                style={{ borderRadius: 5, width: 90, height: 20, alignSelf: 'flex-end', marginTop: -20 }}
-                onPress={() => this.clearCashSammary()} >
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('CLEAR')} </Text>
-              </TouchableOpacity>
-            )} */}
-
             {(this.state.isCash === true || this.state.isCardOrCash === true) && (
               <TextInput style={styles.input}
                 underlineColor="transparent"
@@ -1774,101 +1806,6 @@ class TextilePayment extends Component {
 
               </View>
             )}
-
-            {/* {this.state.isCardOrCash === true && (
-              <TextInput style={styles.input}
-                underlineColor="transparent"
-                activeUnderlineColor='#000'
-                label="Recieved Amount"
-                value={this.state.recievedAmount}
-                //  onEndEditing
-                onChangeText={(text) => this.handlerecievedAmount(text)} />
-              // onEndEditing={() => this.endEditing()}
-            )}
-
-            {this.state.isCardOrCash === true && this.state.giftvoucher === "" && this.state.loyaltyPoints === "" && this.state.verifiedCash === 0 && (
-              <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
-                onPress={() => this.verifycash()} >
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>
-              </TouchableOpacity>
-            )}
-
-            {this.state.isCardOrCash === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash === 0 && (
-              <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
-                onPress={() => this.verifycash()} >
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>
-              </TouchableOpacity>
-            )}
-
-            {this.state.isCardOrCash === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints === "" && this.state.verifiedCash === 0 && (
-              <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
-                onPress={() => this.verifycash()} >
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>
-              </TouchableOpacity>
-            )}
-
-            {this.state.isCardOrCash === true && this.state.giftvoucher === "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash === 0 && (
-              <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
-                onPress={() => this.verifycash()} >
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>
-              </TouchableOpacity>
-            )}
-
-            {this.state.isCardOrCash === true && this.state.giftvoucher === "" && this.state.loyaltyPoints === "" && this.state.verifiedCash !== 0 && (
-              <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
-              >
-                <Image style={{ position: 'absolute', right: Device.isTablet ? 83 : 68, top: Device.isTablet ? 11 : 9 }} source={require('../assets/images/applied.png')} />
-
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
-
-              </TouchableOpacity>
-            )}
-
-            {this.state.isCardOrCash === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash !== 0 && (
-              <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
-              >
-                <Image style={{ position: 'absolute', right: Device.isTablet ? 83 : 68, top: Device.isTablet ? 11 : 9 }} source={require('../assets/images/applied.png')} />
-
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
-
-              </TouchableOpacity>
-            )}
-
-            {this.state.isCardOrCash === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints === "" && this.state.verifiedCash !== 0 && (
-              <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
-              >
-                <Image style={{ position: 'absolute', right: Device.isTablet ? 83 : 68, top: Device.isTablet ? 11 : 9 }} source={require('../assets/images/applied.png')} />
-
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
-
-              </TouchableOpacity>
-            )}
-
-            {this.state.isCardOrCash === true && this.state.giftvoucher === "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash !== 0 && (
-              <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
-              >
-                <Image style={{ position: 'absolute', right: Device.isTablet ? 83 : 68, top: Device.isTablet ? 11 : 9 }} source={require('../assets/images/applied.png')} />
-
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
-
-              </TouchableOpacity>
-            )}
-
-            {this.state.isCardOrCash === true && this.state.verifiedCash !== 0 && (
-              <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10 }}> RETURN AMOUNT  ₹{this.state.returnAmount} </Text>
-
-              </View>
-            )} */}
-
 
             {this.state.flagredeem && (
               <View>
@@ -2270,7 +2207,7 @@ class TextilePayment extends Component {
                   color: "#2ADC09", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
                   fontSize: Device.isTablet ? 19 : 14,
                 }}>
-                  ₹  {this.state.couponDiscount} </Text>
+                  ₹  {this.state.totalPromoDisc} </Text>
               </View>
 
               <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
@@ -2283,7 +2220,7 @@ class TextilePayment extends Component {
                   color: "#353C40", fontFamily: "bold", alignItems: 'center', fontSize: 20, justifyContent: 'center', textAlign: 'center',
                   fontSize: 20,
                 }}>
-                  ₹ {this.state.grandNetAmount}
+                  ₹ {this.state.grandNetAmount + '.00'}
                 </Text>
               </View>
               {
