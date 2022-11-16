@@ -5,11 +5,12 @@ import EscPosPrinter from 'react-native-esc-pos-printer';
 
 const PrintService = async (type, barcode, object, invoiceTax) => {
   console.log({ type, object, barcode, invoiceTax });
-  // var object = [ { sno: 1, barcode: 'bar-enca93', quantity: 4, itemMrp: 4000, itemDiscount: 5000, totalMrp: 11000 } ];
+  // var object = [{ sno: 1, barcode: 'bar-enca93', quantity: 4, itemMrp: 4000, itemDiscount: 5000, totalMrp: 11000 }]; // for Testing
   try {
     const targetIp = await AsyncStorage.getItem("printerIp");
     console.log(`TCP:${targetIp}`);
 
+    // Initilizing Printer
     await EscPosPrinter.init({
       target: `TCP:${targetIp}`,
       seriesName: 'EPOS2_TM_M30',
@@ -24,7 +25,7 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
 
     const printing = new EscPosPrinter.printing();
     const printer = await printing;
-    if (type === 'start') {
+    if (type === 'start') {  // For Connecting
       printer.initialize();
       printer.align('center');
       printer.size(2, 2);
@@ -34,7 +35,7 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       printer.cut();
       printer.addPulse();
       printer.send();
-    } else if (type === 'DSNUM') {
+    } else if (type === 'DSNUM') { // For Delivery Slip
       let dsNum = barcode;
       printer.initialize();
       printer.align('center');
@@ -51,12 +52,12 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       printer.line('S.NO    BARCODE      QTY    MRP   DISC    AMOUNT');
       printer.size(0, 0);
       printer.line('________________________________________________');
-      printer.newline();
+      printer.newline(); // Print Style 1
       for (let i = 0; i < object.length; i++) {
         printer.line(' ' + String(parseInt(i) + 1) + '    ' + object[i].barcode + '      ' + object[i].quantity + '     ' + object[i].itemMrp + '     ' + object[i].itemDiscount + '      ' + object[i].totalMrp);
         printer.line('------------------------------------------------');
       }
-      // printer.newline();
+      // printer.newline(); // Print Style 2
       // for (let i = 0; i < object.length; i++) {
       //   printer.line('S.NO:' + String(parseInt(i) + 1) + ', BARCODE:' + object[ i ].barcode + ', QTY:' + object[ i ].quantity + '\n' + 'MRP:' + object[ i ].itemMrp + ', DISC:' + object[ i ].itemDiscount + ', AMOUNT' + object[ i ].totalMrp);
       //   printer.line('------------------------------------------------');
@@ -97,7 +98,7 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       printer.cut();
       printer.addPulse();
       printer.send();
-    } else if (type === "INVOICE") {
+    } else if (type === "INVOICE") { // For Invoice
       let esNum = barcode;
       printer.initialize();
       printer.align('center');
@@ -119,8 +120,16 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       printer.align('left');
       printer.text('SmNumber: ' + '\n');
       printer.text('________________________________________________\n');
-      printer.text('CUSTOMER NAME: ' + invoiceTax.tagCustomerName + '\n');
-      printer.text('Mobile: ' + invoiceTax.mobileNumber + '\n');
+      if (invoiceTax.tagCustomerName) {
+        printer.text('CUSTOMER NAME: ' + invoiceTax.tagCustomerName + '\n');
+      } else {
+        printer.text('CUSTOMER NAME: ' + '' + '\n');
+      }
+      if (invoiceTax.mobileNumber) {
+        printer.text('Mobile: ' + invoiceTax.mobileNumber + '\n');
+      } else {
+        printer.text('Mobile: ' + '' + '\n');
+      }
       printer.text('________________________________________________\n');
       printer.bold(false);
       printer.align('center');
@@ -139,8 +148,7 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       printer.align('left');
       printer.text('Gross Amount: ');
       printer.align('right');
-      printer.text(invoiceTax.Amount);
-      printer.text('\n');
+      printer.text('' + invoiceTax.Amount + '\n');
       printer.align('left');
       printer.text('Promo Discount: ' + invoiceTax.totalPromoDisc +
         '\n');
@@ -149,27 +157,35 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       if (invoiceTax.returnSlipAmount > 0) {
         printer.text('RT Amount: ' + invoiceTax.returnSlipAmount + '\n');
       }
-      // if (invoiceTax.gvAppliedAmount > 0) {
-      // printer.text('Coupon Amount: ' + invoiceTax.gvAppliedAmount + '\n');
-      // }
-      // printer.line('________________________________________________');
-      // printer.newline();
-      // printer.text('Total Amount: ' + invoiceTax.netPayableAmount + '\n');
-      // printer.line('________________________________________________');
-      // printer.text('Tax  \n');
-      // printer.line('________________________________________________');
-      // printer.text('SGST: ' + invoiceTax.sgst + '\n');
-      // printer.text('CGST: ' + invoiceTax.cgst + '\n');
-      // printer.line('________________________________________________');
-      // printer.text('Net Total(tax inc): ' + invoiceTax.netPayableAmount + '\n');
-      // printer.line('________________________________________________');
-      printer.barcode({
-        value: esNum,
+      if (invoiceTax.gvAppliedAmount > 0) {
+        printer.text('Coupon Amount: ' + invoiceTax.gvAppliedAmount + '\n');
+      }
+      printer.line('________________________________________________');
+      printer.newline();
+      printer.text('Total Amount: ' + invoiceTax.netPayableAmount + '\n');
+      printer.line('________________________________________________');
+      printer.text('Tax  \n');
+      printer.line('________________________________________________');
+      printer.text('SGST: ' + invoiceTax.sgst + '\n');
+      printer.text('CGST: ' + invoiceTax.cgst + '\n');
+      printer.line('________________________________________________');
+      printer.text('Net Total(tax inc): ' + invoiceTax.netPayableAmount + '\n');
+      printer.line('________________________________________________');
+      printer.align('center')
+      printer.barcode({ // For Barcode
+        // value: esNum,
+        value: "ES113u8241u12",
         type: 'EPOS2_BARCODE_CODE93',
         hri: 'EPOS2_HRI_BELOW',
         width: 3,
         height: 70,
       });
+      printer.qrcode({ // For QRCode
+        // value: esNum,
+        value: 'ES113u8241u12',
+        level: 'EPOS2_LEVEL_M',
+        width: 7,
+      })
       printer.newline(2);
       printer.size(1, 1);
       printer.text('THANK YOU');

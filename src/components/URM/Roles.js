@@ -52,7 +52,7 @@ export default class Roles extends Component {
     };
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     this.setState({ clientId: clientId });
     this.getRolesList();
@@ -62,14 +62,14 @@ export default class Roles extends Component {
   }
 
   // Refreshing the List
-  refresh () {
+  refresh() {
     this.setState({ rolesData: [] }, () => {
       this.getRolesList();
     });
   }
 
   // Getting Roles List
-  getRolesList () {
+  getRolesList() {
     this.setState({ rolesData: [], loading: true });
     const { clientId, pageNumber } = this.state;
     UrmService.getAllRoles(clientId, pageNumber).then((res) => {
@@ -86,12 +86,12 @@ export default class Roles extends Component {
   }
 
   // Filter Section
-  filterAction () {
+  filterAction() {
     this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
   // Create Role Navigation
-  navigateToCreateRoles () {
+  navigateToCreateRoles() {
     this.props.navigation.navigate("CreateRole", {
       isEdit: false,
       navText: "Add Role",
@@ -101,13 +101,13 @@ export default class Roles extends Component {
   }
 
   // Filter Clear Action
-  clearFilterAction () {
+  clearFilterAction() {
     this.setState({ filterActive: false, createdDate: '', role: '', createdBy: '' });
     this.getRolesList();
   }
 
   // Filter Cancel Action
-  modelCancel () {
+  modelCancel() {
     this.setState({ modalVisible: false });
   }
 
@@ -122,7 +122,7 @@ export default class Roles extends Component {
   };
 
   // Created Date Action
-  datepickerClicked () {
+  datepickerClicked() {
     this.setState({ datepickerOpen: true });
   }
 
@@ -143,7 +143,7 @@ export default class Roles extends Component {
   };
 
   // Apply Filter Action
-  applyRoleFilter () {
+  applyRoleFilter() {
     const { role, createdBy, createdDate } = this.state;
     this.setState({ loading: true });
     const searchRole = {
@@ -154,19 +154,20 @@ export default class Roles extends Component {
     // console.log(searchRole);
     UrmService.getRolesBySearch(searchRole).then((res) => {
       // console.log(res.data);
-      if (res && res.data && res.data[ 'status' ] === 200) {
+      if (res && res.data && res.data['status'] === 200) {
         let rolesList = res.data.result;
         // console.log({ rolesList });
         this.setState({ filterRolesData: rolesList, filterActive: true });
       }
       else {
+        this.setState({ filterRolesData: [], filterActive: true })
         alert(res && res.data && res.data.message);
       }
       this.setState({ loading: false, modalVisible: false, role: '', createdBy: '' });
     });
   }
 
-  groupBySubPrivileges (array) {
+  groupBySubPrivileges(array) {
     let initialValue = {
       mobile: [],
       web: []
@@ -178,7 +179,7 @@ export default class Roles extends Component {
   }
 
   // Edit Role Action
-  async handleeditrole (item, index) {
+  async handleeditrole(item, index) {
     var parentPrivilegesResult;
     await UrmService.getPrivillagesByRoleName(item.roleName).then(async (res) => {
       if (res) {
@@ -197,7 +198,7 @@ export default class Roles extends Component {
     });
   }
 
-  render () {
+  render() {
     const { filterActive, rolesData, filterRolesData } = this.state;
     return (
       <View>
@@ -354,11 +355,11 @@ export default class Roles extends Component {
                     </View>
                   )}
                   <View style={forms.action_buttons_container}>
-                    <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                       onPress={() => this.applyRoleFilter()}>
                       <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
                       onPress={() => this.modelCancel()}>
                       <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                     </TouchableOpacity>

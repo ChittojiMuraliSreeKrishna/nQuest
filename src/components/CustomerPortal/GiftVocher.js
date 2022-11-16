@@ -2,7 +2,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React, { Component } from 'react';
 import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import DatePicker from 'react-native-date-picker';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -10,14 +9,13 @@ import Modal from 'react-native-modal';
 import { TextInput } from 'react-native-paper';
 import FilterIcon from 'react-native-vector-icons/FontAwesome';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
-import { dateFormat } from '../../commonUtils/DateFormate';
 import DateSelector from '../../commonUtils/DateSelector';
 import { RF, RH, RW } from '../../Responsive';
 import { customerErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
 import CustomerService from '../services/CustomerService';
 import { color } from '../Styles/colorStyles';
-import { datePicker, datePickerBtnText, datePickerButton1, datePickerButton2, dateSelector, dateText, inputField, submitBtn, submitBtnText } from '../Styles/FormFields';
+import { dateSelector, dateText, inputField, submitBtn, submitBtnText } from '../Styles/FormFields';
 import { flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleLight, textStyleMedium } from '../Styles/Styles';
 
 
@@ -253,7 +251,7 @@ class GiftVocher extends Component {
   }
 
   filterAction() {
-    this.setState({ flagFilterOpen: true, modalVisible: true, filterActive: true });
+    this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
   modelCancel() {
@@ -272,11 +270,15 @@ class GiftVocher extends Component {
       this.setState({
         filterVouchersData: res.data.result,
         filterActive: true, searchQuery: "", modalVisible: false,
-        flagFilterOpen: false, filterStartDate: "", filterEndDate: ""
+        flagFilterOpen: false, filterStartDate: "", filterEndDate: "", filterActive: true
       });
     }).catch((err) => {
       this.setState({ modalVisible: false, flagFilterOpen: false, searchQuery: "", filterStartDate: "", filterEndDate: "" });
     });
+  }
+
+  clearFilter() {
+    this.setState({filterVouchersData: [], filterStartDate: "", filterEndDate: "", filterGvNumber: ""})
   }
 
   validationField() {
@@ -328,7 +330,7 @@ class GiftVocher extends Component {
         <ScrollView>
           {this.state.flagFilterOpen &&
             <View>
-              <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
+              <Modal style={{ margin: 0 }} isVisible={this.state.flagFilterOpen}
                 onBackButtonPress={() => this.modelCancel()}
                 onBackdropPress={() => this.modelCancel()} >
                 <View style={forms.filterModelContainer}>
@@ -406,10 +408,12 @@ class GiftVocher extends Component {
                 <Text style={[flatListTitle, { color: color.accent }]}>{I18n.t('Gift Vouchers')}</Text>
                 <TouchableOpacity
                   style={styles.filterBtnStyle}
-                  onPress={() => this.filterAction()} >
+                  onPress={() => this.state.filterActive ? this.clearFilter() : this.filterAction()} >
                   <FilterIcon
                     name="sliders"
-                    size={25} />
+                    size={25}
+                    color={this.state.filterActive ? '#ED1C24' : '#000'}
+                  />
                 </TouchableOpacity>
               </View>}
               data={this.state.filterVouchersData}

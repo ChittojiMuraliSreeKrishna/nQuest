@@ -94,13 +94,15 @@ class AddBarcode extends Component {
       date: new Date(),
       dynamicAttributes: [],
       dynamicAttributesName: "",
-      size: "",
+      selectedValue: "",
+      selectedDValue: "",
       brand: "",
       expiryDate: new Date(),
       expiryDateFruitsDomain: "",
       fabricType: "",
       fabricList: [],
-      isTaxIncluded: ''
+      isTaxIncluded: '',
+      alist: []
     };
   }
 
@@ -141,7 +143,7 @@ class AddBarcode extends Component {
           })
         ) : nulll;
         // }
-        this.setState({ dynamicAttributes: size, dynamicAttributesName: res.data[0].name, loading: false });
+        this.setState({ dynamicAttributes: size, dynamicAttributesName: res.data[0].name, loading: false, alist: res.data });
       } else {
         this.setState({ loading: false });
       }
@@ -294,9 +296,16 @@ class AddBarcode extends Component {
   };
 
   handleSize = (value, data) => {
-    console.log({ value, data });
-    this.setState({ size: value });
+    this.state.alist[0].selectedValue = value
+    this.setState({ alist: this.state.alist, selectedValue: value });
+    console.log({ value, data }, this.state.alist);
   };
+
+  handleSelectChange = (value, data) => {
+    this.state.alist[1].selectedValue = value
+    this.setState({ alist: this.state.alist, selectedDValue: value })
+    console.log({ value }, this.state.alist)
+  }
 
   // HSNCodes Actions
   getAllHSNCodes() {
@@ -539,9 +548,19 @@ class AddBarcode extends Component {
   saveBarcode() {
     // console.log(this.state.store);
     // this.setState({ loading: true });
+    this.state.alist.forEach((item, ind) => {
+      delete item.createdBy;
+      delete item.createdDate;
+      delete item.lastModifiedDate;
+      delete item.modifiedBy;
+      delete item.placeholder;
+      delete item.domainType;
+      delete item.id;
+    })
     const { selectedDomain, isEdit } = this.state;
     const isFormValid = this.validationForm();
     if (isFormValid) {
+      console.log(this.state.alist)
       // Checking for validations
       const params = {
         // status: selectedDomain === "Retail" ? this.state.status : null,
@@ -565,6 +584,7 @@ class AddBarcode extends Component {
         domainType: this.state.selectedDomain,
         vendorTax: this.state.vendorTax,
         barcode: this.state.barcode ? this.state.barcode : null,
+        metadata: this.state.alist
 
       };
       console.log({ params });
@@ -588,7 +608,7 @@ class AddBarcode extends Component {
           ToastAndroid.show(err, ToastAndroid.SHORT);
         });
     } else {
-      alert("Fill All Mandatory Fields");
+      alert("Please Enter All Mandatory Fields");
     }
   }
 
@@ -812,35 +832,69 @@ class AddBarcode extends Component {
               )}
             </View>
           )}
-          {this.state.dynamicAttributes.length > 0 && (
+          {this.state.alist !== null && this.state.alist.length > 0 && (
             <View>
-              <Text style={inputHeading}>{this.state.dynamicAttributesName}</Text>
-              <View
-                style={[
-                  rnPickerContainer,
-                  { borderColor: "#d6d6d6" },
-                ]}
-              >
-                <RNPickerSelect
-                  placeholder={{
-                    label: "Select",
-                  }}
-                  Icon={() => {
-                    return (
-                      <Chevron
-                        style={styles.imagealign}
-                        size={1.5}
-                        color={"gray"}
+              {/* <Text>hrys</Text> */}
+              {this.state.alist.map((items, index) => {
+                return (<View>
+                  {items.type === "select" && (
+                    <View>
+                      <Text style={inputHeading}>{items.name}</Text>
+                      <View
+                        style={[
+                          rnPickerContainer,
+                          { borderColor: "#d6d6d6" },
+                        ]}
+                      >
+                        <RNPickerSelect
+                          placeholder={{
+                            label: "Select",
+                          }}
+                          Icon={() => {
+                            return (
+                              <Chevron
+                                style={styles.imagealign}
+                                size={1.5}
+                                color={"gray"}
+                              />
+                            );
+                          }}
+                          items={items.values.map((item) => (
+                            { label: item, value: item }
+                          ))}
+                          onValueChange={(value, items) => this.handleSize(value, items)}
+                          style={rnPicker}
+                          value={this.state.selectedValue}
+                          useNativeAndroidPickerStyle={false}
+                        />
+                      </View>
+                    </View>
+                  )}
+                  {items.type === "input" && (
+                    <View>
+                      <Text style={inputHeading}>{items.name}</Text>
+                      <TextInput
+                        activeOutlineColor="#d6d6d6"
+                        mode="outlined"
+                        style={[
+                          forms.input_fld,
+                          forms.active_fld,
+                          {},
+                        ]}
+                        underlineColorAndroid="transparent"
+                        placeholder={items.name}
+                        placeholderTextColor={"#6f6f6f"}
+                        textAlignVertical="center"
+                        maxLength={12}
+                        outlineColor={"#d6d6d6"}
+                        autoCapitalize="none"
+                        value={this.state.selectedDValue}
+                        onChangeText={(value) => this.handleSelectChange(value, items)}
                       />
-                    );
-                  }}
-                  items={this.state.dynamicAttributes}
-                  onValueChange={(value, data) => this.handleSize(value, data)}
-                  style={rnPicker}
-                  value={this.state.size}
-                  useNativeAndroidPickerStyle={false}
-                />
-              </View>
+                    </View>
+                  )}
+                </View>)
+              })}
             </View>
           )}
           {this.state.selectedDomain === "FruitsAndVegetables" && ( // For groceries only
@@ -1153,27 +1207,6 @@ class AddBarcode extends Component {
             value={this.state.quantity}
             onBlur={this.handleQuantityValid}
             onChangeText={this.handleQuantity}
-          />
-          <Text style={inputHeading}>
-            Design Code <Text style={{ color: "#aa0000" }}>*</Text>{" "}
-          </Text>
-          <TextInput
-            activeOutlineColor="#000"
-            mode="outlined"
-            outlineColor={"#d6d6d6"}
-            style={[
-              forms.input_fld,
-              forms.active_fld,
-            ]}
-            underlineColorAndroid="transparent"
-            placeholder="Design Code"
-            placeholderTextColor={"#676767"}
-            textAlignVertical="center"
-            maxLength={12}
-            autoCapitalize="none"
-            value={this.state.designCode}
-            onBlur={() => this.handleDesignCodeValid()}
-            onChangeText={() => this.handleDesignCode()}
           />
           <Text style={inputHeading}>
             Barcode

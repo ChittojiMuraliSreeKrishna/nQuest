@@ -121,7 +121,10 @@ class EditBarcode extends Component {
       vendorTax: "",
       dynamicAttributes: [],
       dynamicAttributesName: "",
-      size: ""
+      size: "",
+      alist: [],
+      selectedValue: "",
+      selectedDValue: ""
     };
   }
 
@@ -143,7 +146,7 @@ class EditBarcode extends Component {
       reBar: editBcode.reBar,
       loading: true,
     });
-    console.log({ editBcode });
+    console.log({ editBcode }, editBcode.item.metadata[1].selectedValue);
     // alert(editBcode.item.vendorTax)
     this.setState(
       {
@@ -177,7 +180,10 @@ class EditBarcode extends Component {
         selectedStatus: editBcode.item.status,
         barcode: editBcode.item.barcode,
         designCode: editBcode.item.designcode,
-        vendorTax: String(editBcode.item.vendorTax)
+        vendorTax: String(editBcode.item.vendorTax),
+        alist: editBcode.item.metadata,
+        selectedValue: editBcode.item.metadata[0].selectedValue,
+        selectedDValue: editBcode.item.metadata[1].selectedValue,
       },
       () => {
         const { selectedDomain } = this.state;
@@ -371,6 +377,10 @@ class EditBarcode extends Component {
     return isFormValid;
   }
 
+  handleSelectChange = (value) => {
+    this.setState({ selectedDValue: value })
+  }
+
   // Saving Barcode
   saveBarcode() {
     console.log(this.state.store);
@@ -401,7 +411,7 @@ class EditBarcode extends Component {
         uom: this.state.uomName,
         domainType: this.state.selectedDomain,
         id: this.state.barcodeId,
-
+        metadata: this.state.alist
       };
       this.setState({ loading: true });
       console.log({ params });
@@ -863,6 +873,51 @@ class EditBarcode extends Component {
           </View>
           {!storeValid && (
             <Message imp={true} message={this.state.errors["store"]} />
+          )}
+          {this.state.alist !== null && this.state.alist.length > 0 && (
+            <View>
+              {/* <Text>hrys</Text> */}
+              {this.state.alist.map((items, index) => {
+                return (<View>
+                  {items.type === "select" && (
+                    <View>
+                      <Text style={inputHeading}>{items.name}</Text>
+                      <TextInput
+                        style={[
+                          forms.inactive_fld,
+                          forms.input_fld
+                        ]}
+                        editable={false}
+                        placeholder="Select"
+                        value={this.state.selectedValue}
+                      />
+                    </View>
+                  )}
+                  {items.type === "input" && (
+                    <View>
+                      <Text style={inputHeading}>{items.name}</Text>
+                      <TextInput
+                        activeOutlineColor="#d6d6d6"
+                        mode="outlined"
+                        style={[
+                          forms.input_fld,
+                          forms.inactive_fld,
+                          {},
+                        ]}
+                        underlineColorAndroid="transparent"
+                        placeholder={items.name}
+                        placeholderTextColor={"#6f6f6f"}
+                        textAlignVertical="center"
+                        outlineColor={"#d6d6d6"}
+                        value={this.state.selectedDValue}
+                        editable={false}
+                        onChangeText={(value) => this.handleSelectChange(value, items)}
+                      />
+                    </View>
+                  )}
+                </View>)
+              })}
+            </View>
           )}
           <Text style={inputHeading}>
             QTY <Text style={{ color: "#aa0000" }}>*</Text>{" "}

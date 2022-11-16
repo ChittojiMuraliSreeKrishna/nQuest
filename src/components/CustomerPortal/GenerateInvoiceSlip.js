@@ -54,6 +54,7 @@ class GenerateInvoiceSlip extends Component {
       modalVisible: true,
       customerTagging: false,
       handleBillDiscount: false,
+      billmodelPop: false,
       flagone: true,
       flagqtyModelOpen: false,
       flagCustomerOpen: false,
@@ -204,6 +205,10 @@ class GenerateInvoiceSlip extends Component {
     this.setState({ storeId: storeId });
     this.getDiscountReasons();
     this.getHsnDetails();
+    let data = "cbnaiucs234";
+    let data1 = [];
+    let data2 = [];
+    PrintService('INVOICE', data, data1, data2)
   }
 
 
@@ -235,14 +240,14 @@ class GenerateInvoiceSlip extends Component {
 
   modelCancel() {
     this.setState({
-      modalVisible: false, mobileNumber: ""
+      modalVisible: false, mobileNumber: "", billmodelPop: false, lineItemDelete: false, flagCustomerOpen: false, customerTagging: false
     });
   }
 
   billDiscountModelCancel() {
     this.setState({
       reasonDiscount: '', discApprovedBy: '', discountAmount: '',
-      discountAmountValid: true, modalVisible: false, handleBillDiscount: false
+      discountAmountValid: true, modalVisible: false, billmodelPop: false
     });
   }
 
@@ -289,16 +294,16 @@ class GenerateInvoiceSlip extends Component {
     }
     for (let i = 0; i < this.state.privilages.length; i++) {
       if (item.name === "Tag Customer") {
-        this.setState({ customerTagging: true, modalVisible: true, handleBillDiscount: false });
+        this.setState({ customerTagging: true, modalVisible: true, billmodelPop: false });
         this.state.privilages[1].bool = false;
         return;
       } else {
         this.setState({ customerTagging: false, modalVisible: false });
       }
       if (item.name === "Bill Level Discount") {
-        this.setState({ handleBillDiscount: true, modalVisible: true });
+        this.setState({ billmodelPop: true, modalVisible: true });
       } else {
-        this.setState({ handleBillDiscount: false, modalVisible: false });
+        this.setState({ billmodelPop: false, modalVisible: false });
       }
       if (item.name === "Check Promo Disc") {
         this.setState({ handleCheckPromo: true })
@@ -907,7 +912,7 @@ class GenerateInvoiceSlip extends Component {
       axios.get(CustomerService.getCustomerMobile() + "/" + obj.phoneNo).then((res) => {
         if (res) {
           const mobileData = res.data.result;
-          console.log({ mobileData }, res)
+          console.log({ mobileData }, res.data.result, this.state.barCodeList, obj)
           this.setState({
             userId: res.data.result.userId, customerFullName: res.data.result.userName
           });
@@ -932,14 +937,14 @@ class GenerateInvoiceSlip extends Component {
           CustomerService.getCreditNotes(this.state.mobileNumber, res.data.result.userId).then(response => {
             if (response) {
               if (response.data.result && response.data.result.length > 0) {
-                this.setState({ creditAmount: response.data.result[0].amount, isCredit: true });
+                this.setState({ creditAmount: response.data.result[0].amount, isCredit: true, customerTagging: false });
               }
             }
           });
 
         }
       }).catch(() => {
-        this.setState({ loading: false, mobileNumber: "" });
+        this.setState({ loading: false, mobileNumber: "", customerTagging: false });
         alert('Unable to get customer details');
       });
     }
@@ -1028,7 +1033,7 @@ class GenerateInvoiceSlip extends Component {
         const promDisc = parseInt(this.state.discountAmount) + this.state.totalPromoDisc;
         this.setState({ showDiscReason: true, promoDiscount: promDisc });
 
-        this.setState({ modalVisible: false },
+        this.setState({ billmodelPop: false, handleBillDiscount: true },
           () => {
             this.setState({ disableButton: true, reasonDiscount: "" });
             this.state.privilages[1].bool = false;
@@ -1426,7 +1431,7 @@ class GenerateInvoiceSlip extends Component {
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.handleBillDiscount ? color.disableBackGround : color.accent }]}
-                    onPress={() => this.setState({ handleBillDiscount: true, modalVisible: true, customerTagging: false, handleCheckPromo: false })}
+                    onPress={() => this.setState({ billmodelPop: true, modalVisible: true, customerTagging: false, handleCheckPromo: false })}
                     disabled={this.state.handleBillDiscount}>
                     <Text style={forms.button_text}>
                       {"Bill Level Discount"}
@@ -1476,7 +1481,7 @@ class GenerateInvoiceSlip extends Component {
 
               {this.state.lineItemDelete && (
                 <View>
-                  <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}
+                  <Modal isVisible={this.state.lineItemDelete} style={{ margin: 0 }}
                     onBackButtonPress={() => this.modelCancel()}
                     onBackdropPress={() => this.modelCancel()} >
                     <View style={[styles.filterMainContainer, { height: Device.isTablet ? 350 : 300, marginTop: Device.isTablet ? deviceHeight - 350 : deviceHeight - 300, backgroundColor: '#ED1C24' }]}>
@@ -1613,7 +1618,7 @@ class GenerateInvoiceSlip extends Component {
                               <View>
                                 <Text style={scss.textStyleLight}>{I18n.t("CGST")}
                                   {"\n"}
-                                  <Text style={scss.textStyleMedium}>{item.cgst ? Math.round(item.cgst) : 0}</Text>
+                                  <Text style={scss.textStyleMedium}>{item.cgst ? item.cgst : 0}</Text>
                                 </Text>
                               </View>
                               <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("SGST")}
@@ -1658,7 +1663,7 @@ class GenerateInvoiceSlip extends Component {
                     color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 30, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
                     fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
                   }}>
-                    { this.state.barCodeList.length} </Text>
+                    {this.state.barCodeList.length} </Text>
                   <Text style={{
                     color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 60, justifyContent: 'center', textAlign: 'center', marginTop: 10,
                     fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
@@ -1740,7 +1745,7 @@ class GenerateInvoiceSlip extends Component {
         {
           this.state.customerTagging && (
             <View style={{ backgroundColor: color.white }}>
-              <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
+              <Modal style={{ margin: 0 }} isVisible={this.state.customerTagging}
                 onBackButtonPress={() => this.modelCancel()}
                 onBackdropPress={() => this.modelCancel()}
               >
@@ -1788,9 +1793,9 @@ class GenerateInvoiceSlip extends Component {
           )
         }
         {
-          this.state.handleBillDiscount && (
+          this.state.billmodelPop && (
             <View>
-              <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
+              <Modal style={{ margin: 0 }} isVisible={this.state.billmodelPop}
                 onBackButtonPress={() => this.billDiscountModelCancel()}
                 onBackdropPress={() => this.billDiscountModelCancel()}
               >
@@ -1868,7 +1873,7 @@ class GenerateInvoiceSlip extends Component {
         {
           this.state.flagCustomerOpen && (
             <View style={{ backgroundColor: color.white }}>
-              <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible} onBackButtonPress={() => this.modelCancel()}
+              <Modal style={{ margin: 0 }} isVisible={this.state.flagCustomerOpen} onBackButtonPress={() => this.modelCancel()}
                 onBackdropPress={() => this.modelCancel()} >
                 <KeyboardAwareScrollView >
                   <View style={{

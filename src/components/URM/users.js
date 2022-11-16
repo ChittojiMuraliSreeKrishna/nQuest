@@ -53,7 +53,7 @@ export default class Users extends Component {
     };
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     this.setState({ clientId: clientId });
     console.log({ clientId });
@@ -64,14 +64,14 @@ export default class Users extends Component {
   }
 
   // Refresh Users
-  refresh () {
+  refresh() {
     this.setState({ usersList: [] }, () => {
       this.getAllUsers();
     });
   }
 
   // Get All Users
-  getAllUsers () {
+  getAllUsers() {
     this.setState({ usersList: [], loading: false });
     const { clientId, pageNumber } = this.state;
     UrmService.getAllUsers(clientId, pageNumber).then((res) => {
@@ -95,7 +95,7 @@ export default class Users extends Component {
 
   // Filter Actions
   // Applying Filter Action
-  applyUserFilter () {
+  applyUserFilter() {
     const { userType, role, branch, clientId, pageNumber } = this.state;
     const searchUser = {
       id: 0,
@@ -123,6 +123,7 @@ export default class Users extends Component {
             role: ""
           });
         } else {
+          this.setState({ filterUserList: [], filterActive: true })
           this.setState({ modalVisible: false });
           alert(res.data.message);
         }
@@ -146,20 +147,20 @@ export default class Users extends Component {
   };
 
   // Model Cancel
-  modelCancel () {
+  modelCancel() {
     this.setState({ modalVisible: false });
   }
 
   // Filter Button Actions
-  filterAction () {
+  filterAction() {
     this.setState({ flagFilterOpen: true, modalVisible: true });
   }
-  clearFilterAction () {
+  clearFilterAction() {
     this.setState({ filterActive: false, userType: "", role: "", branch: "" });
   }
 
   // Edit User Navigation
-  handleedituser (item, index) {
+  handleedituser(item, index) {
     this.props.navigation.navigate("AddUser", {
       item: item,
       isEdit: true,
@@ -169,7 +170,7 @@ export default class Users extends Component {
   }
 
   // Add User Navigation
-  handleAddUser (item, index) {
+  handleAddUser(item, index) {
     this.props.navigation.navigate("AddUser", {
       isEdit: false,
       onGoBack: () => this.refresh(),
@@ -177,7 +178,7 @@ export default class Users extends Component {
     });
   }
 
-  render () {
+  render() {
     return (
       <View>
         {this.state.loading && <Loader loading={this.state.loading} />}
@@ -270,9 +271,9 @@ export default class Users extends Component {
                       </Text>
                       <View style={scss.buttonContainer}>
                         {item.isActive ? (
-                          <Text style={[ scss.active_txt ]}>Active</Text>
+                          <Text style={[scss.active_txt]}>Active</Text>
                         ) : (
-                          <Text style={[ scss.inactive_txt ]}>In-Active</Text>
+                          <Text style={[scss.inactive_txt]}>In-Active</Text>
                         )}
                       </View>
                     </View>
@@ -367,11 +368,11 @@ export default class Users extends Component {
                       onChangeText={this.handleBranch}
                     />
                     <View style={forms.action_buttons_container}>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                         onPress={() => this.applyUserFilter()}>
                         <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
                         onPress={() => this.modelCancel()}>
                         <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>

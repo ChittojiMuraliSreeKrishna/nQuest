@@ -12,6 +12,7 @@ import RazorpayCheckout from 'react-native-razorpay';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import Loader from '../../commonUtils/loader';
+import PrintService from '../../commonUtils/Printer/printService';
 import LoginService from '../services/LoginService';
 import NewSaleService from '../services/NewSaleService';
 import PromotionsService from '../services/PromotionsService';
@@ -116,7 +117,9 @@ class TextilePayment extends Component {
       cardManual: false,
       khataAmount: 0,
       payingAmount: 0,
-      grandNetAmount: 0
+      grandNetAmount: 0,
+      sufCash: true,
+      billLevelDisc: 0
     };
   }
 
@@ -182,7 +185,8 @@ class TextilePayment extends Component {
       isTaxIncluded: this.props.route.params.isTaxIncluded,
       barCodeList: this.props.route.params.barCodeList,
       isCreditFlag: this.props.route.params.isCredit,
-      grandNetAmount: this.props.route.params.grandNetAmount
+      grandNetAmount: this.props.route.params.grandNetAmount - this.props.route.params.discountAmount,
+      billLevelDisc: this.props.route.params.discountAmount
     });
     this.setState({ isTagCustomer: this.props.route.params.customerPhoneNumber.length >= 10 ? true : false });
     // var qtyarr = [...this.state.barCodeList]
@@ -409,6 +413,7 @@ class TextilePayment extends Component {
   }
 
   saveCard() {
+    this.setState({})
     var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
     if (this.state.cardPaymentType === "Automatic") {
       this.getCardModel()
@@ -651,11 +656,12 @@ class TextilePayment extends Component {
       if (this.state.isCash === true && this.state.isCardOrCash === false) {
         if (parseFloat(this.state.recievedAmount) < grandNetAmount) {
           alert('Please collect sufficient amount');
+          this.setState({ sufCash: false })
         }
         else {
           if (parseFloat(this.state.recievedAmount) !== NaN) {
             this.setState({ returnAmount: parseFloat(this.state.recievedAmount) - parseFloat(this.state.totalAmount) });
-            this.setState({ verifiedCash: parseFloat(this.state.totalAmount), payingAmount: grandNetAmount, grandNetAmount: 0 });
+            this.setState({ verifiedCash: parseFloat(this.state.totalAmount), payingAmount: grandNetAmount, grandNetAmount: 0, sufCash: true });
           } else {
             alert('please enter only values')
           }
@@ -991,6 +997,7 @@ class TextilePayment extends Component {
     axios.post(NewSaleService.createOrder(), obj).then((res) => {
       console.log("Invoice data", JSON.stringify(res.data));
       if (res.data && res.data["isSuccess"] === "true") {
+        PrintService('INVOICE', res.data.result, this.state.barCodeList, obj)
         // const cardAmount = this.state.isCard || this.state.isCardOrCash ? JSON.stringify(Math.round(this.state.ccCardCash)) : JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString());
         alert("Order created " + res.data["result"]);
         if (this.state.isKhata === true || this.state.cardManual === true) {
@@ -1061,6 +1068,7 @@ class TextilePayment extends Component {
         alert("duplicate record already exists");
       }
     });
+
     // else if (global.domainName === "Retail") {
     //     let lineItems = [];
     //     this.state.retailBarCodeList.forEach((barCode, index) => {
@@ -1617,45 +1625,48 @@ class TextilePayment extends Component {
 
 
 
-            <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 10 }}> {('HAVE A COUPON CODE ?')} </Text>
-            {this.state.giftvoucher !== "" && (
-              <TouchableOpacity
-                style={{ borderRadius: 5, width: 90, height: 20, alignSelf: 'flex-end', marginTop: -20 }}
-                onPress={() => this.clearPromocode()} >
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('CLEAR')} </Text>
-              </TouchableOpacity>
-            )}
-            <TextInput style={styles.input}
-              underlineColor="transparent"
-              label="Enter coupon code"
-              activeUnderlineColor='#000'
-              value={this.state.promocode}
-              onChangeText={(text) => this.handlePromocode(text)}
-            // onEndEditing={() => this.applyPromocode()}
-            />
-            {this.state.giftvoucher === "" && (
-              <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
-                onPress={() => this.applyPromocode()} >
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('APPLY')} </Text>
-              </TouchableOpacity>
-            )}
+            {this.state.billLevelDisc === 0 && <View>
+              <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 10 }}> {('HAVE A COUPON CODE ?')} </Text>
+              {this.state.giftvoucher !== "" && (
+                <TouchableOpacity
+                  style={{ borderRadius: 5, width: 90, height: 20, alignSelf: 'flex-end', marginTop: -20 }}
+                  onPress={() => this.clearPromocode()} >
+                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('CLEAR')} </Text>
+                </TouchableOpacity>
+              )}
+              <TextInput style={styles.input}
+                underlineColor="transparent"
+                label="Enter coupon code"
+                activeUnderlineColor='#000'
+                value={this.state.promocode}
+                maxLength={8}
 
-            {this.state.giftvoucher !== "" && (
-              <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10 }}> {this.state.giftvoucher} </Text>
+                onChangeText={(text) => this.handlePromocode(text)}
+              // onEndEditing={() => this.applyPromocode()}
+              />
+              {this.state.giftvoucher === "" && (
+                <TouchableOpacity
+                  style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
+                  onPress={() => this.applyPromocode()} >
+                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('APPLY')} </Text>
+                </TouchableOpacity>
+              )}
 
-              </View>
-            )}
+              {this.state.giftvoucher !== "" && (
+                <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
+                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10 }}> {this.state.giftvoucher} </Text>
 
-            {this.state.giftvoucher !== "" && (
-              <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10 }}> {"Enter GV Number"} </Text>
+                </View>
+              )}
 
-              </View>
-            )}
+              {this.state.giftvoucher !== "" && (
+                <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
+                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10 }}> {"Enter GV Number"} </Text>
 
-
+                </View>
+              )}
+            </View>
+            }
             {(this.state.isCash === true || this.state.isCardOrCash === true) && (
               <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 10 }}> {('CASH SUMMARY')} </Text>
             )}
