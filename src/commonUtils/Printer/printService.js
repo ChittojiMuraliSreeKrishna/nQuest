@@ -84,7 +84,7 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       printer.line('Net Payable: ' + netpayable);
       printer.smooth();
       printer.newline();
-      printer.barcode({
+      printer.barcode({ // For Barcode
         value: dsNum,
         type: 'EPOS2_BARCODE_CODE93',
         hri: 'EPOS2_HRI_BELOW',
@@ -98,7 +98,12 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       printer.cut();
       printer.addPulse();
       printer.send();
-    } else if (type === "INVOICE") { // For Invoice
+    } else if (type === "Invoice") { // For Invoice
+      let esnum = barcode
+      alert(esnum)
+      console.log({ invoiceTax, object })
+    }
+    else if (type === "INVOICE") {
       let esNum = barcode;
       printer.initialize();
       printer.align('center');
@@ -120,13 +125,13 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       printer.align('left');
       printer.text('SmNumber: ' + '\n');
       printer.text('________________________________________________\n');
-      if (invoiceTax.tagCustomerName) {
-        printer.text('CUSTOMER NAME: ' + invoiceTax.tagCustomerName + '\n');
+      if (invoiceTax[0].tagCustomerName) {
+        printer.text('CUSTOMER NAME: ' + invoiceTax[0].tagCustomerName + '\n');
       } else {
         printer.text('CUSTOMER NAME: ' + '' + '\n');
       }
-      if (invoiceTax.mobileNumber) {
-        printer.text('Mobile: ' + invoiceTax.mobileNumber + '\n');
+      if (invoiceTax[0].mobileNumber) {
+        printer.text('Mobile: ' + invoiceTax[0].mobileNumber + '\n');
       } else {
         printer.text('Mobile: ' + '' + '\n');
       }
@@ -141,51 +146,52 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       printer.size(0, 0);
       printer.newline();
       for (let i = 0; i < object.length; i++) {
-        printer.line(' ' + String(parseInt(i) + 1) + '    ' + object[i].barcode + '      ' + object[i].quantity + '     ' + object[i].itemMrp + '     ' + object[i].itemDiscount + '      ' + object[i].totalMrp);
+        printer.line(' ' + String(parseInt(i) + 1) + '    ' + object[i].barCode + '      ' + object[i].quantity + '     ' + object[i].itemPrice + '     ' + (object[i].manualDiscount + object[i].promoDiscount) + '      ' + object[i].grossValue);
         printer.line('------------------------------------------------');
       }
       printer.newline();
       printer.align('left');
       printer.text('Gross Amount: ');
       printer.align('right');
-      printer.text('' + invoiceTax.Amount + '\n');
+      printer.text('' + invoiceTax[0].grossAmount + '\n');
       printer.align('left');
-      printer.text('Promo Discount: ' + invoiceTax.totalPromoDisc +
+      printer.text('Promo Discount: ' + invoiceTax[0].totalPromoDisc +
         '\n');
-      printer.text('Manual Discount: ' + invoiceTax.totalManualDisc +
+      printer.text('Manual Discount: ' + invoiceTax[0].totalManualDisc +
         '\n');
-      if (invoiceTax.returnSlipAmount > 0) {
-        printer.text('RT Amount: ' + invoiceTax.returnSlipAmount + '\n');
+      if (invoiceTax[0].returnSlipAmount > 0) {
+        printer.text('RT Amount: ' + invoiceTax[0].returnSlipAmount + '\n');
       }
-      if (invoiceTax.gvAppliedAmount > 0) {
-        printer.text('Coupon Amount: ' + invoiceTax.gvAppliedAmount + '\n');
+      if (invoiceTax[0].gvAppliedAmount > 0) {
+        printer.text('Coupon Amount: ' + invoiceTax[0].gvAppliedAmount + '\n');
       }
       printer.line('________________________________________________');
       printer.newline();
-      printer.text('Total Amount: ' + invoiceTax.netPayableAmount + '\n');
+      printer.text('Total Amount: ' + invoiceTax[0].netPayableAmount + '\n');
       printer.line('________________________________________________');
       printer.text('Tax  \n');
       printer.line('________________________________________________');
-      printer.text('SGST: ' + invoiceTax.sgst + '\n');
-      printer.text('CGST: ' + invoiceTax.cgst + '\n');
+      printer.text('SGST: ' + invoiceTax[0].sgst + '\n');
+      printer.text('CGST: ' + invoiceTax[0].cgst + '\n');
       printer.line('________________________________________________');
-      printer.text('Net Total(tax inc): ' + invoiceTax.netPayableAmount + '\n');
+      printer.text('Net Total(tax inc): ' + invoiceTax[0].netPayableAmount + '\n');
       printer.line('________________________________________________');
       printer.align('center')
       printer.barcode({ // For Barcode
-        // value: esNum,
-        value: "ES113u8241u12",
+        value: barcode,
+        // value: "ES113u8241u12",
         type: 'EPOS2_BARCODE_CODE93',
         hri: 'EPOS2_HRI_BELOW',
         width: 3,
         height: 70,
       });
-      printer.qrcode({ // For QRCode
-        // value: esNum,
-        value: 'ES113u8241u12',
-        level: 'EPOS2_LEVEL_M',
-        width: 7,
-      })
+      // printer.newline()
+      // printer.qrcode({ // For QRCode
+      //   value: barcode,
+      //   // value: 'ES113u8241u12',
+      //   level: 'EPOS2_LEVEL_M',
+      //   width: 7,
+      // })
       printer.newline(2);
       printer.size(1, 1);
       printer.text('THANK YOU');
