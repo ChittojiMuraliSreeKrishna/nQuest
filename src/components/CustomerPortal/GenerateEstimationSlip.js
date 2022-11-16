@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
+import moment from 'moment';
 import React, { Component } from 'react';
 import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import RNBeep from 'react-native-a-beep';
@@ -113,24 +114,36 @@ class GenerateEstimationSlip extends Component {
       printerIp: "10.80.2.53",
       showPrinter: false,
       printBtn: false,
-      printEnabled: false
+      printEnabled: false,
+      dayCloseDates: [],
+      toDay: moment(new Date()).format("YYYY-MM-DD").toString()
     };
   }
 
 
   async componentWillMount() {
     const storeId = await AsyncStorage.getItem("storeId");
-    console.log("stroeiddd", storeId);
     this.setState({ storeId: storeId, printBtn: false });
     const prinStat = await AsyncStorage.getItem("prinStat");
     if (prinStat === "ok") {
       this.setState({ printBtn: true, loading: false });
-    } else if (printStat === "no") {
+    } else if (prinStat === "no") {
       alert("failed to connect");
       this.setState({ loading: false });
     } else {
       this.setState({ loading: false });
     }
+    this.getallDates()
+  }
+
+  getallDates() {
+    CustomerService.getDates(this.state.storeId).then(res => {
+      if (res) {
+        if (res.data.length > 0) {
+          this.setState({ dayCloseDates: res.data });
+        }
+      }
+    });
   }
 
 
@@ -189,8 +202,14 @@ class GenerateEstimationSlip extends Component {
             if (barcodeData.barcode === promo.barcode) {
               if (promo.calculatedDiscountVo) {
                 if (promo.calculatedDiscountVo.discountAvailable) {
-                  barcodeData.itemDiscount = parseInt(promo.calculatedDiscountVo.calculatedDiscount);
-                  barcodeData.totalMrp = barcodeData.totalMrp - barcodeData.itemDiscount;
+                  if (promo.calculatedDiscountsVo.thisFixedAmountDiscount) {
+                    barcodeData.itemDiscount = parseInt(promo.calculatedDiscountVo.calculatedDiscount);
+                    barcodeData.totalMrp = barcodeData.totalMrp - barcodeData.itemDiscount;
+                  }
+                  else {
+                    barcodeData.itemDiscount = parseInt(promo.calculatedDiscountsVo.calculatedDiscount);
+                    barcodeData.totalMrp = barcodeData.totalMrp - barcodeData.itemDiscount;
+                  }
                 }
               } else {
                 barcodeData.itamDiscount = "No discount";
@@ -226,10 +245,15 @@ class GenerateEstimationSlip extends Component {
         "userId": parseInt(element.salesMan),
         "hsnCode": element.hsnCode,
         "actualValue": element.itemMrp,
-        "taxValue": element.taxValue,
-        "cgst": element.cgst,
-        "sgst": element.sgst,
-        "discount": (isNaN(element.itamDiscount) ? 0 : (parseInt(element.itamDiscount)))
+        "taxValue": element.taxValue * parseInt(element.quantity),
+        "igst": parseInt(element.igst) * parseInt(element.quantity),
+        "cgst": parseInt(element.cgst) * parseInt(element.quantity),
+        "sgst": parseInt(element.sgst) * parseInt(element.quantity),
+        "costPrice": element.costPrice,
+        "batchNo": element.batchNo,
+        "uom": element.uom,
+        "originalBarcodeCreatedAt": element.createdDate,
+        "discount": (isNaN(element.itemDiscount) ? 0 : (parseInt(element.itemDiscount)))
       };
       lineItem.push(obj);
     });
@@ -251,7 +275,7 @@ class GenerateEstimationSlip extends Component {
         salesMan: parseInt(this.state.smnumber),
         lineItems: this.state.lineItemsList,
         storeId: this.state.storeId,
-        barcode: this.state.barList
+        // barcode: this.state.barList
       };
       CustomerService.createDeliverySlip(createObj).then((res) => {
         if (res) {
@@ -314,76 +338,85 @@ class GenerateEstimationSlip extends Component {
     const { barcodeId, storeId, smnumber } = this.state;
     console.log("datataa", barcodeId, storeId, smnumber);
     let lineItem = [];
-    CustomerService.getDeliverySlip(barcodeId.trim(), storeId, smnumber).then(res => {
-      console.log({ res });
-      if (res.data) {
-        let totalAmount = 0;
-        let totalQty = 0;
-        let count = false;
-        RNBeep.beep();
-        if (res.data.qty === 0) {
-          alert(`this Barcode have ${parseInt(res.data.qty)} Items left`);
-        } else {
-          if (this.state.itemsList.length === 0) {
-            this.state.itemsList.push(res.data);
-          } else {
-            for (let i = 0; i < this.state.itemsList.length; i++) {
-              if (this.state.itemsList[i].barcode === res.data.barcode) {
-                count = true;
-                var items = [...this.state.itemsList];
-                if (parseInt(items[i].quantity) + 1 <= parseInt(items[i].qty)) {
-                  let addItem = parseInt(items[i].quantity) + 1;
-                  items[i].quantity = addItem.toString();
-                  let totalcostMrp = items[i].itemMrp * parseInt(items[i].quantity);
-                  items[i].totalMrp = totalcostMrp;
-                  break;
+    if (this.state.barcodeId && this.state.smnumber) {
+      if (this.state.dayCloseDates.length !== 0) {
+        if (this.state.dayCloseDates.length === 1 && this.state.dayCloseDates[0].dayClose.split("T")[0] === this.state.toDay) {
+          CustomerService.getDeliverySlip(barcodeId.trim(), storeId, smnumber).then(res => {
+            console.log({ res });
+            if (res.data) {
+              let totalAmount = 0;
+              let totalQty = 0;
+              let count = false;
+              RNBeep.beep();
+              if (res.data.qty === 0) {
+                alert(`this Barcode have ${parseInt(res.data.qty)} Items left`);
+              } else {
+                if (this.state.itemsList.length === 0) {
+                  this.state.itemsList.push(res.data);
                 } else {
-                  alert("Barcode reached max");
-                  break;
+                  for (let i = 0; i < this.state.itemsList.length; i++) {
+                    if (this.state.itemsList[i].barcode === res.data.barcode) {
+                      count = true;
+                      var items = [...this.state.itemsList];
+                      if (parseInt(items[i].quantity) + 1 <= parseInt(items[i].qty)) {
+                        let addItem = parseInt(items[i].quantity) + 1;
+                        items[i].quantity = addItem.toString();
+                        let totalcostMrp = items[i].itemMrp * parseInt(items[i].quantity);
+                        items[i].totalMrp = totalcostMrp;
+                        break;
+                      } else {
+                        alert("Barcode reached max");
+                        break;
+                      }
+                    }
+                  }
+                  if (count === false) {
+                    this.state.itemsList.push(res.data);
+                  }
                 }
               }
-            }
-            if (count === false) {
-              this.state.itemsList.push(res.data);
-            }
-          }
-        }
-        this.setState({ barList: this.state.itemsList }, () => {
-          this.state.barList.forEach(element => {
-            element.itemDiscount = 0;
-            if (element.taxValues) {
-              element.cgst = element.taxValues.cgstValue;
-              element.sgst = element.taxValues.sgstValue;
-              element.taxValue = element.taxValues.cgstValue + element.taxValues.sgstValue;
-            }
-            if (element.quantity > 1) {
+              this.setState({ barList: this.state.itemsList }, () => {
+                this.state.barList.forEach(element => {
+                  element.itemDiscount = 0;
+                  if (element.taxValues) {
+                    element.cgst = element.taxValues.cgstValue;
+                    element.sgst = element.taxValues.sgstValue;
+                    element.taxValue = element.taxValues.cgstValue + element.taxValues.sgstValue;
+                  }
+                  if (element.quantity > 1) {
+                  } else {
+                    element.totalMrp = element.itemMrp;
+                    element.quantity = parseInt(1);
+                  }
+                });
+                this.calculateTotal();
+              });
+              this.setState({ barcodeId: "" });
             } else {
-              element.totalMrp = element.itemMrp;
-              element.quantity = parseInt(1);
+              alert(res.data.body);
             }
-          });
-          this.calculateTotal();
-        });
-        this.setState({ barcodeId: "" });
+          })
+        } else {
+          alert("Please Close Previous Days")
+        }
       } else {
-        alert(res.data.body);
+        alert("Unable To Generate Estimate Slip Today Daycloser Is Done");
       }
-    }).catch((err) => {
-      console.log({ err });
-      this.setState({ loading: false, barcodeId: '', smnumber: "" });
-      alert("please enter a valid Barcode / smNumber");
-    });
-    console.log("BarListst", this.state.barList);
+    } else {
+      alert("Please enter Barcode / SM number");
+    }
   }
 
   calculateTotal() {
     let totalAmount = 0;
     let totalqty = 0;
+    let promoDiscount = 0;
     this.state.barList.forEach(barCode => {
       totalAmount = totalAmount + barCode.totalMrp;
       totalqty = totalqty + parseInt(barCode.quantity);
+      promoDiscount = promoDiscount + (isNaN(barCode.itemDiscount) ? 0 : (parseInt(barCode.itemDiscount)));
     });
-    this.setState({ mrpAmount: totalAmount, totalQuantity: totalqty }
+    this.setState({ mrpAmount: totalAmount, totalQuantity: totalqty, promoDisc: promoDiscount }
     );
   }
 
@@ -444,11 +477,13 @@ class GenerateEstimationSlip extends Component {
     console.error("TEXT", value);
     let grandTotal = 0;
     let totalqty = 0;
+    let promoDiscount = 0
     this.state.barList.forEach(bardata => {
       grandTotal = grandTotal + bardata.totalMrp;
       totalqty = totalqty + parseInt(bardata.quantity);
+      promoDiscount = promoDiscount + bardata?.itemDiscount;
     });
-    this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty });
+    this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty, promoDisc: promoDiscount });
     this.state.totalQuantity = (parseInt(this.state.totalQuantity) + 1);
     // this.setState({ itemsList: qtyarr });
   };
@@ -470,11 +505,13 @@ class GenerateEstimationSlip extends Component {
 
     let grandTotal = 0;
     let totalqty = 0;
+    let promoDiscount = 0
     this.state.barList.forEach(bardata => {
       grandTotal = grandTotal + bardata.totalMrp;
       totalqty = totalqty + parseInt(bardata.quantity);
+      promoDiscount = promoDiscount + bardata?.itemDiscount;
     });
-    this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty });
+    this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty, promoDisc: promoDiscount });
     this.state.totalQuantity = (parseInt(this.state.totalQuantity) + 1);
   }
 
@@ -488,11 +525,13 @@ class GenerateEstimationSlip extends Component {
       this.state.totalQuantity = (parseInt(this.state.totalQuantity) - 1);
       let grandTotal = 0;
       let totalqty = 0;
+      let promoDiscount = 0
       this.state.barList.forEach(bardata => {
         grandTotal = grandTotal + bardata.totalMrp;
         totalqty = totalqty + parseInt(bardata.quantity);
+        promoDiscount = promoDiscount + bardata?.itemDiscount;
       });
-      this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty });
+      this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty, promoDisc: promoDiscount });
       this.setState({ itemsList: qtyarr });
     } else {
       this.state.itemsList.splice(index, 1);
