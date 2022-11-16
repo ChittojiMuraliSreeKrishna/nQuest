@@ -175,11 +175,11 @@ export default class GenerateReturnSlip extends Component {
                 var combineList = {};
                 allreturnslipsList.forEach((itm) => {
                   var barcode = itm.barcode;
-                  itm.quantity = parseInt(itm.quantity)
-                  itm.netValue = parseInt(itm.netValue)
-                  itm.manualDiscount = parseInt(itm.manualDiscount)
-                  itm.promoDiscount = parseInt(itm.promoDiscount)
-                  itm.gvAppiled = parseInt(itm.gvAppiled)
+                  itm.quantity = itm.quantity
+                  itm.netValue = itm.netValue
+                  itm.manualDiscount = itm.manualDiscount
+                  itm.promoDiscount = itm.promoDiscount
+                  itm.gvAppiled = itm.gvAppiled
 
                   if (!combineList[barcode]) {
                     return combineList[barcode] = itm
@@ -210,9 +210,6 @@ export default class GenerateReturnSlip extends Component {
                     element.returnQty = parseInt("0");
                     element.returnedAmout = parseInt("0")
                   }
-                  console.log("+quantity+++", quantity, element.quantity)
-
-
                   element.isChecked = false;
                 });
                 if (this.state.returnInvoice.length === 1 && quantity === 1) {
@@ -224,7 +221,6 @@ export default class GenerateReturnSlip extends Component {
                   quantity: quantity,
                   amount: costprice,
                 });
-                console.log("+res+++", this.state.returnInvoice, quantity, this.state.quantity)
               }
 
             );
@@ -245,7 +241,7 @@ export default class GenerateReturnSlip extends Component {
     if (item.isChecked === true) {
       if (selectedElement.quantity === 1) {
         selectedElement.returnQty = selectedElement.quantity;
-        selectedElement.returnedAmout = selectedElement.netValue
+        selectedElement.returnedAmout = (selectedElement.netValue)/selectedElement.returnQty
       }
       const obj = {
         netValue: selectedElement.netValue,
