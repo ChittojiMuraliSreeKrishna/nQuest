@@ -170,7 +170,7 @@ class TextilePayment extends Component {
       userId: this.props.route.params.userId,
       retailBarCodeList: this.props.route.params.retailBarCodeList,
       dsNumberList: this.props.route.params.dsNumberList,
-      customerName: this.props.route.params.customerName,
+      customerFullName: this.props.route.params.customerFullName,
       customerPhoneNumber: this.props.route.params.customerPhoneNumber,
       customerGSTNumber: this.props.route.params.customerGSTNumber,
       customerAddress: String(this.props.route.params.customerAddress),
@@ -386,7 +386,7 @@ class TextilePayment extends Component {
         }
         this.state.paymentType.push(obj);
         if (this.state.isRTApplied) {
-          this.setState({ payingAmount: this.state.creditAmount + this.state.rtAmount })
+          this.setState({ payingAmount: this.state.creditAmount + this.state.rtAmount, payButtonEnable: true })
         }
       })
     } else {
@@ -401,7 +401,7 @@ class TextilePayment extends Component {
     const grandAmount = grandNetAmount >= this.state.payCreditAmount ? grandNetAmount - this.state.payCreditAmount : 0
     this.setState({ isCreditAmount: true, grandNetAmount: grandAmount });
     if (this.state.isRTApplied) {
-      this.setState({ payingAmount: grandNetAmount + this.state.rtAmount })
+      this.setState({ payingAmount: grandNetAmount + this.state.rtAmount, payButtonEnable: true })
     }
     this.cancelCreditModel();
     // this.pay()
@@ -599,7 +599,7 @@ class TextilePayment extends Component {
       isUpi: false,
       isGv: false,
       isKhata: true,
-      payButtonEnable: this.state.totalAmount === 0 ? true : false,
+      payButtonEnable: true,
       isCredit: false,
       recievedAmount: 0,
       returnAmount: 0
@@ -618,7 +618,7 @@ class TextilePayment extends Component {
       isGv: false,
       isKhata: false,
       isCredit: true,
-      payButtonEnable: this.state.totalAmount === 0 ? true : false,
+      payButtonEnable: true,
       recievedAmount: 0,
       returnAmount: 0
     });
@@ -1033,12 +1033,17 @@ class TextilePayment extends Component {
       "totalAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
     };
     console.log(" payment cash method data", obj);
+    let invoiceTax = []
+    invoiceTax.push(obj)
     if (this.state.isCard === true) {
       delete obj.paymentAmountType
     }
     axios.post(NewSaleService.createOrder(), obj).then((res) => {
       console.log("Invoice data", JSON.stringify(res.data));
       if (res.data && res.data["isSuccess"] === "true") {
+
+        PrintService('INVOICE', res.data.result, this.state.barCodeList, invoiceTax)
+
         // const cardAmount = this.state.isCard || this.state.isCardOrCash ? JSON.stringify(Math.round(this.state.ccCardCash)) : JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString());
         alert("Order created " + res.data["result"]);
         if (this.state.isKhata === true || this.state.cardManual === true) {

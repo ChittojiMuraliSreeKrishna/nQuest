@@ -198,7 +198,11 @@ class GenerateInvoiceSlip extends Component {
       handleCheckPromo: false,
       mrpAmount: 0,
       isCredit: false,
+
+      customerTagAllow: false
+
       toDay: moment(new Date()).format("YYYY-MM-DD").toString()
+
     };
   }
 
@@ -207,10 +211,10 @@ class GenerateInvoiceSlip extends Component {
     this.setState({ storeId: storeId });
     this.getDiscountReasons();
     this.getHsnDetails();
-    let data = "cbnaiucs234";
-    let data1 = [];
-    let data2 = [];
-    PrintService('INVOICE', data, data1, data2)
+    // let data = "cbnaiucs234";
+    // let data1 = [];
+    // let data2 = [];
+    // PrintService('Invoice', data, data1, data2)
   }
 
 
@@ -919,7 +923,7 @@ class GenerateInvoiceSlip extends Component {
           const mobileData = res.data.result;
           console.log({ mobileData }, res.data.result, this.state.barCodeList, obj)
           this.setState({
-            userId: res.data.result.userId, customerFullName: res.data.result.userName
+            userId: res.data.result.userId, customerFullName: res.data.result.userName, customerTagAllow: true, customerTagging: false
           });
           this.setState({ modalVisible: false });
           this.state.mobileData = {
@@ -942,7 +946,7 @@ class GenerateInvoiceSlip extends Component {
           CustomerService.getCreditNotes(this.state.mobileNumber, res.data.result.userId).then(response => {
             if (response) {
               if (response.data.result && response.data.result.length > 0) {
-                this.setState({ creditAmount: response.data.result[0].amount, isCredit: true, customerTagging: false });
+                this.setState({ creditAmount: response.data.result[0].amount, isCredit: true, customerTagging: false, customerTagAllow: true });
               }
             }
           });
@@ -1448,8 +1452,8 @@ class GenerateInvoiceSlip extends Component {
 
               {this.state.barCodeList.length !== 0 && (
                 <ScrollView horizontal style={{ flexDirection: 'row' }}>
-                  <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.customerTagging ? color.disableBackGround : color.accent }]}
-                    disabled={this.state.customerTagging}
+                  <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.customerTagAllow ? color.disableBackGround : color.accent }]}
+                    disabled={this.state.customerTagAllow}
                     onPress={() => {
                       this.setState({ customerTagging: true, modalVisible: true })
                     }}>
