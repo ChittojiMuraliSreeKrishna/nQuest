@@ -171,7 +171,7 @@ class TextilePayment extends Component {
       userId: this.props.route.params.userId,
       retailBarCodeList: this.props.route.params.retailBarCodeList,
       dsNumberList: this.props.route.params.dsNumberList,
-      customerName: this.props.route.params.customerName,
+      customerFullName: this.props.route.params.customerFullName,
       customerPhoneNumber: this.props.route.params.customerPhoneNumber,
       customerGSTNumber: this.props.route.params.customerGSTNumber,
       customerAddress: String(this.props.route.params.customerAddress),

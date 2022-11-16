@@ -59,7 +59,7 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       }
       // printer.newline(); // Print Style 2
       // for (let i = 0; i < object.length; i++) {
-      //   printer.line('S.NO:' + String(parseInt(i) + 1) + ', BARCODE:' + object[ i ].barcode + ', QTY:' + object[ i ].quantity + '\n' + 'MRP:' + object[ i ].itemMrp + ', DISC:' + object[ i ].itemDiscount + ', AMOUNT' + object[ i ].totalMrp);
+      //   printer.line('S.NO:' + String(parseInt(i) + 1) + ', BARCODE:' + object[i].barcode + ', QTY:' + object[i].quantity + '\n' + 'MRP:' + object[i].itemMrp + ', DISC:' + object[i].itemDiscount + ', AMOUNT' + object[i].totalMrp);
       //   printer.line('------------------------------------------------');
       // }
       printer.newline();
@@ -125,8 +125,8 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       printer.align('left');
       printer.text('SmNumber: ' + '\n');
       printer.text('________________________________________________\n');
-      if (invoiceTax[0].tagCustomerName) {
-        printer.text('CUSTOMER NAME: ' + invoiceTax[0].tagCustomerName + '\n');
+      if (invoiceTax[0].customerFullName) {
+        printer.text('CUSTOMER NAME: ' + invoiceTax[0].customerFullName + '\n');
       } else {
         printer.text('CUSTOMER NAME: ' + '' + '\n');
       }
