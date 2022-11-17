@@ -35,7 +35,7 @@ class GenerateInvoiceSlip extends Component {
     this.barcodeCodes = [];
     this.state = {
       barcodeId: "",
-      mobileNumber: "",
+      mobileNumber: "9999999999",
       altMobileNo: "",
       name: "",
       loading: false,
@@ -76,8 +76,8 @@ class GenerateInvoiceSlip extends Component {
       customerAddress: '',
       customerGSTNumber: '',
       reasonDiscount: '',
-      discountAmount: 0,
-      approvedBy: '',
+      discountAmount: 10,
+      approvedBy: 'Manager',
       domainId: 1,
       tableHead: ['S.No', 'Barcode', 'Product', 'Price Per Qty', 'Qty', 'Sales Rate'],
       tableData: [],
@@ -92,7 +92,7 @@ class GenerateInvoiceSlip extends Component {
       },
       openn: false,
       isSubOpen: false,
-      dsNumber: "",
+      dsNumber: "ES20221673276",
       manualDisc: 0,
       isCash: false,
       isCard: false,
@@ -198,7 +198,8 @@ class GenerateInvoiceSlip extends Component {
       handleCheckPromo: false,
       mrpAmount: 0,
       isCredit: false,
-      toDay: moment(new Date()).format("YYYY-MM-DD").toString()
+      toDay: moment(new Date()).format("YYYY-MM-DD").toString(),
+      isTagCustomer: false
     };
   }
 
@@ -286,39 +287,39 @@ class GenerateInvoiceSlip extends Component {
     });
   }
 
-  topbarAction1 = (item, index) => {
-    console.log("+++++++++++++++++", item, index);
-    if (this.state.privilages[index].bool === true) {
-      this.state.privilages[index].bool = false;
-    }
-    else {
-      this.state.privilages[index].bool = true;
-    }
-    for (let i = 0; i < this.state.privilages.length; i++) {
-      if (item.name === "Tag Customer") {
-        this.setState({ customerTagging: true, modalVisible: true, billmodelPop: false });
-        this.state.privilages[1].bool = false;
-        return;
-      } else {
-        this.setState({ customerTagging: false, modalVisible: false });
-      }
-      if (item.name === "Bill Level Discount") {
-        this.setState({ billmodelPop: true, modalVisible: true });
-      } else {
-        this.setState({ billmodelPop: false, modalVisible: false });
-      }
-      if (item.name === "Check Promo Disc") {
-        this.setState({ handleCheckPromo: true })
-        this.checkPromo();
-      } else {
-        this.setState({ handleCheckPromo: false })
-      }
-      if (index != i) {
-        this.state.privilages[i].bool = false;
-      }
-      this.setState({ privilages: this.state.privilages });
-    }
-  };
+  // topbarAction1 = (item, index) => {
+  //   console.log("+++++++++++++++++", item, index);
+  //   if (this.state.privilages[index].bool === true) {
+  //     this.state.privilages[index].bool = false;
+  //   }
+  //   else {
+  //     this.state.privilages[index].bool = true;
+  //   }
+  //   for (let i = 0; i < this.state.privilages.length; i++) {
+  //     if (item.name === "Tag Customer") {
+  //       this.setState({ customerTagging: true, modalVisible: true, billmodelPop: false });
+  //       this.state.privilages[1].bool = false;
+  //       return;
+  //     } else {
+  //       this.setState({ customerTagging: false, modalVisible: false });
+  //     }
+  //     if (item.name === "Bill Level Discount") {
+  //       this.setState({ billmodelPop: true, modalVisible: true });
+  //     } else {
+  //       this.setState({ billmodelPop: false, modalVisible: false });
+  //     }
+  //     if (item.name === "Check Promo Disc") {
+  //       this.setState({ handleCheckPromo: true })
+  //       this.checkPromo();
+  //     } else {
+  //       this.setState({ handleCheckPromo: false })
+  //     }
+  //     if (index != i) {
+  //       this.state.privilages[i].bool = false;
+  //     }
+  //     this.setState({ privilages: this.state.privilages });
+  //   }
+  // };
 
 
   checkPromo() {
@@ -424,6 +425,7 @@ class GenerateInvoiceSlip extends Component {
         }
       });
     }
+    this.setState({ handleCheckPromo: true, modalVisible: true, handleBillDiscount: false })
   }
 
   async getDeliverySlipDetails() {
@@ -921,7 +923,6 @@ class GenerateInvoiceSlip extends Component {
           this.setState({
             userId: res.data.result.userId, customerFullName: res.data.result.userName
           });
-          this.setState({ modalVisible: false });
           this.state.mobileData = {
             address: this.state.address,
             altMobileNo: "",
@@ -936,7 +937,9 @@ class GenerateInvoiceSlip extends Component {
           this.setState({
             isBillingDetails: true,
             customerMobilenumber: mobileData.phoneNumber,
-            mobileNumber: ""
+            mobileNumber: "",
+            customerTagging: false,
+            isTagCustomer: true
           });
 
           CustomerService.getCreditNotes(this.state.mobileNumber, res.data.result.userId).then(response => {
@@ -1038,11 +1041,12 @@ class GenerateInvoiceSlip extends Component {
         const promDisc = parseInt(this.state.discountAmount) + this.state.totalPromoDisc;
         this.setState({ showDiscReason: true, promoDiscount: promDisc });
 
-        this.setState({ billmodelPop: false, handleBillDiscount: true },
+        this.setState({ billmodelPop: false, handleBillDiscount: false },
           () => {
             this.setState({ disableButton: true, reasonDiscount: "" });
             this.state.privilages[1].bool = false;
           });
+        this.setState({ customerTagging: false, handleCheckPromo: false })
       }
     }
   }
@@ -1448,8 +1452,8 @@ class GenerateInvoiceSlip extends Component {
 
               {this.state.barCodeList.length !== 0 && (
                 <ScrollView horizontal style={{ flexDirection: 'row' }}>
-                  <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.customerTagging ? color.disableBackGround : color.accent }]}
-                    disabled={this.state.customerTagging}
+                  <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isTagCustomer ? color.disableBackGround : color.accent }]}
+                    disabled={this.state.isTagCustomer}
                     onPress={() => {
                       this.setState({ customerTagging: true, modalVisible: true })
                     }}>
@@ -1458,7 +1462,7 @@ class GenerateInvoiceSlip extends Component {
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.handleBillDiscount ? color.disableBackGround : color.accent }]}
-                    onPress={() => this.setState({ billmodelPop: true, modalVisible: true, customerTagging: false, handleCheckPromo: false })}
+                    onPress={() => this.setState({ billmodelPop: true, modalVisible: true })}
                     disabled={this.state.handleBillDiscount}>
                     <Text style={forms.button_text}>
                       {"Bill Level Discount"}
@@ -1466,7 +1470,6 @@ class GenerateInvoiceSlip extends Component {
                   </TouchableOpacity>
                   <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.handleBillDiscount || this.state.handleCheckPromo ? color.disableBackGround : color.accent }]}
                     onPress={() => {
-                      this.setState({ handleCheckPromo: true, modalVisible: true, handleBillDiscount: false })
                       this.checkPromo();
                     }}
                     disabled={this.state.handleBillDiscount || this.state.handleCheckPromo}>
@@ -1700,7 +1703,7 @@ class GenerateInvoiceSlip extends Component {
                     color: "#2ADC09", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 60, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
                     fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
                   }}>
-                    ₹ {this.state.totalPromoDisc } </Text>
+                    ₹ {this.state.totalPromoDisc} </Text>
 
                   <Text style={{
                     color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 90, fontSize: 20, justifyContent: 'center', textAlign: 'center', marginTop: 10,

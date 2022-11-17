@@ -114,7 +114,7 @@ class TextilePayment extends Component {
       cardModelVisible: false,
       cardPaymentType: 'Manual',
       cardManual: false,
-      khataAmount: 0,
+      khataAmount: 3888,
       payingAmount: 0,
       grandNetAmount: 0,
       sufCash: true,
@@ -351,13 +351,30 @@ class TextilePayment extends Component {
         // totalAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString() + this.state.rtAmount
       });
     }
-    if (this.state.totalAmount > 0) {
+    // if (this.state.totalAmount > 0) {
+    //   this.setState({
+    //     grandNetAmount: this.state.grandNetAmount - this.state.khataAmount,
+    //     payingAmount: parseFloat(this.state.totalAmount) - parseFloat(this.state.khataAmount)
+    //   }, () => {
+    //     this.cancelKathaModel();
+    //   });
+    // }
+    if (parseFloat(this.state.khataAmount) === parseFloat(this.state.grandNetAmount)) {
       this.setState({
-        grandNetAmount: this.state.grandNetAmount - this.state.khataAmount,
-        payingAmount: parseFloat(this.state.totalAmount) - parseFloat(this.state.khataAmount)
+        payButtonEnable: true,
+        enableCoupon: false,
+        enablePayment: false, isCheckPromo: true, isBillLevel: true, grandNetAmount: 0.0
       }, () => {
         this.cancelKathaModel();
-      });
+      })
+    } else {
+      let netPayableAmt = parseFloat(this.state.grandNetAmount) - parseFloat(this.state.khataAmount);
+      let grandNetAmount = parseFloat(netPayableAmt)
+      this.setState({
+        grandNetAmount: grandNetAmount, payingAmount: parseFloat(this.state.totalAmount) - parseFloat(this.state.khataAmount)
+      }, () => {
+        this.cancelKathaModel();
+      })
     }
   }
 
@@ -599,7 +616,7 @@ class TextilePayment extends Component {
       isUpi: false,
       isGv: false,
       isKhata: true,
-      payButtonEnable: this.state.totalAmount === 0 ? true : false,
+      // payButtonEnable: this.state.grandNetAmount == 0 ? true : false,
       isCredit: false,
       recievedAmount: 0,
       returnAmount: 0
@@ -1966,15 +1983,18 @@ class TextilePayment extends Component {
                           // value={(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()}
                           value={this.state.khataAmount}
                           onChangeText={(value) =>
-                            this.setState({ khataAmount: value }, () => {
-                              if (this.state.khataAmount < (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()) {
-                                this.setState({ khataAmount: value })
-                              }
-                            })
+                            this.setState({ khataAmount: value }
+                              // , () => {
+                              // if (this.state.khataAmount < (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()) {
+                              //   this.setState({ khataAmount: value })
+                              // }
+                            )
                           }
                         />
                         <View style={forms.action_buttons_container}>
-                          <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                          <TouchableOpacity style={
+                            [forms.action_buttons, forms.submit_btn, { backgroundColor: (parseFloat(this.state.khataAmount) > this.state.grandNetAmount) && parseFloat(this.state.khataAmount) > 0 ? color.disableBackGround : color.accent }]}
+                            disabled={(!parseFloat(this.state.khataAmount) > this.state.grandNetAmount) && !parseFloat(this.state.khataAmount) > 0}
                             onPress={() => this.confirmKathaModel()}>
                             <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
                           </TouchableOpacity>
