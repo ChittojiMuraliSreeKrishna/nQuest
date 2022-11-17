@@ -1537,35 +1537,6 @@ class GenerateInvoiceSlip extends Component {
                     </Text>
                   </TouchableOpacity>
                 </ScrollView>
-                // <FlatList
-                //   style={styles.flatList}
-                //   horizontal
-                //   data={this.state.privilages}
-                //   showsVerticalScrollIndicator={false}
-                //   showsHorizontalScrollIndicator={false}
-                //   renderItem={({ item, index }) => (
-                //     <TouchableOpacity style={{
-                //       borderWidth: 1,
-                //       backgroundColor: item.bool ? '#FFFFFF' : '#ED1C24',
-                //       borderColor: item.bool ? '#858585' : '#ED1C24',
-                //       borderRadius: 5,
-                //       marginLeft: 10, padding: 15
-                //     }}
-                //       onPress={() => this.topbarAction1(item, index)}
-                //       disabled={item.name === "Check Promo Disc" && !this.state.handleBillDiscount}>
-                //       {/* //  || item.name === "Bill Level Discount" && !this.state.handleCheckPromo}> */}
-                //       {/* <Image
-                //         source={
-                //           item.name === "Tag Customer" ? require("../../commonUtils/assets/Images/tag_customer_icon.png") :
-                //             item.name === "Bill Level Discount" ? require("../../commonUtils/assets/Images/bill_level_disc.png") :
-                //               item.name === "Check Promo Disc" ? require("../../commonUtils/assets/Images/check_promo_disc.png"):""} style={{ height: RH(30), width: RW(45) ,marginTop:4}} /> */}
-                //       <Text style={{ fontSize: 16, alignItems: 'center', alignSelf: 'center', marginTop: 5, color: item.bool ? '#353C40' : "#FFFFFF", fontFamily: 'regular' }}>
-                //         {item.name}
-                //       </Text>
-                //     </TouchableOpacity>
-                //   )}
-                //   ListFooterComponent={<View style={{ width: 15 }}></View>}
-                // />
               )}
 
               {this.state.lineItemDelete && (
