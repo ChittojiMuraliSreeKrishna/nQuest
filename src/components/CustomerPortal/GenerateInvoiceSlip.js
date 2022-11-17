@@ -944,8 +944,8 @@ class GenerateInvoiceSlip extends Component {
             isBillingDetails: true,
             customerMobilenumber: mobileData.phoneNumber,
             mobileNumber: "",
+            isTagCustomer: true,
             customerTagging: false,
-            isTagCustomer: true
           });
 
           CustomerService.getCreditNotes(this.state.mobileNumber, res.data.result.userId).then(response => {
