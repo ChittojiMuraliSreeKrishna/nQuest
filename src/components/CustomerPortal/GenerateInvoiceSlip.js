@@ -78,8 +78,8 @@ class GenerateInvoiceSlip extends Component {
       customerAddress: '',
       customerGSTNumber: '',
       reasonDiscount: '',
-      discountAmount: 10,
-      approvedBy: 'Manager',
+      discountAmount: 0,
+      approvedBy: '',
       domainId: 1,
       tableHead: ['S.No', 'Barcode', 'Product', 'Price Per Qty', 'Qty', 'Sales Rate'],
       tableData: [],
@@ -950,14 +950,14 @@ class GenerateInvoiceSlip extends Component {
             isBillingDetails: true,
             customerMobilenumber: mobileData.phoneNumber,
             mobileNumber: "",
+            isTagCustomer: true,
             customerTagging: false,
-            isTagCustomer: true
           });
 
           CustomerService.getCreditNotes(this.state.mobileNumber, res.data.result.userId).then(response => {
             if (response) {
               if (response.data.result && response.data.result.length > 0) {
-                this.setState({ creditAmount: response.data.result[0].amount, isCredit: true, customerTagging: false, customerTagAllow: true });
+                this.setState({ creditAmount: response.data.result[0].amount, isCredit: true, customerTagging: false, isTagCustomer: true });
               }
             }
           });
@@ -1519,16 +1519,14 @@ class GenerateInvoiceSlip extends Component {
 
               {this.state.barCodeList.length !== 0 && (
                 <ScrollView horizontal style={{ flexDirection: 'row' }}>
-                  {/* <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isTagCustomer ? color.disableBackGround : color.accent }]}
-                    disabled={this.state.isTagCustomer} */}
-                  <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.customerTagAllow ? color.disableBackGround : color.accent }]}
-                    disabled={this.state.customerTagAllow}
+
+                  <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isTagCustomer ? color.disableBackGround : color.accent }]}
+                    disabled={this.state.isTagCustomer}
+
                     onPress={() => {
                       this.setState({ customerTagging: true, modalVisible: true })
                     }}>
-                    <Text style={forms.button_text}>
-                      {"Tag Customer"}
-                    </Text>
+                    <Text style={forms.button_text}> {"Tag Customer"}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.handleBillDiscount ? color.disableBackGround : color.accent }]}
                     onPress={() => this.setState({ billmodelPop: true, modalVisible: true })}
@@ -1547,35 +1545,6 @@ class GenerateInvoiceSlip extends Component {
                     </Text>
                   </TouchableOpacity>
                 </ScrollView>
-                // <FlatList
-                //   style={styles.flatList}
-                //   horizontal
-                //   data={this.state.privilages}
-                //   showsVerticalScrollIndicator={false}
-                //   showsHorizontalScrollIndicator={false}
-                //   renderItem={({ item, index }) => (
-                //     <TouchableOpacity style={{
-                //       borderWidth: 1,
-                //       backgroundColor: item.bool ? '#FFFFFF' : '#ED1C24',
-                //       borderColor: item.bool ? '#858585' : '#ED1C24',
-                //       borderRadius: 5,
-                //       marginLeft: 10, padding: 15
-                //     }}
-                //       onPress={() => this.topbarAction1(item, index)}
-                //       disabled={item.name === "Check Promo Disc" && !this.state.handleBillDiscount}>
-                //       {/* //  || item.name === "Bill Level Discount" && !this.state.handleCheckPromo}> */}
-                //       {/* <Image
-                //         source={
-                //           item.name === "Tag Customer" ? require("../../commonUtils/assets/Images/tag_customer_icon.png") :
-                //             item.name === "Bill Level Discount" ? require("../../commonUtils/assets/Images/bill_level_disc.png") :
-                //               item.name === "Check Promo Disc" ? require("../../commonUtils/assets/Images/check_promo_disc.png"):""} style={{ height: RH(30), width: RW(45) ,marginTop:4}} /> */}
-                //       <Text style={{ fontSize: 16, alignItems: 'center', alignSelf: 'center', marginTop: 5, color: item.bool ? '#353C40' : "#FFFFFF", fontFamily: 'regular' }}>
-                //         {item.name}
-                //       </Text>
-                //     </TouchableOpacity>
-                //   )}
-                //   ListFooterComponent={<View style={{ width: 15 }}></View>}
-                // />
               )}
 
               {this.state.lineItemDelete && (
@@ -3293,172 +3262,4 @@ const styles = StyleSheet.create({
     width: 155,
     height: 42,
   },
-
-  // Styles for mobile
-  filterMainContainer_mobile: {
-    width: deviceWidth,
-    alignItems: 'center',
-    marginLeft: -20,
-    backgroundColor: "#ffffff",
-    position: 'absolute',
-    bottom: -20,
-  },
-  filterByTitle_mobile: {
-    position: 'absolute',
-    left: 20,
-    top: 15,
-    width: 300,
-    height: 20,
-    fontFamily: 'medium',
-    fontSize: 16,
-    color: '#353C40'
-  },
-  filterByTitleDecoration_mobile: {
-    height: Device.isTablet ? 2 : 1,
-    width: deviceWidth,
-    backgroundColor: 'lightgray',
-    marginTop: 50,
-  },
-  filterCloseButton_mobile: {
-    position: 'absolute',
-    right: 8,
-    top: 15,
-    width: 50, height: 50,
-  },
-  filterCloseImage_mobile: {
-    color: '#ED1C24',
-    fontFamily: 'regular',
-    fontSize: 12,
-    position: 'absolute',
-    top: 10,
-    right: 0,
-  },
-  filterApplyButton_mobile: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-    height: 50,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  filterButtonText_mobile: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#ffffff",
-    fontSize: 15,
-    fontFamily: "regular"
-  },
-  filterCancelButton_mobile: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-    height: 50,
-    backgroundColor: "#ffffff",
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#353C4050",
-  },
-  filterButtonCancelText_mobile: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#000000",
-    fontSize: 15,
-    fontFamily: "regular"
-  },
-
-
-  // Styles for Tablet
-  filterMainContainer_tablet: {
-    width: deviceWidth,
-    alignItems: 'center',
-    marginLeft: -40,
-    backgroundColor: "#ffffff",
-    height: 600,
-    position: 'absolute',
-    bottom: -40,
-  },
-  filterByTitle_tablet: {
-    position: 'absolute',
-    left: 20,
-    top: 15,
-    width: 300,
-    height: 30,
-    fontFamily: 'medium',
-    fontSize: 21,
-    color: '#353C40'
-  },
-  filterByTitleDecoration_tablet: {
-    height: Device.isTablet ? 2 : 1,
-    width: deviceWidth,
-    backgroundColor: 'lightgray',
-    marginTop: 60,
-  },
-  filterCloseButton_tablet: {
-    position: 'absolute',
-    right: 24,
-    top: 10,
-    width: 60, height: 60,
-  },
-  filterCloseImage_tablet: {
-    color: '#ED1C24',
-    fontFamily: 'regular',
-    fontSize: 17,
-    position: 'absolute',
-    top: 10,
-    right: 24,
-  },
-  filterApplyButton_tablet: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-    height: 60,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  filterButtonText_tablet: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#ffffff",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  filterCancelButton_tablet: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-    height: 60,
-    backgroundColor: "#ffffff",
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#353C4050",
-  },
-  filterButtonCancelText_tablet: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#000000",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  signInButton_tablet: {
-    backgroundColor: '#ED1C24',
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 20,
-    width: deviceWidth - 40,
-    height: 60,
-    borderRadius: 10,
-    fontWeight: 'bold',
-    // marginBottom:100,
-  },
-  signInButtonText_tablet: {
-    color: 'white',
-    alignSelf: 'center',
-    fontSize: 20,
-    fontFamily: "regular",
-  },
-
 });
