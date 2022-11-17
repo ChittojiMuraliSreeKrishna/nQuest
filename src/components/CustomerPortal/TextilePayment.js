@@ -7,7 +7,7 @@ import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from "react-native-modal";
-import { Appbar, RadioButton, TextInput } from 'react-native-paper';
+import { Appbar, TextInput } from 'react-native-paper';
 import RazorpayCheckout from 'react-native-razorpay';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
@@ -86,6 +86,7 @@ class TextilePayment extends Component {
       khataToCustomerModel: false,
       kathaModelVisible: false,
       upiToCustomerModel: false,
+      kathaColleted: 0,
       upiModelVisible: false,
       upiMobileNumber: '',
       paymentType: [],
@@ -365,7 +366,8 @@ class TextilePayment extends Component {
       this.setState({
         payButtonEnable: true,
         enableCoupon: false,
-        enablePayment: false, isCheckPromo: true, isBillLevel: true, grandNetAmount: 0.0
+        enablePayment: false, isCheckPromo: true, isBillLevel: true, grandNetAmount: 0.0,
+        kathaColleted: parseFloat(this.state.khataAmount)
       }, () => {
         this.cancelKathaModel();
       })
@@ -373,7 +375,9 @@ class TextilePayment extends Component {
       let netPayableAmt = parseFloat(this.state.grandNetAmount) - parseFloat(this.state.khataAmount);
       let grandNetAmount = parseFloat(netPayableAmt)
       this.setState({
-        grandNetAmount: grandNetAmount, payingAmount: parseFloat(this.state.totalAmount) - parseFloat(this.state.khataAmount)
+        grandNetAmount: grandNetAmount,
+        payingAmount: parseFloat(this.state.totalAmount) - parseFloat(this.state.khataAmount),
+        kathaColleted: parseFloat(this.state.khataAmount)
       }, () => {
         this.cancelKathaModel();
       })
@@ -433,13 +437,13 @@ class TextilePayment extends Component {
   saveCard() {
     this.setState({})
     var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
-    if (this.state.cardPaymentType === "Automatic") {
-      this.getCardModel()
-      this.cancelCardModel()
-    } else {
-      this.setState({ cashAmount: parseFloat(grandNetAmount) })
-      this.manualCardPayment()
-    }
+    // if (this.state.cardPaymentType === "Automatic") {
+    //   this.getCardModel()
+    //   this.cancelCardModel()
+    // } else {
+    // }
+    this.setState({ cashAmount: parseFloat(grandNetAmount) })
+    this.manualCardPayment()
   }
 
   getCardModel = () => {
@@ -676,13 +680,13 @@ class TextilePayment extends Component {
     if (parseFloat(this.state.recievedAmount)) {
       const grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10))
       if (this.state.isCash === true && this.state.isCardOrCash === false) {
-        if (parseFloat(this.state.recievedAmount) < grandNetAmount) {
+        if (parseFloat(this.state.recievedAmount) < this.state.grandNetAmount) {
           alert('Please collect sufficient amount');
           this.setState({ sufCash: false })
         }
         else {
           if (parseFloat(this.state.recievedAmount) !== NaN) {
-            this.setState({ returnAmount: parseFloat(this.state.recievedAmount) - parseFloat(this.state.totalAmount) });
+            this.setState({ returnAmount: parseFloat(this.state.recievedAmount) - parseFloat(this.state.grandNetAmount) });
             this.setState({ verifiedCash: parseFloat(this.state.totalAmount), payingAmount: grandNetAmount, grandNetAmount: 0, sufCash: true });
           } else {
             alert('please enter only values')
@@ -2115,6 +2119,7 @@ class TextilePayment extends Component {
                       <KeyboardAwareScrollView >
                         <View>
                           <Text style={scss.textStyleMedium}>Card Payment:</Text>
+                          <Text>Amount:</Text>
                           <TextInput
                             style={forms.input_fld}
                             underlineColor="transparent"
@@ -2122,7 +2127,15 @@ class TextilePayment extends Component {
                             editable={this.state.isCardOrCash ? true : false} selectTextOnFocus={false}
                             value={(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10) - parseInt(this.state.verifiedCash)).toString()}
                           />
-                          <View style={scss.radio_group}>
+                          <Text>Transc No:</Text>
+                          <TextInput
+                            style={forms.input_fld}
+                            underlineColor="transparent"
+                            activeUnderlineColor='#000'
+                            value={this.state.transcNum}
+                            onChange={() => this.handleTranscNum()}
+                          />
+                          {/* <View style={scss.radio_group}>
                             <View style={scss.radio_item}>
                               <RadioButton
                                 value="Automatic"
@@ -2138,8 +2151,8 @@ class TextilePayment extends Component {
                                 onPress={() => this.setState({ cardPaymentType: 'Manual' })}
                               />
                               <Text>Manual</Text>
-                            </View>
-                          </View>
+                            </View> */}
+                          {/* </View> */}
                         </View>
                         <View style={forms.action_buttons_container}>
                           <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
@@ -2254,6 +2267,20 @@ class TextilePayment extends Component {
                   ₹ {this.state.grandNetAmount + '.00'}
                 </Text>
               </View>
+              {this.state.kathaColleted > 0 && (
+                <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "bold", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                    fontSize: 16,
+                  }}>
+                    Katha Amount </Text>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "bold", alignItems: 'center', fontSize: 20, justifyContent: 'center', textAlign: 'center',
+                    fontSize: 16,
+                  }}>
+                    ₹ {this.state.kathaColleted}</Text>
+                </View>
+              )}
               {
                 this.state.isCreditAmount && (
                   <>

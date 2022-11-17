@@ -53,7 +53,7 @@ export default class DebitNotes extends Component {
     };
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     const storeId = await AsyncStorage.getItem("storeId");
     const userId = await AsyncStorage.getItem('custom:userId');
     this.setState({ storeId: storeId, userId: userId });
@@ -61,11 +61,11 @@ export default class DebitNotes extends Component {
   }
 
 
-  datepickerClicked () {
+  datepickerClicked() {
     this.setState({ datepickerOpen: true });
   }
 
-  enddatepickerClicked () {
+  enddatepickerClicked() {
     this.setState({ datepickerendOpen: true });
   }
 
@@ -90,12 +90,12 @@ export default class DebitNotes extends Component {
   };
 
 
-  modelCancel () {
+  modelCancel() {
     this.setState({ flagFilterOpen: false, isShowAllTransactions: false });
   }
 
 
-  async getDebitNotes () {
+  async getDebitNotes() {
     this.setState({ lodaing: true });
     const accountType = 'DEBIT';
     const { storeId } = this.state;
@@ -119,7 +119,7 @@ export default class DebitNotes extends Component {
     });
   }
 
-  handleViewDebit (item, index) {
+  handleViewDebit(item, index) {
     const reqObj = {
       fromDate: null,
       toDate: null,
@@ -139,7 +139,7 @@ export default class DebitNotes extends Component {
     });
   }
 
-  applyDebitNotesFilter () {
+  applyDebitNotesFilter() {
     this.setState({ loading: true });
     const accountType = 'DEBIT';
     const { storeId, startDate, endDate, mobileNumber } = this.state;
@@ -167,33 +167,33 @@ export default class DebitNotes extends Component {
     });
   }
 
-  modalViewCancel () {
+  modalViewCancel() {
     this.setState({ isShowAllTransactions: false });
   }
 
-  handleAddDebit (item, index) {
+  handleAddDebit(item, index) {
     this.props.navigation.navigate('AddDebitNotes', {
       item: item,
       onGoBack: () => this.getDebitNotes()
     });
   }
 
-  filterAction () {
+  filterAction() {
     this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
-  clearFilterAction () {
+  clearFilterAction() {
     this.setState({ filterActive: false });
   }
 
-  refresh () {
+  refresh() {
     this.setState({ debitNotes: [] }, () => {
       this.getDebitNotes();
     });
   }
 
 
-  render () {
+  render() {
     return (
       <View style={{ backgroundColor: "#FFFFFF" }}>
         {this.state.loading &&
@@ -262,7 +262,7 @@ export default class DebitNotes extends Component {
                       <IconIA
                         name='add-circle-outline'
                         size={25}
-                        style={[ scss.action_icons, { marginLeft: 10 } ]}
+                        style={[scss.action_icons, { marginLeft: 10 }]}
                         onPress={() => this.handleAddDebit(item, index)}
                       ></IconIA>
                     </View>
@@ -334,11 +334,11 @@ export default class DebitNotes extends Component {
                       onChangeText={this.handleMobile}
                     />
                     <View style={forms.action_buttons_container}>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                         onPress={() => this.applyDebitNotesFilter()}>
                         <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
                         onPress={() => this.modelCancel()}>
                         <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>
@@ -357,7 +357,7 @@ export default class DebitNotes extends Component {
               onBackdropPress={() => this.modalViewCancel()} >
               <View style={forms.filterModelContainer}>
                 <Text style={forms.popUp_decorator}>-</Text>
-                <View style={forms.filterModelSub}>
+                <View style={[forms.filterModelSub, { maxHeight: 500 }]}>
                   <ScrollView>
                     <FlatList
                       data={this.state.transactionHistory}
@@ -366,18 +366,20 @@ export default class DebitNotes extends Component {
                       keyExtractor={(item, index) => index.toString()}
                       renderItem={({ item, index }) => (
                         <View style={scss.model_subbody}>
-                          <View style={scss.model_text_container}>
-                            <Text style={scss.highText}>#CRM ID: {item.customerId}</Text>
-                            <Text style={scss.textStyleMedium}>STORE: {item.storeId}</Text>
-                          </View>
-                          <View style={scss.model_text_container}>
-                            <Text style={scss.textStyleLight}>TRANSACTION TYPE: {"\n"}{item.transactionType}</Text>
-                            <Text style={scss.textStyleLight}>ACCOUNT TYPE: {"\n"}{item.accountType}</Text>
-                          </View>
-                          <View style={scss.model_text_container}>
-                            <Text style={scss.textStyleLight}>AMOUNT: {item.amount}</Text>
-                            <Text style={scss.textStyleLight}>DATE: {formatListDates(item.createdDate)}</Text>
-                          </View>
+                          <ScrollView>
+                            <View style={scss.model_text_container}>
+                              <Text style={scss.highText}>#CRM ID: {item.customerId}</Text>
+                              <Text style={scss.textStyleMedium}>STORE: {item.storeId}</Text>
+                            </View>
+                            <View style={scss.model_text_container}>
+                              <Text style={scss.textStyleLight}>TRANSACTION TYPE: {"\n"}{item.transactionType}</Text>
+                              <Text style={scss.textStyleLight}>ACCOUNT TYPE: {"\n"}{item.accountType}</Text>
+                            </View>
+                            <View style={scss.model_text_container}>
+                              <Text style={scss.textStyleLight}>AMOUNT: {item.amount}</Text>
+                              <Text style={scss.textStyleLight}>DATE: {formatListDates(item.createdDate)}</Text>
+                            </View>
+                          </ScrollView>
                         </View>
                       )}
                     />

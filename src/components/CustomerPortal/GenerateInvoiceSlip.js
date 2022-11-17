@@ -37,7 +37,7 @@ class GenerateInvoiceSlip extends Component {
     this.barcodeCodes = [];
     this.state = {
       barcodeId: "",
-      mobileNumber: "9999999999",
+      mobileNumber: "",
       altMobileNo: "",
       name: "",
       loading: false,
@@ -94,7 +94,7 @@ class GenerateInvoiceSlip extends Component {
       },
       openn: false,
       isSubOpen: false,
-      dsNumber: "ES20221673276",
+      dsNumber: "",
       manualDisc: 0,
       isCash: false,
       isCard: false,
@@ -201,7 +201,7 @@ class GenerateInvoiceSlip extends Component {
       mrpAmount: 0,
       isCredit: false,
       toDay: moment(new Date()).format("YYYY-MM-DD").toString(),
-      isTagCustomer: false
+      isTagCustomer: false,
       customerTagAllow: false,
       toDay: moment(new Date()).format("YYYY-MM-DD").toString(),
       showPrinter: false,
@@ -211,10 +211,10 @@ class GenerateInvoiceSlip extends Component {
   }
 
   async componentDidMount() {
-    const storeId = await AsyncStorage.getItem("storeId");
-    this.setState({ storeId: storeId });
-    this.getDiscountReasons();
-    this.getHsnDetails();
+    // const storeId = await AsyncStorage.getItem("storeId");
+    // this.setState({ storeId: storeId });
+    // this.getDiscountReasons();
+    // this.getHsnDetails();
     // let data = "cbnaiucs234";
     // let data1 = [];
     // let data2 = [];
@@ -225,6 +225,9 @@ class GenerateInvoiceSlip extends Component {
   async componentWillMount() {
     const isTaxIncluded = await AsyncStorage.getItem('custom:isTaxIncluded');
     this.setState({ isTaxIncluded: isTaxIncluded })
+    await AsyncStorage.getItem("storeId").then((value) => {
+      this.setState({ storeId: value })
+    })
     this.getallDates();
     const childPrivileges = PrivilagesList('Generate Invoice');
     childPrivileges.then((res) => {
@@ -724,8 +727,10 @@ class GenerateInvoiceSlip extends Component {
 
   getallDates() {
     const { storeId } = this.state;
+    console.error({ storeId })
     CustomerService.getDates(storeId).then(res => {
       if (res) {
+        console.log({ res }, res.data)
         if (res.data.length > 0) {
           this.setState({ dayCloseDates: res.data });
         }
@@ -1514,8 +1519,8 @@ class GenerateInvoiceSlip extends Component {
 
               {this.state.barCodeList.length !== 0 && (
                 <ScrollView horizontal style={{ flexDirection: 'row' }}>
-                  <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isTagCustomer ? color.disableBackGround : color.accent }]}
-                    disabled={this.state.isTagCustomer}
+                  {/* <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isTagCustomer ? color.disableBackGround : color.accent }]}
+                    disabled={this.state.isTagCustomer} */}
                   <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.customerTagAllow ? color.disableBackGround : color.accent }]}
                     disabled={this.state.customerTagAllow}
                     onPress={() => {
