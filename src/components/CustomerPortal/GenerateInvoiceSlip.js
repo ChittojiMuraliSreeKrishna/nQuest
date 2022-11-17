@@ -16,6 +16,7 @@ import { Chevron } from 'react-native-shapes';
 import { default as MinusIcon, default as PlusIcon, default as ScanIcon } from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
+import PrintService from '../../commonUtils/Printer/printService';
 import PrivilagesList from '../../commonUtils/PrivilagesList';
 import { RF, RW } from '../../Responsive';
 import { customerErrorMessages } from '../Errors/errors';
@@ -23,6 +24,7 @@ import Message from '../Errors/Message';
 import CustomerService from '../services/CustomerService';
 import { color } from '../Styles/colorStyles';
 import { inputField } from '../Styles/FormFields';
+import { sucessBtn, sucessBtnText } from '../Styles/PopupStyles';
 import { listEmptyMessage } from '../Styles/Styles';
 
 var deviceWidth = Dimensions.get('window').width;
@@ -200,6 +202,11 @@ class GenerateInvoiceSlip extends Component {
       isCredit: false,
       toDay: moment(new Date()).format("YYYY-MM-DD").toString(),
       isTagCustomer: false
+      customerTagAllow: false,
+      toDay: moment(new Date()).format("YYYY-MM-DD").toString(),
+      showPrinter: false,
+      printerIp: "",
+
     };
   }
 
@@ -208,10 +215,10 @@ class GenerateInvoiceSlip extends Component {
     this.setState({ storeId: storeId });
     this.getDiscountReasons();
     this.getHsnDetails();
-    let data = "cbnaiucs234";
-    let data1 = [];
-    let data2 = [];
-    PrintService('INVOICE', data, data1, data2)
+    // let data = "cbnaiucs234";
+    // let data1 = [];
+    // let data2 = [];
+    // PrintService('Invoice', data, data1, data2)
   }
 
 
@@ -921,7 +928,7 @@ class GenerateInvoiceSlip extends Component {
           const mobileData = res.data.result;
           console.log({ mobileData }, res.data.result, this.state.barCodeList, obj)
           this.setState({
-            userId: res.data.result.userId, customerFullName: res.data.result.userName
+            userId: res.data.result.userId, customerFullName: res.data.result.userName, customerTagAllow: true, customerTagging: false
           });
           this.state.mobileData = {
             address: this.state.address,
@@ -945,7 +952,7 @@ class GenerateInvoiceSlip extends Component {
           CustomerService.getCreditNotes(this.state.mobileNumber, res.data.result.userId).then(response => {
             if (response) {
               if (response.data.result && response.data.result.length > 0) {
-                this.setState({ creditAmount: response.data.result[0].amount, isCredit: true, customerTagging: false });
+                this.setState({ creditAmount: response.data.result[0].amount, isCredit: true, customerTagging: false, customerTagAllow: true });
               }
             }
           });
@@ -1418,6 +1425,27 @@ class GenerateInvoiceSlip extends Component {
     );
   }
 
+  // Printer Functions
+  handleViewPrinter() {
+    this.setState({ showPrinter: true });
+  }
+
+  handlePrinterIp = (text) => {
+    this.setState({ printerIp: text });
+  };
+
+  connectPrinter() {
+    AsyncStorage.setItem("printerIp", String(this.state.printerIp)).then(() => {
+      this.setState({ showPrinter: false, loading: true });
+      PrintService('start', 'print').then(() => {
+        this.setState({ loading: false, printEnabled: true });
+      }).catch((err) => {
+        this.setState({ loading: false, printEnabled: false });
+        alert(err);
+      });
+    });
+  }
+
   render() {
     return (
       <View style={{ flex: 1 }}>
@@ -1449,11 +1477,47 @@ class GenerateInvoiceSlip extends Component {
                   <Message imp={true} message={this.state.errors["dsNumber"]} />
                 )}
               </View>
+              <TouchableOpacity style={{ width: '90%', marginHorizontal: '5%', height: 35, borderWidth: 2, borderColor: '#6f6f6f', borderRadius: 5 }} onPress={() => this.handleViewPrinter()}>
+                <Text style={{ textAlign: 'center', marginVertical: 5, fontSize: 16, fontWeight: 'bold', color: '#6f6f6f' }}>Connect Printer</Text>
+              </TouchableOpacity>
+
+              {this.state.showPrinter && (
+                <View>
+                  <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
+                    onBackButtonPress={() => this.modelCancel()}
+                    onBackdropPress={() => this.modelCancel()} >
+                    <View style={forms.filterModelContainer}>
+                      <Text style={forms.popUp_decorator}>-</Text>
+                      <View style={forms.filterModelSub}>
+                        <View style={{ alignItems: 'center', marginTop: 20 }}>
+                          <Text>Printer IP:</Text>
+                          <Text></Text>
+                          <TextInput style={{ width: '90%', marginLeft: '5%', marginRight: '5%' }}
+                            mode="flat"
+                            activeUnderlineColor='#000'
+                            underlineColor='#6f6f6f'
+                            placeholder="Printer ip"
+                            keyboardType={'number-pad'}
+                            value={this.state.printerIp}
+                            onChangeText={(text) => this.handlePrinterIp(text)} />
+                        </View>
+                        <TouchableOpacity
+                          style={sucessBtn} onPress={() => this.connectPrinter()}
+                        >
+                          <Text style={sucessBtnText}  > {I18n.t("Connect")} </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </Modal>
+                </View>
+              )}
 
               {this.state.barCodeList.length !== 0 && (
                 <ScrollView horizontal style={{ flexDirection: 'row' }}>
                   <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isTagCustomer ? color.disableBackGround : color.accent }]}
                     disabled={this.state.isTagCustomer}
+                  <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.customerTagAllow ? color.disableBackGround : color.accent }]}
+                    disabled={this.state.customerTagAllow}
                     onPress={() => {
                       this.setState({ customerTagging: true, modalVisible: true })
                     }}>
