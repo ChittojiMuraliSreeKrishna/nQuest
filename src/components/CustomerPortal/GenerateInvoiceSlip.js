@@ -1518,9 +1518,7 @@ class GenerateInvoiceSlip extends Component {
                     onPress={() => {
                       this.setState({ customerTagging: true, modalVisible: true })
                     }}>
-                    <Text style={forms.button_text}>
-                      {"Tag Customer"}
-                    </Text>
+                    <Text style={forms.button_text}> {"Tag Customer"}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.handleBillDiscount ? color.disableBackGround : color.accent }]}
                     onPress={() => this.setState({ billmodelPop: true, modalVisible: true })}
