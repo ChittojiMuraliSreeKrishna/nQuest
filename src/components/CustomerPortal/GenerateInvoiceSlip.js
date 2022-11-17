@@ -37,7 +37,7 @@ class GenerateInvoiceSlip extends Component {
     this.barcodeCodes = [];
     this.state = {
       barcodeId: "",
-      mobileNumber: "9999999999",
+      mobileNumber: "",
       altMobileNo: "",
       name: "",
       loading: false,
@@ -78,8 +78,8 @@ class GenerateInvoiceSlip extends Component {
       customerAddress: '',
       customerGSTNumber: '',
       reasonDiscount: '',
-      discountAmount: 10,
-      approvedBy: 'Manager',
+      discountAmount: 0,
+      approvedBy: '',
       domainId: 1,
       tableHead: ['S.No', 'Barcode', 'Product', 'Price Per Qty', 'Qty', 'Sales Rate'],
       tableData: [],
@@ -94,7 +94,7 @@ class GenerateInvoiceSlip extends Component {
       },
       openn: false,
       isSubOpen: false,
-      dsNumber: "ES20221673276",
+      dsNumber: "",
       manualDisc: 0,
       isCash: false,
       isCard: false,
@@ -1515,8 +1515,6 @@ class GenerateInvoiceSlip extends Component {
                 <ScrollView horizontal style={{ flexDirection: 'row' }}>
                   <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isTagCustomer ? color.disableBackGround : color.accent }]}
                     disabled={this.state.isTagCustomer}
-                  <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.customerTagAllow ? color.disableBackGround : color.accent }]}
-                    disabled={this.state.customerTagAllow}
                     onPress={() => {
                       this.setState({ customerTagging: true, modalVisible: true })
                     }}>
