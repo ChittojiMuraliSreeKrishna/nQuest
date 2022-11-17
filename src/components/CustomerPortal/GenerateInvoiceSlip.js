@@ -927,7 +927,7 @@ class GenerateInvoiceSlip extends Component {
           const mobileData = res.data.result;
           console.log({ mobileData }, res.data.result, this.state.barCodeList, obj)
           this.setState({
-            userId: res.data.result.userId, customerFullName: res.data.result.userName
+            userId: res.data.result.userId, customerFullName: res.data.result.userName, customerTagAllow: true, customerTagging: false
           });
           this.state.mobileData = {
             address: this.state.address,
@@ -1515,6 +1515,8 @@ class GenerateInvoiceSlip extends Component {
                 <ScrollView horizontal style={{ flexDirection: 'row' }}>
                   <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isTagCustomer ? color.disableBackGround : color.accent }]}
                     disabled={this.state.isTagCustomer}
+                  <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.customerTagAllow ? color.disableBackGround : color.accent }]}
+                    disabled={this.state.customerTagAllow}
                     onPress={() => {
                       this.setState({ customerTagging: true, modalVisible: true })
                     }}>

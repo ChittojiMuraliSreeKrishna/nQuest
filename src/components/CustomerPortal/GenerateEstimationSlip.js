@@ -111,7 +111,7 @@ class GenerateEstimationSlip extends Component {
       smnumberValid: true,
       barcodeIdValid: true,
       errors: {},
-      printerIp: "10.80.2.53",
+      printerIp: "",
       showPrinter: false,
       printBtn: false,
       printEnabled: false,
