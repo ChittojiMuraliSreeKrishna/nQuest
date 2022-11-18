@@ -1499,10 +1499,7 @@ class GenerateInvoiceSlip extends Component {
               {this.state.barCodeList.length !== 0 && (
                 <View>
                   <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isTagCustomer ? color.disableBackGround : color.accent, width: '90%' }]}
-                <ScrollView horizontal style={{ flexDirection: 'row' }}>
-
                     disabled={this.state.isTagCustomer}
-
                     onPress={() => {
                       this.setState({ customerTagging: true, modalVisible: true })
                     }}>
