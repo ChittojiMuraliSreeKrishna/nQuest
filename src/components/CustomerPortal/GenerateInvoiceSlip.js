@@ -711,9 +711,9 @@ class GenerateInvoiceSlip extends Component {
 
   getallDates() {
     const { storeId } = this.state;
-    console.log("in get all dates", storeId);
     CustomerService.getDates(storeId).then(res => {
       if (res) {
+        console.log({ res }, res.data)
         if (res.data.length > 0) {
           this.setState({ dayCloseDates: res.data });
         }
@@ -1499,7 +1499,10 @@ class GenerateInvoiceSlip extends Component {
               {this.state.barCodeList.length !== 0 && (
                 <View>
                   <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isTagCustomer ? color.disableBackGround : color.accent, width: '90%' }]}
+                <ScrollView horizontal style={{ flexDirection: 'row' }}>
+
                     disabled={this.state.isTagCustomer}
+
                     onPress={() => {
                       this.setState({ customerTagging: true, modalVisible: true })
                     }}>
