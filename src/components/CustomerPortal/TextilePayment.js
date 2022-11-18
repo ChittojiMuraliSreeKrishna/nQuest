@@ -1,6 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import Constants from 'expo-constants';
 import React, { Component } from 'react';
 import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
@@ -12,11 +11,15 @@ import RazorpayCheckout from 'react-native-razorpay';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import Loader from '../../commonUtils/loader';
-import PrintService from '../../commonUtils/Printer/printService';
+import CustomerService from '../services/CustomerService';
 import LoginService from '../services/LoginService';
 import NewSaleService from '../services/NewSaleService';
 import PromotionsService from '../services/PromotionsService';
 import { color } from '../Styles/colorStyles';
+import RNPickerSelect from 'react-native-picker-select';
+import { Chevron } from 'react-native-shapes';
+import Message from '../Errors/Message';
+import { customerErrorMessages } from '../Errors/errors';
 
 
 var deviceWidth = Dimensions.get('window').width;
@@ -67,7 +70,6 @@ class TextilePayment extends Component {
       totalPromoDisc: 0,
       CGST: 0,
       SGST: 0,
-      manualDisc: 0,
       taxAmount: 0,
       approvedBy: '',
       reasonDiscount: '',
@@ -79,7 +81,7 @@ class TextilePayment extends Component {
       gvToCustomerModel: false,
       gvNumber: "",
       promoDiscount: 0,
-      discountAmount: 0,
+      manualDisc: 0,
       loading: false,
       clientId: 0,
       isTagCustomer: false,
@@ -116,11 +118,19 @@ class TextilePayment extends Component {
       cardModelVisible: false,
       cardPaymentType: 'Manual',
       cardManual: false,
-      khataAmount: 3888,
+      khataAmount: 0,
       payingAmount: 0,
       grandNetAmount: 0,
-      sufCash: true,
+      showVerified: false,
       billLevelDisc: 0,
+      isBillLevelDisc: false,
+      isCheckPromo: false,
+      totalManualDisc: 0,
+      discReasons: [],
+      discountAmountValid: true,
+      errors: {},
+      netPayableAmount: 0,
+      isBillingDiscount: false
     };
   }
 
@@ -129,7 +139,8 @@ class TextilePayment extends Component {
     var storeStringId = "";
     const userId = await AsyncStorage.getItem("userId");
     const clientId = await AsyncStorage.getItem("custom:clientId1");
-    this.setState({ createdBy: userId, clientId: clientId });
+    const isEsSlipEnabled = await AsyncStorage.getItem('custom:isEsSlipEnabled');
+    this.setState({ createdBy: userId, clientId: clientId, isEstimationEnable: isEsSlipEnabled });
     AsyncStorage.getItem("domainDataId").then((value) => {
       domainStringId = value;
       this.setState({ domainId: parseInt(domainStringId) });
@@ -164,11 +175,7 @@ class TextilePayment extends Component {
       netPayableAmount: this.props.route.params.netPayableAmount,
       grossAmount: this.props.route.params.grossAmount,
       totalPromoDisc: this.props.route.params.totalPromoDisc,
-      manualDisc: this.props.route.params.manualDisc,
       taxAmount: this.props.route.params.taxAmount,
-      approvedBy: this.props.route.params.approvedBy,
-      reasonDiscount: this.props.route.params.reasonDiscount,
-      totalDiscount: this.props.route.params.totalDiscount,
       userId: this.props.route.params.userId,
       retailBarCodeList: this.props.route.params.retailBarCodeList,
       dsNumberList: this.props.route.params.dsNumberList,
@@ -186,7 +193,7 @@ class TextilePayment extends Component {
       isTaxIncluded: this.props.route.params.isTaxIncluded,
       barCodeList: this.props.route.params.barCodeList,
       isCreditFlag: this.props.route.params.isCredit,
-      grandNetAmount: this.props.route.params.grandNetAmount - this.props.route.params.discountAmount,
+      grandNetAmount: this.props.route.params.grandNetAmount,
       billLevelDisc: this.props.route.params.discountAmount
     });
     this.setState({ isTagCustomer: this.props.route.params.customerPhoneNumber.length >= 10 ? true : false });
@@ -207,6 +214,7 @@ class TextilePayment extends Component {
     // if (isTaxIncluded === 'null') {
     //   this.setState({ CGST: 0, SGST: 0, totalAmount: totalAmount, netPayableAmount: totalAmount })
     // }
+    this.getDiscountReasons();
   }
 
 
@@ -350,7 +358,7 @@ class TextilePayment extends Component {
     if (this.state.isRTApplied) {
       this.setState({
         payingAmount: this.state.grandNetAmount + this.state.rtAmount,
-        // totalAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString() + this.state.rtAmount
+        // totalAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString() + this.state.rtAmount
       });
     }
     // if (this.state.totalAmount > 0) {
@@ -393,7 +401,7 @@ class TextilePayment extends Component {
   }
 
   confirmCreditModel() {
-    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
+    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString()
     if (this.state.payCreditAmount > grandNetAmount) {
       alert("please check the value")
     } else if (this.state.creditAmount < grandNetAmount) {
@@ -432,7 +440,7 @@ class TextilePayment extends Component {
 
   saveCard() {
     this.setState({})
-    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
+    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString()
     if (this.state.cardPaymentType === "Automatic") {
       this.getCardModel()
       this.cancelCardModel()
@@ -443,7 +451,7 @@ class TextilePayment extends Component {
   }
 
   getCardModel = () => {
-    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10) - parseFloat(this.state.verifiedCash)).toString()
+    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10) - parseFloat(this.state.verifiedCash)).toString()
     this.setState({ payingAmount: grandNetAmount })
     this.setState({
       isCard: true,
@@ -466,7 +474,7 @@ class TextilePayment extends Component {
     this.setState({ isCard: false, cardManual: true })
     const obj = {
       "paymentType": "Card",
-      "paymentAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10) - parseFloat(this.state.verifiedCash)).toString()
+      "paymentAmount": parseFloat(this.state.grandNetAmount)
     }
     this.state.paymentType.push(obj);
     this.cancelCardModel();
@@ -519,7 +527,6 @@ class TextilePayment extends Component {
   };
 
   clearRedemption() {
-    console.log('dasdsdasdafsf');
     this.setState({ redeemedPints: "" });
   }
   handleCustomerPhoneNumber = (text) => {
@@ -548,13 +555,11 @@ class TextilePayment extends Component {
   };
 
   cancel() {
-    console.log('clicked');
     this.setState({ flagCustomerOpen: false, flagqtyModelOpen: false, modalVisible: false });
     //this.setState({ modalVisible: true });
   }
 
   endEditing() {
-    console.log("end edited");
     if (this.state.customerPhoneNumber.length > 0) {
       this.getUserDetails();
     }
@@ -595,8 +600,6 @@ class TextilePayment extends Component {
 
   gvAction() {
     this.setState({
-      gvToCustomerModel: true,
-      modelVisible: true,
       isCash: false,
       isCard: false,
       isCardOrCash: false,
@@ -628,7 +631,7 @@ class TextilePayment extends Component {
   creditAction() {
     this.setState({
       creditModel: true,
-      payCreditAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString(),
+      payCreditAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString(),
       creditModelVisible: true,
       isCash: false,
       isCard: false,
@@ -662,7 +665,7 @@ class TextilePayment extends Component {
   handlerecievedAmount = (text) => {
     this.setState({ recievedAmount: text });
     if (this.state.isCardOrCash === true) {
-      let grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10))
+      let grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10))
       this.setState({ ccCardCash: grandNetAmount - text })
     }
   };
@@ -674,26 +677,37 @@ class TextilePayment extends Component {
   verifycash() {
     // alert(parseFloat(this.state.recievedAmount))
     if (parseFloat(this.state.recievedAmount)) {
-      const grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10))
+      const grandNetAmount = this.state.grandNetAmount
       if (this.state.isCash === true && this.state.isCardOrCash === false) {
-        if (parseFloat(this.state.recievedAmount) < grandNetAmount) {
+        if (parseFloat(this.state.recievedAmount) > parseFloat(this.state.grandNetAmount)) {
+          this.setState({ returnAmount: parseFloat(this.state.recievedAmount) - parseFloat(this.state.grandNetAmount) });
+          this.setState({ verifiedCash: parseFloat(this.state.totalAmount), payingAmount: grandNetAmount, grandNetAmount: 0, showVerified: true });
+        } else if (parseFloat(this.state.recievedAmount) === parseFloat(this.state.grandNetAmount)) {
+          this.setState({
+            isPayment: false, returnAmount: parseFloat(this.state.recievedAmount) - parseFloat(this.state.grandNetAmount), showVerified: true,
+            payingAmount: this.state.grandNetAmount, grandNetAmount: 0,
+          });
+        } else if (parseFloat(this.state.recievedAmount) < grandNetAmount || parseFloat(this.state.recievedAmount) !== "") {
           alert('Please collect sufficient amount');
-          this.setState({ sufCash: false })
-        }
-        else {
-          if (parseFloat(this.state.recievedAmount) !== NaN) {
-            this.setState({ returnAmount: parseFloat(this.state.recievedAmount) - parseFloat(this.state.totalAmount) });
-            this.setState({ verifiedCash: parseFloat(this.state.totalAmount), payingAmount: grandNetAmount, grandNetAmount: 0, sufCash: true });
-          } else {
-            alert('please enter only values')
-          }
+          this.setState({ showVerified: false })
+        } else {
+          this.state.verifiedCash = 0;
+          this.state.returnAmount = 0;
+          this.state.grandNetAmount = 0;
+          this.state.receivedAmount = 0;
+          this.setState({ isCash: false });
         }
         if (this.state.isreturnCreditCash) {
           this.setState({ grandNetAmount: this.state.balanceCreditAmount })
         }
+        const obj = {
+          "paymentType": "Cash",
+          "paymentAmount": parseFloat(this.state.grandNetAmount)
+        };
+        this.state.paymentType.push(obj);
       }
       else if (this.state.isCardOrCash === true) {
-        if ((parseFloat(this.state.recievedAmount) < (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)))) {
+        if ((parseFloat(this.state.recievedAmount) < (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)))) {
           this.setState({
             // cardModelVisible: true,
             payingAmount: grandNetAmount,
@@ -754,10 +768,10 @@ class TextilePayment extends Component {
               promocode: ''
             }, () => {
               this.setState({
+                isCheckPromo: true,
                 giftCouponsList: [...new Map(this.state.giftCouponsList.map((m) => [m.gvNumber, m])).values()]
               })
             })
-            // this.gvAccumulation()
           }
           else {
             alert(res.data.message);
@@ -774,31 +788,6 @@ class TextilePayment extends Component {
       alert("Please Enter GV Number");
       this.setState({ promocode: '' })
     }
-  }
-
-  gvAccumulation() {
-    let grandAmount = this.state.totalAmount;
-    let sum = this.state.giftCouponsList.reduce((accumulator, current) => {
-      return accumulator += current.value;
-    }, 0);
-    this.setState({}, () => {
-      if (grandAmount > sum) {
-        this.setState({
-          totalAmount: grandAmount,
-          grandNetAmount: this.state.grandNetAmount - sum,
-          couponAmount: this.state.couponAmount + sum
-        });
-      }
-      else if (grandAmount === sum) {
-        this.setState({
-          couponAmount: sum,
-          grandNetAmount: grandAmount - sum,
-        }, () => {
-        });
-      } else {
-        toast.error("Please purchase greater than coupon amount")
-      }
-    });
   }
 
   applyRedem() {
@@ -868,7 +857,7 @@ class TextilePayment extends Component {
   }
 
   pay = () => {
-    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString();
+    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString();
     var obj;
     if (this.state.isRTApplied) {
       this.setState({ payingAmount: grandNetAmount + this.state.rtAmount });
@@ -929,7 +918,7 @@ class TextilePayment extends Component {
     if (this.state.isCash === true && this.state.isCardOrCash === false && this.state.recievedAmount === "") {
       alert('Please collect sufficient amount and then only pay');
     }
-    else if (this.state.isCash === true && this.state.isCardOrCash === false && parseFloat(this.state.recievedAmount) < (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10))) {
+    else if (this.state.isCash === true && this.state.isCardOrCash === false && parseFloat(this.state.recievedAmount) < (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10))) {
       alert('Please collect sufficient amount and then only pay');
     }
     else if (this.state.isCardOrCash === true && this.state.verifiedCash === "") {
@@ -938,7 +927,7 @@ class TextilePayment extends Component {
     else if (this.state.isUpi === true) {
       // this.getPaymentResposne()
       const obj = {
-        "amount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString(),
+        "amount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString(),
         "description": "payment description",
         "customerDetails": {
           "name": "kadali",
@@ -974,13 +963,13 @@ class TextilePayment extends Component {
     //     }
     //     this.state.paymentType.push(obj);
     // }
-    else if (this.state.isCash === true) {
-      const obj = {
-        "paymentType": "Cash",
-        "paymentAmount": parseFloat(this.state.verifiedCash)
-      };
-      this.state.paymentType.push(obj);
-    }
+    // else if (this.state.isCash === true) {
+    //   const obj = {
+    //     "paymentType": "Cash",
+    //     "paymentAmount": parseFloat(this.state.grandNetAmount)
+    //   };
+    //   this.state.paymentType.push(obj);
+    // }
     // else if (this.state.isCardOrCash === true) {
     //   const obj = {
 
@@ -1027,6 +1016,7 @@ class TextilePayment extends Component {
       "offlineNumber": null,
       "mobileNumber": this.state.customerPhoneNumber,
       "customerFullName": this.state.customerFullName,
+      "customerName": this.state.customerName,
       "userId": this.state.userId,
       "sgst": this.state.SGST,
       "cgst": this.state.CGST,
@@ -1049,7 +1039,10 @@ class TextilePayment extends Component {
       "returnSlipAmount": (this.state.rtAmount === null ? 0 : this.state.rtAmount),
       "gvAppliedAmount": (this.state.couponAmount === null ? 0 : this.state.couponAmount),
       "gvNumber": couponCode,
-      "totalAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()
+      "totalAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString(),
+      "withoutTaxTotal": this.state.netPayableAmount,
+      "TotalAmTax": this.state.totalAmount,
+      "TaxIncExc": this.state.isTaxIncluded
     };
     console.log(" payment cash method data", obj);
     let invoiceTax = []
@@ -1061,9 +1054,9 @@ class TextilePayment extends Component {
       console.log("Invoice data", JSON.stringify(res.data));
       if (res.data && res.data["isSuccess"] === "true") {
 
-        PrintService('INVOICE', res.data.result, this.state.barCodeList, invoiceTax)
+        // PrintService('INVOICE', res.data.result, this.state.barCodeList, invoiceTax)
 
-        // const cardAmount = this.state.isCard || this.state.isCardOrCash ? JSON.stringify(Math.round(this.state.ccCardCash)) : JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString());
+        // const cardAmount = this.state.isCard || this.state.isCardOrCash ? JSON.stringify(Math.round(this.state.ccCardCash)) : JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString());
         alert("Order created " + res.data["result"]);
         if (this.state.isKhata === true) {
           this.props.route.params.onGoBack();
@@ -1084,7 +1077,7 @@ class TextilePayment extends Component {
         let obj;
         if (this.state.isCard === true) {
           obj = {
-            "amount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)),
+            "amount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)),
             "info": "order creations",
             "newsaleId": res.data["result"],
           };
@@ -1174,7 +1167,7 @@ class TextilePayment extends Component {
     //                     "discApprovedBy": this.state.approvedBy,
     //                     "discType": this.state.reasonDiscount,
     //                     "approvedBy": null,
-    //                     "netPayableAmount": (parseFloat(this.state.totalAmount ) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString(),
+    //                     "netPayableAmount": (parseFloat(this.state.totalAmount ) -  parseFloat(this.state.redeemedPints / 10)).toString(),
     //                     "offlineNumber": null,
     //                     "userId": this.state.userId,
     //                     "sgst": this.state.CGST,
@@ -1277,20 +1270,19 @@ class TextilePayment extends Component {
         "invoiceNumber": null,
         "mobileNumber": this.state.mobileNumber,
       };
-      console.log(params);
       this.setState({ loading: true });
       axios.post(PromotionsService.searchLoyaltyPoints(),
         params).then((res) => {
           if (res.data && res.data["isSuccess"] === "true") {
             this.setState({ loading: false });
             let len = res.data["result"].length;
-            console.log(res.data["result"]);
+            // console.log(res.data["result"]);
             if (len > 0) {
               for (let i = 0; i < len; i++) {
                 let number = res.data["result"][i];
                 this.setState({ loyaltyPoints: number.loyaltyPoints });
 
-                console.log(this.state.loyaltyPoints);
+                // console.log(this.state.loyaltyPoints);
               }
             }
           }
@@ -1307,7 +1299,7 @@ class TextilePayment extends Component {
     const param = '?flag=' + false;
     axios.put(NewSaleService.saveCoupons() + param, gvObj).then(res => {
       if (res) {
-        console.log(res.data);
+        // console.log(res.data);
         alert(res.data.message);
       }
       this.setState({ modelVisible: false, gvNumber: "" });
@@ -1317,12 +1309,12 @@ class TextilePayment extends Component {
   async applyRt() {
     const obj = this.state.rtNumber
     if (this.state.compareRTList.length === 0) {
-      console.log("in if", this.state.compareRTList, this.state.listOfRtnum);
+      // console.log("in if", this.state.compareRTList, this.state.listOfRtnum);
       this.setState({
         compareRTList: [...this.state.listOfRtnum, obj],
       })
     } else {
-      console.log("in else", this.state.rtListList);
+      // console.log("in else", this.state.rtListList);
       const isFound = this.state.rtListList.find(element => {
         if (element.returnReference === obj) {
           alert("RT Number Alredy Exist ");
@@ -1337,7 +1329,7 @@ class TextilePayment extends Component {
       }
 
     }
-    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString();
+    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString();
     if (this.state.rtNumber.length > 0) {
       const storeId = await AsyncStorage.getItem("storeId");
       NewSaleService.getRTDetails([this.state.rtNumber], storeId).then(res => {
@@ -1401,6 +1393,178 @@ class TextilePayment extends Component {
     }
   }
 
+  checkPromo() {
+    let costPrice = 0;
+    let discount = 0;
+    let total = 0;
+    let discAppliedTotal = 0;
+    const { storeId, domainId, barCodeList } = this.state;
+    const requestObj = barCodeList.map((item) => {
+      let obj = {};
+      obj.actualValue = item.actualValue;
+      obj.barCode = item.barCode;
+      obj.cgst = item.cgst;
+      obj.discount = item.promoDiscount;
+      obj.division = item.division;
+      obj.domainId = item.domainId;
+      obj.grossValue = item.grossValue;
+      obj.hsnCode = item.hsnCode;
+      obj.itemPrice = item.itemPrice;
+      obj.lineItemId = item.lineItemId;
+      obj.netValue = item.netValue;
+      obj.quantity = item.quantity;
+      obj.section = item.section;
+      obj.sgst = item.sgst;
+      obj.storeId = item.storeId;
+      obj.subSection = item.subSection;
+      obj.taxValue = item.taxValue;
+      obj.userId = item.userId;
+      obj.costPrice = item.costPrice;
+      obj.uom = item.uom;
+      obj.originalBarcodeCreatedAt = item.createdDate;
+      obj.batchNo = item.batchNo;
+      obj.promoDiscount = 0;
+      return obj;
+    });
+    if (this.state.isEstimationEnable === "true") {
+      CustomerService.getinvoiceLevelCheckPro(1, storeId, requestObj,).then((res) => {
+        if (res.status === 200) {
+          this.setState({
+            barCodeList: res.data.result,
+            isCheckPromo: true,
+          });
+
+          this.state.barCodeList.forEach((barCode, index) => {
+            costPrice = costPrice + barCode.itemPrice;
+            discount = discount + barCode.promoDiscount;
+            total = total + barCode.netValue;
+          });
+
+          discount = discount + this.state.manualDisc;
+          discAppliedTotal = this.state.grandNetAmount - discount;
+          this.setState({
+            netPayableAmount: total,
+            totalPromoDisc: discount,
+            grossAmount: costPrice,
+            grandNetAmount: discAppliedTotal
+          });
+          if (this.state.barCodeList.length > 0) {
+            this.setState({ enablePayment: true });
+          }
+
+          // this.getTaxAmount();
+        } else {
+          alert("no Promo Available");
+          this.setState({ isCheckPromo: true });
+        }
+      });
+    } else {
+      CustomerService.getCheckPromoAmount(storeId, 1, barCodeList).then(res => {
+        let calculatedDisc = res.data.result.calculatedDiscountVo;
+        if (res.status === 200) {
+          this.setState({
+            isCheckPromo: true
+          });
+        }
+        if (res?.data && res?.data?.result[0].calculatedDiscountVo) {
+          this.setState({ promoDisc: res?.data?.result });
+          this.state.barCodeList.forEach(barcodeData => {
+            this.state.promoDisc.forEach(promo => {
+              if (barcodeData.barcode === promo.barcode) {
+                if (promo.calculatedDiscountVo) {
+                  if (promo.calculatedDiscountVo.discountAvailable) {
+                    if (promo.calculatedDiscountsVo.thisFixedAmountDiscount) {
+                      barcodeData.itemDiscount = parseInt(promo.calculatedDiscountVo.calculatedDiscount);
+                      barcodeData.totalMrp = barcodeData.totalMrp - barcodeData.itemDiscount;
+                    }
+                    else {
+                      barcodeData.itemDiscount = parseInt(promo.calculatedDiscountsVo.calculatedDiscount);
+                      barcodeData.totalMrp = barcodeData.totalMrp - barcodeData.itemDiscount;
+                    }
+                  }
+                } else {
+                  barCodeData.itemDiscount = "No discount";
+                }
+              }
+            });
+          });
+          // this.setState({ barList: this.state.barList }, () => {
+          // this.calculateTotal();
+          // });
+        } else {
+          alert("No Promo Available");
+        }
+      });
+    }
+    this.setState({ isCheckPromo: true, modalVisible: true, handleBillDiscount: false })
+  }
+
+  getDiscountReasons() {
+    axios.get(CustomerService.getDiscountReasons()).then((res) => {
+      if (res.status === 200) {
+        //this.setState({discReasons: res.data});
+        const discount = res.data.result;
+        discount.forEach((dis, index) => {
+          const obj = {
+            value: dis,
+            label: dis,
+          };
+          this.state.discReasons.push(obj);
+        });
+      } else {
+        alert(res.data);
+      }
+    }).catch(() => {
+      this.setState({ loading: false });
+      // alert('Error with getting discount reasons');
+    });
+  }
+
+  billDiscountModelCancel() {
+    this.setState({
+      reasonDiscount: '', discApprovedBy: '', manualDisc: '',
+      discountAmountValid: true, modalVisible: false, billmodelPop: false
+    });
+  }
+
+  billValidation() {
+    let isFormValid = true;
+    let errors = {};
+
+    if (this.state.manualDisc > this.state.netPayableAmount) {
+      isFormValid = false;
+      errors["discountAmount"] = customerErrorMessages.discountAmount;
+      this.setState({ discountAmountValid: false });
+    }
+    this.setState({ errors: errors });
+    return isFormValid;
+  }
+
+  billDiscount() {
+    const isFormValid = this.billValidation();
+    console.log("manualDiscmanualDisc", this.state.manualDisc, this.state.totalAmount);
+    if (isFormValid) {
+      if (this.state.manualDisc === 0 || this.state.approvedBy === "" || this.state.reasonDiscount === "") {
+        alert("Please enter all fields");
+      } else {
+        // this.state.netPayableAmount = 0;
+        const totalDisc = parseFloat(this.state.manualDisc);
+        if (totalDisc < this.state.grandNetAmount) {
+          const netPayableAmount = this.state.grandNetAmount - totalDisc;
+          this.setState({ grandNetAmount: netPayableAmount });
+          // this.getTaxAmount();
+        }
+        const promDisc = parseInt(this.state.manualDisc) + this.state.totalPromoDisc;
+        this.setState({
+          showDiscReason: true, promoDiscount: promDisc, isCheckPromo: false,
+          billmodelPop: false, modalVisible: false, isBillingDiscount: true
+        });
+      }
+    }
+    console.log("manualDiscmanualDisc after", this.state.manualDisc, this.state.totalAmount);
+  }
+
+
   render() {
     return (
       <View style={styles.mainContainer}>
@@ -1415,7 +1579,7 @@ class TextilePayment extends Component {
         <ScrollView>
           <View style={styles.container}>
 
-            <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 15 }}> SELECT A MODE TO PAY ₹ {(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()} </Text>
+            <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 15 }}> SELECT A MODE TO PAY ₹ {(parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString()} </Text>
             <FlatList
               style={styles.flatListContainer}
               horizontal
@@ -1563,77 +1727,161 @@ class TextilePayment extends Component {
               ListFooterComponent={<View style={{ width: 15 }}></View>}
             />
 
-
-
-            <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 10 }}> {('HAVE A RT NUMBER?')} </Text>
-            {this.state.loyaltyPoints !== "" && (
-              <TouchableOpacity
-                style={{ borderRadius: 5, width: 90, height: 20, alignSelf: 'flex-end', marginTop: -20 }}
-                onPress={() => this.clearTaggedCustomer()} >
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('CLEAR')} </Text>
+            <View style={{ flexDirection: 'row' }}>
+              <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isBillingDiscount ? color.disableBackGround : color.accent }]}
+                onPress={() =>
+                  this.setState({ billmodelPop: true, modalVisible: true })
+                }
+                disabled={this.state.isBillingDiscount}>
+                <Text style={forms.button_text}>
+                  {"Bill Level Discount"}
+                </Text>
               </TouchableOpacity>
-            )}
-
-            {this.state.notfound === "not found" && (
-              <TouchableOpacity
-                style={{ borderRadius: 5, width: 90, height: 20, alignSelf: 'flex-end', marginTop: -20 }}
-                onPress={() => this.clearTaggedCustomer()} >
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('CLEAR')} </Text>
+              <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isBillingDiscount || this.state.isCheckPromo ? color.disableBackGround : color.accent }]}
+                onPress={() => {
+                  this.checkPromo();
+                }}
+                disabled={this.state.isBillingDiscount || this.state.isCheckPromo}>
+                <Text style={forms.button_text}>
+                  {"Check Promo Disc"}
+                </Text>
               </TouchableOpacity>
-            )}
+            </View>
+            {
+              this.state.billmodelPop && (
+                <View>
+                  <Modal style={{ margin: 0 }} isVisible={this.state.billmodelPop}
+                    onBackButtonPress={() => this.billDiscountModelCancel()}
+                    onBackdropPress={() => this.billDiscountModelCancel()}
+                  >
+                    <View style={[forms.filterModelContainer, { width: '100%' }]}>
+                      <Text style={forms.popUp_decorator}>-</Text>
+                      <View style={forms.filterModelSub}>
+                        <TextInput
+                          style={forms.input_fld}
+                          mode="flat"
+                          activeUnderlineColor='#000'
+                          underlineColor={'#6f6f6f'}
+                          label={I18n.t("AMOUNT *")}
+                          keyboardType={'numeric'}
+                          value={this.state.manualDisc}
+                          onChangeText={(text) => {
+                            this.setState({ manualDisc: text })
+                          }}
+                        />
+                        {!this.state.discountAmountValid && (
+                          <Message imp={true} message={this.state.errors["discountAmount"]} />
+                        )}
 
+                        <TextInput
+                          style={forms.input_fld}
+                          mode="flat"
+                          activeUnderlineColor='#000'
+                          underlineColor={'#6f6f6f'}
+                          label={I18n.t("APPROVED BY *")}
+                          value={this.state.approvedBy}
+                          onChangeText={(text) => { this.setState({ approveBy: text }) }}
+                        />
+                        <View style={[Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile, { width: "92%" }]}>
+                          <RNPickerSelect
+                            placeholder={{ label: 'REASON *', value: '' }}
+                            Icon={() => {
+                              return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
+                            }}
+                            items={
+                              this.state.discReasons
+                            }
+                            onValueChange={(value) => { this.setState({ reasonDiscount: value }) }}
+                            style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
+                            value={this.state.reasonDiscount}
+                            useNativeAndroidPickerStyle={false}
+                          />
+                        </View>
+                        <View style={forms.action_buttons_container}>
+                          <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                            onPress={() => this.billDiscount()}>
+                            <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                            onPress={() => this.billDiscountModelCancel()}>
+                            <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    </View>
+                  </Modal>
+                </View >
+              )
+            }
 
-            {/* loyalty points */}
-            <TextInput style={styles.input}
-              underlineColor="transparent"
-              label="ENTER RT NUMBER"
-              activeUnderlineColor='#000'
-              value={this.state.rtNumber}
-              onChangeText={(text) => this.setState({ rtNumber: text })}
-            // onEndEditing={() => this.endEditing()}
-            />
-            {this.state.loyaltyPoints === "" && this.state.notfound !== "not found" && (
-              <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, alignSelf: 'flex-end', right: 10, marginTop: Device.isTablet ? -47 : -37 }}
-                onPress={() => this.applyRt()}
-              >
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>
-              </TouchableOpacity>
-            )}
+            {this.state.isBillingDiscount === false &&
+              <>
+                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 10 }}> {('HAVE A RT NUMBER?')} </Text>
+                {this.state.loyaltyPoints !== "" && (
+                  <TouchableOpacity
+                    style={{ borderRadius: 5, width: 90, height: 20, alignSelf: 'flex-end', marginTop: -20 }}
+                    onPress={() => this.clearTaggedCustomer()} >
+                    <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('CLEAR')} </Text>
+                  </TouchableOpacity>
+                )}
 
-            {this.state.notfound === "not found" && this.state.loyaltyPoints == "" && (
-              <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, alignSelf: 'flex-end', right: 10, marginTop: Device.isTablet ? -47 : -37 }}
-              >
-                <Image style={{ position: 'absolute', right: Device.isTablet ? 83 : 68, top: Device.isTablet ? 11 : 9 }} source={require('../assets/images/notapplied.png')} />
+                {this.state.notfound === "not found" && (
+                  <TouchableOpacity
+                    style={{ borderRadius: 5, width: 90, height: 20, alignSelf: 'flex-end', marginTop: -20 }}
+                    onPress={() => this.clearTaggedCustomer()} >
+                    <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('CLEAR')} </Text>
+                  </TouchableOpacity>
+                )}
+                <TextInput style={styles.input}
+                  underlineColor="transparent"
+                  label="ENTER RT NUMBER"
+                  activeUnderlineColor='#000'
+                  value={this.state.rtNumber}
+                  onChangeText={(text) => this.setState({ rtNumber: text })}
+                // onEndEditing={() => this.endEditing()}
+                />
+                {this.state.loyaltyPoints === "" && this.state.notfound !== "not found" && (
+                  <TouchableOpacity
+                    style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, alignSelf: 'flex-end', right: 10, marginTop: Device.isTablet ? -47 : -37 }}
+                    onPress={() => this.applyRt()}
+                  >
+                    <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>
+                  </TouchableOpacity>
+                )}
 
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('NO RECORDS')} </Text>
-              </TouchableOpacity>
-            )}
-            {this.state.notfound === "not found" && this.state.loyaltyPoints == "" && (
-              <View style={{ height: 50, backgroundColor: "#ffffff", }}>
-                <View style={{ height: Device.isTablet ? 2 : 1, backgroundColor: "" }}>
-                </View>
-                <TouchableOpacity
-                  style={{ backgroundColor: '#ED1C24', borderRadius: 5, width: 150, height: 32, alignSelf: 'center', marginTop: 5 }}
-                  onPress={() => this.tagCustomer()} >
-                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ffffff', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('ADD TO TAG CUSTOMER')} </Text>
-                </TouchableOpacity>
-              </View>
-            )}
+                {this.state.notfound === "not found" && this.state.loyaltyPoints == "" && (
+                  <TouchableOpacity
+                    style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, alignSelf: 'flex-end', right: 10, marginTop: Device.isTablet ? -47 : -37 }}
+                  >
+                    <Image style={{ position: 'absolute', right: Device.isTablet ? 83 : 68, top: Device.isTablet ? 11 : 9 }} source={require('../assets/images/notapplied.png')} />
 
-            {this.state.loyaltyPoints !== "" && this.state.giftvoucher === "" && (
-              <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, alignSelf: 'flex-end', right: 10, marginTop: Device.isTablet ? -47 : -37 }}
-              >
-                <Image style={{ position: 'absolute', right: Device.isTablet ? 83 : 68, top: Device.isTablet ? 11 : 9 }} source={require('../assets/images/applied.png')} />
+                    <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('NO RECORDS')} </Text>
+                  </TouchableOpacity>
+                )}
+                {this.state.notfound === "not found" && this.state.loyaltyPoints == "" && (
+                  <View style={{ height: 50, backgroundColor: "#ffffff", }}>
+                    <View style={{ height: Device.isTablet ? 2 : 1, backgroundColor: "" }}>
+                    </View>
+                    <TouchableOpacity
+                      style={{ backgroundColor: '#ED1C24', borderRadius: 5, width: 150, height: 32, alignSelf: 'center', marginTop: 5 }}
+                      onPress={() => this.tagCustomer()} >
+                      <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ffffff', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('ADD TO TAG CUSTOMER')} </Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
 
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
+                {this.state.loyaltyPoints !== "" && this.state.giftvoucher === "" && (
+                  <TouchableOpacity
+                    style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, alignSelf: 'flex-end', right: 10, marginTop: Device.isTablet ? -47 : -37 }}
+                  >
+                    <Image style={{ position: 'absolute', right: Device.isTablet ? 83 : 68, top: Device.isTablet ? 11 : 9 }} source={require('../assets/images/applied.png')} />
 
-              </TouchableOpacity>
-            )}
+                    <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
 
-            {/* {this.state.notfound === "not found" && this.state.giftvoucher !== "" && (
+                  </TouchableOpacity>
+                )}
+
+                {/* {this.state.notfound === "not found" && this.state.giftvoucher !== "" && (
                             <TouchableOpacity
                                 style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, position: 'absolute', right: 10,alignSelf: 'flex-end',marginTop:-37 }}
                             >
@@ -1644,57 +1892,58 @@ class TextilePayment extends Component {
                             </TouchableOpacity>
                         )} */}
 
-            {this.state.loyaltyPoints !== "" && this.state.giftvoucher !== "" && (
-              <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, position: 'absolute', right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
-              >
-                <Image style={{ position: 'absolute', right: Device.isTablet ? 83 : 68, top: Device.isTablet ? 11 : 9 }} source={require('../assets/images/applied.png')} />
+                {this.state.loyaltyPoints !== "" && this.state.giftvoucher !== "" && (
+                  <TouchableOpacity
+                    style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, position: 'absolute', right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
+                  >
+                    <Image style={{ position: 'absolute', right: Device.isTablet ? 83 : 68, top: Device.isTablet ? 11 : 9 }} source={require('../assets/images/applied.png')} />
 
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
+                    <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
 
-              </TouchableOpacity>
-            )}
-
-            {this.state.loyaltyPoints !== "" && this.state.redeemedPints === "0" && (
-              <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10 }}> LOYALTY POINTS  {this.state.loyaltyPoints} </Text>
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10, marginBottom: 10 }}> VALUE  {(parseInt(this.state.loyaltyPoints) / 10).toString()} </Text>
-              </View>
-            )}
-
-            {this.state.redeemedPints !== 0 && (
-              <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10 }}> REDEEMED POINTS   {this.state.redeemedPints} </Text>
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10, marginBottom: 10 }}> REMAINING POINTS  {(parseInt(this.state.loyaltyPoints - this.state.redeemedPints)).toString()} </Text>
-              </View>
-            )}
-
-            {this.state.loyaltyPoints !== "" && this.state.redeemedPints !== "0" && (
-              <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
-                <TouchableOpacity
-                  style={{ borderRadius: 5, width: 90, height: 20, alignSelf: 'flex-end', marginTop: -40 }}
-                  onPress={() => this.clearRedemption()} >
-                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('CLEAR')} </Text>
-                </TouchableOpacity>
-              </View>
-            )}
-
-            {this.state.loyaltyPoints !== "" && this.state.redeemedPints === "0" && (
-              <View style={{ height: 0, backgroundColor: "#ffffff", }}>
-                {/* <View style={{ height: Device.isTablet ? 2 : 1, backgroundColor: "#22222240",marginTop:-20, }}> */}
-
-                <TouchableOpacity
-                  style={{ backgroundColor: '#ED1C24', borderRadius: 5, width: 150, height: 32, alignSelf: 'flex-end', marginTop: -45, right: 10 }}
-                  onPress={() => this.redeemPoints()} >
-                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ffffff', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('REDEEM POINTS')} </Text>
-                </TouchableOpacity>
-                {/* </View> */}
-              </View>
-            )}
+                  </TouchableOpacity>
+                )}
 
 
+                {this.state.loyaltyPoints !== "" && this.state.redeemedPints === "0" && (
+                  <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
+                    <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10 }}> LOYALTY POINTS  {this.state.loyaltyPoints} </Text>
+                    <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10, marginBottom: 10 }}> VALUE  {(parseInt(this.state.loyaltyPoints) / 10).toString()} </Text>
+                  </View>
+                )}
 
-            {this.state.billLevelDisc === 0 && <View>
+                {this.state.redeemedPints !== 0 && (
+                  <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
+                    <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10 }}> REDEEMED POINTS   {this.state.redeemedPints} </Text>
+                    <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10, marginBottom: 10 }}> REMAINING POINTS  {(parseInt(this.state.loyaltyPoints - this.state.redeemedPints)).toString()} </Text>
+                  </View>
+                )}
+
+                {this.state.loyaltyPoints !== "" && this.state.redeemedPints !== "0" && (
+                  <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
+                    <TouchableOpacity
+                      style={{ borderRadius: 5, width: 90, height: 20, alignSelf: 'flex-end', marginTop: -40 }}
+                      onPress={() => this.clearRedemption()} >
+                      <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('CLEAR')} </Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+
+                {this.state.loyaltyPoints !== "" && this.state.redeemedPints === "0" && (
+                  <View style={{ height: 0, backgroundColor: "#ffffff", }}>
+                    {/* <View style={{ height: Device.isTablet ? 2 : 1, backgroundColor: "#22222240",marginTop:-20, }}> */}
+
+                    <TouchableOpacity
+                      style={{ backgroundColor: '#ED1C24', borderRadius: 5, width: 150, height: 32, alignSelf: 'flex-end', marginTop: -45, right: 10 }}
+                      onPress={() => this.redeemPoints()} >
+                      <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ffffff', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('REDEEM POINTS')} </Text>
+                    </TouchableOpacity>
+                    {/* </View> */}
+                  </View>
+                )}
+
+              </>}
+
+            {this.state.isBillingDiscount === false && <View>
               <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 10 }}> {('HAVE A COUPON CODE ?')} </Text>
               {this.state.giftvoucher !== "" && (
                 <TouchableOpacity
@@ -1752,39 +2001,47 @@ class TextilePayment extends Component {
               // onEndEditing={() => this.endEditing()}
             )}
 
-            {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.giftvoucher === "" && this.state.loyaltyPoints === "" && this.state.verifiedCash === 0 && (
+            {(this.state.isCash === true || this.state.isCardOrCash === true) && (
               <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
+                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: this.state.showVerified === true ? '#28D266' : "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
                 onPress={() => this.verifycash()} >
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>
+                {this.state.showVerified ?
+                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFIED')} </Text> :
+                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>}
               </TouchableOpacity>
             )}
 
-            {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.giftvoucher !== "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash === 0 && (
+            {/* {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.giftvoucher !== "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash === 0 && (
               <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
+                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: this.state.showVerified === true ? '#28D266' : "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
                 onPress={() => this.verifycash()} >
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>
+                {this.state.showVerified === true ?
+                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFIED')} </Text> :
+                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>}
               </TouchableOpacity>
             )}
 
             {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.giftvoucher !== "" && this.state.loyaltyPoints === "" && this.state.verifiedCash === 0 && (
               <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
+                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: this.state.showVerified === true ? '#28D266' : "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
                 onPress={() => this.verifycash()} >
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>
+                {this.state.showVerified === true ?
+                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFIED')} </Text> :
+                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>}
               </TouchableOpacity>
             )}
 
             {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.giftvoucher === "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash === 0 && (
               <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
+                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: this.state.showVerified === true ? '#28D266' : "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
                 onPress={() => this.verifycash()} >
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>
+                {this.state.showVerified === true ?
+                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFIED')} </Text> :
+                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>}
               </TouchableOpacity>
-            )}
+            )} */}
 
-            {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.giftvoucher === "" && this.state.loyaltyPoints === "" && this.state.verifiedCash !== 0 && (
+            {/* {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.showVerified === true && (
               <TouchableOpacity
                 style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
               >
@@ -1793,47 +2050,14 @@ class TextilePayment extends Component {
                 <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
 
               </TouchableOpacity>
-            )}
+            )} */}
 
-            {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.giftvoucher !== "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash !== 0 && (
-              <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
-              >
-                <Image style={{ position: 'absolute', right: Device.isTablet ? 83 : 68, top: Device.isTablet ? 11 : 9 }} source={require('../assets/images/applied.png')} />
-
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
-
-              </TouchableOpacity>
-            )}
-
-            {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.giftvoucher !== "" && this.state.loyaltyPoints === "" && this.state.verifiedCash !== 0 && (
-              <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
-              >
-                <Image style={{ position: 'absolute', right: Device.isTablet ? 83 : 68, top: Device.isTablet ? 11 : 9 }} source={require('../assets/images/applied.png')} />
-
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
-
-              </TouchableOpacity>
-            )}
-
-            {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.giftvoucher === "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash !== 0 && (
-              <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
-              >
-                <Image style={{ position: 'absolute', right: Device.isTablet ? 83 : 68, top: Device.isTablet ? 11 : 9 }} source={require('../assets/images/applied.png')} />
-
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
-
-              </TouchableOpacity>
-            )}
-
-            {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.verifiedCash !== 0 && (
+            {/* {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.verifiedCash !== 0 && (
               <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
                 <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10 }}> RETURN AMOUNT  ₹{this.state.returnAmount} </Text>
 
               </View>
-            )}
+            )} */}
 
             {this.state.flagredeem && (
               <View>
@@ -1945,7 +2169,7 @@ class TextilePayment extends Component {
                           underlineColor="transparent"
                           activeUnderlineColor='#000'
                           disabled
-                          value={(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()}
+                          value={(parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString()}
                         />
                         <Text style={scss.textStyleLight}>Mobile Number:</Text>
                         <TextInput
@@ -2071,34 +2295,31 @@ class TextilePayment extends Component {
                 <Modal isVisible={this.state.modelVisible} style={{ margin: 0 }}
                   onBackButtonPress={() => this.modelCancel()}
                   onBackdropPress={() => this.modelCancel()} >
-                  <View style={styles.filterMainContainer}>
-                    <KeyboardAwareScrollView >
-                      <Text style={Device.isTablet ? styles.filterByTitle_tablet : styles.filterByTitle_mobile} > Issue GV Number </Text>
-                      <TouchableOpacity style={Device.isTablet ? styles.filterCloseButton_tablet : styles.filterCloseButton_mobile} onPress={() => this.modelCancel()}>
-                        <Image style={styles.modelCloseImage} source={require('../assets/images/modelcancel.png')} />
-                      </TouchableOpacity>
-                      <Text style={Device.isTablet ? styles.filterByTitleDecoration_tablet : styles.filterByTitleDecoration_mobile}>
-                      </Text>
-                      <Text style={{ alignItems: 'center', fontSize: Device.isTablet ? 20 : 15, marginLeft: 40 }}>GV Number:</Text>
-                      <TextInput
-                        style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-                        underlineColor="transparent"
-                        label="GV Number"
-                        activeUnderlineColor='#000'
-                        value={this.state.gvNumber}
-                        onChangeText={this.handleGVNumber}
-                      />
-                      <View style={forms.action_buttons_container}>
-                        <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
-                          onPress={() => this.applyGVNumber()}>
-                          <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
-                          onPress={() => this.modelCancel()}>
-                          <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </KeyboardAwareScrollView>
+                  <View style={forms.filterModelContainer} >
+                    <Text style={forms.popUp_decorator}>-</Text>
+                    <View style={forms.filterModelSub}>
+                      <KeyboardAwareScrollView >
+                        <Text style={scss.textStyleMedium}>GV Number:</Text>
+                        <TextInput
+                          style={forms.input_fld}
+                          underlineColor="transparent"
+                          label="GV Number"
+                          activeUnderlineColor='#000'
+                          value={this.state.promocode}
+                          onChangeText={this.handlePromocode}
+                        />
+                        <View style={forms.action_buttons_container}>
+                          <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                            onPress={() => this.applyPromocode()}>
+                            <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                            onPress={() => this.modelCancel()}>
+                            <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </KeyboardAwareScrollView>
+                    </View>
                   </View>
                 </Modal>
               </View>
@@ -2120,17 +2341,17 @@ class TextilePayment extends Component {
                             underlineColor="transparent"
                             activeUnderlineColor='#000'
                             editable={this.state.isCardOrCash ? true : false} selectTextOnFocus={false}
-                            value={(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10) - parseInt(this.state.verifiedCash)).toString()}
+                            value={parseFloat(this.state.grandNetAmount)}
                           />
                           <View style={scss.radio_group}>
-                            <View style={scss.radio_item}>
+                            {/* <View style={scss.radio_item}>
                               <RadioButton
                                 value="Automatic"
                                 status={this.state.cardPaymentType === 'Automatic' ? 'checked' : 'unchecked'}
                                 onPress={() => this.setState({ cardPaymentType: 'Automatic' })}
                               />
                               <Text >Automatic</Text>
-                            </View>
+                            </View> */}
                             <View style={scss.radio_item}>
                               <RadioButton
                                 value="Manual"
@@ -2201,20 +2422,6 @@ class TextilePayment extends Component {
                     ₹  {this.state.SGST} </Text>
                 </View>}
 
-              {this.props.route.params.discountAmount !== 0 &&
-                <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
-                  <Text style={{
-                    color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                    fontSize: Device.isTablet ? 19 : 14,
-                  }}>
-                    Bill Level Discount </Text>
-                  <Text style={{
-                    color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                    fontSize: Device.isTablet ? 19 : 14,
-                  }}>
-                    ₹  {this.props.route.params.discountAmount} </Text>
-                </View>}
-
               <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
                 <Text style={{
                   color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
@@ -2225,7 +2432,7 @@ class TextilePayment extends Component {
                   color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
                   fontSize: Device.isTablet ? 19 : 14,
                 }}>
-                  ₹  {(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()} </Text>
+                  ₹  {(parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString()} </Text>
               </View>
 
               <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
@@ -2251,9 +2458,38 @@ class TextilePayment extends Component {
                   color: "#353C40", fontFamily: "bold", alignItems: 'center', fontSize: 20, justifyContent: 'center', textAlign: 'center',
                   fontSize: 20,
                 }}>
-                  ₹ {this.state.grandNetAmount + '.00'}
+                  ₹ {this.state.grandNetAmount}
                 </Text>
               </View>
+              {this.state.isBillingDiscount &&
+                <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                    fontSize: Device.isTablet ? 19 : 14,
+                  }}>
+                    Billing Discount </Text>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                    fontSize: Device.isTablet ? 19 : 14,
+                  }}>
+                    ₹  {this.state.manualDisc} </Text>
+                </View>}
+
+              {this.state.khataAmount > 0 &&
+                <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                    fontSize: Device.isTablet ? 19 : 14,
+                  }}>
+                    Katha Amount </Text>
+                  <Text style={{
+                    color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                    fontSize: Device.isTablet ? 19 : 14,
+                  }}>
+                    ₹  {this.state.khataAmount} </Text>
+                </View>}
+
+
               {
                 this.state.isCreditAmount && (
                   <>
@@ -2403,11 +2639,6 @@ const styles = StyleSheet.create({
     top: 10,
     right: Device.isTablet ? 15 : 30,
   },
-  safeArea: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: '#FAFAFF'
-  },
   TopcontainerforPay: {
     flexDirection: 'row',
     marginLeft: 0,
@@ -2420,34 +2651,6 @@ const styles = StyleSheet.create({
     // height: 50,
     // position: 'absolute',
     // bottom: 0,
-  },
-  image: {
-    marginTop: 40,
-    marginLeft: 10,
-    width: 80,
-    height: 80,
-    borderWidth: 0,
-    borderRadius: 40,
-  },
-  viewswidth: {
-    backgroundColor: '#FFFFFF',
-    width: deviceWidth,
-    textAlign: 'center',
-    fontSize: 24,
-    height: 84,
-  },
-  input: {
-    justifyContent: 'center',
-    marginLeft: 0,
-    marginRight: 0,
-    height: Device.isTablet ? 54 : 44,
-    marginTop: 5,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#ffffff',
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: Device.isTablet ? 19 : 14,
   },
   signInButton: {
     justifyContent: 'center',
@@ -2466,658 +2669,15 @@ const styles = StyleSheet.create({
     fontSize: Device.isTablet ? 19 : 14,
     fontFamily: "regular",
   },
-  signInFieldStyle: {
-    color: '#456CAF55',
-    marginLeft: 20,
-    marginTop: 5,
-    fontSize: Device.isTablet ? 17 : 12,
-    fontFamily: "regular",
-  },
-  findIteminput: {
-    marginLeft: 30,
-    marginRight: 30,
-    marginTop: 20,
-    marginBottom: 1000,
-    height: 50,
-    backgroundColor: "#DEF1FF",
-    borderRadius: 10,
-    color: '#001B4A',
-    fontFamily: "regular",
-    fontSize: Device.isTablet ? 17 : 12,
-  },
-  signUptext: {
-    marginTop: 40,
-    fontFamily: "regular",
-    alignSelf: 'center',
-    color: '#FFFFFF',
-    fontSize: 28,
-  },
-  saleBillsText: {
-    marginLeft: 0,
-    marginTop: -20,
-    marginBottom: 10,
-    fontFamily: "bold",
-    color: '#0F2851',
-    fontSize: Device.isTablet ? 19 : 14,
-  },
-  tablecontainer: {
-    flex: 1,
-    // width:deviceWidth,
-    marginLeft: 20,
-    marginRight: 20,
-    padding: 20,
-    paddingTop: 30,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 10,
-  },
   flatListContainer: {
     marginTop: 20,
     backgroundColor: '#ffffff',
     height: Device.isTablet ? 130 : 100,
     width: deviceWidth,
   },
-  flatlistbox: {
-    display: 'flex',
+  rnSelectContainer_tablet: {
     justifyContent: 'center',
-    alignItems: 'center',
-    height: 150,
-    width: 220,
-    borderWidth: 1,
-    backgroundColor: "#00C656",
-    borderColor: '#ffffff',
-    borderRadius: 10,
-    marginLeft: 10,
-    //  paddingHorizontal: 15,
-    // padding:15,
-    // marginRight: 15,
-  },
-
-  head: {
-    height: 45,
-    borderColor: '#FAFAFF',
-    borderWidth: 1,
-    borderRadius: 10,
-  },
-  text: {
-    margin: 6,
-    color: "#0196FD",
-    fontFamily: "semibold",
-    fontSize: 11,
-  },
-  textData: {
-    margin: 6,
-    color: "#48596B",
-    fontFamily: "regular",
-    fontSize: 10,
-  },
-
-  Topcontainer: {
-    flexDirection: 'row',
-    marginLeft: 0,
-    marginRight: 0,
-    width: '100%',
-    backgroundColor: 'grey',
-    height: 50
-  },
-
-  TopcontainerforModel: {
-    flexDirection: 'row',
-    marginLeft: 0,
-    marginRight: 0,
-    marginTop: 10,
-    width: '100%',
-    backgroundColor: 'grey',
-    borderRadius: 20,
-    height: 50,
-  },
-  redbox: {
-    backgroundColor: "#1CA2FF",
-    alignSelf: "flex-start",
-
-    //marginHorizontal: "1%",
-    marginBottom: 6,
-    width: "25%",
-    height: 45,
-    textAlign: "center",
-  },
-  bluebox: {
-    backgroundColor: "#0196FD",
-    alignSelf: "flex-start",
-    //marginHorizontal: "1%",
-    marginBottom: 6,
-    width: "25%",
-    height: 45,
-    textAlign: "center",
-  },
-  blackbox: {
-    backgroundColor: "#0196FD",
-    alignSelf: "flex-start",
-    //marginHorizontal: "1%",
-    marginBottom: 6,
-    width: "25%",
-    height: 45,
-    textAlign: "center",
-  },
-  greenbox: {
-    backgroundColor: "#0196FD",
-    alignSelf: "flex-start",
-    //marginHorizontal: "1%",
-    marginBottom: 6,
-    width: "25%",
-    height: 45,
-    textAlign: "center",
-  },
-  tabBar: {
-    flexDirection: 'row',
-    paddingTop: Constants.statusBarHeight,
-  },
-  tabItem: {
-    flex: 1,
-    alignItems: 'center',
-    padding: 16,
-  },
-  box: {
-    width: 50,
-    height: 50,
-  },
-  row: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  button: {
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    //borderRadius: 4,
-    backgroundColor: "#0196FD",
-    alignSelf: "flex-start",
-    //marginHorizontal: "1%",
-    marginBottom: 6,
-    width: "25%",
-    height: 45,
-    textAlign: "center",
-  },
-  selected: {
-    backgroundColor: "#BBE3FF",
-    borderWidth: 0,
-    backgroundColor: "#0196FD",
-  },
-  buttonLabel: {
-    textAlign: "center",
-    color: "#BBE3FF",
-    fontFamily: "regular",
-    fontSize: Device.isTablet ? 19 : 14,
-  },
-  imagealign: {
-    marginTop: Device.isTablet ? 25 : 20,
-    marginRight: Device.isTablet ? 30 : 20,
-  },
-  selectedLabel: {
-    color: "white",
-    textAlign: "center",
-    alignSelf: "center",
-    marginTop: 10,
-    fontFamily: "regular",
-    fontSize: Device.isTablet ? 19 : 14,
-  },
-  modelinput: {
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 20,
-    height: 44,
-    marginTop: 5,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: Device.isTablet ? 19 : 14,
-  },
-  label: {
-    textAlign: "center",
-    marginBottom: 10,
-    fontSize: 24,
-  },
-  createUserinput: {
-    justifyContent: 'center',
-    margin: 40,
-    height: 44,
-    marginTop: 5,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: Device.isTablet ? 19 : 14,
-  },
-
-  //model
-  modelcontainer: {
-    alignItems: 'center',
-    backgroundColor: '#ede3f2',
-    padding: 100
-  },
-  modal: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#f7021a',
-    padding: 100
-  },
-  modeltext: {
-    color: '#3f2949',
-    marginTop: 10
-  },
-
-
-  // Styles For Mobile
-  viewsWidth_mobile: {
-    backgroundColor: '#ffffff',
-    width: deviceWidth,
-    textAlign: 'center',
-    fontSize: 24,
-    height: Device.isAndroid ? 70 : 84,
-  },
-  backButton_mobile: {
-    position: 'absolute',
-    left: 10,
-    bottom: 0,
-    width: 40,
-    height: 40,
-  },
-  flatList: {
-    marginTop: 20,
-    marginBottom: 20
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    // backgroundColor: '#FAFAFF'
-  },
-  headerTitle_mobile: {
-    position: 'absolute',
-    left: 70,
-    bottom: 10,
-    width: 300,
-    height: 25,
-    fontFamily: 'bold',
-    fontSize: 18,
-    color: '#353C40'
-  },
-  filterButton_mobile: {
-    position: 'absolute',
-    right: 20,
-    bottom: 5,
-    backgroundColor: '#ffffff',
-    borderRadius: 5,
-    width: 30,
-    height: 32,
-  },
-  modalContainer_mobile: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    alignSelf: 'center',
-    marginRight: 20,
-    borderRadius: 5,
-    marginTop: 20,
-    borderColor: '#ED1C24',
-    width: '100%',
-    height: 50,
-  },
-  modalButton_mobile: {
-    borderColor: '#353C40',
-    height: 32,
-    width: "33.3%",
-    borderWidth: 1,
-    alignSelf: "flex-start",
-  },
-  modalButtonText_mobile: {
-    height: 32,
-    width: 100,
-    marginTop: 5,
-    fontFamily: "medium",
-    fontSize: Device.isTablet ? 17 : 12,
-    textAlign: 'center',
-    alignItems: 'center',
-  },
-  addBarcodeButton_mobile: {
-    position: 'absolute',
-    right: 70,
-    bottom: 5,
-    backgroundColor: '#ED1C24',
-    borderRadius: 5,
-    width: 110,
-    height: 32,
-    textAlign: 'center',
-    alignItems: 'center',
-  },
-  addBarcodeButtonText_mobile: {
-    fontSize: Device.isTablet ? 17 : 12,
-    fontFamily: 'regular',
-    color: '#ffffff',
-    marginTop: 8,
-    textAlign: 'center',
-    alignSelf: 'center'
-  },
-  filterBarcodeContainer_mobile: {
-    width: deviceWidth,
-    alignItems: 'center',
-    marginLeft: -20,
-    backgroundColor: "#ffffff",
-    height: 400,
-    position: 'absolute',
-    bottom: -20,
-  },
-  filterByTitle_mobile: {
-    position: 'absolute',
-    left: 20,
-    top: 15,
-    width: 300,
-    height: 20,
-    fontFamily: 'medium',
-    fontSize: 16,
-    color: '#353C40',
-  },
-  filterByTitleDecoration_mobile: {
-    height: Device.isTablet ? 2 : 1,
-    width: deviceWidth,
-    backgroundColor: 'lightgray',
-    marginTop: 50,
-  },
-  filterCloseButton_mobile: {
-    position: 'absolute',
-    right: 8,
-    top: 15,
-    width: 50,
-    height: 50,
-  },
-  filterCloseImage_mobile: {
-    fontFamily: 'regular',
-    fontSize: Device.isTablet ? 17 : 12,
-    position: 'absolute',
-    top: 15,
-    right: 0,
-  },
-  filterDateButton_mobile: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    height: 50,
-    backgroundColor: "#F6F6F6",
-    borderRadius: 5,
-  },
-  filterDateButtonText_mobile: {
-
-    marginTop: 20,
-    color: "#6F6F6F",
-    fontSize: 15,
-    fontFamily: "regular"
-  },
-  datePickerContainer_mobile: {
-    height: 280,
-    width: deviceWidth,
-    backgroundColor: '#ffffff'
-  },
-  datePickerButton_mobile: {
-    position: 'absolute',
-    left: 20,
-    top: 10,
-    height: 30,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  datePickerEndButton_mobile: {
-    position: 'absolute',
-    right: 20,
-    top: 10,
-    height: 30,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  datePickerButtonText_mobile: {
-    textAlign: 'center',
-    marginTop: 5,
-    color: "#ffffff",
-    fontSize: 15,
-    fontFamily: "regular"
-  },
-  input_mobile: {
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 20,
-    height: 44,
-    marginTop: 5,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#e9ecef',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: Device.isTablet ? 19 : 14,
-    color: "#212529"
-  },
-  filterApplyButton_mobile: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-    height: 50,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  filterButtonText_mobile: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#ffffff",
-    fontSize: 15,
-    fontFamily: "regular"
-  },
-  filterCancelButton_mobile: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-    height: 50,
-    backgroundColor: "#ffffff",
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#353C4050",
-  },
-  filterButtonCancelText_mobile: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#000000",
-    fontSize: 15,
-    fontFamily: "regular"
-  },
-  barcodesFlatlistContainer_mobile: {
-    height: 140,
-    backgroundColor: '#FBFBFB',
-    borderBottomWidth: 5,
-    borderBottomColor: '#FFFFFF',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  barcodesFlatlistSubContainer_mobile: {
-    flexDirection: 'column',
-    width: '100%',
-    height: 140,
-  },
-
-  // Styles For Tablet
-  viewsWidth_tablet: {
-    backgroundColor: '#ffffff',
-    width: deviceWidth,
-    textAlign: 'center',
-    fontSize: 28,
-    height: 90,
-  },
-  backButton_tablet: {
-    position: 'absolute',
-    left: 10,
-    top: 38,
-    width: 90,
-    height: 90,
-  },
-  headerTitle_tablet: {
-    position: 'absolute',
-    left: 70,
-    top: 40,
-    width: 300,
-    height: 40,
-    fontFamily: 'bold',
-    fontSize: 24,
-    color: '#353C40'
-  },
-  filterButton_tablet: {
-    position: 'absolute',
-    right: 20,
-    top: 40,
-    backgroundColor: '#ffffff',
-    borderRadius: 5,
-    width: 35,
-    height: 37,
-  },
-  modalContainer_tablet: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    alignSelf: 'center',
-    marginRight: 20,
-    borderRadius: 5,
-    marginTop: 20,
-    borderColor: '#ED1C24',
-    width: '100%',
-    height: 50,
-  },
-  modalButton_tablet: {
-    borderColor: '#353C40',
-    height: 42,
-    width: "33.3%",
-    borderWidth: 1,
-    alignSelf: "flex-start",
-  },
-  modalButtonText_tablet: {
-    height: 42,
-    width: 210,
-    marginTop: 5,
-    fontFamily: "medium",
-    fontSize: 17,
-    textAlign: 'center',
-    alignItems: 'center',
-  },
-  addBarcodeButton_tablet: {
-    position: 'absolute',
-    right: 70,
-    top: 40,
-    backgroundColor: '#ED1C24',
-    borderRadius: 5,
-    width: 110,
-    height: 32,
-    textAlign: 'center',
-    alignItems: 'center',
-  },
-  addBarcodeButtonText_tablet: {
-    fontSize: 17,
-    fontFamily: 'regular',
-    color: '#ffffff',
-    marginTop: 6,
-    textAlign: 'center',
-    alignSelf: 'center'
-  },
-
-  filterBarcodeContainer_tablet: {
-    width: deviceWidth,
-    alignItems: 'center',
-    marginLeft: -40,
-    backgroundColor: "#ffffff",
-    height: 500,
-    position: 'absolute',
-    bottom: -40,
-  },
-  filterByTitle_tablet: {
-    position: 'absolute',
-    left: 20,
-    top: 15,
-    width: 300,
-    height: 30,
-    fontFamily: 'medium',
-    fontSize: 21,
-    color: '#353C40'
-  },
-  filterByTitleDecoration_tablet: {
-    height: Device.isTablet ? 2 : 1,
-    width: deviceWidth,
-    backgroundColor: 'lightgray',
-    marginTop: 60,
-  },
-  filterCloseButton_tablet: {
-    position: 'absolute',
-    right: 24,
-    top: 10,
-    width: 60, height: 60,
-  },
-  filterCloseImage_tablet: {
-    color: '#ED1C24',
-    fontFamily: 'regular',
-    fontSize: 17,
-    position: 'absolute',
-    top: 10,
-    right: 0,
-  },
-  filterDateButton_tablet: {
-    width: deviceWidth - 30,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    height: 60,
-    backgroundColor: "#F6F6F6",
-    borderRadius: 5,
-  },
-  filterDateButtonText_tablet: {
-
-    marginTop: 20,
-    color: "#6F6F6F",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  datePickerButton_tablet: {
-    position: 'absolute',
-    left: 20,
-    top: 10,
-    height: 40,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  datePickerButtonText_tablet: {
-    textAlign: 'center',
-    marginTop: 5,
-    color: "#ffffff",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  datePickerEndButton_tablet: {
-    position: 'absolute',
-    right: 20,
-    top: 10,
-    height: 40,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  input_tablet: {
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 20,
+    margin: 20,
     height: 54,
     marginTop: 5,
     marginBottom: 10,
@@ -3129,273 +2689,95 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     fontSize: 20,
   },
-  filterApplyButton_tablet: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-    height: 60,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  filterButtonText_tablet: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#ffffff",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  filterCancelButton_tablet: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-    height: 60,
-    backgroundColor: "#ffffff",
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#353C4050",
-  },
-  filterButtonCancelText_tablet: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#000000",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  barcodesFlatlistContainer_tablet: {
-    height: 160,
+  rnSelectContainer_mobile: {
+    justifyContent: 'center',
+    margin: 20,
+    height: 44,
+    marginTop: 5,
+    marginBottom: 10,
+    borderColor: '#8F9EB717',
+    borderRadius: 3,
     backgroundColor: '#FBFBFB',
-    borderBottomWidth: 5,
-    borderBottomColor: '#FFFFFF',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center'
+    borderWidth: 1,
+    fontFamily: 'regular',
+    paddingLeft: 15,
+    fontSize: 14,
   },
-  barcodesFlatlistSubContainer_tablet: {
-    flexDirection: 'column',
-    width: '100%',
-    height: 160,
+  imagealign: {
+    marginTop: Device.isTablet ? 25 : 20,
+    marginRight: Device.isTablet ? 30 : 20,
   },
-
 });
 
-// Styles For Flat-Lists
-
-const flats = StyleSheet.create({
-  mainText_mobile: {
-    fontSize: 16,
-
-    marginTop: 10,
-    marginBottom: 10,
-    fontFamily: 'medium',
-    color: '#ED1C24',
+const pickerSelectStyles_mobile = StyleSheet.create({
+  placeholder: {
+    color: "#6F6F6F",
+    fontFamily: "regular",
+    fontSize: 15,
   },
-  subText_mobile: {
-    fontSize: Device.isTablet ? 17 : 12,
-
-    marginTop: 10,
-    marginBottom: 10,
-    fontFamily: 'medium',
-    color: '#353C40'
-  },
-  commonText_mobile: {
-    fontSize: Device.isTablet ? 17 : 12,
-    marginBottom: 10,
-    marginTop: -95,
-    alignSelf: 'center',
-    textAlign: 'center',
-    fontFamily: 'regular',
-    color: '#808080'
-  },
-  commonTextRebar_mobile: {
-    fontSize: Device.isTablet ? 17 : 12,
-    marginBottom: 10,
-    marginTop: -95,
-    marginLeft: 110,
-    alignSelf: 'center',
-    textAlign: 'center',
-    fontFamily: 'regular',
-    color: '#808080'
-  },
-  commonTextRebar2_mobile: {
-    fontSize: Device.isTablet ? 17 : 12,
-    marginBottom: 10,
-    marginTop: 10,
-    marginLeft: 110,
-    alignSelf: 'center',
-    textAlign: 'center',
-    fontFamily: 'regular',
-    color: '#808080'
-  },
-  commonTextsubrebar_mobile: {
-    fontSize: Device.isTablet ? 17 : 12,
-    marginBottom: 10,
-    marginTop: 10,
-    position: 'absolute',
-    right: 20,
-    alignSelf: 'center',
-    textAlign: 'center',
-    fontFamily: 'regular',
-    color: '#808080'
-  },
-  commonTextsubreba2_mobile: {
-    fontSize: Device.isTablet ? 17 : 12,
-    marginBottom: 10,
-    marginTop: 100,
-    alignSelf: 'center',
-    textAlign: 'center',
-    fontFamily: 'regular',
-    color: '#808080'
-  },
-  commonTextsub_mobile: {
-    fontSize: Device.isTablet ? 17 : 12,
-    marginBottom: 10,
-    marginTop: 10,
-    alignSelf: 'center',
-    textAlign: 'center',
-    fontFamily: 'regular',
-    color: '#808080'
-  },
-  editButton_mobile: {
-    position: 'absolute',
-    right: 50,
-    top: 90,
-    width: 30,
-    height: 30,
-    borderBottomLeftRadius: 5,
-    borderTopLeftRadius: 5,
+  inputIOS: {
+    justifyContent: 'center',
+    height: 42,
+    borderRadius: 3,
     borderWidth: 1,
-    borderColor: "lightgray",
-    // borderRadius:5,
+    fontFamily: 'regular',
+    //paddingLeft: -20,
+    fontSize: 15,
+    borderColor: '#FBFBFB',
+    backgroundColor: '#FBFBFB',
   },
-  deleteButton_mobile: {
-    position: 'absolute',
-    right: 20,
-    top: 90,
-    width: 30,
-    height: 30,
-    borderBottomRightRadius: 5,
-    borderTopRightRadius: 5,
+  inputAndroid: {
+    justifyContent: 'center',
+    height: 42,
+    borderRadius: 3,
     borderWidth: 1,
-    borderColor: "lightgray",
-  },
-  deleteBarcodeContainer_mobile: {
-    width: deviceWidth,
-    alignItems: 'center',
-    marginLeft: -20,
-    backgroundColor: "#ffffff",
-    height: 260,
-    position: 'absolute',
-    bottom: -20,
-  },
-  deleteBarcodeHeading_mobile: {
-    position: 'absolute',
-    left: 20,
-    top: 15,
-    width: 300,
-    height: 20,
-    fontFamily: 'medium',
-    fontSize: 16,
-    color: '#353C40'
-  },
-
-  // Tablet styles
-
-  mainText_tablet: {
-    fontSize: 21,
-
-    marginTop: 10,
-    marginBottom: 10,
-    fontFamily: 'medium',
-    color: '#ED1C24',
-  },
-  subText_tablet: {
-    fontSize: 17,
-
-    marginTop: 10,
-    marginBottom: 10,
-    fontFamily: 'medium',
-    color: '#353C40'
-  },
-  commonText_tablet: {
-    fontSize: 17,
-    marginBottom: 10,
-    marginTop: -120,
-    alignSelf: 'center',
-    textAlign: 'center',
     fontFamily: 'regular',
-    color: '#808080'
+    //paddingLeft: -20,
+    fontSize: 15,
+    borderColor: '#FBFBFB',
+    backgroundColor: '#FBFBFB',
+    color: '#001B4A',
+
+    // marginLeft: 20,
+    // marginRight: 20,
+    // marginTop: 10,
+    // height: 40,
+    // backgroundColor: '#ffffff',
+    // borderBottomColor: '#456CAF55',
+    // color: '#001B4A',
+    // fontFamily: "bold",
+    // fontSize: 16,
+    // borderRadius: 3,
   },
-  commonTextRebar_tablet: {
-    fontSize: 17,
-    marginBottom: 10,
-    marginTop: -120,
-    marginLeft: 100,
-    alignSelf: 'center',
-    textAlign: 'center',
-    fontFamily: 'regular',
-    color: '#808080'
+});
+
+const pickerSelectStyles_tablet = StyleSheet.create({
+  placeholder: {
+    color: "#6F6F6F",
+    fontFamily: "regular",
+    fontSize: 20,
   },
-  commonTextRebar2_tablet: {
-    fontSize: 17,
-    marginBottom: 10,
-    marginTop: 10,
-    marginLeft: 100,
-    alignSelf: 'center',
-    textAlign: 'center',
-    fontFamily: 'regular',
-    color: '#808080'
-  },
-  commonTextsub_tablet: {
-    fontSize: 17,
-    marginBottom: 10,
-    marginTop: 10,
-    alignSelf: 'center',
-    textAlign: 'center',
-    fontFamily: 'regular',
-    color: '#808080'
-  },
-  editButton_tablet: {
-    position: 'absolute',
-    right: 70,
-    top: 90,
-    width: 50,
-    height: 50,
-    borderBottomLeftRadius: 5,
-    borderTopLeftRadius: 5,
+  inputIOS: {
+    justifyContent: 'center',
+    height: 52,
+    borderRadius: 3,
     borderWidth: 1,
-    borderColor: "lightgray",
-    // borderRadius:5,
+    fontFamily: 'regular',
+    //paddingLeft: -20,
+    fontSize: 20,
+    borderColor: '#FBFBFB',
+    backgroundColor: '#FBFBFB',
   },
-  deleteButton_tablet: {
-    position: 'absolute',
-    right: 20,
-    top: 90,
-    width: 50,
-    height: 50,
-    borderBottomRightRadius: 5,
-    borderTopRightRadius: 5,
+  inputAndroid: {
+    justifyContent: 'center',
+    height: 52,
+    borderRadius: 3,
     borderWidth: 1,
-    borderColor: "lightgray",
-  },
-  deleteBarcodeContainer_tablet: {
-    width: deviceWidth,
-    alignItems: 'center',
-    marginLeft: -20,
-    backgroundColor: "#ffffff",
-    height: 280,
-    position: 'absolute',
-    bottom: -20,
-  },
-  deleteBarcodeHeading_tablet: {
-    position: 'absolute',
-    left: 20,
-    top: 15,
-    width: 300,
-    height: 30,
-    fontFamily: 'medium',
-    fontSize: 21,
-    color: '#353C40'
+    fontFamily: 'regular',
+    //paddingLeft: -20,
+    fontSize: 20,
+    borderColor: '#FBFBFB',
+    backgroundColor: '#FBFBFB',
+    color: '#001B4A',
   },
 });
