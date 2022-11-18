@@ -2375,8 +2375,8 @@ class TextilePayment extends Component {
                                 onPress={() => this.setState({ cardPaymentType: 'Manual' })}
                               />
                               <Text>Manual</Text>
-                            </View> */}
-                          {/* </View> */}
+                            </View> 
+                          </View>
                         </View>
                         <View style={forms.action_buttons_container}>
                           <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
