@@ -202,8 +202,6 @@ class GenerateInvoiceSlip extends Component {
       isCredit: false,
       toDay: moment(new Date()).format("YYYY-MM-DD").toString(),
       isTagCustomer: false,
-      customerTagAllow: false,
-      toDay: moment(new Date()).format("YYYY-MM-DD").toString(),
       showPrinter: false,
       printerIp: "",
 
@@ -211,10 +209,8 @@ class GenerateInvoiceSlip extends Component {
   }
 
   async componentDidMount() {
-    // const storeId = await AsyncStorage.getItem("storeId");
-    // this.setState({ storeId: storeId });
-    // this.getDiscountReasons();
-    // this.getHsnDetails();
+    this.getDiscountReasons();
+    this.getHsnDetails();
     // let data = "cbnaiucs234";
     // let data1 = [];
     // let data2 = [];
@@ -225,21 +221,9 @@ class GenerateInvoiceSlip extends Component {
   async componentWillMount() {
     const isTaxIncluded = await AsyncStorage.getItem('custom:isTaxIncluded');
     this.setState({ isTaxIncluded: isTaxIncluded })
-    await AsyncStorage.getItem("storeId").then((value) => {
-      this.setState({ storeId: value })
-    })
+    const storeId = await AsyncStorage.getItem("storeId");
+    this.setState({ storeId: storeId });
     this.getallDates();
-    const childPrivileges = PrivilagesList('Generate Invoice');
-    childPrivileges.then((res) => {
-      if (res) {
-        const result = res.sort((a, b) => a.id - b.id);
-        this.setState({
-          tagcustomerPrivilege: result[0],
-          checkpromodiscountPrivilege: result[1],
-          billleveldiscountPrivilege: result[2]
-        });
-      }
-    });
   }
 
   handleMenuButtonClick() {
@@ -607,7 +591,7 @@ class GenerateInvoiceSlip extends Component {
             if (this.state.dlslips.length === 0) {
               this.state.dlslips.push(res.data.lineItems);
               const flattened = this.state.dlslips.flatMap(barCode => barCode);
-              this.setState({ barcodeList: flattened })
+              this.setState({ barCodeList: flattened })
             }
             else {
               for (let i = 0; i < this.state.barCodeList.length; i++) {
@@ -667,7 +651,7 @@ class GenerateInvoiceSlip extends Component {
               } else {
                 // element.returnedAmout = parseInt(element.returnQty) * element.netValue
               }
-              element.returnedAmout = ((element.returnQty) * element.netValue) / element.quantity
+              element.returnedAmout = (((element.returnQty) * element.netValue / element.quantity).toFixed(2))
             });
             let stateGST = this.state.barCodeList.reduce((accumulator, curValue) => {
               if (curValue.sgst && curValue.sgst !== 0 && curValue.sgst !== 'null') {
@@ -727,7 +711,6 @@ class GenerateInvoiceSlip extends Component {
 
   getallDates() {
     const { storeId } = this.state;
-    console.error({ storeId })
     CustomerService.getDates(storeId).then(res => {
       if (res) {
         console.log({ res }, res.data)
@@ -870,7 +853,7 @@ class GenerateInvoiceSlip extends Component {
       taxAmount: this.state.taxAmount,
       approvedBy: this.state.approvedBy,
       reasonDiscount: this.state.reasonDiscount,
-      discountAmount: this.state.discountAmount,
+      manualDisc: this.state.discountAmount,
       userId: this.state.userId,
       dsNumberList: this.state.dsNumberList,
       customerName: this.state.mobileData.userName,
@@ -1149,29 +1132,27 @@ class GenerateInvoiceSlip extends Component {
     let cgst = 0;
     let scgtTotal = 0;
     this.state.barCodeList.forEach((barCode, index) => {
+
+      costPrice = costPrice + barCode.itemPrice;
+      promoDiscValue = promoDiscValue + barCode.promoDiscount;
+      total = total + barCode.itemPrice * barCode.qty;
+      netTotal = netTotal + barCode.itemPrice * barCode.qty;
       if (barCode.qty > 1) {
 
       } else {
         // barCode.grossValue = barCode.itemPrice;
         barCode.qty = parseInt("1");
       }
-      costPrice = costPrice + barCode.itemPrice;
-      promoDiscValue = promoDiscValue + barCode.promoDiscount;
-      total = total + barCode.itemPrice * barCode.qty;
-      netTotal = netTotal + barCode.itemPrice * barCode.qty;
-      // scgtTotal = total + barCode.sgst + barCode.cgst;
-      scgtTotal = ((barCode.sgst).toFixed(2));
-      cgstTotal = ((barCode.cgst).toFixed(2));
     });
 
     this.state.barCodeList.forEach((element, ind) => {
       if (element.sgst && element.sgst !== 0 && element.sgst !== 'null' && element.cgst && element.cgst !== 0 && element.cgst !== 'null') {
-        element.sgsttotal = element.sgst//* element.qty.toFixed(2)
-        element.cgsttotal = element.cgst
+        element.sgsttotal = (((element.sgst) * element.qty))
+        element.cgsttotal = (((element.cgst) * element.qty))
       } else {
         // element.returnedAmout = parseInt(element.returnQty) * element.netValue
       }
-      element.returnedAmout = ((element.returnQty) * element.netValue) / element.quantity
+      element.returnedAmout = (((element.returnQty) * element.netValue / element.quantity).toFixed(2))
     });
     let stateGST = this.state.barCodeList.reduce((accumulator, curValue) => {
       if (curValue.sgst && curValue.sgst !== 0 && curValue.sgst !== 'null') {
@@ -1190,16 +1171,13 @@ class GenerateInvoiceSlip extends Component {
     discount = discount + this.state.manualDisc;
     if (this.state.isTaxIncluded === "true" && this.state.isTaxIncluded !== "null") {
       this.setState({
-        netPayableAmount: (total.toFixed(2)),
-        grandNetAmount: (netTotal.toFixed(2)),
-        totalPromoDisc: (promoDiscValue.toFixed(2)),
-        grossAmount: (costPrice.toFixed(2)),
-        totalAmount: (total.toFixed(2)),
-        enableCoupon: true,
-        returnCash: parseFloat(this.state.returnCash),
-        cashAmount: parseFloat(this.state.cashAmount),
+        netPayableAmount: total,
+        grandNetAmount: netTotal,
+        totalPromoDisc: promoDiscValue,
+        grossAmount: costPrice,
+        totalAmount: total,
         stateGST: ((stateGST).toFixed(2)),
-        centralGST: ((centralGST).toFixed(2))
+        centralGST: ((centralGST).toFixed(2)),
       });
     } else {
       this.setState({
@@ -1243,30 +1221,28 @@ class GenerateInvoiceSlip extends Component {
     let sgst = 0;
     let cgst = 0;
     let scgtTotal = 0;
+    let cgstTotal = 0
     this.state.barCodeList.forEach((barCode, index) => {
+      costPrice = costPrice + barCode.itemPrice;
+      promoDiscValue = promoDiscValue + barCode.promoDiscount
+      total = total + barCode.itemPrice * barCode.qty;
+      netTotal = netTotal + barCode.itemPrice * barCode.qty;
       if (barCode.qty > 1) {
 
       } else {
         // barCode.grossValue = barCode.itemPrice;
         barCode.qty = parseInt("1");
       }
-      costPrice = costPrice + barCode.itemPrice;
-      promoDiscValue = promoDiscValue + barCode.promoDiscount;
-      total = total + barCode.itemPrice * barCode.qty;
-      netTotal = netTotal + barCode.itemPrice * barCode.qty;
-      // scgtTotal = total + barCode.sgst + barCode.cgst;
-      scgtTotal = Math.round(barCode.sgst);
-      cgstTotal = Math.round(barCode.cgst);
     });
 
     this.state.barCodeList.forEach((element, ind) => {
       if (element.sgst && element.sgst !== 0 && element.sgst !== 'null' && element.cgst && element.cgst !== 0 && element.cgst !== 'null') {
-        scgtTotal = ((barCode.sgst).toFixed(2));
-        cgstTotal = ((barCode.cgst).toFixed(2));
+        element.sgsttotal = (((element.sgst) * element.qty))
+        element.cgsttotal = (((element.cgst) * element.qty))
       } else {
         // element.returnedAmout = parseInt(element.returnQty) * element.netValue
       }
-      element.returnedAmout = ((element.returnQty) * element.netValue) / element.quantity
+      element.returnedAmout = (((element.returnQty) * element.netValue / element.quantity).toFixed(2))
     });
     let stateGST = this.state.barCodeList.reduce((accumulator, curValue) => {
       if (curValue.sgst && curValue.sgst !== 0 && curValue.sgst !== 'null') {
@@ -1285,16 +1261,23 @@ class GenerateInvoiceSlip extends Component {
     discount = discount + this.state.manualDisc;
     if (this.state.isTaxIncluded === "true" && this.state.isTaxIncluded !== "null") {
       this.setState({
-        netPayableAmount: (total.toFixed(2)),
-        grandNetAmount: (netTotal.toFixed(2)),
-        totalPromoDisc: (promoDiscValue.toFixed(2)),
-        grossAmount: (costPrice.toFixed(2)),
-        totalAmount: (total.toFixed(2)),
-        enableCoupon: true,
-        returnCash: parseFloat(this.state.returnCash),
-        cashAmount: parseFloat(this.state.cashAmount),
+        // netPayableAmount: (total.toFixed(2)),
+        // grandNetAmount: (netTotal.toFixed(2)),
+        // totalPromoDisc: (promoDiscValue.toFixed(2)),
+        // grossAmount: (costPrice.toFixed(2)),
+        // totalAmount: (total.toFixed(2)),
+        // enableCoupon: true,
+        // returnCash: parseFloat(this.state.returnCash),
+        // cashAmount: parseFloat(this.state.cashAmount),
+        // stateGST: ((stateGST).toFixed(2)),
+        // centralGST: ((centralGST).toFixed(2))
+        netPayableAmount: total,
+        grandNetAmount: netTotal,
+        totalPromoDisc: promoDiscValue,
+        grossAmount: costPrice,
+        totalAmount: total,
         stateGST: ((stateGST).toFixed(2)),
-        centralGST: ((centralGST).toFixed(2))
+        centralGST: ((centralGST).toFixed(2)),
 
       });
 
@@ -1337,29 +1320,28 @@ class GenerateInvoiceSlip extends Component {
       let cgst = 0;
       let scgtTotal = 0;
       this.state.barCodeList.forEach((barCode, index) => {
+        costPrice = costPrice + barCode.itemPrice;
+        promoDiscValue = promoDiscValue + barCode.promoDiscount;
+        total = total + barCode.itemPrice * barCode.qty;
+        netTotal = netTotal + barCode.itemPrice * barCode.qty;
         if (barCode.qty > 1) {
 
         } else {
           // barCode.grossValue = barCode.itemPrice;
           barCode.qty = parseInt("1");
         }
-        costPrice = costPrice + barCode.itemPrice;
-        promoDiscValue = promoDiscValue + barCode.promoDiscount;
-        total = total + barCode.itemPrice * barCode.qty;
-        netTotal = netTotal + barCode.itemPrice * barCode.qty;
-        // scgtTotal = total + barCode.sgst + barCode.cgst;
-        scgtTotal = Math.round(barCode.sgst);
-        cgstTotal = Math.round(barCode.cgst);
+
       });
+
 
       this.state.barCodeList.forEach((element, ind) => {
         if (element.sgst && element.sgst !== 0 && element.sgst !== 'null' && element.cgst && element.cgst !== 0 && element.cgst !== 'null') {
-          scgtTotal = ((barCode.sgst).toFixed(2));
-          cgstTotal = ((barCode.cgst).toFixed(2));
+          element.sgsttotal = (((element.sgst) * element.qty))
+          element.cgsttotal = (((element.cgst) * element.qty))
         } else {
           // element.returnedAmout = parseInt(element.returnQty) * element.netValue
         }
-        element.returnedAmout = ((element.returnQty) * element.netValue) / element.quantity
+        element.returnedAmout = (((element.returnQty) * element.netValue / element.quantity).toFixed(2))
       });
       let stateGST = this.state.barCodeList.reduce((accumulator, curValue) => {
         if (curValue.sgst && curValue.sgst !== 0 && curValue.sgst !== 'null') {
@@ -1378,16 +1360,13 @@ class GenerateInvoiceSlip extends Component {
       discount = discount + this.state.manualDisc;
       if (this.state.isTaxIncluded === "true" && this.state.isTaxIncluded !== "null") {
         this.setState({
-          netPayableAmount: (total.toFixed(2)),
-          grandNetAmount: (netTotal.toFixed(2)),
-          totalPromoDisc: (promoDiscValue.toFixed(2)),
-          grossAmount: (costPrice.toFixed(2)),
-          totalAmount: (total.toFixed(2)),
-          enableCoupon: true,
-          returnCash: parseFloat(this.state.returnCash),
-          cashAmount: parseFloat(this.state.cashAmount),
+          netPayableAmount: total,
+          grandNetAmount: netTotal,
+          totalPromoDisc: promoDiscValue,
+          grossAmount: costPrice,
+          totalAmount: total,
           stateGST: ((stateGST).toFixed(2)),
-          centralGST: ((centralGST).toFixed(2))
+          centralGST: ((centralGST).toFixed(2)),
 
         });
 
@@ -1518,9 +1497,10 @@ class GenerateInvoiceSlip extends Component {
               )}
 
               {this.state.barCodeList.length !== 0 && (
+                <View>
+                  <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isTagCustomer ? color.disableBackGround : color.accent, width: '90%' }]}
                 <ScrollView horizontal style={{ flexDirection: 'row' }}>
 
-                  <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isTagCustomer ? color.disableBackGround : color.accent }]}
                     disabled={this.state.isTagCustomer}
 
                     onPress={() => {
@@ -1528,7 +1508,7 @@ class GenerateInvoiceSlip extends Component {
                     }}>
                     <Text style={forms.button_text}> {"Tag Customer"}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.handleBillDiscount ? color.disableBackGround : color.accent }]}
+                  {/* <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.handleBillDiscount ? color.disableBackGround : color.accent }]}
                     onPress={() => this.setState({ billmodelPop: true, modalVisible: true })}
                     disabled={this.state.handleBillDiscount}>
                     <Text style={forms.button_text}>
@@ -1543,8 +1523,8 @@ class GenerateInvoiceSlip extends Component {
                     <Text style={forms.button_text}>
                       {"Check Promo Disc"}
                     </Text>
-                  </TouchableOpacity>
-                </ScrollView>
+                  </TouchableOpacity> */}
+                </View>
               )}
 
               {this.state.lineItemDelete && (
@@ -1919,19 +1899,6 @@ class GenerateInvoiceSlip extends Component {
                         <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>
                     </View>
-                    {/* <TouchableOpacity
-                      style={[Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile]}
-                      onPress={() => this.billDiscount()}
-                    >
-                      <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile}  > {I18n.t("CONFIRM")} </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile}
-                      onPress={() => this.modelCancel()}
-                    >
-                      <Text style={Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile}  > {I18n.t("CANCEL")} </Text>
-                    </TouchableOpacity> */}
                   </View>
                 </View>
               </Modal>

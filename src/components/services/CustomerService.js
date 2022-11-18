@@ -146,5 +146,18 @@ class CustomerService {
   saveLoyaltyPoints(obj) {
     return axios.post(BASE_URL + "/new-sale/newsale/saveLoyaltyPoints", obj);
   }
+
+  getPendingDeliverySlips(fromDate, storeId) {
+    const param = '?fromDate=' + fromDate + '&storeId=' + storeId;
+    return axios.get(BASE_URL + "/new-sale/newsale/getPendingDeliverySlips" + param);
+  }
+  saveDayCloser(obj) {
+    //const param = '?storeId=' + storeId ;
+    return axios.post(BASE_URL + "/new-sale/newsale/savedayclosure", obj);
+  }
+  closePendingDeliverySlips(fromDate, storeId) {
+    const param = '?fromDate=' + fromDate + '&storeId=' + storeId;
+    return axios.put(BASE_URL + "/new-sale/newsale/closePendingDeliverySlips" + param);
+  }
 }
 export default new CustomerService();
