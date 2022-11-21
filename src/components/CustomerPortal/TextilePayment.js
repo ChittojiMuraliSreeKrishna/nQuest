@@ -380,10 +380,12 @@ class TextilePayment extends Component {
         this.cancelKathaModel();
       })
     } else {
+      console.log(this.state.grandNetAmount);
+      console.log(this.state.khataAmount);
       let netPayableAmt = parseFloat(this.state.grandNetAmount) - parseFloat(this.state.khataAmount);
       let grandNetAmount = parseFloat(netPayableAmt)
       this.setState({
-        grandNetAmount: grandNetAmount,
+        grandNetAmount: (grandNetAmount.toFixed(2)),
         payingAmount: parseFloat(this.state.totalAmount) - parseFloat(this.state.khataAmount),
         kathaColleted: parseFloat(this.state.khataAmount)
       }, () => {
@@ -1440,17 +1442,17 @@ class TextilePayment extends Component {
 
           this.state.barCodeList.forEach((barCode, index) => {
             costPrice = costPrice + barCode.itemPrice;
-            discount = discount + barCode.promoDiscount;
+            discount = discount + barCode.totalPromoDiscount;
             total = total + barCode.netValue;
           });
 
           discount = discount + this.state.manualDisc;
           discAppliedTotal = this.state.grandNetAmount - discount;
           this.setState({
-            netPayableAmount: total,
-            totalPromoDisc: discount,
+            netPayableAmount: (total.toFixed(2)),
+            totalPromoDisc: (discount.toFixed(2)),
             grossAmount: costPrice,
-            grandNetAmount: discAppliedTotal
+            grandNetAmount: (discAppliedTotal.toFixed(2))
           });
           if (this.state.barCodeList.length > 0) {
             this.setState({ enablePayment: true });
@@ -1500,7 +1502,7 @@ class TextilePayment extends Component {
         }
       });
     }
-    this.setState({ isCheckPromo: true, modalVisible: true, handleBillDiscount: false })
+    this.setState({ handleBillDiscount: false })
   }
 
   getDiscountReasons() {
@@ -1531,10 +1533,21 @@ class TextilePayment extends Component {
     });
   }
 
+  handleDiscountAmount(value) {
+    this.setState({ manualDisc: value });
+  }
+
+  handleApprovedBy(text) {
+    this.setState({ approvedBy: text });
+  }
+
+  handleDiscountReason = (value) => {
+    this.setState({ reasonDiscount: value });
+  };
+
   billValidation() {
     let isFormValid = true;
     let errors = {};
-
     if (this.state.manualDisc > this.state.netPayableAmount) {
       isFormValid = false;
       errors["discountAmount"] = customerErrorMessages.discountAmount;
@@ -1567,6 +1580,7 @@ class TextilePayment extends Component {
     }
     console.log("manualDiscmanualDisc after", this.state.manualDisc, this.state.totalAmount);
   }
+
 
 
   render() {
@@ -1769,9 +1783,9 @@ class TextilePayment extends Component {
                           label={I18n.t("AMOUNT *")}
                           keyboardType={'numeric'}
                           value={this.state.manualDisc}
-                          onChangeText={(text) => {
-                            this.setState({ manualDisc: text })
-                          }}
+                          onChangeText={(text) =>
+                            this.handleDiscountAmount(text)
+                          }
                         />
                         {!this.state.discountAmountValid && (
                           <Message imp={true} message={this.state.errors["discountAmount"]} />
@@ -1784,7 +1798,7 @@ class TextilePayment extends Component {
                           underlineColor={'#6f6f6f'}
                           label={I18n.t("APPROVED BY *")}
                           value={this.state.approvedBy}
-                          onChangeText={(text) => { this.setState({ approveBy: text }) }}
+                          onChangeText={(text) => this.handleApprovedBy(text)}
                         />
                         <View style={[Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile, { width: "92%" }]}>
                           <RNPickerSelect
@@ -1795,7 +1809,7 @@ class TextilePayment extends Component {
                             items={
                               this.state.discReasons
                             }
-                            onValueChange={(value) => { this.setState({ reasonDiscount: value }) }}
+                            onValueChange={this.handleDiscountReason}
                             style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
                             value={this.state.reasonDiscount}
                             useNativeAndroidPickerStyle={false}
@@ -2375,7 +2389,7 @@ class TextilePayment extends Component {
                                 onPress={() => this.setState({ cardPaymentType: 'Manual' })}
                               />
                               <Text>Manual</Text>
-                            </View> 
+                            </View>
                           </View>
                         </View>
                         <View style={forms.action_buttons_container}>

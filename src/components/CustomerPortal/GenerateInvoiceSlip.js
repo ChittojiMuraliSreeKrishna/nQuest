@@ -2739,6 +2739,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     // marginBottom:100,
   },
+  signInButton_tablet: {
+    backgroundColor: '#ED1C24',
+    justifyContent: 'center',
+    marginLeft: 20,
+    marginRight: 20,
+    width: deviceWidth - 40,
+    height: 60,
+    borderRadius: 10,
+    fontWeight: 'bold',
+    // marginBottom:100,
+  },
+  signInButtonText_tablet: {
+    color: 'white',
+    alignSelf: 'center',
+    fontSize: 20,
+    fontFamily: "regular",
+  },
   signInButtonText_mobile: {
     color: 'white',
     alignSelf: 'center',
