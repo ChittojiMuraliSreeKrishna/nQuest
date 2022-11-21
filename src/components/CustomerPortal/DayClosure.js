@@ -17,6 +17,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import I18n from 'react-native-i18n';
 import moment from 'moment';
 import { TextInput } from 'react-native-paper';
+import { color } from '../Styles/colorStyles';
 
 
 var deviceheight = Dimensions.get('window').height;
@@ -80,7 +81,7 @@ export default class DayClosure extends Component {
     const param = '?storeId=' + this.state.storeId;
     axios.get(CustomerService.getAllDayClosure() + param).then(res => {
       if (res?.data) {
-        if (res.data.result.length > 0) {
+        if (res.data.result.deliverySlips.length > 0) {
           this.setState({ dayClosureList: res.data.result.deliverySlips });
           if (this.state.dayClosureList.length > 0) {
             this.setState({ enableButton: true });
@@ -278,7 +279,7 @@ export default class DayClosure extends Component {
             ListHeaderComponent={<View style={scss.headerContainer}>
               <Text style={flatListTitle}>List of Pending DL slips - <Text style={{ color: '#ED1C24' }}>{this.state.dayClosureList.length}</Text> </Text>
               {/* {this.state.isdayCloser && ( */}
-              <TouchableOpacity style={styles.closeBtn} onPress={() => this.closeDay()}
+              <TouchableOpacity style={[styles.closeBtn, { backgroundColor: this.state.isdayCloser ? color.disableBackGround : color.accent }]} onPress={() => this.closeDay()}
                 disabled={this.state.isdayCloser}
               >
                 <Text style={styles.closeBtnText}>Day Closure</Text>
