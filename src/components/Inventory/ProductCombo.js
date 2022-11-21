@@ -307,7 +307,7 @@ export default class ProductCombo extends Component {
                       <Text style={scss.textStyleLight}>
                         No.of Items: {item.bundleQuantity}
                       </Text>
-                      <Text style={scss.textStyleLight}>Unit Price: {item.itemMrp}</Text>
+                      <Text style={scss.textStyleLight}>Unit Price: {parseFloat(item.itemMrp)}</Text>
                     </View>
                     <View style={scss.flatListFooter}>
                       <Text style={scss.footerText} selectable={true} >{item.barcode}</Text>

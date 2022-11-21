@@ -574,15 +574,15 @@ class AddBarcode extends Component {
         batchNo: this.state.batchNo,
         name: this.state.name,
         colour: this.state.colour,
-        costPrice: this.state.costPrice,
+        costPrice: parseFloat(this.state.costPrice),
         empId: this.state.empId,
         hsnCode: this.state.hsnCode,
-        itemMrp: this.state.listPrice,
+        itemMrp: parseFloat(this.state.listPrice),
         qty: this.state.quantity,
         storeId: this.state.storeId,
         uom: this.state.uomName,
         domainType: this.state.selectedDomain,
-        vendorTax: this.state.vendorTax,
+        vendorTax: parseFloat(this.state.vendorTax),
         barcode: this.state.barcode ? this.state.barcode : null,
         metadata: this.state.alist
 

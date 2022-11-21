@@ -361,12 +361,12 @@ export default class Barcode extends Component {
                           </Text>
                         </Text>
                         <Text style={scss.textStyleLight}>
-                          {I18n.t("VALUE")}: ₹{item.value}
+                          {I18n.t("VALUE")}: ₹{parseFloat(item.value)}
                         </Text>
                       </View>
                       <View style={scss.textContainer}>
                         <Text style={scss.textStyleLight}>
-                          {I18n.t("MRP")}: ₹{item.itemMrp}
+                          {I18n.t("MRP")}: ₹{parseFloat(item.itemMrp)}
                         </Text>
                         <Text style={scss.textStyleLight}>QTY: {item.qty}</Text>
                       </View>

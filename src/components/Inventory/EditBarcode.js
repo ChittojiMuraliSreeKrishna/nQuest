@@ -401,17 +401,18 @@ class EditBarcode extends Component {
         batchNo: this.state.batchNo,
         name: this.state.name,
         colour: this.state.colour,
-        costPrice: this.state.costPrice,
+        costPrice: parseFloat(this.state.costPrice),
         empId: this.state.empId,
-        hsnCode: parseInt(this.state.hsnId),
-        itemMrp: this.state.listPrice,
+        hsnCode: this.state.hsnId,
+        itemMrp: parseFloat(this.state.listPrice),
         domainId: 1,
         qty: this.state.quantity,
         storeId: this.state.storeId,
         uom: this.state.uomName,
         domainType: this.state.selectedDomain,
         id: this.state.barcodeId,
-        metadata: this.state.alist
+        metadata: this.state.alist,
+        vendorTax: parseFloat(this.state.vendorTax)
       };
       this.setState({ loading: true });
       console.log({ params });
