@@ -116,7 +116,8 @@ class GenerateEstimationSlip extends Component {
       printBtn: false,
       printEnabled: false,
       dayCloseDates: [],
-      toDay: moment(new Date()).format("YYYY-MM-DD").toString()
+      toDay: moment(new Date()).format("YYYY-MM-DD").toString(),
+      isCheckPromo: false
     };
   }
 
@@ -172,23 +173,23 @@ class GenerateEstimationSlip extends Component {
     // this.listRef.scrollToOffset({ offset: 0, animated: true });
   }
 
-  topbarAction1 = (item, index) => {
-    if (this.state.privilages[index].bool === true) {
-      this.state.privilages[index].bool = false;
-    }
-    else {
-      this.state.privilages[index].bool = true;
-    }
-    for (let i = 0; i < this.state.privilages.length; i++) {
-      if (item.name === 'Check Promo Disc') {
-        this.checkPromo();
-      }
-      if (index != i) {
-        this.state.privilages[i].bool = false;
-      }
-      this.setState({ privilages: this.state.privilages });
-    }
-  };
+  // topbarAction1 = (item, index) => {
+  //   if (this.state.privilages[index].bool === true) {
+  //     this.state.privilages[index].bool = false;
+  //   }
+  //   else {
+  //     this.state.privilages[index].bool = true;
+  //   }
+  //   for (let i = 0; i < this.state.privilages.length; i++) {
+  //     if (item.name === 'Check Promo Disc') {
+  //       this.checkPromo();
+  //     }
+  //     if (index != i) {
+  //       this.state.privilages[i].bool = false;
+  //     }
+  //     this.setState({ privilages: this.state.privilages });
+  //   }
+  // };
 
   checkPromo() {
     const { storeId, domainId, barList } = this.state;
@@ -223,6 +224,7 @@ class GenerateEstimationSlip extends Component {
         console.log("in error");
         alert("No Promo Available");
       }
+      this.setState({ isCheckPromo: true })
     });
   }
 
@@ -534,7 +536,7 @@ class GenerateEstimationSlip extends Component {
       this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty, promoDisc: promoDiscount });
       this.setState({ itemsList: qtyarr });
     } else {
-      this.state.itemsList.splice(index, 1);
+      // this.state.itemsList.splice(index, 1);
       this.setState({ barList: this.state.itemsList });
       this.calculateTotal();
     }
@@ -694,24 +696,34 @@ class GenerateEstimationSlip extends Component {
 
 
               {this.state.itemsList.length !== 0 && (
-                <FlatList
-                  style={styles.flatList}
-                  horizontal
-                  data={this.state.privilages}
-                  showsVerticalScrollIndicator={false}
-                  showsHorizontalScrollIndicator={false}
-                  renderItem={({ item, index }) => (
-                    <TouchableOpacity style={[checkPromoDiscountBtn, {
-                      backgroundColor: item.bool ? '#ED1C24' : color.white, borderColor: item.bool ? '#ED1C24' : color.lightBlack,
+                // <FlatList
+                //   style={styles.flatList}
+                //   horizontal
+                //   data={this.state.privilages}
+                //   showsVerticalScrollIndicator={false}
+                //   showsHorizontalScrollIndicator={false}
+                //   renderItem={({ item, index }) => (
+                <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isCheckPromo ? color.disableBackGround : color.accent, width: '90%' }]}
+                  onPress={() => {
+                    this.checkPromo();
+                  }}
+                  disabled={this.state.isCheckPromo}>
+                  <Text style={forms.button_text}>
+                    {"Check Promo Disc"}
+                  </Text>
+                </TouchableOpacity>
+                // <TouchableOpacity style={[checkPromoDiscountBtn, {
+                //   backgroundColor: item.bool ? '#ED1C24' : color.white, borderColor: item.bool ? '#ED1C24' : color.lightBlack,
 
-                    }]} onPress={() =>
-                      this.topbarAction1(item, index)
-                    }>
-                      <Image source={require('../../commonUtils/assets/Images/check_promo_disc.png')} />
-                      <Text style={{ padding: RF(1), color: item.bool ? "#FFFFFF" : color.dark, fontFamily: 'regular', fontSize: 15 }}>{item.name}</Text>
-                    </TouchableOpacity>
-                  )}
-                />
+                // }]} onPress={() =>
+                //   this.setState({ isCheckPromo: true })
+                //   // this.topbarAction1(item, index)
+                // }>
+                //   {/* <Image source={require('../../commonUtils/assets/Images/check_promo_disc.png')} /> */}
+                //   <Text style={{ padding: RF(1), color: item.bool ? "#FFFFFF" : color.dark, fontFamily: 'regular', fontSize: 15 }}>{item.name}</Text>
+                // </TouchableOpacity>
+                //   )}
+                // />
               )}
 
               {this.state.itemsList.length !== 0 && (

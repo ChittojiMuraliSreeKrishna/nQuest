@@ -51,8 +51,8 @@ export default class DayClosure extends Component {
   async componentWillMount() {
     const storeId = await AsyncStorage.getItem("storeId");
     this.setState({ storeId: storeId });
-    this.getallPendingDate()
     this.getAllDayCloser();
+    this.getallPendingDate()
     this.getalltoDates();
   }
 
@@ -149,11 +149,12 @@ export default class DayClosure extends Component {
         }
       }
     });
+    this.hidedayModel();
     this.hideModal();
   }
 
   pendingConfirmDayCloser() {
-    this.setState({ isView: true }, () => this.getPendingDeliverySlips(this.state.applicability));
+    this.setState({ isView: true, isDates: false }, () => this.getPendingDeliverySlips(this.state.applicability));
   }
 
   getPendingDeliverySlips(selectedDate) {
@@ -219,6 +220,7 @@ export default class DayClosure extends Component {
     } else if (this.state.daycheckCloseDates.length <= 1) {
       this.hidedayModel();
     }
+    this.hidedayModel();
   }
 
   closePendingDeliverySlips() {
@@ -263,6 +265,7 @@ export default class DayClosure extends Component {
   }
 
   render() {
+    console.log(this.state.dayClosureList);
     return (
       <View>
         {this.state.loading &&
@@ -452,7 +455,7 @@ export default class DayClosure extends Component {
                             <Text selectable={true} style={scss.textStyleLight}>MRP:
                               <Text style={scss.textStyleMedium}>{"\n"}{item.mrp}</Text>
                             </Text>
-                            <Text selectable={true} style={scss.textStyleLight}>SALESMan:
+                            <Text selectable={true} style={scss.textStyleLight}>Sales Man:
                               <Text style={scss.textStyleMedium}>{"\n"}{item.salesMan}</Text>
                             </Text>
                           </View>
