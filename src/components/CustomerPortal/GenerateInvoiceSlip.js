@@ -347,6 +347,8 @@ class GenerateInvoiceSlip extends Component {
       obj.originalBarcodeCreatedAt = item.createdDate;
       obj.batchNo = item.batchNo;
       obj.promoDiscount = 0;
+      obj.totalPromoDiscount = 0.0;
+      obj.distributedPromoDiscount = 0.0
       return obj;
     });
     if (this.state.isEstimationEnable === "true") {
@@ -359,15 +361,15 @@ class GenerateInvoiceSlip extends Component {
 
           this.state.barCodeList.forEach((barCode, index) => {
             costPrice = costPrice + barCode.itemPrice;
-            discount = discount + barCode.promoDiscount;
-            total = total + barCode.netValue;
+            discount = discount + barCode.distributedPromoDiscount;
+            total = total + barCode.grossValue;
           });
 
           discount = discount + this.state.manualDisc;
-          discAppliedTotal = this.state.grandNetAmount - discount;
+          discAppliedTotal = parseFloat(this.state.grandNetAmount - discount).toFixed(2);
           this.setState({
-            netPayableAmount: total,
-            totalPromoDisc: discount,
+            netPayableAmount: parseFloat(total).toFixed(2),
+            totalPromoDisc: parseFloat(discount).toFixed(2),
             grossAmount: costPrice,
             grandNetAmount: discAppliedTotal
           });
@@ -449,256 +451,296 @@ class GenerateInvoiceSlip extends Component {
         if (isEsSlipEnabled === "true") {
           isEstimationEnable = true;
           this.setState({ isEstimationEnable: true });
-          if (this.state.dsCompareList.length === 0) {
-            this.state.dsNumberList2.push(obj);
-            this.setState({
-              dsCompareList: [...this.state.dsNumberList2],
-              dsNumber: this.state.dsNumberList2
-            });
-          } else {
-            const isFound = this.state.dsCompareList.find(element => {
-              if (element.dsNumber === obj.dsNumber) {
-                alert("DS Number Already Exist");
-                this.setState({
-                  dsNumber: '',
-                });
-                return true;
-              }
-              return false;
-            });
-            if (!isFound) {
-              this.state.dsNumberList2.push(obj);
-              this.state.dsCompareList.push(this.state.dsNumberList2);
-              const flattened = this.state.dsCompareList.flatMap(dsNumber => dsNumber);
-              this.setState({
-                dsCompareList: flattened,
-                dsNumber: this.state.dsNumberList2
-              });
-            }
-          }
+          // if (this.state.dsCompareList.length === 0) {
+          //   this.state.dsNumberList2.push(obj);
+          //   this.setState({
+          //     dsCompareList: [...this.state.dsNumberList2],
+          //     dsNumber: this.state.dsNumberList2
+          //   });
+          // } else {
+          //   const isFound = this.state.dsCompareList.find(element => {
+          //     if (element.dsNumber === obj.dsNumber) {
+          //       alert("DS Number Already Exist");
+          //       this.setState({
+          //         dsNumber: '',
+          //       });
+          //       return true;
+          //     }
+          //     return false;
+          //   });
+          //   if (!isFound) {
+          //     this.state.dsNumberList2.push(obj);
+          //     this.state.dsCompareList.push(this.state.dsNumberList2);
+          //     const flattened = this.state.dsCompareList.flatMap(dsNumber => dsNumber);
+          //     this.setState({
+          //       dsCompareList: flattened,
+          //       dsNumber: this.state.dsNumberList2
+          //     });
+          //   }
+          // }
         } else {
           isEstimationEnable = false;
           this.setState({ isEstimationEnable: false });
         }
         CustomerService.getDsSlip(esNumber.trim(), isEstimationEnable, storeId).then((res) => {
-          // console.log("data in getDeliverySlipDetails", esNumber, isEstimationEnable, storeId);
-          RNBeep.beep();
-          // console.log("getInvoiceSlip", JSON.stringify(res.data));
-          if (isEstimationEnable) {
-            this.state.dlslips.push(res.data.lineItems);
-            const flattened = this.state.dlslips.flatMap(barCode => barCode);
-            if (this.state.dlslips.length > 1) {
-              const barList = flattened.filter(
-                (test, index, array) =>
-                  index ===
-                  array.findIndex((findTest) => findTest.lineItemId === test.lineItemId)
-              );
+          console.log("data in getDeliverySlipDetails", esNumber, isEstimationEnable, storeId);
+          if (res.data) {
+            if (this.state.dsCompareList.length === 0) {
+              if (this.state.dsNumber.trim() === res.data.dsNumber) {
+                this.state.dsNumberList2.push(obj);
+                this.setState({
+                  dsCompareList: [...this.state.dsNumberList2],
+                  dsNumberList: this.state.dsNumberList2
+                })
+                console.log("dsNumberList1", this.state.dsNumberList)
+              }
 
-              var combineList = {};
+            } else {
 
-              barList.forEach((itm) => {
-                console.log({ itm })
-                var barCode = itm.barCode;
-                itm.quantity = parseInt(itm.quantity);
-                itm.netValue = parseInt(itm.netValue);
-                itm.grossValue = parseInt(itm.grossValue);
-                if (!combineList[barCode]) {
-                  return combineList[barCode] = itm;
+              const isFound = this.state.dsCompareList.find(element => {
+                if (element.dsNumber === res.data.dsNumber) {
+                  alert("DS Number Alredy Exist");
+                  this.setState({
+                    dsNumber: '',
+                  });
+                  return true;
                 }
-                return combineList[barCode].quantity = combineList[barCode].quantity + itm.quantity,
-                  combineList[barCode].netValue = combineList[barCode].netValue + itm.netValue,
-                  combineList[barCode].grossValue = combineList[barCode].grossValue + itm.grossValue,
-                  combineList[barCode].sgst = combineList[barCode].sgst + itm.sgst,
-                  combineList[barCode].cgst = combineList[barCode].cgst + itm.cgst
+                return false;
+
+
               });
-              var combineList2 = [];
-              Object.keys(combineList).forEach((key) => {
-                combineList2.push(combineList[key]);
-              });
-              const clearList = [...combineList2];
-              if (barList.length > 1) {
-                this.setState({ barCodeList: clearList, dsNumber: '', dsNumberList2: [] });
-              } else {
-                this.setState({ barCodeList: clearList, dsNumber: '', dsNumberList2: [] });
-              }
-            } else {
-              if (isEstimationEnable) {
-                this.setState({ barCodeList: res.data.lineItems, dsNumber: '', dsNumberList2: [] });
+              if (!isFound) {
+                if (res.data.dsNumber === obj.dsNumber) {
+                  this.state.dsNumberList2.push(obj);
+                  this.state.dsCompareList.push(this.state.dsNumberList2);
+                  const flattened = this.state.dsCompareList.flatMap(dsNumber => dsNumber);
+                  this.setState({
+                    dsCompareList: flattened,
+                    dsNumberList: flattened
+                  })
+                }
+                console.log("dsNumberList22", this.state.dsNumberList)
               }
             }
-            this.state.barCodeList.forEach((barCode, index) => {
-              costPrice = costPrice + barCode.itemPrice;
-              promoDiscValue = promoDiscValue + barCode.promoDiscount;
-              total = total + barCode.grossValue;
-              netTotal = netTotal + barCode.grossValue;
-              scgtTotal = ((barCode.sgst).toFixed(2));
-              cgstTotal = ((barCode.cgst).toFixed(2));
-            });
-            this.state.barCodeList.forEach((element, ind) => {
-              if (element.sgst && element.sgst !== 0 && element.sgst !== 'null' && element.cgst && element.cgst !== 0 && element.cgst !== 'null') {
-                element.sgsttotal = ((element.sgst))
-                element.cgsttotal = ((element.cgst))
-              } else {
-                // element.returnedAmout = parseInt(element.returnQty) * element.netValue
-              }
-              element.returnedAmout = ((element.returnQty) * element.netValue) / element.quantity
-            });
-            let stateGST = this.state.barCodeList.reduce((accumulator, curValue) => {
-              if (curValue.sgst && curValue.sgst !== 0 && curValue.sgst !== 'null') {
-                accumulator = accumulator + curValue.sgsttotal;
-              }
-              return accumulator;
 
-            }, 0);
-            let centralGST = this.state.barCodeList.reduce((accumulator, curValue) => {
-              if (curValue.cgst && curValue.cgst !== 0 && curValue.cgst !== 'null') {
-                accumulator = accumulator + curValue.cgsttotal;
-              }
-              return accumulator;
-
-            }, 0);
-            discount = discount + this.state.manualDisc;
-            if (isTaxIncluded === "true" && isTaxIncluded !== "null") {
-              this.setState({
-                netPayableAmount: (total.toFixed(2)),
-                grandNetAmount: (((total) - promoDiscValue).toFixed(2)),
-                totalPromoDisc: (promoDiscValue.toFixed(2)),
-                grossAmount: costPrice,
-                totalAmount: (total.toFixed(2)),
-                stateGST: ((stateGST).toFixed(2)),
-                centralGST: ((centralGST).toFixed(2)),
-                returnCash: parseFloat(this.state.returnCash),
-                cashAmount: parseFloat(this.state.cashAmount)
-              });
-
-            } else {
-              this.setState({
-                netPayableAmount: (total.toFixed(2)),
-                grandNetAmount: ((total + stateGST + centralGST - promoDiscValue).toFixed(2)),
-                totalPromoDisc: (promoDiscValue.toFixed(2)),
-                grossAmount: ((total + stateGST + centralGST).toFixed(2)),
-                totalAmount: ((total + stateGST + centralGST).toFixed(2)),
-                stateGST: ((stateGST).toFixed(2)),
-                centralGST: ((centralGST).toFixed(2)),
-                returnCash: parseFloat(this.state.returnCash),
-                cashAmount: parseFloat(this.state.cashAmount)
-
-              });
-
-            }
-          } else {
-            let count = false;
-            if (this.state.dlslips.length === 0) {
+            RNBeep.beep();
+            // console.log("getInvoiceSlip", JSON.stringify(res.data));
+            if (isEstimationEnable) {
               this.state.dlslips.push(res.data.lineItems);
               const flattened = this.state.dlslips.flatMap(barCode => barCode);
-              this.setState({ barCodeList: flattened })
-            }
-            else {
-              for (let i = 0; i < this.state.barCodeList.length; i++) {
-                if (
-                  this.state.barCodeList[i].barCode ===
-                  res.data.lineItems[0].barCode
-                ) {
-                  count = true;
-                  var items = [...this.state.barCodeList];
-                  if (parseInt(items[i].qty) + 1 <= parseInt(items[i].quantity)) {
-                    let addItem = parseInt(items[i].qty) + 1;
-                    items[i].qty = addItem.toString();
-                    let totalcostMrp = items[i].itemPrice * parseInt(items[i].qty);
-                    items[i].totalMrp = totalcostMrp;
-                    break;
-                  } else {
-                    alert("Insufficient Quantity");
-                  }
-                }
-              }
-              if (!count) {
-                this.state.dlslips.push(res.data.lineItems);
-                const flattened = this.state.dlslips.flatMap(barCode => barCode);
-                this.setState({ barCodeList: flattened });
-                const barList = this.state.barCodeList.filter(
+              if (this.state.dlslips.length > 1) {
+                const barList = flattened.filter(
                   (test, index, array) =>
                     index ===
-                    array.findIndex((findTest) => findTest.barCode === test.barCode)
+                    array.findIndex((findTest) => findTest.lineItemId === test.lineItemId)
                 );
-                this.setState({ barCodeList: barList });
-              }
-            }
-            // this.setState({ dsNumber: '' });
-            this.setState({ barCodeList: this.state.barCodeList, dsNumber: '' });
-            this.state.barCodeList.forEach((barCode, index) => {
-              if (barCode.qty > 1) {
-                //  barCode.grossValue = barCode.itemPrice * barCode.qty;
 
+                var combineList = {};
+
+                barList.forEach((itm) => {
+                  console.log({ itm })
+                  var barCode = itm.barCode;
+                  itm.quantity = parseInt(itm.quantity);
+                  itm.netValue = parseInt(itm.netValue);
+                  itm.grossValue = parseInt(itm.grossValue);
+                  if (!combineList[barCode]) {
+                    return combineList[barCode] = itm;
+                  }
+                  return combineList[barCode].quantity = combineList[barCode].quantity + itm.quantity,
+                    combineList[barCode].netValue = combineList[barCode].netValue + itm.netValue,
+                    combineList[barCode].grossValue = combineList[barCode].grossValue + itm.grossValue,
+                    combineList[barCode].sgst = combineList[barCode].sgst + itm.sgst,
+                    combineList[barCode].cgst = combineList[barCode].cgst + itm.cgst
+                });
+                var combineList2 = [];
+                Object.keys(combineList).forEach((key) => {
+                  combineList2.push(combineList[key]);
+                });
+                const clearList = [...combineList2];
+                if (barList.length > 1) {
+                  this.setState({ barCodeList: clearList, dsNumber: '', dsNumberList2: [] });
+                } else {
+                  this.setState({ barCodeList: clearList, dsNumber: '', dsNumberList2: [] });
+                }
               } else {
-                // barCode.grossValue = barCode.itemPrice;
-                barCode.qty = parseInt("1");
-                // total = total + barCode.grossValue;
+                if (isEstimationEnable) {
+                  this.setState({ barCodeList: res.data.lineItems, dsNumber: '', dsNumberList2: [] });
+                }
               }
-              costPrice = costPrice + barCode.itemPrice;
-              promoDiscValue = promoDiscValue + barCode.promoDiscount;
-              total = total + barCode.itemPrice * barCode.qty;
-              netTotal = netTotal + barCode.itemPrice * barCode.qty;
-              // scgtTotal = total + barCode.sgst + barCode.cgst;
-              scgtTotal = ((barCode.sgst).toFixed(2));
-              cgstTotal = ((barCode.cgst).toFixed(2));
-            });
-
-            this.state.barCodeList.forEach((element, ind) => {
-              if (element.sgst && element.sgst !== 0 && element.sgst !== 'null' && element.cgst && element.cgst !== 0 && element.cgst !== 'null') {
-                element.sgsttotal = element.sgst//* element.qty.toFixed(2)
-                element.cgsttotal = element.cgst
-              } else {
-                // element.returnedAmout = parseInt(element.returnQty) * element.netValue
-              }
-              element.returnedAmout = (((element.returnQty) * element.netValue / element.quantity).toFixed(2))
-            });
-            let stateGST = this.state.barCodeList.reduce((accumulator, curValue) => {
-              if (curValue.sgst && curValue.sgst !== 0 && curValue.sgst !== 'null') {
-                accumulator = accumulator + curValue.sgsttotal;
-              }
-              return accumulator;
-
-            }, 0);
-            let centralGST = this.state.barCodeList.reduce((accumulator, curValue) => {
-              if (curValue.cgst && curValue.cgst !== 0 && curValue.cgst !== 'null') {
-                accumulator = accumulator + curValue.cgsttotal;
-              }
-              return accumulator;
-
-            }, 0);
-            discount = discount + this.state.manualDisc;
-            if (isTaxIncluded === "true" && isTaxIncluded !== "null") {
-              this.setState({
-                netPayableAmount: (total.toFixed(2)),
-                grandNetAmount: (netTotal.toFixed(2)),
-                totalPromoDisc: (promoDiscValue.toFixed(2)),
-                grossAmount: (costPrice.toFixed(2)),
-                totalAmount: (total.toFixed(2)),
-                enableCoupon: true,
-                returnCash: parseFloat(this.state.returnCash),
-                cashAmount: parseFloat(this.state.cashAmount),
-                stateGST: ((stateGST).toFixed(2)),
-                centralGST: ((centralGST).toFixed(2))
-
+              this.state.barCodeList.forEach((barCode, index) => {
+                costPrice = costPrice + barCode.itemPrice;
+                promoDiscValue = promoDiscValue + barCode.promoDiscount;
+                total = total + barCode.grossValue;
+                netTotal = netTotal + barCode.grossValue;
+                scgtTotal = ((barCode.sgst).toFixed(2));
+                cgstTotal = ((barCode.cgst).toFixed(2));
               });
+              this.state.barCodeList.forEach((element, ind) => {
+                if (element.sgst && element.sgst !== 0 && element.sgst !== 'null' && element.cgst && element.cgst !== 0 && element.cgst !== 'null') {
+                  element.sgsttotal = ((element.sgst))
+                  element.cgsttotal = ((element.cgst))
+                } else {
+                  // element.returnedAmout = parseInt(element.returnQty) * element.netValue
+                }
+                element.returnedAmout = ((element.returnQty) * element.netValue) / element.quantity
+              });
+              let stateGST = this.state.barCodeList.reduce((accumulator, curValue) => {
+                if (curValue.sgst && curValue.sgst !== 0 && curValue.sgst !== 'null') {
+                  accumulator = accumulator + curValue.sgsttotal;
+                }
+                return accumulator;
+
+              }, 0);
+              let centralGST = this.state.barCodeList.reduce((accumulator, curValue) => {
+                if (curValue.cgst && curValue.cgst !== 0 && curValue.cgst !== 'null') {
+                  accumulator = accumulator + curValue.cgsttotal;
+                }
+                return accumulator;
+
+              }, 0);
+              discount = discount + this.state.manualDisc;
+              if (isTaxIncluded === "true" && isTaxIncluded !== "null") {
+                this.setState({
+                  netPayableAmount: (total.toFixed(2)),
+                  grandNetAmount: (((total) - promoDiscValue).toFixed(2)),
+                  totalPromoDisc: (promoDiscValue.toFixed(2)),
+                  grossAmount: costPrice,
+                  totalAmount: (total.toFixed(2)),
+                  stateGST: ((stateGST).toFixed(2)),
+                  centralGST: ((centralGST).toFixed(2)),
+                  returnCash: parseFloat(this.state.returnCash),
+                  cashAmount: parseFloat(this.state.cashAmount)
+                });
+
+              } else {
+                this.setState({
+                  netPayableAmount: (total.toFixed(2)),
+                  grandNetAmount: ((total + stateGST + centralGST - promoDiscValue).toFixed(2)),
+                  totalPromoDisc: (promoDiscValue.toFixed(2)),
+                  grossAmount: ((total + stateGST + centralGST).toFixed(2)),
+                  totalAmount: ((total + stateGST + centralGST).toFixed(2)),
+                  stateGST: ((stateGST).toFixed(2)),
+                  centralGST: ((centralGST).toFixed(2)),
+                  returnCash: parseFloat(this.state.returnCash),
+                  cashAmount: parseFloat(this.state.cashAmount)
+
+                });
+
+              }
             } else {
-              this.setState({
-                netPayableAmount: (total.toFixed(2)),
-                grandNetAmount: ((total + (stateGST) + (centralGST)).toFixed(2)),
-                totalPromoDisc: (promoDiscValue.toFixed(2)),
-                stateGST: ((stateGST).toFixed(2)),
-                centralGST: ((centralGST).toFixed(2)),
-                grossAmount: costPrice,
-                totalAmount: ((total + (stateGST) + (centralGST)).toFixed(2)),
-                enableCoupon: true,
-                returnCash: parseFloat(this.state.returnCash),
-                cashAmount: parseFloat(this.state.cashAmount)
+              let count = false;
+              if (this.state.dlslips.length === 0) {
+                this.state.dlslips.push(res.data.lineItems);
+                const flattened = this.state.dlslips.flatMap(barCode => barCode);
+                this.setState({ barCodeList: flattened })
+              }
+              else {
+                for (let i = 0; i < this.state.barCodeList.length; i++) {
+                  if (
+                    this.state.barCodeList[i].barCode ===
+                    res.data.lineItems[0].barCode
+                  ) {
+                    count = true;
+                    var items = [...this.state.barCodeList];
+                    if (parseInt(items[i].qty) + 1 <= parseInt(items[i].quantity)) {
+                      let addItem = parseInt(items[i].qty) + 1;
+                      items[i].qty = addItem.toString();
+                      let totalcostMrp = items[i].itemPrice * parseInt(items[i].qty);
+                      items[i].totalMrp = totalcostMrp;
+                      break;
+                    } else {
+                      alert("Insufficient Quantity");
+                    }
+                  }
+                }
+                if (!count) {
+                  this.state.dlslips.push(res.data.lineItems);
+                  const flattened = this.state.dlslips.flatMap(barCode => barCode);
+                  this.setState({ barCodeList: flattened });
+                  const barList = this.state.barCodeList.filter(
+                    (test, index, array) =>
+                      index ===
+                      array.findIndex((findTest) => findTest.barCode === test.barCode)
+                  );
+                  this.setState({ barCodeList: barList });
+                }
+              }
+              // this.setState({ dsNumber: '' });
+              this.setState({ barCodeList: this.state.barCodeList, dsNumber: '' });
+              this.state.barCodeList.forEach((barCode, index) => {
+                if (barCode.qty > 1) {
+                  //  barCode.grossValue = barCode.itemPrice * barCode.qty;
+
+                } else {
+                  // barCode.grossValue = barCode.itemPrice;
+                  barCode.qty = parseInt("1");
+                  // total = total + barCode.grossValue;
+                }
+                costPrice = costPrice + barCode.itemPrice;
+                promoDiscValue = promoDiscValue + barCode.promoDiscount;
+                total = total + barCode.itemPrice * barCode.qty;
+                netTotal = netTotal + barCode.itemPrice * barCode.qty;
+                // scgtTotal = total + barCode.sgst + barCode.cgst;
+                scgtTotal = ((barCode.sgst).toFixed(2));
+                cgstTotal = ((barCode.cgst).toFixed(2));
               });
+
+              this.state.barCodeList.forEach((element, ind) => {
+                if (element.sgst && element.sgst !== 0 && element.sgst !== 'null' && element.cgst && element.cgst !== 0 && element.cgst !== 'null') {
+                  element.sgsttotal = element.sgst//* element.qty.toFixed(2)
+                  element.cgsttotal = element.cgst
+                } else {
+                  // element.returnedAmout = parseInt(element.returnQty) * element.netValue
+                }
+                element.returnedAmout = (((element.returnQty) * element.netValue / element.quantity).toFixed(2))
+              });
+              let stateGST = this.state.barCodeList.reduce((accumulator, curValue) => {
+                if (curValue.sgst && curValue.sgst !== 0 && curValue.sgst !== 'null') {
+                  accumulator = accumulator + curValue.sgsttotal;
+                }
+                return accumulator;
+
+              }, 0);
+              let centralGST = this.state.barCodeList.reduce((accumulator, curValue) => {
+                if (curValue.cgst && curValue.cgst !== 0 && curValue.cgst !== 'null') {
+                  accumulator = accumulator + curValue.cgsttotal;
+                }
+                return accumulator;
+
+              }, 0);
+              discount = discount + this.state.manualDisc;
+              if (isTaxIncluded === "true" && isTaxIncluded !== "null") {
+                this.setState({
+                  netPayableAmount: (total.toFixed(2)),
+                  grandNetAmount: (netTotal.toFixed(2)),
+                  totalPromoDisc: (promoDiscValue.toFixed(2)),
+                  grossAmount: (costPrice.toFixed(2)),
+                  totalAmount: (total.toFixed(2)),
+                  enableCoupon: true,
+                  returnCash: parseFloat(this.state.returnCash),
+                  cashAmount: parseFloat(this.state.cashAmount),
+                  stateGST: ((stateGST).toFixed(2)),
+                  centralGST: ((centralGST).toFixed(2))
+
+                });
+              } else {
+                this.setState({
+                  netPayableAmount: (total.toFixed(2)),
+                  grandNetAmount: ((total + (stateGST) + (centralGST)).toFixed(2)),
+                  totalPromoDisc: (promoDiscValue.toFixed(2)),
+                  stateGST: ((stateGST).toFixed(2)),
+                  centralGST: ((centralGST).toFixed(2)),
+                  grossAmount: costPrice,
+                  totalAmount: ((total + (stateGST) + (centralGST)).toFixed(2)),
+                  enableCoupon: true,
+                  returnCash: parseFloat(this.state.returnCash),
+                  cashAmount: parseFloat(this.state.cashAmount)
+                });
+              }
+              // this.calculateTotal();
             }
-            // this.calculateTotal();
+            // this.getTaxAmount();
           }
-          // this.getTaxAmount();
         });
       } else {
         alert("Please Close Previous Days");

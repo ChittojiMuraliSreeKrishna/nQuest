@@ -28,10 +28,10 @@ class CustomerService {
     return axios.get(BASE_URL + NEW_SALE_URL.getDeliverySlip + param);
   }
 
-  getAllDayClosure() {
-    return BASE_URL + "/new-sale/newsale/getPendingDeliverySlips";
+  getAllDayClosr(storeId) {
+    const param = '?storeId=' + storeId;
+    return axios.get(BASE_URL + "/new-sale/newsale/getPendingDeliverySlips" + param);
   }
-
   dayCloseActivity() {
     return BASE_URL + "/new-sale/newsale/closePendingDeliverySlips";
   }

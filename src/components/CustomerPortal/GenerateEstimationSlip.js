@@ -282,7 +282,7 @@ class GenerateEstimationSlip extends Component {
       CustomerService.createDeliverySlip(createObj).then((res) => {
         if (res) {
           console.log(res.data);
-          this.setState({ resultModel: true, resultData: res.data, modalVisible: true, resultDsNumber: res.data });
+          this.setState({ resultModel: true, resultData: res.data, modalVisible: true, resultDsNumber: res.data, isCheckPromo: false });
           {
             this.state.printEnabled && PrintService('DSNUM', res.data, this.state.barList).then(() => {
               this.setState({ loading: false, });
@@ -364,7 +364,7 @@ class GenerateEstimationSlip extends Component {
                         let addItem = parseInt(items[i].quantity) + 1;
                         items[i].quantity = addItem.toString();
                         let totalcostMrp = items[i].itemMrp * parseInt(items[i].quantity);
-                        items[i].totalMrp = totalcostMrp;
+                        items[ i ].totalMrp = parseFloat(totalcostMrp).toFixed(2);
                         break;
                       } else {
                         alert("Barcode reached max");
@@ -372,7 +372,7 @@ class GenerateEstimationSlip extends Component {
                       }
                     }
                   }
-                  if (count === false) {
+                  if (!count) {
                     this.state.itemsList.push(res.data);
                   }
                 }
@@ -383,11 +383,12 @@ class GenerateEstimationSlip extends Component {
                   if (element.taxValues) {
                     element.cgst = element.taxValues.cgstValue;
                     element.sgst = element.taxValues.sgstValue;
+                    element.igst = element.taxValues.igstValue;
                     element.taxValue = element.taxValues.cgstValue + element.taxValues.sgstValue;
                   }
                   if (element.quantity > 1) {
                   } else {
-                    element.totalMrp = element.itemMrp;
+                    element.totalMrp = element.itemMrp.toFixed(2);
                     element.quantity = parseInt(1);
                   }
                 });
@@ -398,6 +399,7 @@ class GenerateEstimationSlip extends Component {
               alert(res.data.body);
             }
           })
+          this.setState({  isCheckPromo: false });
         } else {
           alert("Please Close Previous Days")
         }
@@ -414,12 +416,11 @@ class GenerateEstimationSlip extends Component {
     let totalqty = 0;
     let promoDiscount = 0;
     this.state.barList.forEach(barCode => {
-      totalAmount = totalAmount + barCode.totalMrp;
-      totalqty = totalqty + parseInt(barCode.quantity);
+      totalAmount = totalAmount + parseFloat(barCode.totalMrp);
       promoDiscount = promoDiscount + (isNaN(barCode.itemDiscount) ? 0 : (parseInt(barCode.itemDiscount)));
+      totalqty = totalqty + parseInt(barCode.quantity);
     });
-    this.setState({ mrpAmount: totalAmount, totalQuantity: totalqty, promoDisc: promoDiscount }
-    );
+    this.setState({ mrpAmount: totalAmount.toFixed(2), totalQuantity: totalqty, promoDisc: promoDiscount });
   }
 
   refresh() {
@@ -481,11 +482,11 @@ class GenerateEstimationSlip extends Component {
     let totalqty = 0;
     let promoDiscount = 0
     this.state.barList.forEach(bardata => {
-      grandTotal = grandTotal + bardata.totalMrp;
-      totalqty = totalqty + parseInt(bardata.quantity);
+      grandTotal = grandTotal + parseFloat(bardata.totalMrp);
       promoDiscount = promoDiscount + bardata?.itemDiscount;
+      totalqty = totalqty + parseInt(bardata.quantity);
     });
-    this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty, promoDisc: promoDiscount });
+    this.setState({ mrpAmount: (grandTotal.toFixed(2)), totalQuantity: totalqty, promoDisc: promoDiscount });
     this.state.totalQuantity = (parseInt(this.state.totalQuantity) + 1);
     // this.setState({ itemsList: qtyarr });
   };
@@ -509,11 +510,11 @@ class GenerateEstimationSlip extends Component {
     let totalqty = 0;
     let promoDiscount = 0
     this.state.barList.forEach(bardata => {
-      grandTotal = grandTotal + bardata.totalMrp;
-      totalqty = totalqty + parseInt(bardata.quantity);
+      grandTotal = grandTotal + parseFloat(bardata.totalMrp);
       promoDiscount = promoDiscount + bardata?.itemDiscount;
+      totalqty = totalqty + parseInt(bardata.quantity);
     });
-    this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty, promoDisc: promoDiscount });
+    this.setState({ mrpAmount: (grandTotal.toFixed(2)), totalQuantity: totalqty, promoDisc: promoDiscount });
     this.state.totalQuantity = (parseInt(this.state.totalQuantity) + 1);
   }
 
@@ -529,16 +530,16 @@ class GenerateEstimationSlip extends Component {
       let totalqty = 0;
       let promoDiscount = 0
       this.state.barList.forEach(bardata => {
-        grandTotal = grandTotal + bardata.totalMrp;
-        totalqty = totalqty + parseInt(bardata.quantity);
+        grandTotal = grandTotal + parseFloat(bardata.totalMrp);
         promoDiscount = promoDiscount + bardata?.itemDiscount;
+        totalqty = totalqty + parseInt(bardata.quantity);
       });
-      this.setState({ mrpAmount: grandTotal, totalQuantity: totalqty, promoDisc: promoDiscount });
+      this.setState({ mrpAmount: (grandTotal.toFixed(2)), totalQuantity: totalqty, promoDisc: promoDiscount });
       this.setState({ itemsList: qtyarr });
     } else {
-      // this.state.itemsList.splice(index, 1);
+      this.state.itemsList.splice(index, 1);
       this.setState({ barList: this.state.itemsList });
-      this.calculateTotal();
+      // this.calculateTotal();
     }
   }
 
@@ -748,7 +749,7 @@ class GenerateEstimationSlip extends Component {
                           </View>
                           <View style={textContainer}>
                             <Text style={textStyleMedium}>{item.barcode}</Text>
-                            <Text style={textStyleMedium}>₹ {item.itemMrp + '.00'}</Text>
+                            <Text style={textStyleMedium}>₹ {item.itemMrp }</Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                               <TouchableOpacity
                                 onPress={() => this.incrementForTable(item, index)}>
@@ -782,12 +783,12 @@ class GenerateEstimationSlip extends Component {
                           <View style={textContainer}>
                             <Text style={textStyleMedium}>{this.state.smnumber}</Text>
                             <Text style={textStyleMedium}>{ }</Text>
-                            <Text style={[textStyleMedium, { color: '#2ADC09' }]}>₹{item.itemDiscount + '.00'}</Text>
+                            <Text style={[textStyleMedium, { color: '#2ADC09' }]}>₹{item.itemDiscount }</Text>
                           </View>
                         </View>
                       </View>
                       <View style={flatListTextStyle}>
-                        <Text style={{ fontFamily: 'bold' }}>{I18n.t("TOTAL")} :  ₹{item.totalMrp + '.00'}</Text>
+                        <Text style={{ fontFamily: 'bold' }}>{I18n.t("TOTAL")} :  ₹{item.totalMrp }</Text>
                       </View>
                     </>
                   )}
@@ -825,7 +826,7 @@ class GenerateEstimationSlip extends Component {
                     color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 90, fontSize: 20, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
                     fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
                   }}>
-                    ₹ {(this.state.mrpAmount)} </Text>
+                    ₹ {parseFloat(this.state.mrpAmount)} </Text>
                   <View style={styles.TopcontainerforPay}>
                     <TouchableOpacity
                       style={Device.isTablet ? styles.signInButton_tablet : styles.signInButton_mobile}

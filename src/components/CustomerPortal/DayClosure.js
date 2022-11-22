@@ -78,10 +78,9 @@ export default class DayClosure extends Component {
 
   getAllDayCloser() {
     this.setState({ loading: true });
-    const param = '?storeId=' + this.state.storeId;
-    axios.get(CustomerService.getAllDayClosure() + param).then(res => {
+    CustomerService.getAllDayClosr(this.state.storeId).then((res) => {
       if (res?.data) {
-        if (res.data.result.deliverySlips.length > 0) {
+        if (res.data.result.deliverySlips && res.data.result.deliverySlips.length > 0) {
           this.setState({ dayClosureList: res.data.result.deliverySlips });
           if (this.state.dayClosureList.length > 0) {
             this.setState({ enableButton: true });
@@ -171,15 +170,15 @@ export default class DayClosure extends Component {
   }
 
   hideModal() {
-    this.setState({ isCloseDay: false, isDayClose: false });
+    this.setState({ isCloseDay: false, isDayClose: false, applicability: '' });
   }
 
   hidedayModel() {
-    this.setState({ isDates: false })
+    this.setState({ isDates: false, applicability: '' })
   }
 
   hideClosePop() {
-    this.setState({ isView: false })
+    this.setState({ isView: false, applicability: '' })
   }
 
   handleSelectPendingDates = selecteddate => {
@@ -215,6 +214,7 @@ export default class DayClosure extends Component {
             toadaydeskValue: '',
             toadayValue: '',
             penlitydeskValue: '',
+            applicability: ''
           });
         }
       });
@@ -260,13 +260,13 @@ export default class DayClosure extends Component {
         toadaydeskValue: '',
         toadayValue: '',
         penlitydeskValue: '',
+        applicability: ''
       });
     });
     this.hideModal();
   }
 
   render() {
-    console.log(this.state.dayClosureList);
     return (
       <View>
         {this.state.loading &&
@@ -390,7 +390,7 @@ export default class DayClosure extends Component {
           <Modal style={{ margin: 0 }} isVisible={this.state.isView}
             onBackButtonPress={() => this.hideClosePop()}
             onBackdropPress={() => this.hideClosePop()} >
-            <View style={forms.filterModelContainer} >
+            <View style={[forms.filterModelContainer, { height: '60%' }]} >
               <Text style={forms.popUp_decorator}>-</Text>
               <View style={forms.filterModelSub}>
                 <KeyboardAwareScrollView>
