@@ -1213,11 +1213,11 @@ class GenerateInvoiceSlip extends Component {
     discount = discount + this.state.manualDisc;
     if (this.state.isTaxIncluded === "true" && this.state.isTaxIncluded !== "null") {
       this.setState({
-        netPayableAmount: total,
-        grandNetAmount: netTotal,
-        totalPromoDisc: promoDiscValue,
-        grossAmount: costPrice,
-        totalAmount: total,
+        netPayableAmount: (total).toFixed(2),
+        grandNetAmount: (netTotal).toFixed(2),
+        totalPromoDisc: (promoDiscValue).toFixed(2),
+        grossAmount: (costPrice).toFixed(2),
+        totalAmount: (total).toFixed(2),
         stateGST: ((stateGST).toFixed(2)),
         centralGST: ((centralGST).toFixed(2)),
       });
@@ -1228,7 +1228,7 @@ class GenerateInvoiceSlip extends Component {
         totalPromoDisc: (promoDiscValue.toFixed(2)),
         stateGST: ((stateGST).toFixed(2)),
         centralGST: ((centralGST).toFixed(2)),
-        grossAmount: costPrice,
+        grossAmount: ((costPrice).toFixed(2)),
         totalAmount: ((total + (stateGST) + (centralGST)).toFixed(2)),
         enableCoupon: true,
         returnCash: parseFloat(this.state.returnCash),
@@ -1303,21 +1303,11 @@ class GenerateInvoiceSlip extends Component {
     discount = discount + this.state.manualDisc;
     if (this.state.isTaxIncluded === "true" && this.state.isTaxIncluded !== "null") {
       this.setState({
-        // netPayableAmount: (total.toFixed(2)),
-        // grandNetAmount: (netTotal.toFixed(2)),
-        // totalPromoDisc: (promoDiscValue.toFixed(2)),
-        // grossAmount: (costPrice.toFixed(2)),
-        // totalAmount: (total.toFixed(2)),
-        // enableCoupon: true,
-        // returnCash: parseFloat(this.state.returnCash),
-        // cashAmount: parseFloat(this.state.cashAmount),
-        // stateGST: ((stateGST).toFixed(2)),
-        // centralGST: ((centralGST).toFixed(2))
-        netPayableAmount: total,
-        grandNetAmount: netTotal,
-        totalPromoDisc: promoDiscValue,
-        grossAmount: costPrice,
-        totalAmount: total,
+        netPayableAmount: (total).toFixed(2),
+        grandNetAmount: (netTotal).toFixed(2),
+        totalPromoDisc: (promoDiscValue).toFixed(2),
+        grossAmount: (costPrice).toFixed(2),
+        totalAmount: (total).toFixed(2),
         stateGST: ((stateGST).toFixed(2)),
         centralGST: ((centralGST).toFixed(2)),
 
@@ -1330,7 +1320,7 @@ class GenerateInvoiceSlip extends Component {
         totalPromoDisc: (promoDiscValue.toFixed(2)),
         stateGST: ((stateGST).toFixed(2)),
         centralGST: ((centralGST).toFixed(2)),
-        grossAmount: costPrice,
+        grossAmount: ((costPrice).toFixed(2)),
         totalAmount: ((total + (stateGST) + (centralGST)).toFixed(2)),
         enableCoupon: true,
         returnCash: parseFloat(this.state.returnCash),
@@ -1402,11 +1392,11 @@ class GenerateInvoiceSlip extends Component {
       discount = discount + this.state.manualDisc;
       if (this.state.isTaxIncluded === "true" && this.state.isTaxIncluded !== "null") {
         this.setState({
-          netPayableAmount: total,
-          grandNetAmount: netTotal,
-          totalPromoDisc: promoDiscValue,
-          grossAmount: costPrice,
-          totalAmount: total,
+          netPayableAmount: (total).toFixed(2),
+          grandNetAmount: (netTotal).toFixed(2),
+          totalPromoDisc: (promoDiscValue).toFixed(2),
+          grossAmount: (costPrice).toFixed(2),
+          totalAmount: (total).toFixed(2),
           stateGST: ((stateGST).toFixed(2)),
           centralGST: ((centralGST).toFixed(2)),
 
@@ -1419,7 +1409,7 @@ class GenerateInvoiceSlip extends Component {
           totalPromoDisc: (promoDiscValue.toFixed(2)),
           stateGST: ((stateGST).toFixed(2)),
           centralGST: ((centralGST).toFixed(2)),
-          grossAmount: costPrice,
+          grossAmount: ((costPrice).toFixed(2)),
           totalAmount: ((total + (stateGST) + (centralGST)).toFixed(2)),
           enableCoupon: true,
           returnCash: parseFloat(this.state.returnCash),
@@ -1705,12 +1695,12 @@ class GenerateInvoiceSlip extends Component {
                               <View>
                                 <Text style={scss.textStyleLight}>{I18n.t("CGST")}
                                   {"\n"}
-                                  <Text style={scss.textStyleMedium}>{item.cgst ? (item.cgst).toFixed(2) : 0}</Text>
+                                  <Text style={scss.textStyleMedium}>{(parseFloat(item.cgst).toFixed(2))}</Text>
                                 </Text>
                               </View>
                               <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("SGST")}
                                 {"\n"}
-                                <Text style={scss.textStyleMedium}>{item.sgst ? (item.sgst).toFixed(2) : 0}</Text>
+                                <Text style={scss.textStyleMedium}>{(parseFloat(item.sgst).toFixed(2))}</Text>
                               </Text>
                             </View>
                           }
@@ -1718,14 +1708,15 @@ class GenerateInvoiceSlip extends Component {
                           <View style={scss.textContainer}>
                             <Text style={[scss.textStyleLight, { textAlign: 'left' }]}>{I18n.t("MRP")}
                               {"\n"}
-                              <Text style={scss.textStyleMedium}>₹ {item.itemPrice}</Text>
+                              <Text style={scss.textStyleMedium}>₹ {parseFloat(item.itemPrice).toFixed(2)}</Text>
                             </Text>
-                            <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("Discount")}{"\n"}<Text style={[scss.textStyleMedium, { color: '#2ADC09', }]}>₹{item.promoDiscount ? item.promoDiscount + '.00' : 0}</Text></Text>
+                            <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("Pro Disc")}{"\n"}<Text style={[scss.textStyleMedium, { color: '#2ADC09', }]}>₹{(item.totalPromoDiscount) ? parseFloat(item.totalPromoDiscount).toFixed(2) : 0.0}</Text></Text>
+                            <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("Dist Discount")}{"\n"}<Text style={[scss.textStyleMedium, { color: '#2ADC09', }]}>₹{(item.distributedPromoDiscount) ? parseFloat(item.distributedPromoDiscount).toFixed(2) : 0.0}</Text></Text>
                           </View>
                           <View style={scss.flatListFooter}>
                             <Text style={scss.footerText}>{I18n.t("GROSS")} :
-                              {this.state.isEstimationEnable && <Text>₹{item.grossValue}</Text>}
-                              {!this.state.isEstimationEnable && <Text>₹ {item.itemPrice * item.qty}</Text>}
+                              {this.state.isEstimationEnable && <Text>₹{parseFloat(item.grossValue.toFixed(2))}</Text>}
+                              {!this.state.isEstimationEnable && <Text>₹ {parseFloat(item.itemPrice * item.qty).toFixed(2)}</Text>}
                               {/* ₹{item.itemPrice} */}
                             </Text>
                           </View>

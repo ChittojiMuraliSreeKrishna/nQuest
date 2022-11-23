@@ -16,7 +16,7 @@ import Message from '../Errors/Message';
 import CustomerService from '../services/CustomerService';
 import { color } from '../Styles/colorStyles';
 import { dateSelector, dateText, inputField, submitBtn, submitBtnText } from '../Styles/FormFields';
-import { flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleLight, textStyleMedium } from '../Styles/Styles';
+import { flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleLight, textStyleMedium, textStyleMediumColor } from '../Styles/Styles';
 
 
 var deviceheight = Dimensions.get('window').height;
@@ -255,30 +255,36 @@ class GiftVocher extends Component {
   }
 
   modelCancel() {
-    this.setState({ modalVisible: false });
+    this.setState({ modalVisible: false, flagFilterOpen: false, searchQuery: "", filterStartDate: "", filterEndDate: "", filterGvNumber: '' });
   }
 
   applyVoucherFilter() {
     const { filterStartDate, filterEndDate, filterGvNumber, searchQuery } = this.state;
     const obj = {
-      fromDate: filterStartDate ? filterStartDate : undefined,
-      toDate: filterEndDate ? filterEndDate : undefined,
-      gvNumber: filterGvNumber ? filterGvNumber : searchQuery ? searchQuery : undefined,
+      fromDate: filterStartDate ? filterStartDate : null,
+      toDate: filterEndDate ? filterEndDate : null,
+      gvNumber: filterGvNumber ? filterGvNumber : searchQuery ? searchQuery : null,
       clientId: parseInt(this.state.clientId)
     };
-    CustomerService.searchGiftVoucher(obj).then((res) => {
-      this.setState({
-        filterVouchersData: res.data.result,
-        filterActive: true, searchQuery: "", modalVisible: false,
-        flagFilterOpen: false, filterStartDate: "", filterEndDate: "", filterActive: true
+    console.log("objjbjj", obj.fromDate, obj.toDate);
+    if (obj.fromDate !== null && obj.toDate !== null) {
+      CustomerService.searchGiftVoucher(obj).then((res) => {
+        this.setState({
+          filterVouchersData: res.data.result,
+          filterActive: true,
+          flagFilterOpen: false
+        });
+      }).catch((err) => {
+        this.setState({ modalVisible: false, flagFilterOpen: false, searchQuery: "", filterStartDate: "", filterEndDate: "" });
       });
-    }).catch((err) => {
-      this.setState({ modalVisible: false, flagFilterOpen: false, searchQuery: "", filterStartDate: "", filterEndDate: "" });
-    });
+    } else {
+      alert("Please Provide Input Fields")
+    }
   }
 
+
   clearFilter() {
-    this.setState({filterVouchersData: [], filterStartDate: "", filterEndDate: "", filterGvNumber: ""})
+    this.setState({ filterVouchersData: [], filterStartDate: "", filterEndDate: "", filterGvNumber: "", filterActive: false })
   }
 
   validationField() {
@@ -308,16 +314,15 @@ class GiftVocher extends Component {
   };
 
   hideGVModel = () => {
-    this.setState({ isgvModel: false, gvModelVisible: false });
+    this.setState({ isgvModel: false, gvModelVisible: false, filterStartDate: "", filterEndDate: "", filterGvNumber: "" });
   };
 
   saveGvNumber() {
     const obj = [this.state.activeGVNumber];
     CustomerService.saveGvNumber(obj, true).then(res => {
       if (res) {
-        console.log("responsee", res);
-        this.setState({ filterVouchersData: [] });
         alert(res.data.message);
+        this.setState({ filterVouchersData: [] });
       }
     });
     this.hideGVModel();
@@ -426,10 +431,38 @@ class GiftVocher extends Component {
                       <Text style={textStyleMedium}>{I18n.t("VALUE")}: {item.value}</Text>
                     </View>
                     <View style={textContainer}>
-                      <Text style={textStyleMedium} selectable={true}>GV NUMBER: {item.gvNumber}</Text>
-                      <TouchableOpacity onPress={() => this.activeGV(item)}>
-                        <Text style={[textStyleMedium, { backgroundColor: item.isActivated ? '#009900' : '#ee0000', color: '#ffffff', padding: 5, alignSelf: 'flex-start', borderRadius: Device.isTablet ? 10 : 5, fontFamily: 'medium' }]}>{I18n.t("Activate")} </Text>
+                      <Text style={textStyleMediumColor}>GV NUMBER: <Text selectable={true} style={textStyleMedium}>{item.gvNumber}</Text></Text>
+                      {/* {item.isApplied ? */}
+                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn, { backgroundColor: item.isActivated === false && item.isApplied === false ? '#009900' : color.disableBackGround, width: "30%" }]} disabled={item.isActivated} onPress={() => this.activeGV(item)}>
+                        <Text style={[forms.submit_btn_text, {}]
+                          //   [textStyleMedium, {
+                          // backgroundColor: item.isActivated === false && item.isApplied === false ? '#009900' : color.disableBackGround,
+                          //    color: '#ffffff', padding: 5, alignSelf: 'flex-start', borderRadius: Device.isTablet ? 10 : 5, fontFamily: 'medium'
+                          // }]
+                        }>
+                          {item.isActivated === false && item.isApplied === false ? "Assign" : "Assigned"}
+                        </Text>
                       </TouchableOpacity>
+                      {/* // <button className={items.isActivated === false && items.isApplied === false ? "fs-12 m-l-3 btn-sm-green" : "fs-12 m-l-3 btn-sm-disable"} disabled={items.isActivated} >
+                        //   {items.isActivated === false && items.isApplied === false ? <span>Assign</span> : <span>Assigned</span>}
+                        // </button> 
+                        // :
+                        // <TouchableOpacity onPress={() => this.activeGV(item)} disabled={item.isActivated}>
+                        //   <Text style={[textStyleMedium, { backgroundColor: item.isActivated === false && item.isApplied === false ? '#009900' : color.disableBackGround,
+                        //   //  color: '#ffffff', padding: 5, alignSelf: 'flex-start', borderRadius: Device.isTablet ? 10 : 5, fontFamily: 'medium'
+                        //     }]}>
+                        //     {item.isActivated === false && item.isApplied === false ? Assign : Assigned}
+                        //   </Text>
+                        // </TouchableOpacity>
+                      
+                        // <button className={items.isActivated === false && items.isApplied === false ? "fs-12 m-l-3 btn-sm-green" : "fs-12 m-l-3 btn-sm-disable"} disabled={items.isActivated} onClick={(e) => this.activeGV(items)}>
+                        //   {items.isActivated === false && items.isApplied === false ? <span>Assign</span> : <span>Assigned</span>}
+
+                        // </button>
+                      // }
+                      // {/* <TouchableOpacity onPress={() => this.activeGV(item)} disabled={item.isActivated}>
+                      //   <Text style={[textStyleMedium, { backgroundColor: item.isActivated ? '#009900' : '#ee0000', color: '#ffffff', padding: 5, alignSelf: 'flex-start', borderRadius: Device.isTablet ? 10 : 5, fontFamily: 'medium' }]}>{I18n.t("Activate")} </Text>
+                      // </TouchableOpacity> */}
                     </View>
                     <View style={textContainer}>
                       <Text style={textStyleLight}>{I18n.t("FROM DATE")}: {item.fromDate}</Text>
