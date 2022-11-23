@@ -285,3 +285,9 @@ export const textStyleMediumColor = {
 	fontFamily: 'medium',
 	color: color.mediumDark
 }
+
+export const highText_black = {
+	fontSize: RF(14),
+	fontFamily: "medium",
+	color: color.black,
+};

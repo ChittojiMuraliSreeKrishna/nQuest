@@ -11,13 +11,14 @@ import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
 import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
+import scss from '../../commonUtils/assets/styles/style.scss'
 import { RF, RW } from '../../Responsive';
 import { customerErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
 import CustomerService from '../services/CustomerService';
 import { color } from '../Styles/colorStyles';
 import { checkPromoDiscountBtn, inputField, textStyle } from '../Styles/FormFields';
-import { flatListMainContainer, flatlistSubContainer, textContainer, textStyleMedium, textStyleMediumColor } from '../Styles/Styles';
+import { flatListMainContainer, flatlistSubContainer, highText, highText_black, textContainer, textStyleMedium, textStyleMediumColor } from '../Styles/Styles';
 
 
 var deviceheight = Dimensions.get('window').height;
@@ -172,6 +173,7 @@ export default class GenerateReturnSlip extends Component {
               () => {
                 let costprice = 0;
                 let quantity = 0;
+                let netValue = 0;
                 var combineList = {};
                 allreturnslipsList.forEach((itm) => {
                   var barcode = itm.barcode;
@@ -204,6 +206,7 @@ export default class GenerateReturnSlip extends Component {
                 console.log("returnslipsList", this.state.returnInvoice)
 
                 this.state.returnInvoice.forEach((element) => {
+                  netValue = netValue + element.netValue;
                   costprice = costprice + element.mrp;
                   quantity = quantity + element.quantity;
                   if (element.quantity >= 1) {
@@ -213,13 +216,13 @@ export default class GenerateReturnSlip extends Component {
                   element.isChecked = false;
                 });
                 if (this.state.returnInvoice.length === 1 && quantity === 1) {
-                  this.setState({ returnSlipTotal: costprice });
+                  this.setState({ returnSlipTotal: netValue });
                 }
 
                 this.setState({
-                  netValue: costprice,
+                  netValue: netValue,
                   quantity: quantity,
-                  amount: costprice,
+                  amount: netValue,
                 });
               }
 
@@ -241,7 +244,7 @@ export default class GenerateReturnSlip extends Component {
     if (item.isChecked === true) {
       if (selectedElement.quantity === 1) {
         selectedElement.returnQty = selectedElement.quantity;
-        selectedElement.returnedAmout = (selectedElement.netValue)/selectedElement.returnQty
+        selectedElement.returnedAmout = (selectedElement.netValue) / selectedElement.returnQty
       }
       const obj = {
         netValue: selectedElement.netValue,
@@ -333,7 +336,7 @@ export default class GenerateReturnSlip extends Component {
           barCode: element.barcode,
           qty: element.quantity,
           returnQty: element.returnQty ? parseInt(element.returnQty) : 0,
-          returnAmount: element.returnedAmout ? parseInt(element.returnedAmout) : 0
+          returnAmount: element.returnedAmout ? (element.returnedAmout).toFixed(2) : 0
         };
         barList.push(obj);
       });
@@ -345,7 +348,7 @@ export default class GenerateReturnSlip extends Component {
           barCode: element.barcode,
           qty: element.quantity,
           returnQty: element.quantity ? parseInt(element.quantity) : 0,
-          returnAmount: element.mrp ? parseInt(element.mrp) : 0
+          returnAmount: element.netValue ? (element.netValue).toFixed(2) : 0
         };
         barList.push(obj);
         this.setState({ retBarList: barList })
@@ -363,7 +366,6 @@ export default class GenerateReturnSlip extends Component {
       comments: this.state.reasonDesc,
       returnQty: this.state.returnQty,
     };
-    // if (isFormValid) {
     console.log(saveObj, "params");
     axios.post(CustomerService.saveRetunSlip(), saveObj).then((res) => {
       console.log("return slip data,res", JSON.stringify(res.data));
@@ -458,7 +460,8 @@ export default class GenerateReturnSlip extends Component {
     // this.setState({ returnInvoice: qtyarr });
     this.state.returnInvoice.forEach((element, ind) => {
       if (element.returnQty && element.returnQty !== 0 && ind == index) {
-        element.returnedAmout = (parseInt(element.returnQty) * element.netValue) / element.quantity
+        const perQty = (element.netValue / element.quantity)
+        element.returnedAmout = (parseInt(element.returnQty)) * perQty
       } else if (element.returnQty === '' && element.returnQty === 0 && ind == index) {
         element.returnedAmout = 0
         element.isChecked = false;
@@ -506,7 +509,8 @@ export default class GenerateReturnSlip extends Component {
     // });
     this.state.returnInvoice.forEach((element, ind) => {
       if (element.returnQty && element.returnQty !== 0 && ind == index) {
-        element.returnedAmout = (parseInt(element.returnQty) * element.netValue) / element.quantity
+        const perQty = (element.netValue / element.quantity)
+        element.returnedAmout = (parseInt(element.returnQty)) * perQty
       } else if (element.returnQty === '' && element.returnQty === 0 && ind == index) {
         element.returnedAmout = 0
         element.isChecked = false;
@@ -537,7 +541,8 @@ export default class GenerateReturnSlip extends Component {
       let totalqty = 0;
       this.state.returnInvoice.forEach((element, ind) => {
         if (element.returnQty && element.returnQty !== 0 && ind == index) {
-          element.returnedAmout = (parseInt(element.returnQty) * element.netValue) / element.quantity
+          const perQty = (element.netValue / element.quantity)
+          element.returnedAmout = (parseInt(element.returnQty)) * perQty
         } else if (element.returnQty === '' && element.returnQty === 0 && ind == index) {
           element.returnedAmout = 0
           element.isChecked = false;
@@ -625,8 +630,9 @@ export default class GenerateReturnSlip extends Component {
     return (
       <View style={{ backgroundColor: color.white }}>
         <ScrollView>
-          <View style={{ flexDirection: 'row', width: Device.isTablet ? deviceWidth - 20 : deviceWidth - 10, justifyContent: 'space-between', marginTop: 20 }}>
-            <TextInput style={[Device.isTablet ? styles.input_tablet : inputField, { width: Device.isTablet ? deviceWidth / 1.3 : deviceWidth / 1.25, borderColor: '#8F9EB717', marginRight: RW(0) }]}
+          <View style={[scss.page_navigation_subcontainer, { marginTop: 20 }]}>
+            <TextInput
+              style={[forms.input_fld, { width: "75%", minWidth: "75%", maxWidth: "75%" }]}
               mode="flat"
               activeUnderlineColor='#000'
               underlineColor={'#6f6f6f'}
@@ -726,10 +732,7 @@ export default class GenerateReturnSlip extends Component {
           {this.state.returnInvoice && this.state.returnInvoice.length > 0 && (
             <>
               <>
-                <View style={{ flex: 1, flexDirection: 'row' }}>
-                  <Text style={Device.isTablet ? styles.headerText_tablet : styles.hederText_mobile}>{I18n.t("List Of Items For Return -")} </Text>
-                  <Text style={[textStyle, { color: color.accent, fontSize: RF(16) }]}>{('0' + this.state.returnInvoice.length).slice(-2)} </Text>
-                </View>
+                <Text style={[highText_black, { marginLeft: RF(10) }]}>{I18n.t("List Of Items For Return -")}<Text style={[textStyle, { color: color.accent, fontSize: RF(16) }]}>{('0' + this.state.returnInvoice.length).slice(-2)} </Text></Text>
                 <FlatList
                   style={{ marginTop: 20, marginBottom: 20 }}
                   data={this.state.returnInvoice}
@@ -795,22 +798,22 @@ export default class GenerateReturnSlip extends Component {
                           <View style={textContainer}>
                             <Text style={textStyleMediumColor}>{I18n.t("MRP")}</Text>
                             <Text style={textStyleMediumColor}>{I18n.t("PROMO")}</Text>
-                            <Text style={textStyleMediumColor}>{I18n.t("GV")}</Text>
                             <Text style={textStyleMediumColor}>{I18n.t("MANUAL")}</Text>
+                            <Text style={textStyleMediumColor}>{I18n.t("GV APPLIED")}</Text>
                           </View>
                           <View style={textContainer}>
                             <Text style={textStyleMedium}>₹{item.mrp}</Text>
-                            <Text style={textStyleMedium}>₹{item.promoDiscount ? item.promoDiscount : 0}</Text>
-                            <Text style={textStyleMedium}>₹{item.gvAppiled ? item.gvAppiled : 0}</Text>
-                            <Text style={textStyleMedium}>₹{item.manualDiscount ? item.manualDiscount : 0}</Text>
+                            <Text style={textStyleMedium}>₹{parseFloat(item.promoDiscount).toFixed(2)}</Text>
+                            <Text style={textStyleMedium}>₹{parseFloat(item.manualDiscount).toFixed(2)}</Text>
+                            <Text style={textStyleMedium}>₹{parseFloat(item.gvAppiled).toFixed(2)}</Text>
                           </View>
                           <View style={textContainer}>
                             <Text style={textStyleMediumColor}> {I18n.t("VALUE")}</Text>
                             <Text style={textStyleMediumColor}> {I18n.t("PER/QUANTITY")}</Text>
                           </View>
                           <View style={textContainer}>
-                            <Text style={textStyleMedium}>₹{item.netValue}</Text>
-                            <Text style={textStyleMedium}>₹{item.netValue / item.quantity}</Text>
+                            <Text style={textStyleMedium}>₹{parseFloat(item.netValue).toFixed(2)}</Text>
+                            <Text style={textStyleMedium}>₹{parseFloat(item.netValue / item.quantity).toFixed(2)}</Text>
                           </View>
                         </View>
                       </View>
@@ -818,16 +821,15 @@ export default class GenerateReturnSlip extends Component {
                   )}
                 />
               </>
-              <View style={{ backgroundColor: "#F8F8F8" }}>
-                <Text style={[styles.textAccentStyle, { alignSelf: 'center', marginLeft: RF(0) }]}>{I18n.t("Return summary")}</Text>
+              <View style={{ backgroundColor: "#F8F8F8", margin: RF(10) }}>
+                <Text style={[highText_black, { alignSelf: 'center' }]}>{I18n.t("Return summary")}</Text>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text style={[styles.textAccentStyle, { color: color.black, fontSize: RF(14), marginLeft: RF(10) }]}>{I18n.t("Retrun Amount")} </Text>
-                  <Text style={[styles.textAccentStyle, { color: color.black, fontSize: RF(14), marginRight: RF(10) }]}> ₹ {this.state.returnSlipTotal} </Text>
+                  <Text style={[highText]}>{I18n.t("Retrun Amount")} </Text>
+                  <Text style={[highText]}> ₹ {this.state.returnSlipTotal} </Text>
                 </View>
-                <Text style={styles.headings}>{I18n.t("Return For Reason")} </Text>
+                <Text style={[textStyleMediumColor]}>{I18n.t("Return For Reason")} </Text>
                 <View style={Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile}>
                   <RNPickerSelect
-                    // style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
                     placeholder={{ label: 'REASON', value: '' }}
                     Icon={() => {
                       return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
@@ -847,9 +849,9 @@ export default class GenerateReturnSlip extends Component {
                 {!this.state.reasonValid && (
                   <Message imp={true} message={this.state.errors["reason"]} />
                 )}
-                <Text style={styles.headings}>{I18n.t("Comments")}</Text>
+                <Text style={textStyleMediumColor}>{I18n.t("Comments")}</Text>
                 <TextInput
-                  style={styles.textarea}
+                  style={forms.text_area}
                   label={I18n.t('Write comments')}
                   multiline
                   numberOfLines={5}
@@ -859,16 +861,16 @@ export default class GenerateReturnSlip extends Component {
                   value={this.state.reasonDesc}
                   onChangeText={(text) => this.handleReasonDesc(text)}
                 />
-                <TouchableOpacity
-                  style={[Device.isTablet ? styles.signInButton_tablet : styles.signInButton_mobile, { width: deviceWidth - 40, height: Device.isTablet ? 60 : 50 }]}
-                  onPress={(item, index) => this.generateNewSlip(item, index)}
-                >
-                  <Text
-                    style={Device.isTablet ? styles.signInButtonText_tablet : styles.signInButtonText_mobile}
+                <View style={forms.action_buttons_container}>
+                  <TouchableOpacity
+                    style={[forms.action_buttons, forms.submit_btn, { width: "90%" }]}
+                    onPress={(item, index) => this.generateNewSlip(item, index)}
                   >
-                    {I18n.t("GENERATE RETURN SLIP")}
-                  </Text>
-                </TouchableOpacity>
+                    <Text style={forms.submit_btn_text}>
+                      {I18n.t("GENERATE RETURN SLIP")}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </>
           )}
@@ -933,195 +935,12 @@ export default class GenerateReturnSlip extends Component {
             </Modal>
           </View>
         )} */}
-          {this.state.resultModel && (
-            <View>
-              <Modal style={{ margin: 0 }} isVisible={this.state.modelVisible}
-                onBackButtonPress={() => this.modelCancel()}
-                onBackdropPress={() => this.modelCancel()} >
-                <View style={[Device.isTablet ? styles.filterMainContainer_tablet : styles.filterMainContainer_mobile, { height: Device.isTablet ? 300 : 250, backgroundColor: '#00aa00', marginTop: Device.isTablet ? deviceheight - 300 : deviceheight - 250 }]}>
-                  <View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, height: Device.isTablet ? 60 : 50 }}>
-                      <View>
-                        <Text style={{ marginTop: 15, fontSize: Device.isTablet ? 22 : 17, marginLeft: 20, color: '#ffffff' }} > RT Number </Text>
-                      </View>
-                      <View>
-                        <TouchableOpacity style={{ width: Device.isTablet ? 60 : 50, height: Device.isTablet ? 60 : 50, marginTop: Device.isTablet ? 20 : 15, marginRight: Device.isTablet ? 0 : -5 }} onPress={() => this.modelCancel()}>
-                          <Image style={{ width: Device.isTablet ? 20 : 15, height: Device.isTablet ? 20 : 15, margin: 5 }} source={require('../assets/images/modalCloseWhite.png')} />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                    <Text style={{
-                      height: Device.isTablet ? 2 : 1,
-                      width: deviceWidth,
-                      backgroundColor: 'lightgray',
-                    }}></Text>
-                  </View>
-                  <View style={{ backgroundColor: '#ffffff', height: Device.isTablet ? 250 : 200, }}>
-                    <View style={{ height: Device.isTablet ? 70 : 60, alignItems: 'center', marginTop: 20 }}>
-                      <Text style={{ fontSize: Device.isTablet ? 24 : 19, fontFamily: 'medium', }} selectable={true}>{this.state.resultData}</Text>
-                    </View>
-                    <TouchableOpacity
-                      style={[Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile, { borderColor: '#00aa00', }]} onPress={() => this.modelCancel()}
-                    >
-                      <Text style={[Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile, { color: '#00aa00' }]}  > {I18n.t("BACK TO DASHBOARD")} </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </Modal>
-            </View>
-          )}
         </ScrollView>
       </View>
     );
   }
 }
 
-const flats = StyleSheet.create({
-  buttons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  text: {
-    height: '100%',
-    flexDirection: 'column',
-    justifyContent: 'space-around',
-  },
-
-  // flats for Mobile
-  flatlistContainer_mobile: {
-    height: 150,
-    backgroundColor: '#fbfbfb',
-    borderBottomWidth: 5,
-    borderBottomColor: '#ffffff',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  flatlistSubContainer_mobile: {
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-between',
-    paddingLeft: 10,
-    paddingRight: 10,
-    alignItems: 'center',
-    height: 140
-  },
-  flatlistTextAccent_mobile: {
-    fontFamily: 'medium',
-    fontSize: 16,
-    color: '#ED1C24'
-  },
-  flatlistText_mobile: {
-    fontFamily: 'regular',
-    fontSize: 12,
-    color: '#353c40'
-  },
-  flatlistTextCommon_mobile: {
-    fontFamily: 'regular',
-    fontSize: 12,
-    color: '#808080'
-  },
-  editButton_mobile: {
-    width: 30,
-    height: 30,
-    borderBottomLeftRadius: 5,
-    borderTopLeftRadius: 5,
-    borderWidth: Device.isTablet ? 2 : 1,
-    borderColor: "lightgray",
-    // borderRadius:5,
-  },
-  deleteButton_mobile: {
-    width: 30,
-    height: 30,
-    borderBottomRightRadius: 5,
-    borderTopRightRadius: 5,
-    borderWidth: Device.isTablet ? 2 : 1,
-    borderColor: "lightgray",
-  },
-  flatlistSubContainerTotal_mobile: {
-    backgroundColor: '#e4d7d7',
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-between',
-    paddingLeft: 10,
-    paddingRight: 10,
-    alignItems: 'center',
-    height: 140
-  },
-
-
-  // flats for Tablet
-  flatlistContainer_tablet: {
-    height: 200,
-    backgroundColor: '#fbfbfb',
-    borderBottomWidth: 5,
-    borderBottomColor: '#ffffff',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  flatlistSubContainer_tablet: {
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-between',
-    paddingLeft: 20,
-    paddingRight: 20,
-    alignItems: 'center',
-    height: 160
-  },
-  flatlistTextAccent_tablet: {
-    fontFamily: 'medium',
-    fontSize: 21,
-    color: '#ED1C24'
-  },
-
-  flatlistText_tablet: {
-    fontFamily: 'regular',
-    fontSize: 21,
-    color: '#353c40'
-  },
-  flatlistTextCommon_tablet: {
-    fontFamily: 'regular',
-    fontSize: 17,
-    color: '#808080'
-  },
-  flatlstTextCommon_tablet: {
-    fontFamily: 'regular',
-    fontSize: 17,
-    color: '#808080'
-  },
-  editButton_tablet: {
-    width: 50,
-    height: 50,
-    borderBottomLeftRadius: 5,
-    borderTopLeftRadius: 5,
-    borderWidth: Device.isTablet ? 2 : 1,
-    borderColor: "lightgray",
-    // borderRadius:5,
-  },
-  deleteButton_tablet: {
-    width: 50,
-    height: 50,
-    borderBottomRightRadius: 5,
-    borderTopRightRadius: 5,
-    borderWidth: Device.isTablet ? 2 : 1,
-    borderColor: "lightgray",
-  },
-  flatlistSubContainerTotal_tablet: {
-    flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-between',
-    paddingLeft: 20,
-    paddingRight: 20,
-    backgroundColor: '#e4d7d7',
-    alignItems: 'center',
-    height: 160
-  },
-
-
-
-
-});
 
 const pickerSelectStyles_mobile = StyleSheet.create({
   placeholder: {
@@ -1208,236 +1027,9 @@ const pickerSelectStyles_tablet = StyleSheet.create({
 });
 
 const styles = StyleSheet.create({
-  item: {
-    padding: 15,
-    fontSize: 18,
-    height: 44,
-    backgroundColor: '#ffffff',
-    fontSize: 18,
-    fontFamily: 'medium',
-    color: '#353C40',
-  },
-  logoImage: {
-    alignSelf: 'center',
-    width: 300,
-    height: 230,
-
-  },
-  containerForActivity: {
-    flex: 1,
-    backgroundColor: '#623FA0',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    color: 'white',
-    fontSize: 20,
-    margin: 20
-  },
-  navButtonText_tablet: {
-    fontSize: 22,
-    fontFamily: 'regular',
-    color: '#ffffff',
-    marginLeft: 10,
-    marginTop: 8,
-    alignSelf: 'center'
-  },
-  navButtonText_mobile: {
-    fontSize: 17,
-    fontFamily: 'regular',
-    color: '#ffffff',
-    marginLeft: 10,
-    marginTop: 8,
-    alignSelf: 'center'
-  },
   imagealign: {
     marginTop: Device.isTablet ? 25 : 20,
     marginRight: Device.isTablet ? 30 : 20,
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    height: deviceheight + 40,
-    backgroundColor: '#FFFFFF'
-  },
-  ytdImageValue: {
-    alignSelf: 'center',
-  },
-  loading: {
-    flex: 1,
-    justifyContent: 'center'
-    // alignItems: 'center',
-  },
-
-  // Mobile Styles
-  filterMainContainer_mobile: {
-    width: deviceWidth,
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    backgroundColor: "#ffffff",
-    height: 400,
-    marginTop: deviceheight - 400,
-  },
-  filterByTitle_mobile: {
-    position: 'absolute',
-    left: 20,
-    top: 15,
-    width: 300,
-    height: 20,
-    fontFamily: 'medium',
-    fontSize: 16,
-    color: '#353C40'
-  },
-  filterByTitleDecoration_mobile: {
-    height: Device.isTablet ? 2 : 1,
-    width: deviceWidth,
-    backgroundColor: 'lightgray',
-    marginTop: 50,
-  },
-  filterCloseButton_mobile: {
-    position: 'absolute',
-    right: 8,
-    top: 15,
-    width: 50, height: 50,
-  },
-  filterCloseImage_mobile: {
-    color: '#ED1C24',
-    fontFamily: 'regular',
-    fontSize: 12,
-    position: 'absolute',
-    top: 10,
-    right: 0,
-  },
-  filterApplyButton_mobile: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    height: 50,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  filterButtonText_mobile: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#ffffff",
-    fontSize: 15,
-    fontFamily: "regular"
-  },
-  filterCancelButton_mobile: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-    height: 50,
-    backgroundColor: "#ffffff",
-    borderRadius: 5,
-    borderWidth: Device.isTablet ? 2 : 1,
-    borderColor: "#353C4050",
-  },
-  filterButtonCancelText_mobile: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#000000",
-    fontSize: 15,
-    fontFamily: "regular"
-  },
-  hederText_mobile: {
-    color: "#353C40",
-    fontSize: RF(16),
-    fontFamily: "bold",
-    marginLeft: RF(10),
-    marginTop: RF(10),
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-  headerText2_mobile: {
-    color: "#353C40",
-    fontSize: 20,
-    fontFamily: "bold",
-    marginLeft: 10,
-    marginTop: 0,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    height: 45,
-    fontSize: 28,
-  },
-  bottomImage_mobile: {
-    position: 'absolute',
-    right: 0,
-    bottom: 40,
-    width: 162,
-    height: 170
-  },
-  input_mobile: {
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 20,
-    marginBottom: 5,
-    height: 44,
-    marginTop: 5,
-    width: deviceWidth - 40,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: Device.isTablet ? 2 : 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 14,
-  },
-  signInButton_mobile: {
-    backgroundColor: '#ED1C24',
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 10,
-    marginBottom: 10,
-    width: deviceWidth / 2.6,
-    height: 30,
-    borderRadius: 10,
-    fontWeight: 'bold',
-    // marginBottom:100,
-  },
-  signInButtonText_mobile: {
-    color: 'white',
-    alignSelf: 'center',
-    fontSize: 15,
-    fontFamily: "regular",
-  },
-  cancelButton_mobile: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#8F9EB717',
-    borderWidth: Device.isTablet ? 2 : 1,
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 10,
-    marginBottom: 10,
-    width: deviceWidth / 2.3,
-    height: 30,
-    borderRadius: Device.isTablet ? 10 : 5,
-    fontWeight: 'bold',
-    // marginBottom:100,
-  },
-  cancelButtonText_mobile: {
-    color: 'black',
-    alignSelf: 'center',
-    fontSize: RF(14)
-    // fontFamily: "regular",
-  },
-  navigationText_mobile: {
-    fontSize: 16,
-    color: '#858585',
-    fontFamily: "regular",
-  },
-  navigationButtonText_mobile: {
-    color: '#353C40',
-    fontSize: 16,
-    fontFamily: "bold",
-    textDecorationLine: 'underline'
-  },
-  rnSelect_mobile: {
-    color: '#8F9EB7',
-    fontSize: 15
   },
   rnSelectContainer_mobile: {
     justifyContent: 'center',
@@ -1454,252 +1046,6 @@ const styles = StyleSheet.create({
     fontFamily: 'regular',
     fontSize: 14,
   },
-  filterDateButton_mobile: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    height: 50,
-    backgroundColor: "#F6F6F6",
-    borderRadius: 5,
-  },
-  filterDateButtonText_mobile: {
-    marginLeft: 16,
-    marginTop: 20,
-    color: "#6F6F6F",
-    fontSize: 15,
-    fontFamily: "regular"
-  },
-  datePickerContainer_mobile: {
-    height: 280,
-    width: deviceWidth,
-    backgroundColor: '#ffffff'
-  },
-  datePickerButton_mobile: {
-    position: 'absolute',
-    left: 20,
-    top: 10,
-    height: 30,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  datePickerEndButton_mobile: {
-    position: 'absolute',
-    right: 20,
-    top: 10,
-    height: 30,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  datePickerButtonText_mobile: {
-    textAlign: 'center',
-    marginTop: 5,
-    color: "#ffffff",
-    fontSize: 15,
-    fontFamily: "regular"
-  },
-
-  // Tablet Styles
-  filterMainContainer_tablet: {
-    width: deviceWidth,
-    alignItems: 'center',
-    backgroundColor: "#ffffff",
-    height: 600,
-    marginTop: deviceheight - 500,
-  },
-  filterByTitle_tablet: {
-    position: 'absolute',
-    left: 20,
-    top: 15,
-    width: 300,
-    height: 30,
-    fontFamily: 'medium',
-    fontSize: 21,
-    color: '#353C40'
-  },
-  filterByTitleDecoration_tablet: {
-    height: Device.isTablet ? 2 : 1,
-    width: deviceWidth,
-    backgroundColor: 'lightgray',
-    marginTop: 60,
-  },
-  filterCloseButton_tablet: {
-    position: 'absolute',
-    right: 24,
-    top: 10,
-    width: 60, height: 60,
-  },
-  filterCloseImage_tablet: {
-    color: '#ED1C24',
-    fontFamily: 'regular',
-    fontSize: 17,
-    position: 'absolute',
-    top: 10,
-    right: 14,
-  },
-  filterByTitle_tablet: {
-    position: 'absolute',
-    left: 20,
-    top: 15,
-    width: 300,
-    height: 30,
-    fontFamily: 'medium',
-    fontSize: 21,
-    color: '#353C40'
-  },
-  filterByTitleDecoration_tablet: {
-    height: Device.isTablet ? 2 : 1,
-    width: deviceWidth,
-    backgroundColor: 'lightgray',
-    marginTop: 60,
-  },
-  filterCloseButton_tablet: {
-    position: 'absolute',
-    right: 24,
-    top: 10,
-    width: 60, height: 60,
-  },
-  filterCloseImage_tablet: {
-    color: '#ED1C24',
-    fontFamily: 'regular',
-    fontSize: 17,
-    position: 'absolute',
-    top: 10,
-    right: 14,
-  },
-  filterApplyButton_tablet: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 10,
-    height: 60,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  filterButtonText_tablet: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#ffffff",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  filterCancelButton_tablet: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-    height: 60,
-    backgroundColor: "#ffffff",
-    borderRadius: 5,
-    borderWidth: Device.isTablet ? 2 : 1,
-    borderColor: "#353C4050",
-  },
-  filterButtonCancelText_tablet: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#000000",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  headerText_tablet: {
-    color: "#353C40",
-    fontSize: 40,
-    fontFamily: "bold",
-    marginLeft: 10,
-    marginTop: 10,
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-  headerText2_tablet: {
-    color: "#353C40",
-    fontSize: 40,
-    fontFamily: "bold",
-    marginLeft: 10,
-    marginTop: 0,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    height: 55,
-  },
-  bottomImage_tablet: {
-    position: 'absolute',
-    right: 0,
-    bottom: 40,
-    width: 202,
-    height: 230
-  },
-  input_tablet: {
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 10,
-    marginBottom: 20,
-    marginTop: 10,
-    height: 60,
-    width: deviceWidth - 40,
-    marginTop: 5,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: Device.isTablet ? 2 : 1,
-    paddingLeft: 15,
-    // fontFamily: 'regular',
-    fontSize: RF(14)
-  },
-  signInButton_tablet: {
-    backgroundColor: '#ED1C24',
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 10,
-    marginBottom: 10,
-    width: deviceWidth / 2.3,
-    height: 40,
-    borderRadius: 10,
-    fontWeight: 'bold',
-    // marginBottom:100,
-  },
-  cancelButton_tablet: {
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 10,
-    marginBottom: 10,
-    width: deviceWidth / 2.3,
-    height: 40,
-    borderRadius: 10,
-    fontWeight: 'bold',
-    // marginBottom:100,
-  },
-  signInButtonText_tablet: {
-    color: 'white',
-    alignSelf: 'center',
-    fontSize: 20,
-    fontFamily: "regular",
-  },
-  cancelButtonText_tablet: {
-    color: 'black',
-    alignSelf: 'center',
-    fontSize: RF(14)
-    // fontFamily: "regular",
-  },
-  navigationText_tablet: {
-    fontSize: 22,
-    color: '#858585',
-    fontFamily: "regular",
-  },
-  navigationButtonText_tablet: {
-    color: '#353C40',
-    fontSize: 22,
-    fontFamily: "bold",
-    textDecorationLine: 'underline'
-  },
-  rnSelect_tablet: {
-    color: '#8F9EB7',
-    fontSize: 20
-  },
   rnSelectContainer_tablet: {
     justifyContent: 'center',
     height: 54,
@@ -1714,74 +1060,5 @@ const styles = StyleSheet.create({
     borderWidth: Device.isTablet ? 2 : 1,
     fontFamily: 'regular',
     fontSize: 20,
-  },
-  filterDateButton_tablet: {
-    width: deviceWidth / 2.2,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    height: 60,
-    backgroundColor: "#F6F6F6",
-    borderRadius: 5,
-  },
-  filterDateButtonText_tablet: {
-    marginLeft: 16,
-    marginTop: 20,
-    color: "#6F6F6F",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  datePickerButton_tablet: {
-    position: 'absolute',
-    left: 20,
-    top: 10,
-    height: 40,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  datePickerButtonText_tablet: {
-    textAlign: 'center',
-    marginTop: 5,
-    color: "#ffffff",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  datePickerEndButton_tablet: {
-    position: 'absolute',
-    right: 20,
-    top: 10,
-    height: 40,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  textAccentStyle: {
-    fontFamily: 'medium',
-    fontSize: Device.isTablet ? RF(22) : RF(18),
-    color: '#ED1C24',
-    marginLeft: RF(20),
-    marginTop: RF(10),
-  },
-  headings: {
-    fontSize: Device.isTablet ? 20 : 15,
-    marginLeft: 20,
-    color: '#B4B7B8',
-    marginTop: Device.isTablet ? 10 : 5,
-    marginBottom: Device.isTablet ? 10 : 5,
-  },
-  textarea: {
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 20,
-    marginBottom: 5,
-    marginTop: 5,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: Device.isTablet ? 2 : 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: Device.isTablet ? 20 : 14,
   }
 });

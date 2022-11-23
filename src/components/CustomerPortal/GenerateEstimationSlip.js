@@ -666,13 +666,13 @@ class GenerateEstimationSlip extends Component {
                     /><Text>Remember Sales Man</Text>
                   </View>
                 </View>
-                <TouchableOpacity style={{ width: '90%', marginHorizontal: '5%', height: 35, borderWidth: 2, borderColor: '#6f6f6f', borderRadius: 5 }} onPress={() => this.handleViewPrinter()}>
-                  <Text style={{ textAlign: 'center', marginVertical: 5, fontSize: 16, fontWeight: 'bold', color: '#6f6f6f' }}>Connect Printer</Text>
-                </TouchableOpacity>
                 {!this.state.barcodeIdValid && (
                   <Message imp={true} message={this.state.errors["barcodeId"]} />
                 )}
-
+                <TouchableOpacity style={{ width: '90%', marginHorizontal: '5%', height: 35, borderWidth: 2, borderColor: '#6f6f6f', borderRadius: 5 }} onPress={() => this.handleViewPrinter()}>
+                  <Text style={{ textAlign: 'center', marginVertical: 5, fontSize: 16, fontWeight: 'bold', color: '#6f6f6f' }}>Connect Printer</Text>
+                </TouchableOpacity>
+                
                 {this.state.uom === "Pieces" && (
                   <TextInput style={[Device.isTablet ? styles.input_tablet_notedit : styles.input_mobile_notedit, { marginLeft: Device.isTablet ? deviceWidth / 2.4 : deviceWidth / 2.15, width: Device.isTablet ? 160 : 80 }]}
                     mode="flat"
@@ -749,7 +749,7 @@ class GenerateEstimationSlip extends Component {
                           </View>
                           <View style={textContainer}>
                             <Text style={textStyleMedium}>{item.barcode}</Text>
-                            <Text style={textStyleMedium}>₹ {item.itemMrp }</Text>
+                            <Text style={textStyleMedium}>₹ {parseFloat((item.itemMrp)).toFixed(2) }</Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                               <TouchableOpacity
                                 onPress={() => this.incrementForTable(item, index)}>
