@@ -102,7 +102,8 @@ class AddBarcode extends Component {
       fabricType: "",
       fabricList: [],
       isTaxIncluded: '',
-      alist: []
+      alist: [],
+      colorsRes: []
     };
   }
 
@@ -119,6 +120,7 @@ class AddBarcode extends Component {
     this.setState({ isTaxIncluded: isTaxIncluded });
     this.getAllstores();
     this.getAllHSNCodes();
+    this.getAllColors();
   }
 
   // Go Back Actions
@@ -126,6 +128,8 @@ class AddBarcode extends Component {
     this.props.navigation.goBack(null);
     return true;
   }
+
+
 
   // Domain Actions
   handleDomain = (value) => {
@@ -162,6 +166,9 @@ class AddBarcode extends Component {
     });
   };
 
+
+
+
   // Status Actions
   handleStatus = (value) => {
     console.log({ value });
@@ -193,6 +200,27 @@ class AddBarcode extends Component {
       this.setState({ divisionValid: true });
     }
   };
+
+  // Colors
+  getAllColors() {
+    InventoryService.getColors().then(res => {
+      let Colors = []
+      console.log({ Colors }, "Colors")
+      res.data.forEach((res) => {
+        Colors.push({
+          value: res.name,
+          label: res.name
+        })
+      })
+      this.setState({ colorsRes: Colors })
+    }).catch(err => {
+      console.log({ err }, 'Colors')
+    })
+  }
+
+  handleColor = (value) => {
+    this.setState({ selectedColor: value })
+  }
 
   // Section Actions
   getAllSections(id, data) {
@@ -506,7 +534,7 @@ class AddBarcode extends Component {
         isFormValid = false;
       }
     }
-    if (String(this.state.colour).length < errorLength.colour) {
+    if (String(this.state.selectedColor).length < errorLength.selectedColor) {
       isFormValid = false;
     }
     if (String(this.state.batchNo).length === 0) {
@@ -573,7 +601,7 @@ class AddBarcode extends Component {
         category: parseInt(this.state.catogirieId),
         batchNo: this.state.batchNo,
         name: this.state.name,
-        colour: this.state.colour,
+        colour: this.state.selectedColor,
         costPrice: parseFloat(this.state.costPrice),
         empId: this.state.empId,
         hsnCode: this.state.hsnCode,
@@ -946,25 +974,31 @@ class AddBarcode extends Component {
           <Text style={inputHeading}>
             {I18n.t("Colour")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
-          <TextInput
-            activeOutlineColor="#d6d6d6"
-            mode="outlined"
+          <View
             style={[
-              forms.input_fld,
-              forms.active_fld,
-              {},
+              rnPickerContainer,
             ]}
-            underlineColorAndroid="transparent"
-            placeholder={I18n.t("Colour")}
-            placeholderTextColor={"#6f6f6f"}
-            textAlignVertical="center"
-            maxLength={12}
-            outlineColor={"#d6d6d6"}
-            autoCapitalize="none"
-            onBlur={this.handleColourValid}
-            value={this.state.colour}
-            onChangeText={this.handleColour}
-          />
+          >
+            <RNPickerSelect
+              placeholder={{
+                label: "Select",
+              }}
+              Icon={() => {
+                return (
+                  <Chevron
+                    style={styles.imagealign}
+                    size={1.5}
+                    color="grey"
+                  />
+                );
+              }}
+              items={this.state.colorsRes}
+              onValueChange={this.handleColor}
+              style={rnPicker}
+              value={this.state.selectedColor}
+              useNativeAndroidPickerStyle={false}
+            />
+          </View>
           <Text style={inputHeading}>
             {I18n.t("Name")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
