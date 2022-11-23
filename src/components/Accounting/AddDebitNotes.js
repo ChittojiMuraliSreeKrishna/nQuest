@@ -1,17 +1,15 @@
-import React, { Component } from 'react';
-import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import DatePicker from 'react-native-date-picker';
-import Device from 'react-native-device-detection';
-import RNPickerSelect from 'react-native-picker-select';
-import { Chevron } from 'react-native-shapes';
-import { cancelBtn, cancelBtnText, inputFieldDisabled, inputArea, inputField, inputHeading, rnPicker, rnPickerContainer, submitBtn, submitBtnText } from '../Styles/FormFields';
-import { backButton, backButtonImage, headerTitle, headerTitleContainer, headerTitleSubContainer } from '../Styles/Styles';
-import RazorpayCheckout from 'react-native-razorpay';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import AccountingService from '../services/AccountingService';
-import { Appbar, TextInput } from 'react-native-paper';
+import React, { Component } from 'react';
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { Appbar, TextInput } from 'react-native-paper';
+import RNPickerSelect from 'react-native-picker-select';
+import RazorpayCheckout from 'react-native-razorpay';
+import { Chevron } from 'react-native-shapes';
+import AccountingService from '../services/AccountingService';
+import { cancelBtn, cancelBtnText, inputArea, inputField, inputFieldDisabled, inputHeading, rnPicker, rnPickerContainer, submitBtn, submitBtnText } from '../Styles/FormFields';
 
 
 var deviceWidth = Dimensions.get('window').width;
@@ -31,7 +29,6 @@ export default class AddDebitNotes extends Component {
       payableAmount: 0,
       comments: "",
       trasanctionTypes: [
-        { label: 'Card', value: 'Card' },
         { label: 'Cash', value: 'Cash' }
       ],
     };
@@ -108,7 +105,7 @@ export default class AddDebitNotes extends Component {
       if (res) {
         if (transanctionMode === 'Card') {
           this.savePayment(res.data.amount, res.data.referenceNumber);
-        } else if(transanctionMode === 'Cash'){
+        } else if (transanctionMode === 'Cash') {
           this.props.route.params.onGoBack()
           this.props.navigation.goBack()
         }

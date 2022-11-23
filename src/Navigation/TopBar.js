@@ -103,7 +103,6 @@ export class TopBar extends Component {
     displayName = "";
     this.setState({ firstDisplayName: "", privilages: [] });
     var domainStringId = "";
-    // this.props.navigation.navigate('Login')
   }
   async componentDidMount() {
     AsyncStorage.getItem("storeName").then((value) => {
@@ -306,14 +305,23 @@ export class TopBar extends Component {
                   await this.setState({ privilages: this.state.privilages }, () => {
                     this.props.navigation.navigate(String(this.state.privilages[0].name));
                     console.log(this.state.privilages, "TopPtiv");
-                  });
+                    if (this.state.privilages.length > 0) {
+                      console.log(this.state.privilages, "buyPtiv")
+                      this.changeNavigation()
+                    }
+                  })
                 }
               }
             }
           }
         });
-      });
-    });
+      })
+    })
+  }
+
+  changeNavigation() {
+    let randomIndex = Math.floor(Math.random(Date.now()) * this.state.privilages.length);
+    this.flatListRef.scrollToIndex({ animated: true, index: randomIndex });
   }
 
   groupBySubPrivileges(array) {
@@ -372,6 +380,9 @@ export class TopBar extends Component {
     this.props.navigation.push("Login");
     this.setState({ popupModel: false });
   }
+  getItemLayout = (data, index) => (
+    { length: this.state.privilages.length, offset: this.state.privilages.length * index, index }
+  )
 
   handleSubHeaderNavigation(value, index) {
     if (this.state.privilages[index].bool === true) {
@@ -535,11 +546,13 @@ export class TopBar extends Component {
           <FlatList
             horizontal
             data={this.state.privilages}
-            initialScrollIndex={0}
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
             ref={(ref) => this.flatListRef = ref}
-            keyExtractor={(item, index) => item.id}
+            getItemLayout={this.getItemLayout}
+            initialScrollIndex={0}
+            initialNumToRender={4}
+            keyExtractor={(item, index) => item}
             style={headers.pageNavigationContainer}
             renderItem={({ item, index }) => (
               <View>

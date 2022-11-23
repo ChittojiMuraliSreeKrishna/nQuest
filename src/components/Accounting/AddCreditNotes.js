@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React, { Component } from 'react';
-import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
 import { Appbar, TextInput } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
@@ -12,7 +12,6 @@ import { BASE_URL } from '../../commonUtils/Base';
 import AccountingService from '../services/AccountingService';
 import NewSaleService from '../services/NewSaleService';
 import { cancelBtn, cancelBtnText, inputArea, inputField, inputFieldDisabled, inputHeading, rnPicker, rnPickerContainer, submitBtn, submitBtnText } from '../Styles/FormFields';
-import { backButton, backButtonImage, headerTitle, headerTitleContainer, headerTitleSubContainer } from '../Styles/Styles';
 var deviceWidth = Dimensions.get('window').width;
 
 export default class AddCreditNotes extends Component {
@@ -35,7 +34,6 @@ export default class AddCreditNotes extends Component {
       createdBy: "",
       comments: "",
       trasanctionTypes: [
-        { label: 'Card', value: 'Card' },
         { label: 'Cash', value: 'Cash' }
       ],
       transanctionMode: '',
@@ -151,7 +149,7 @@ export default class AddCreditNotes extends Component {
   }
 
   savePayment = (cardAmount, referenceNumber) => {
-      let self = this;
+    let self = this;
     const reqObj = {
       amount: cardAmount,
       type: "C",
@@ -203,7 +201,7 @@ export default class AddCreditNotes extends Component {
             loading={this.state.loading} />
         }
         <Appbar mode="center-aligned">
-          <Appbar.BackAction onPress={() => this.handleBackButtonClick()}  />
+          <Appbar.BackAction onPress={() => this.handleBackButtonClick()} />
           <Appbar.Content title="Add Credit Notes" />
         </Appbar>
         <ScrollView>

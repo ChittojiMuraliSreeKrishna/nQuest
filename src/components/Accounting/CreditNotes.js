@@ -454,7 +454,7 @@ export default class CreditNotes extends Component {
               onBackdropPress={() => this.modalViewCancel()} >
               <View style={forms.filterModelContainer}>
                 <Text style={forms.popUp_decorator}>-</Text>
-                <View style={forms.filterModelSub}>
+                <View style={[forms.filterModelSub, { maxHeight: 500 }]}>
                   <ScrollView>
                     <FlatList
                       data={this.state.transactionHistory}
