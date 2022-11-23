@@ -342,7 +342,7 @@ export default class Users extends Component {
                       />
                     </View>
                     <TextInput
-                      mode="outlined"
+                      mode="flat"
                       activeOutlineColor="#b9b9b9"
                       outlineColor="#b9b9b9"
                       style={forms.input_fld}
@@ -355,7 +355,7 @@ export default class Users extends Component {
                       onChangeText={this.handleRole}
                     />
                     <TextInput
-                      mode="outlined"
+                      mode="flat"
                       activeOutlineColor="#b9b9b9"
                       outlineColor="#b9b9b9"
                       style={forms.input_fld}

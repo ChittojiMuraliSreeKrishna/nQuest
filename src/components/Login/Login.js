@@ -374,8 +374,8 @@ export default class Login extends Component {
                 <Text style={scss.input_heading}>{I18n.t("Username")}</Text>
                 <TextInput
                   activeUnderlineColor="#000"
-                  mode="outlined"
-                  outlineColor={userValid ? "#8F9EB7" : "#dd0000"}
+                  mode="flat"
+                  underlineColor={userValid ? "#8F9EB7" : "#dd0000"}
                   activeOutlineColor="#d7d7d7"
                   style={[
                     inputField,
@@ -394,11 +394,11 @@ export default class Login extends Component {
                 <Text style={scss.input_heading}>{I18n.t("Password")}</Text>
                 <TextInput
                   activeUnderlineColor="#000"
-                  mode="outlined"
+                  mode="flat"
                   style={[
                     inputField,
                   ]}
-                  outlineColor={passValid ? "#8F9EB7" : "#dd0000"}
+                  underlineColor={passValid ? "#8F9EB7" : "#dd0000"}
                   activeOutlineColor="#d7d7d7"
                   secureTextEntry={true}
                   autoCapitalize="none"

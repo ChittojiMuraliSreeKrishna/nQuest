@@ -64,21 +64,21 @@ export default class CreditNotes extends Component {
     };
   }
 
-  modelCancel () {
+  modelCancel() {
     this.setState({
       modalVisible: false,
       flagFilterOpen: false
     });
   }
 
-  modalViewCancel () {
+  modalViewCancel() {
     this.setState({
       modalVisible: false,
       isShowAllTransactions: false,
     });
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     const storeId = await AsyncStorage.getItem("storeId");
     const userId = await AsyncStorage.getItem("custom:userId");
     this.setState({ storeId: storeId, userId: userId });
@@ -86,14 +86,14 @@ export default class CreditNotes extends Component {
   }
 
   // Refreshing Credit Notes
-  refresh () {
+  refresh() {
     this.setState({ creditNotes: [] }, () => {
       this.getAllCreditNotes();
     });
   }
 
   // Getting All Credit Notes
-  async getAllCreditNotes () {
+  async getAllCreditNotes() {
     this.setState({ loading: true });
     const accountType = "CREDIT";
     const { storeId } = this.state;
@@ -115,7 +115,7 @@ export default class CreditNotes extends Component {
     });
   }
 
-  applyCreditNotesFilter () {
+  applyCreditNotesFilter() {
     this.setState({ loading: true });
     const accountType = "CREDIT";
     const { storeId, startDate, endDate, mobileNumber } = this.state;
@@ -157,11 +157,11 @@ export default class CreditNotes extends Component {
     this.setState({ storeName: value });
   };
 
-  datepickerClicked () {
+  datepickerClicked() {
     this.setState({ datepickerOpen: true });
   }
 
-  enddatepickerClicked () {
+  enddatepickerClicked() {
     this.setState({ datepickerendOpen: true });
   }
 
@@ -169,11 +169,11 @@ export default class CreditNotes extends Component {
     this.setState({ mobileNumber: value });
   };
 
-  datepickerClicked () {
+  datepickerClicked() {
     this.setState({ datepickerOpen: true });
   }
 
-  enddatepickerClicked () {
+  enddatepickerClicked() {
     this.setState({ datepickerendOpen: true });
   }
 
@@ -197,7 +197,7 @@ export default class CreditNotes extends Component {
     this.setState({ endDate: value });
   };
 
-  handleViewCredit (item, index) {
+  handleViewCredit(item, index) {
     const reqOb = {
       fromDate: null,
       mobileNumber: null,
@@ -218,7 +218,7 @@ export default class CreditNotes extends Component {
   }
 
   // Edit Navigation
-  handleAddCredit (item, index) {
+  handleAddCredit(item, index) {
     this.props.navigation.navigate("AddCreditNotes", {
       item: item,
       isEdit: true,
@@ -228,11 +228,11 @@ export default class CreditNotes extends Component {
   }
 
   // Filter Actions
-  filterAction () {
+  filterAction() {
     this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
-  clearFilterAction () {
+  clearFilterAction() {
     this.setState({
       filterActive: false,
       mobileNumber: "",
@@ -245,7 +245,7 @@ export default class CreditNotes extends Component {
   }
 
   // Add Credit
-  navigateToAddCreditNotes () {
+  navigateToAddCreditNotes() {
     this.props.navigation.navigate("AddCreditNotes", {
       isEdit: false,
       onGoBack: () => this.refresh(),
@@ -253,7 +253,7 @@ export default class CreditNotes extends Component {
     });
   }
 
-  render () {
+  render() {
     return (
       <View>
         {this.state.loading && <Loader loading={this.state.loading} />}
@@ -341,7 +341,7 @@ export default class CreditNotes extends Component {
                     <View style={scss.buttonContainer}>
                       <IconFA
                         name="eye"
-                        style={[ scss.action_icons, { paddingRight: 10 } ]}
+                        style={[scss.action_icons, { paddingRight: 10 }]}
                         size={25}
                         onPress={() => this.handleViewCredit(item, index)}
                       ></IconFA>
@@ -416,7 +416,7 @@ export default class CreditNotes extends Component {
                       </View>
                     )}
                     <TextInput
-                      mode="outlined"
+                      mode="flat"
                       outlineColor="#d6d6d6"
                       activeOutlineColor="#d6d6d6"
                       style={forms.input_fld}
@@ -432,11 +432,11 @@ export default class CreditNotes extends Component {
                       onChangeText={this.handleMobile}
                     />
                     <View style={forms.action_buttons_container}>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                         onPress={() => this.applyCreditNotesFilter()}>
                         <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
                         onPress={() => this.modelCancel()}>
                         <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>
@@ -462,28 +462,28 @@ export default class CreditNotes extends Component {
                       renderItem={({ item, index }) => (
                         <View style={scss.model_subbody}>
                           <View style={scss.model_text_container}>
-                            <Text style={[ scss.highText, { textAlign: 'left' } ]}>
+                            <Text style={[scss.highText, { textAlign: 'left' }]}>
                               #CRM ID: {item.customerId}
                             </Text>
-                            <Text style={[ scss.textStyleMedium, { textAlign: 'right' } ]}>
+                            <Text style={[scss.textStyleMedium, { textAlign: 'right' }]}>
                               STORE: {item.storeId}
                             </Text>
                           </View>
                           <View style={scss.model_text_container}>
-                            <Text style={[ scss.textStyleLight, { textAlign: 'left' } ]}>
+                            <Text style={[scss.textStyleLight, { textAlign: 'left' }]}>
                               TRANSACTION TYPE: {"\n"}
                               {item.transactionType}
                             </Text>
-                            <Text style={[ scss.textStyleLight, { textAlign: 'right' } ]}>
+                            <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>
                               ACCOUNT TYPE: {"\n"}
                               {item.accountType}
                             </Text>
                           </View>
                           <View style={scss.model_text_container}>
-                            <Text style={[ scss.textStyleLight, , { textAlign: 'left' } ]}>
+                            <Text style={[scss.textStyleLight, , { textAlign: 'left' }]}>
                               AMOUNT: {item.amount}
                             </Text>
-                            <Text style={[ scss.textStyleLight, { textAlign: 'right' } ]}>
+                            <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>
                               DATE:{" "}
                               {formatListDates(item.createdDate)}
                             </Text>

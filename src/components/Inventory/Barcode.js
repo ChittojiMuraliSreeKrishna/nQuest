@@ -547,7 +547,7 @@ export default class Barcode extends Component {
                       </View>
                     )}
                     <TextInput
-                      mode="outlined"
+                      mode="flat"
                       activeOutlineColor="#b9b9b9"
                       outlineColor="#b9b9b9"
                       style={forms.input_fld}

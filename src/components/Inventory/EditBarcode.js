@@ -771,8 +771,8 @@ class EditBarcode extends Component {
           </Text>
           <TextInput
             activeOutlineColor="#d6d6d6"
-            mode="outlined"
-            outlineColor={"#d6d6d6"}
+            mode="flat"
+            underlineColor={"#d6d6d6"}
             style={[
               forms.input_fld,
               forms.inactive_fld,
@@ -903,7 +903,7 @@ class EditBarcode extends Component {
                       <Text style={inputHeading}>{items.name}</Text>
                       <TextInput
                         activeOutlineColor="#d6d6d6"
-                        mode="outlined"
+                        mode="flat"
                         style={[
                           forms.input_fld,
                           forms.inactive_fld,
@@ -913,7 +913,7 @@ class EditBarcode extends Component {
                         placeholder={items.name}
                         placeholderTextColor={"#6f6f6f"}
                         textAlignVertical="center"
-                        outlineColor={"#d6d6d6"}
+                        underlineColor={"#d6d6d6"}
                         value={this.state.selectedDValue}
                         editable={false}
                         onChangeText={(value) => this.handleSelectChange(value, items)}
@@ -953,8 +953,8 @@ class EditBarcode extends Component {
           </Text>
           <TextInput
             activeOutlineColor="#000"
-            mode="outlined"
-            outlineColor={"#d6d6d6"}
+            mode="flat"
+            underlineColor={"#d6d6d6"}
             style={[
               forms.input_fld,
               forms.inactive_fld,

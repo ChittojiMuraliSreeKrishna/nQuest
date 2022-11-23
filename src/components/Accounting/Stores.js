@@ -431,7 +431,7 @@ export default class Stores extends Component {
                       />
                     </View>
                     <TextInput
-                      mode="outlined"
+                      mode="flat"
                       outlineColor="#dfdfdf"
                       activeOutlineColor="dfdfdf"
                       style={forms.input_fld}

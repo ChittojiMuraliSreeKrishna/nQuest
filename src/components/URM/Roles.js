@@ -305,7 +305,7 @@ export default class Roles extends Component {
                 ></Text>
                 <View>
                   <TextInput
-                    mode="outlined"
+                    mode="flat"
                     outlineColor="#b9b9b9"
                     activeOutlineColor="#b9b9b9"
                     style={forms.input_fld}
@@ -318,7 +318,7 @@ export default class Roles extends Component {
                     onChangeText={this.handleRole}
                   />
                   <TextInput
-                    mode="outlined"
+                    mode="flat"
                     outlineColor="#b9b9b9"
                     activeOutlineColor="#b9b9b9"
                     style={forms.input_fld}

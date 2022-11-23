@@ -295,7 +295,7 @@ export default class AddProductCombo extends Component {
             <TextInput
               outlineColor="#8F9EB7"
               activeOutlineColor="#000"
-              mode="outlined"
+              mode="flat"
               style={inputField}
               underlineColorAndroid="transparent"
               placeholder="Combo Name"
@@ -310,7 +310,7 @@ export default class AddProductCombo extends Component {
             <TextInput
               outlineColor="#8F9EB7"
               activeOutlineColor="#000"
-              mode="outlined"
+              mode="flat"
               style={inputField}
               underlineColorAndroid="transparent"
               placeholder="Combo Price"
@@ -325,7 +325,7 @@ export default class AddProductCombo extends Component {
             <TextInput
               outlineColor="#8F9EB7"
               activeOutlineColor="#000"
-              mode="outlined"
+              mode="flat"
               style={inputField}
               underlineColorAndroid="transparent"
               placeholder="Combo Qty"
@@ -340,7 +340,7 @@ export default class AddProductCombo extends Component {
             <TextInput
               outlineColor="#8F9EB7"
               activeOutlineColor="#000"
-              mode="outlined"
+              mode="flat"
               style={inputField}
               underlineColorAndroid="transparent"
               placeholder="Barcode"
@@ -431,7 +431,7 @@ export default class AddProductCombo extends Component {
                           <TextInp
                             outlineColor="#8F9EB7"
                             activeOutlineColor="#000"
-                            mode="outlined"
+                            mode="flat"
                             style={{
                               justifyContent: "center",
                               height: 25,

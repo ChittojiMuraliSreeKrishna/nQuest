@@ -56,7 +56,7 @@ export default class ReBarcode extends Component {
     };
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     const storeId = await AsyncStorage.getItem("storeId");
     console.log({ storeId });
     this.setState({ storeId: storeId });
@@ -67,7 +67,7 @@ export default class ReBarcode extends Component {
   }
 
   // Rebarcode Data
-  getAllReBarcodes (pageNumber) {
+  getAllReBarcodes(pageNumber) {
     const params = {
       fromDate: this.state.startDate,
       toDate: this.state.endDate,
@@ -98,24 +98,24 @@ export default class ReBarcode extends Component {
   }
 
   // Filter Actions
-  filterAction () {
+  filterAction() {
     this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
-  clearFilterAction () {
+  clearFilterAction() {
     this.setState({ filterActive: false, reBarcodesData: [], filterRebarcodesData: [], startDate: "", endDate: "", barCodeId: "" });
     this.getAllReBarcodes();
   }
 
-  modelCancel () {
+  modelCancel() {
     this.setState({ flagFilterOpen: false, modalVisible: false });
   }
 
   // Print
-  print () { }
+  print() { }
 
   // Filter ReBarcode Api
-  applyReBarcodeFilter () {
+  applyReBarcodeFilter() {
     this.setState({ loadMoreActive: false });
     let list = {};
     list = {
@@ -157,11 +157,11 @@ export default class ReBarcode extends Component {
   }
 
   // Date Actions
-  datepickerClicked () {
+  datepickerClicked() {
     this.setState({ datepickerOpen: true });
   }
 
-  enddatepickerClicked () {
+  enddatepickerClicked() {
     this.setState({ datepickerendOpen: true });
   }
 
@@ -214,7 +214,7 @@ export default class ReBarcode extends Component {
     });
   };
 
-  handleModelView () {
+  handleModelView() {
     this.setState({ viewBarcodeData: [], viewBarcode: false });
   }
 
@@ -241,7 +241,7 @@ export default class ReBarcode extends Component {
     }
   };
 
-  continuePagination () {
+  continuePagination() {
     if (this.state.filterActive) {
       if (this.state.totalPages > 1) {
         this.setState({ loadMoreActive: true });
@@ -264,14 +264,14 @@ export default class ReBarcode extends Component {
     });
   };
 
-  refresh () {
+  refresh() {
     this.setState({ pageNo: 0 }, () => {
       this.getAllReBarcodes();
     });
   }
 
 
-  render () {
+  render() {
     return (
       <View>
         {this.state.loading && <Loader loading={this.state.loading} />}
@@ -335,7 +335,7 @@ export default class ReBarcode extends Component {
                   <View style={scss.flatListFooter}>
                     <Text style={scss.footerText}>
                       {I18n.t("DATE")}:
-                      {item.lastModifiedDate ? item.lastModifiedDate.toString().split(/T/)[ 0 ]
+                      {item.lastModifiedDate ? item.lastModifiedDate.toString().split(/T/)[0]
                         : item.lastModifiedDate}
                     </Text>
                     <IconFA
@@ -360,14 +360,14 @@ export default class ReBarcode extends Component {
                   {this.state.loadPrevActive && (
                     <View style={scss.page_navigation_subcontainer}>
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(0)}
                         name="chevron-double-left"
                         size={25}
                       />
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(this.state.pageNo - 1)}
                         name="chevron-left"
@@ -379,13 +379,13 @@ export default class ReBarcode extends Component {
                   {this.state.loadNextActive && (
                     <View style={scss.page_navigation_subcontainer}>
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         onPress={() => this.loadMoreList(this.state.pageNo + 1)}
                         name="chevron-right"
                         size={25}
                       />
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         onPress={() => this.loadMoreList(this.state.totalPages - 1)}
                         name="chevron-double-right"
                         size={25}
@@ -453,10 +453,10 @@ export default class ReBarcode extends Component {
                               {item.domainType === "Retail" && (
                                 <View style={scss.model_text_container}>
                                   <Text variant="bodyMedium">FromDate: {item.fromDate
-                                    ? item.fromDate.toString().split(/T/)[ 0 ]
+                                    ? item.fromDate.toString().split(/T/)[0]
                                     : item.fromDate}</Text>
                                   <Text variant="bodyMedium">ToDate: {item.toDate
-                                    ? item.toDate.toString().split(/T/)[ 0 ]
+                                    ? item.toDate.toString().split(/T/)[0]
                                     : item.toDate}</Text>
                                 </View>
                               )}
@@ -540,7 +540,7 @@ export default class ReBarcode extends Component {
                       </View>
                     )}
                     <TextInput
-                      mode="outlined"
+                      mode="flat"
                       activeOutlineColor="#b6b6b6"
                       outlineColor="#b6b6b6"
                       style={forms.input_fld}
@@ -550,11 +550,11 @@ export default class ReBarcode extends Component {
                       onChangeText={this.handlebarCodeId}
                     />
                     <View style={forms.action_buttons_container}>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                         onPress={() => this.applyReBarcodeFilter(0)}>
                         <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
                         onPress={() => this.modelCancel()}>
                         <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>

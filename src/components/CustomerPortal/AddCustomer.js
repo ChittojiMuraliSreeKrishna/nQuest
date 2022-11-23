@@ -239,9 +239,9 @@ export default class AddCustomer extends Component {
           <Text style={styles.headings}>{I18n.t("Customer Name")} <Text style={{ color: 'red' }}>*</Text></Text>
           <TextInput
             style={nameValid ? Device.isTablet ? styles.input_tablet : styles.input_mobile : Device.isTablet ? styles.inputError_tablet : styles.inputError_mobile}
-            mode="outlined"
+            mode="flat"
             activeOutlineColor='#d6d6d6'
-            outlineColor={nameValid ? '#d6d6d6' : "#dd0000"}
+            underlineColor={nameValid ? '#d6d6d6' : "#dd0000"}
             label={I18n.t('CUSTOMER NAME')}
             maxLength={25}
             // onBlur={this.handleNameValid}
@@ -252,9 +252,9 @@ export default class AddCustomer extends Component {
           <Text style={styles.headings}>{I18n.t("Mobile Number")} <Text style={{ color: 'red' }}>*</Text></Text>
           <TextInput
             style={mobileValid ? Device.isTablet ? styles.input_tablet : styles.input_mobile : Device.isTablet ? styles.inputError_tablet : styles.inputError_mobile}
-            mode="outlined"
+            mode="flat"
             activeOutlineColor='#d6d6d6'
-            outlineColor={mobileValid ? '#d6d6d6' : "#dd0000"}
+            underlineColor={mobileValid ? '#d6d6d6' : "#dd0000"}
             label={I18n.t('MOBILE NUMBER')}
             maxLength={10}
             keyboardType='phone-pad'
@@ -266,9 +266,9 @@ export default class AddCustomer extends Component {
           {!mobileValid && <Message imp={true} message={this.state.errors["mobile"]} />}
           <Text style={styles.headings}>{I18n.t("Email")}</Text>
           <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-            mode="outlined"
+            mode="flat"
             activeOutlineColor='#d6d6d6'
-            outlineColor={emailValid ? '#d6d6d6' : "#dd0000"}
+            underlineColor={emailValid ? '#d6d6d6' : "#dd0000"}
             label={I18n.t('EMAIL')}
             keyboardType='email-address'
             autoCapitalize='none'
@@ -278,7 +278,7 @@ export default class AddCustomer extends Component {
           {!emailValid && <Message imp={false} message={this.state.errors["email"]} />}
           <Text style={styles.headings}>{I18n.t("Address")}</Text>
           <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-            mode="outlined"
+            mode="flat"
             activeOutlineColor='#d6d6d6'
             outlineColor='#d6d6d6'
             label={I18n.t('ADDRESS')}
@@ -287,7 +287,7 @@ export default class AddCustomer extends Component {
           />
           <Text style={styles.headings}>{I18n.t("GST Number")}</Text>
           <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
-            mode="outlined"
+            mode="flat"
             activeOutlineColor='#d6d6d6'
             outlineColor='#d6d6d6'
             label={I18n.t('GST Number')}
@@ -608,7 +608,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     fontFamily: 'regular',
     paddingLeft: 15,
-    fontSize: 22,
+    fontSize: 16,
   },
   inputError_tablet: {
     justifyContent: 'center',
@@ -623,7 +623,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     fontFamily: 'regular',
     paddingLeft: 15,
-    fontSize: 22,
+    fontSize: 16,
   },
   signInButton_tablet: {
     backgroundColor: '#ED1C24',

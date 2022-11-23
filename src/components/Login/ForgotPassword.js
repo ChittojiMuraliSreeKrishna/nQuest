@@ -106,9 +106,9 @@ class ForgotPassword extends Component {
                 style={userValid ? Device.isTablet ? styles.input_tablet : styles.input_mobile : Device.isTablet ? styles.inputError_tablet : styles.inputError_mobile}
                 underlineColorAndroid="transparent"
                 placeholder={I18n.t("USER NAME")}
-                mode="outlined"
+                mode="flat"
                 placeholderTextColor={userValid ? "#6F6F6F" : "#dd0000"}
-                outlineColor={userValid ? "#6F6F6F" : "#dd0000"}
+                underlineColor={userValid ? "#6F6F6F" : "#dd0000"}
                 activeOutlineColor="#d7d7d7"
                 autoCapitalize="none"
                 maxLength={25}

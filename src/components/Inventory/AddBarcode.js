@@ -903,7 +903,7 @@ class AddBarcode extends Component {
                       <Text style={inputHeading}>{items.name}</Text>
                       <TextInput
                         activeOutlineColor="#d6d6d6"
-                        mode="outlined"
+                        mode="flat"
                         style={[
                           forms.input_fld,
                           forms.active_fld,
@@ -914,7 +914,7 @@ class AddBarcode extends Component {
                         placeholderTextColor={"#6f6f6f"}
                         textAlignVertical="center"
                         maxLength={12}
-                        outlineColor={"#d6d6d6"}
+                        underlineColor={"#d6d6d6"}
                         autoCapitalize="none"
                         value={this.state.selectedDValue}
                         onChangeText={(value) => this.handleSelectChange(value, items)}
@@ -930,7 +930,7 @@ class AddBarcode extends Component {
               <Text style={inputHeading}> {I18n.t("Brand Name")} </Text>
               <TextInput
                 activeOutlineColor="#d6d6d6"
-                mode="outlined"
+                mode="flat"
                 style={[
                   forms.input_fld,
                   forms.active_fld,
@@ -941,7 +941,7 @@ class AddBarcode extends Component {
                 placeholderTextColor={"#6f6f6f"}
                 textAlignVertical="center"
                 maxLength={12}
-                outlineColor={"#d6d6d6"}
+                underlineColor={"#d6d6d6"}
                 autoCapitalize="none"
                 value={this.state.brand}
                 onChangeText={this.handleBrand}
@@ -1004,8 +1004,8 @@ class AddBarcode extends Component {
           </Text>
           <TextInput
             activeOutlineColor="#d6d6d6"
-            mode="outlined"
-            outlineColor={"#d6d6d6"}
+            mode="flat"
+            underlineColor={"#d6d6d6"}
             style={[
               forms.input_fld,
               forms.active_fld,
@@ -1025,8 +1025,8 @@ class AddBarcode extends Component {
           </Text>
           <TextInput
             activeOutlineColor="#d6d6d6"
-            mode="outlined"
-            outlineColor={"#d6d6d6"}
+            mode="flat"
+            underlineColor={"#d6d6d6"}
             style={[
               forms.input_fld,
               forms.active_fld,
@@ -1046,8 +1046,8 @@ class AddBarcode extends Component {
           </Text>
           <TextInput
             activeOutlineColor="#d6d6d6"
-            mode="outlined"
-            outlineColor={"#d6d6d6"}
+            mode="flat"
+            underlineColor={"#d6d6d6"}
             style={[
               forms.input_fld,
               forms.active_fld,
@@ -1069,8 +1069,8 @@ class AddBarcode extends Component {
           </Text>
           <TextInput
             activeOutlineColor="#d6d6d6"
-            mode="outlined"
-            outlineColor={"#d6d6d6"}
+            mode="flat"
+            underlineColor={"#d6d6d6"}
             style={[
               forms.input_fld,
               forms.active_fld,
@@ -1092,8 +1092,8 @@ class AddBarcode extends Component {
           </Text>
           <TextInput
             activeOutlineColor="#d6d6d6"
-            mode="outlined"
-            outlineColor={"#d6d6d6"}
+            mode="flat"
+            underlineColor={"#d6d6d6"}
             style={[
               forms.input_fld,
               forms.active_fld,
@@ -1175,8 +1175,8 @@ class AddBarcode extends Component {
           </Text>
           <TextInput
             activeOutlineColor="#000"
-            mode="outlined"
-            outlineColor={"#d6d6d6"}
+            mode="flat"
+            underlineColor={"#d6d6d6"}
             keyboardType="numeric"
             style={[
               forms.input_fld,
@@ -1226,8 +1226,8 @@ class AddBarcode extends Component {
           </Text>
           <TextInput
             activeOutlineColor="#000"
-            mode="outlined"
-            outlineColor={"#d6d6d6"}
+            mode="flat"
+            underlineColor={"#d6d6d6"}
             style={[
               forms.input_fld,
               forms.active_fld,
@@ -1247,8 +1247,8 @@ class AddBarcode extends Component {
           </Text>
           <TextInput
             activeOutlineColor="#000"
-            mode="outlined"
-            outlineColor={"#d6d6d6"}
+            mode="flat"
+            underlineColor={"#d6d6d6"}
             style={[
               forms.input_fld,
               forms.active_fld,
