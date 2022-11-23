@@ -131,7 +131,8 @@ class TextilePayment extends Component {
       discountAmountValid: true,
       errors: {},
       netPayableAmount: 0,
-      isBillLevel: false
+      isBillLevel: false,
+      isCreditConfirm: false
     };
   }
 
@@ -408,31 +409,32 @@ class TextilePayment extends Component {
 
   confirmCreditModel() {
     var grandNetAmount = parseFloat(this.state.grandNetAmount)
-    if (this.state.payCreditAmount > grandNetAmount) {
-      alert("please check the value")
-    } else if (this.state.creditAmount < grandNetAmount) {
-      const amount = grandNetAmount - this.state.creditAmount;
+    // if (this.state.payCreditAmount > grandNetAmount) {
+    //   alert("please check the value")
+    if (parseFloat(this.state.payCreditAmount) < grandNetAmount) {
+      const amount = grandNetAmount - this.state.payCreditAmount;
+      this.state.grandNetAmount = parseFloat(amount);
       this.setState({ isPayment: true, isreturnCreditCash: true, balanceCreditAmount: amount, grandNetAmount: amount }, () => {
         const obj = {
           "paymentType": "PKTADVANCE",
-          "paymentAmount": this.state.creditAmount
+          "paymentAmount": this.state.payCreditAmount
         }
         this.state.paymentType.push(obj);
         if (this.state.isRTApplied) {
-          this.setState({ payingAmount: this.state.creditAmount + this.state.rtAmount, payButtonEnable: true })
+          this.setState({ payingAmount: this.state.payCreditAmount + this.state.rtAmount, payButtonEnable: true })
         }
       })
-    } else if (this.state.creditAmount === grandNetAmount) {
-      this.setState({ isPayment: true, isProccedtoCheck: true, isCheckPromo: true, isBillLevel: true, isTagCustomer: true })
+    } else if (parseFloat(this.state.payCreditAmount) === grandNetAmount) {
+      this.setState({ isPayment: true, payButtonEnable: true, isCheckPromo: true, isBillLevel: true, isTagCustomer: true })
       const obj = {
         "paymentType": "PKTADVANCE",
-        "paymentAmount": grandNetAmount
+        "paymentAmount": this.state.payCreditAmount
       }
       this.state.paymentType.push(obj);
     }
-    this.setState({ recievedAmount: grandNetAmount, payingAmount: grandNetAmount })
+    this.setState({ recievedAmount: this.state.payCreditAmount, payingAmount: this.state.payCreditAmount })
     const grandAmount = grandNetAmount >= this.state.payCreditAmount ? grandNetAmount - this.state.payCreditAmount : 0
-    this.setState({ isCreditAmount: true, grandNetAmount: grandAmount });
+    this.setState({ isCreditAmount: true });
     if (this.state.isRTApplied) {
       this.setState({ payingAmount: grandNetAmount + this.state.rtAmount, payButtonEnable: true })
     }
@@ -643,7 +645,7 @@ class TextilePayment extends Component {
   creditAction() {
     this.setState({
       creditModel: true,
-      payCreditAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString(),
+      // payCreditAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString(),
       creditModelVisible: true,
       isCash: false,
       isCard: false,
@@ -652,7 +654,6 @@ class TextilePayment extends Component {
       isGv: false,
       isKhata: false,
       isCredit: true,
-      payButtonEnable: true,
       recievedAmount: 0,
       returnAmount: 0
     });
@@ -688,60 +689,63 @@ class TextilePayment extends Component {
 
   verifycash() {
     // alert(parseFloat(this.state.recievedAmount))
-    if (parseFloat(this.state.recievedAmount)) {
-      const grandNetAmount = this.state.grandNetAmount
-      if (this.state.isCash === true && this.state.isCardOrCash === false) {
-        if (parseFloat(this.state.recievedAmount) > parseFloat(this.state.grandNetAmount)) {
-          this.setState({ returnAmount: parseFloat(this.state.recievedAmount) - parseFloat(this.state.grandNetAmount) });
-          this.state.returnAmount = ((this.state.returnAmount).toFixed(2))
-          this.setState({ verifiedCash: parseFloat(this.state.totalAmount), payingAmount: grandNetAmount, grandNetAmount: 0, showVerified: true });
-        } else if (parseFloat(this.state.recievedAmount) === parseFloat(this.state.grandNetAmount)) {
-          this.setState({
-            isPayment: false, returnAmount: parseFloat(this.state.recievedAmount) - parseFloat(this.state.grandNetAmount), showVerified: true,
-            payingAmount: this.state.grandNetAmount, grandNetAmount: 0,
-          });
-        } else if (parseFloat(this.state.recievedAmount) < grandNetAmount || parseFloat(this.state.recievedAmount) !== "") {
-          alert('Please collect sufficient amount');
-          this.setState({ showVerified: false })
-        } else {
-          this.state.verifiedCash = 0;
-          this.state.returnAmount = 0;
-          this.state.grandNetAmount = 0;
-          this.state.receivedAmount = 0;
-          this.setState({ isCash: false });
-        }
-        if (this.state.isreturnCreditCash) {
-          this.setState({ grandNetAmount: this.state.balanceCreditAmount })
-        }
-        const obj = {
-          "paymentType": "Cash",
-          "paymentAmount": parseFloat(this.state.grandNetAmount)
-        };
-        this.state.paymentType.push(obj);
-        if (this.state.grandNetAmount !== 0 || this.state.totalAmount === 0) {
-          this.setState({ isProccedtoCheck: true, enablePayment: false, isCheckPromo: true, isBillLevel: true })
-        }
-      }
-      else if (this.state.isCardOrCash === true) {
-        if ((parseFloat(this.state.recievedAmount) < (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)))) {
-          this.setState({
-            // cardModelVisible: true,
-            payingAmount: grandNetAmount,
-            // cardAutoModel: true, 
-            verifiedCash: this.state.recievedAmount,
-            grandNetAmount: 0
-          });
-          this.pay()
-        } else {
-          alert(" Collected Cash Should be less than payable amount when it comes to Cash & Card Payment")
-        }
-
+    const cash = parseInt(this.state.payCreditAmount) + parseInt(this.state.balanceCreditAmount)
+    this.setState({
+      balanceCreditAmount: 0,
+      // cashAmount:  parseInt(this.state.payCreditAmount) + parseInt(this.state.balanceCreditAmount),
+      recievedAmount: cash ? cash : this.state.recievedAmount,
+      payCreditAmount: parseInt(this.state.payCreditAmount) + parseInt(this.state.balanceCreditAmount)
+    })
+    const grandNetAmount = this.state.grandNetAmount
+    if (this.state.isCash === true && this.state.isCardOrCash === false) {
+      if (parseFloat(this.state.recievedAmount) > parseFloat(this.state.grandNetAmount)) {
+        this.setState({ returnAmount: parseFloat(this.state.recievedAmount) - parseFloat(this.state.grandNetAmount) });
+        this.state.returnAmount = ((this.state.returnAmount).toFixed(2))
+        this.setState({ verifiedCash: parseFloat(this.state.totalAmount), payingAmount: grandNetAmount, grandNetAmount: 0, showVerified: true });
+      } else if (parseFloat(this.state.recievedAmount) === parseFloat(this.state.grandNetAmount)) {
+        this.setState({
+          isPayment: false, returnAmount: parseFloat(this.state.recievedAmount) - parseFloat(this.state.grandNetAmount), showVerified: true,
+          payingAmount: this.state.grandNetAmount, grandNetAmount: 0,
+        });
+      } else if (parseFloat(this.state.recievedAmount) < grandNetAmount || parseFloat(this.state.recievedAmount) !== "") {
+        alert('Please collect sufficient amount');
+        this.setState({ showVerified: false })
+      } else {
+        this.state.verifiedCash = 0;
+        this.state.returnAmount = 0;
+        this.state.grandNetAmount = 0;
+        this.state.receivedAmount = 0;
+        this.setState({ isCash: false });
       }
       if (this.state.isreturnCreditCash) {
         this.setState({ grandNetAmount: this.state.balanceCreditAmount })
       }
-    } else {
-      alert("Please Enter Only Numerics")
+      const obj = {
+        "paymentType": "Cash",
+        "paymentAmount": parseFloat(this.state.grandNetAmount)
+      };
+      this.state.paymentType.push(obj);
+      if (this.state.grandNetAmount !== 0 || this.state.totalAmount === 0) {
+        this.setState({ isProccedtoCheck: true, enablePayment: false, isCheckPromo: true, isBillLevel: true })
+      }
+    }
+    else if (this.state.isCardOrCash === true) {
+      if ((parseFloat(this.state.recievedAmount) < (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)))) {
+        this.setState({
+          // cardModelVisible: true,
+          payingAmount: grandNetAmount,
+          // cardAutoModel: true, 
+          verifiedCash: this.state.recievedAmount,
+          grandNetAmount: 0
+        });
+        this.pay()
+      } else {
+        alert(" Collected Cash Should be less than payable amount when it comes to Cash & Card Payment")
+      }
+
+    }
+    if (this.state.isreturnCreditCash) {
+      this.setState({ grandNetAmount: this.state.balanceCreditAmount })
     }
   }
 
@@ -2312,12 +2316,23 @@ class TextilePayment extends Component {
                           selectTextOnFocus={false}
                           value={this.state.payCreditAmount}
                           onChangeText={(value) =>
-                            this.setState({ payCreditAmount: value })
+                            this.setState({ payCreditAmount: value }, () => {
+                              if (this.state.creditAmount < this.state.payCreditAmount || this.state.creditAmount === this.state.grandNetAmount) {
+                                this.setState({
+                                  isCreditConfirm: true
+                                })
+                              } else {
+                                this.setState({
+                                  isCreditConfirm: false
+                                })
+                              }
+                            })
                           }
                         // value={}
                         />
                         <View style={forms.action_buttons_container}>
-                          <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                          <TouchableOpacity style={[forms.action_buttons, forms.submit_btn, { backgroundColor: this.state.isCreditConfirm ? color.disableBackGround : color.accent }]}
+                            disabled={this.state.isCreditConfirm}
                             onPress={() => this.confirmCreditModel()}>
                             <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
                           </TouchableOpacity>
