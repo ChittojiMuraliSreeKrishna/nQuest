@@ -139,6 +139,17 @@ export default class Barcode extends Component {
     });
   }
 
+  // View Barcode Function
+  handleViewBarcode(item, index, value) {
+    this.props.navigation.navigate("EditBarcode", {
+      item: item,
+      isEdit: null,
+      reBar: value,
+      onGoBack: () => this.refresh(),
+      goBack: () => this.refresh(),
+    })
+  }
+
   // Delete Barcode Function
   handlebarcodedeleteaction(item, index) {
     this.setState({
@@ -381,6 +392,16 @@ export default class Barcode extends Component {
                           {formatListDates(item.createdDate)}
                         </Text>
                         <View style={scss.buttonContainer}>
+                          <IconFA
+                            name="eye"
+                            style={[scss.action_icons, { paddingRight: 5 }]}
+                            size={25}
+                            color="#000"
+                            onPress={() =>
+                              this.handleViewBarcode(item, index, null)
+                            }
+                          >
+                          </IconFA>
                           <IconMA
                             size={35}
                             style={{ paddingRight: 10 }}

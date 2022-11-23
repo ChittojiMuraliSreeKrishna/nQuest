@@ -34,6 +34,7 @@ export const INVENTORY_PORTAL = {
   deleteRetailBarcode: "/inventory/inventoryRetail/deleteBarcode",
 
   // Textile
+  getAllColors: '/user-management/colour/list',
   getAllBarcodes: "/inventory/inventoryTextile/getAllBarcodeTextiles",
   getTextileBarcodes: "/inventory/inventory-management/barcodes/filter",
   getAllProductBundleList: "/inventory/productBundle/all",

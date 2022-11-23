@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import moment from 'moment';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import RNBeep from 'react-native-a-beep';
 import { RNCamera } from 'react-native-camera';
 import Device from 'react-native-device-detection';
@@ -21,7 +21,7 @@ import { customerErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
 import CustomerService from '../services/CustomerService';
 import { color } from '../Styles/colorStyles';
-import { checkPromoDiscountBtn, textStyle } from '../Styles/FormFields';
+import { textStyle } from '../Styles/FormFields';
 import { sucessBtn, sucessBtnText, sucessText } from '../Styles/PopupStyles';
 import { flatListMainContainer, flatlistSubContainer, flatListTextStyle, textContainer, textStyleMedium, textStyleMediumColor } from '../Styles/Styles';
 
@@ -364,7 +364,7 @@ class GenerateEstimationSlip extends Component {
                         let addItem = parseInt(items[i].quantity) + 1;
                         items[i].quantity = addItem.toString();
                         let totalcostMrp = items[i].itemMrp * parseInt(items[i].quantity);
-                        items[ i ].totalMrp = parseFloat(totalcostMrp).toFixed(2);
+                        items[i].totalMrp = parseFloat(totalcostMrp).toFixed(2);
                         break;
                       } else {
                         alert("Barcode reached max");
@@ -399,7 +399,7 @@ class GenerateEstimationSlip extends Component {
               alert(res.data.body);
             }
           })
-          this.setState({  isCheckPromo: false });
+          this.setState({ isCheckPromo: false });
         } else {
           alert("Please Close Previous Days")
         }
@@ -783,12 +783,12 @@ class GenerateEstimationSlip extends Component {
                           <View style={textContainer}>
                             <Text style={textStyleMedium}>{this.state.smnumber}</Text>
                             <Text style={textStyleMedium}>{ }</Text>
-                            <Text style={[textStyleMedium, { color: '#2ADC09' }]}>₹{item.itemDiscount }</Text>
+                            <Text style={[textStyleMedium, { color: '#2ADC09' }]}>₹{item.itemDiscount}</Text>
                           </View>
                         </View>
                       </View>
                       <View style={flatListTextStyle}>
-                        <Text style={{ fontFamily: 'bold' }}>{I18n.t("TOTAL")} :  ₹{item.totalMrp }</Text>
+                        <Text style={{ fontFamily: 'bold' }}>{I18n.t("TOTAL")} :  ₹{item.totalMrp}</Text>
                       </View>
                     </>
                   )}
@@ -826,7 +826,7 @@ class GenerateEstimationSlip extends Component {
                     color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 90, fontSize: 20, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
                     fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
                   }}>
-                    ₹ {parseFloat(this.state.mrpAmount)} </Text>
+                    ₹ {parseFloat(this.state.mrpAmount).toFixed(2)} </Text>
                   <View style={styles.TopcontainerforPay}>
                     <TouchableOpacity
                       style={Device.isTablet ? styles.signInButton_tablet : styles.signInButton_mobile}

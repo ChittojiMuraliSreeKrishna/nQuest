@@ -54,11 +54,11 @@ export default class AddCustomer extends Component {
     };
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     this.addCustomer = this.addCustomer.bind(this);
   }
 
-  validationCheck () {
+  validationCheck() {
     let errors = {};
     let isFormValid = true;
     const mobReg = /^[0-9\b]+$/;
@@ -67,26 +67,26 @@ export default class AddCustomer extends Component {
 
     if (this.state.name.length < 3) {
       isFormValid = false;
-      errors[ "name" ] = urmErrorMessages.customerName;
+      errors["name"] = urmErrorMessages.customerName;
       this.setState({ nameValid: false });
     }
 
     if (mobReg.test(this.state.phoneNumber) === false || this.state.phoneNumber.length < errorLength.mobile) {
       isFormValid = false;
-      errors[ "mobile" ] = urmErrorMessages.mobile;
+      errors["mobile"] = urmErrorMessages.mobile;
       this.setState({ mobileValid: false });
     }
 
     if (this.state.email.length > 0 && emailReg.test(this.state.email) === false) {
       isFormValid = false;
-      errors[ "email" ] = urmErrorMessages.email;
+      errors["email"] = urmErrorMessages.email;
       this.setState({ emailValid: false });
     }
 
 
     if (this.state.gstNumber.length > 0 && this.state.gstNumber.length < errorLength.gstNumber) {
       isFormValid = false;
-      errors[ "gst" ] = urmErrorMessages.gstNumber;
+      errors["gst"] = urmErrorMessages.gstNumber;
       this.setState({ gstValid: false });
     }
 
@@ -96,7 +96,7 @@ export default class AddCustomer extends Component {
     return isFormValid;
   }
 
-  addCustomer () {
+  addCustomer() {
     const isFormValid = this.validationCheck();
     if (isFormValid) {
       this.state.phoneNumber = "+91" + this.state.phoneNumber;
@@ -110,38 +110,66 @@ export default class AddCustomer extends Component {
             alert("Customer Added Successfully");
             mobileNumber = '';
           }
-          this.setState({
-            username: "",
-            name: "",
-            phoneNumber: "",
-            birthDate: "",
-            email: "",
-            gender: "",
-            tempPassword: "Otsi@123",
-            parentId: "1",
-            domianId: "802",
-            address: "",
-            role: {
-              roleName: ""
-            },
-            stores: [],
-            clientId: "",
-            isConfigUser: "",
-            clientDomain: [],
-            gstNumber: "",
-            companyName: "",
-            gstemail: "",
-            gstmobile: "",
-            gstaddress: "",
-            isCustomer: "true",
-            isConfigUser: "false"
-          });
         }
-      });
+        this.setState({
+          username: "",
+          name: "",
+          phoneNumber: "",
+          birthDate: "",
+          email: "",
+          gender: "",
+          tempPassword: "Otsi@123",
+          parentId: "1",
+          domianId: "802",
+          address: "",
+          role: {
+            roleName: ""
+          },
+          stores: [],
+          clientId: "",
+          isConfigUser: "",
+          clientDomain: [],
+          gstNumber: "",
+          companyName: "",
+          gstemail: "",
+          gstmobile: "",
+          gstaddress: "",
+          isCustomer: "true",
+          isConfigUser: "false"
+        });
+      }).catch(err => {
+        this.setState({
+          username: "",
+          name: "",
+          phoneNumber: "",
+          birthDate: "",
+          email: "",
+          gender: "",
+          tempPassword: "Otsi@123",
+          parentId: "1",
+          domianId: "802",
+          address: "",
+          role: {
+            roleName: ""
+          },
+          stores: [],
+          clientId: "",
+          isConfigUser: "",
+          clientDomain: [],
+          gstNumber: "",
+          companyName: "",
+          gstemail: "",
+          gstmobile: "",
+          gstaddress: "",
+          isCustomer: "true",
+          isConfigUser: "false"
+        });
+
+      })
     }
   }
 
-  handleCustomerName (text) {
+  handleCustomerName(text) {
     this.setState({ username: text, name: text });
   }
 
@@ -151,7 +179,7 @@ export default class AddCustomer extends Component {
     }
   };
 
-  handleMobileNumber (text) {
+  handleMobileNumber(text) {
     this.setState({ phoneNumber: text });
     mobileNumber = text;
   }
@@ -162,7 +190,7 @@ export default class AddCustomer extends Component {
     }
   };
 
-  handleEmail (text) {
+  handleEmail(text) {
     this.setState({ email: text });
   }
 
@@ -170,38 +198,38 @@ export default class AddCustomer extends Component {
     this.setState({ gender: value });
   };
 
-  handleAddress (text) {
+  handleAddress(text) {
     this.setState({ address: text });
   }
 
-  handleCompanyName (text) {
+  handleCompanyName(text) {
     this.setState({ companyName: text });
   }
 
-  handleGstNumber (text) {
+  handleGstNumber(text) {
     this.setState({ gstNumber: text });
   }
 
-  handleGstNumberValid (text) {
+  handleGstNumberValid(text) {
     if (this.state.gstNumber.length >= errorLength.gstNumber) {
       this.setState({ gstValid: true });
     }
   }
 
-  handleBusinessAddress (text) {
+  handleBusinessAddress(text) {
     this.setState({ gstaddress: text });
   }
 
-  handleBusinessEmail (text) {
+  handleBusinessEmail(text) {
     this.setState({ gstemail: text });
   }
 
-  handleBusinessPhone (text) {
+  handleBusinessPhone(text) {
     this.setState({ gstmobile: text });
   }
 
 
-  render () {
+  render() {
     const { nameValid, mobileValid, emailValid, gstValid } = this.state;
 
     return (
@@ -220,7 +248,7 @@ export default class AddCustomer extends Component {
             value={this.state.name}
             onChangeText={(text) => this.handleCustomerName(text)}
           />
-          {!nameValid && <Message imp={true} message={this.state.errors[ "name" ]} />}
+          {!nameValid && <Message imp={true} message={this.state.errors["name"]} />}
           <Text style={styles.headings}>{I18n.t("Mobile Number")} <Text style={{ color: 'red' }}>*</Text></Text>
           <TextInput
             style={mobileValid ? Device.isTablet ? styles.input_tablet : styles.input_mobile : Device.isTablet ? styles.inputError_tablet : styles.inputError_mobile}
@@ -235,7 +263,7 @@ export default class AddCustomer extends Component {
             value={mobileNumber}
             onChangeText={(text) => this.handleMobileNumber(text)}
           />
-          {!mobileValid && <Message imp={true} message={this.state.errors[ "mobile" ]} />}
+          {!mobileValid && <Message imp={true} message={this.state.errors["mobile"]} />}
           <Text style={styles.headings}>{I18n.t("Email")}</Text>
           <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
             mode="outlined"
@@ -247,7 +275,7 @@ export default class AddCustomer extends Component {
             value={this.state.email}
             onChangeText={(text) => this.handleEmail(text)}
           />
-          {!emailValid && <Message imp={false} message={this.state.errors[ "email" ]} />}
+          {!emailValid && <Message imp={false} message={this.state.errors["email"]} />}
           <Text style={styles.headings}>{I18n.t("Address")}</Text>
           <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
             mode="outlined"
@@ -267,7 +295,7 @@ export default class AddCustomer extends Component {
             onBlur={(text) => this.handleGstNumberValid(text)}
             onChangeText={(text) => this.handleGstNumber(text)}
           />
-          {!gstValid && <Message imp={false} message={this.state.errors[ "gst" ]} />}
+          {!gstValid && <Message imp={false} message={this.state.errors["gst"]} />}
           <Text style={styles.headings}>{I18n.t("Gender")}</Text>
           <View style={rnPickerContainer}>
             <RNPickerSelect

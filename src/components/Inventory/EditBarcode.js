@@ -138,8 +138,12 @@ class EditBarcode extends Component {
     const editBcode = this.props.route.params;
     if (editBcode.reBar === true) {
       this.setState({ navText: "RE-Barcode" });
-    } else {
+    }
+    else if (editBcode.reBar === false) {
       this.setState({ navText: "Edit Barcode" });
+    }
+    else {
+      this.setState({ navText: "View Barcode" })
     }
     this.setState({
       isEdit: editBcode.isEdit,
@@ -472,7 +476,7 @@ class EditBarcode extends Component {
           <Appbar.BackAction
             onPress={() => this.handleBackButtonClick()}
           />
-          <Appbar.Content title={this.state.reBar ? "Rebarcode" : "Edit Barcode"} />
+          <Appbar.Content title={this.state.reBar === null ? "View Barcode" : this.state.reBar ? "Rebarcode" : "Edit Barcode"} />
         </Appbar>
         <KeyboardAwareScrollView>
           <Text style={inputHeading}>
@@ -926,9 +930,10 @@ class EditBarcode extends Component {
           <TextInput
             style={[
               forms.input_fld,
-              forms.active_fld,
+              this.state.reBar === null ? forms.inactive_fld : forms.active_fld,
               { borderColor: storeValid ? "#8F9EB7" : "#dd0000" },
             ]}
+            editable={this.state.reBar === null ? false : true}
             underlineColorAndroid="transparent"
             placeholder="QTY"
             placeholderTextColor={storeValid ? "#6F6F6F17" : "#dd0000"}
@@ -942,27 +947,7 @@ class EditBarcode extends Component {
           {!qtyValid && (
             <Message imp={true} message={this.state.errors["qty"]} />
           )}
-          <Text style={inputHeading}>
-            Design Code <Text style={{ color: "#aa0000" }}>*</Text>{" "}
-          </Text>
-          <TextInput
-            activeOutlineColor="#000"
-            mode="outlined"
-            outlineColor={"#d6d6d6"}
-            style={[
-              forms.input_fld,
-              forms.inactive_fld,
-            ]}
-            underlineColorAndroid="transparent"
-            placeholder="Design Code"
-            placeholderTextColor={"#676767"}
-            textAlignVertical="center"
-            editable={false}
-            autoCapitalize="none"
-            value={this.state.designCode}
-            onBlur={() => this.handleDesignCodeValid()}
-            onChangeText={() => this.handleDesignCode()}
-          />
+
           <Text style={inputHeading}>
             Barcode
           </Text>
@@ -985,10 +970,10 @@ class EditBarcode extends Component {
             onChangeText={() => this.handleBarcode()}
           />
           <View style={forms.action_buttons_container}>
-            <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+            {this.state.reBar !== null && <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
               onPress={() => this.saveBarcode()}>
               <Text style={forms.submit_btn_text} >{I18n.t("SAVE")}</Text>
-            </TouchableOpacity>
+            </TouchableOpacity>}
             <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
               onPress={() => this.cancel()}>
               <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
@@ -996,8 +981,8 @@ class EditBarcode extends Component {
           </View>
 
           <View style={styles.bottomContainer}></View>
-        </KeyboardAwareScrollView>
-      </View>
+        </KeyboardAwareScrollView >
+      </View >
     );
   }
 }

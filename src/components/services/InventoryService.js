@@ -27,6 +27,10 @@ class InventoryService {
     return axios.get(BASE_URL + INVENTORY_PORTAL.getAllUOMs);
   }
 
+  getColors() {
+    return axios.get(BASE_URL + INVENTORY_PORTAL.getAllColors);
+  }
+
   // Get all divisions for -> AddBarcodes.js, EditBarcodes.js
   getAllDivisions(domainType) {
     const divisionParam = "?domainType=" + domainType;

@@ -7,19 +7,19 @@ import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from "react-native-modal";
 import { Appbar, RadioButton, TextInput } from 'react-native-paper';
+import RNPickerSelect from 'react-native-picker-select';
 import RazorpayCheckout from 'react-native-razorpay';
+import { Chevron } from 'react-native-shapes';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import Loader from '../../commonUtils/loader';
+import { customerErrorMessages } from '../Errors/errors';
+import Message from '../Errors/Message';
 import CustomerService from '../services/CustomerService';
 import LoginService from '../services/LoginService';
 import NewSaleService from '../services/NewSaleService';
 import PromotionsService from '../services/PromotionsService';
 import { color } from '../Styles/colorStyles';
-import RNPickerSelect from 'react-native-picker-select';
-import { Chevron } from 'react-native-shapes';
-import Message from '../Errors/Message';
-import { customerErrorMessages } from '../Errors/errors';
 
 
 var deviceWidth = Dimensions.get('window').width;
@@ -1572,7 +1572,7 @@ class TextilePayment extends Component {
   billValidation() {
     let isFormValid = true;
     let errors = {};
-    if (this.state.manualDisc > this.state.netPayableAmount) {
+    if (parseFloat(this.state.manualDisc) > parseFloat(this.state.netPayableAmount)) {
       isFormValid = false;
       errors["discountAmount"] = customerErrorMessages.discountAmount;
       this.setState({ discountAmountValid: false });
