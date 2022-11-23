@@ -372,27 +372,34 @@ class TextilePayment extends Component {
     //     this.cancelKathaModel();
     //   });
     // }
-    if (parseFloat(this.state.khataAmount) === parseFloat(this.state.grandNetAmount)) {
-      this.setState({
-        payButtonEnable: true,
-        enableCoupon: false,
-        enablePayment: false, isCheckPromo: true, isBillLevel: true, grandNetAmount: 0.0,
-        kathaColleted: parseFloat(this.state.khataAmount)
-      }, () => {
-        this.cancelKathaModel();
-      })
+    if (parseFloat(this.state.khataAmount) <= parseFloat(this.state.netPayableAmount)) {
+      if (parseFloat(this.state.khataAmount) === parseFloat(this.state.grandNetAmount)) {
+        this.setState({
+          payButtonEnable: true,
+          enableCoupon: false,
+          enablePayment: false, isCheckPromo: true, isBillLevel: true, grandNetAmount: 0.0,
+          kathaColleted: parseFloat(this.state.khataAmount)
+        }, () => {
+          this.cancelKathaModel();
+        })
+      } else {
+        console.log(this.state.grandNetAmount);
+        console.log(this.state.khataAmount);
+        let netPayableAmt = parseFloat(this.state.grandNetAmount) - parseFloat(this.state.khataAmount);
+        let grandNetAmount = parseFloat(netPayableAmt)
+        this.setState({
+          grandNetAmount: (grandNetAmount.toFixed(2)),
+          payingAmount: parseFloat(this.state.netPayableAmount) - parseFloat(this.state.khataAmount),
+          kathaColleted: parseFloat(this.state.khataAmount)
+        }, () => {
+          this.cancelKathaModel();
+          if (this.state.netPayableAmount === 0) {
+            this.setState({ enablePayment: true })
+          }
+        })
+      }
     } else {
-      console.log(this.state.grandNetAmount);
-      console.log(this.state.khataAmount);
-      let netPayableAmt = parseFloat(this.state.grandNetAmount) - parseFloat(this.state.khataAmount);
-      let grandNetAmount = parseFloat(netPayableAmt)
-      this.setState({
-        grandNetAmount: (grandNetAmount.toFixed(2)),
-        payingAmount: parseFloat(this.state.totalAmount) - parseFloat(this.state.khataAmount),
-        kathaColleted: parseFloat(this.state.khataAmount)
-      }, () => {
-        this.cancelKathaModel();
-      })
+      alert("cannot proceed")
     }
   }
 
@@ -2277,7 +2284,7 @@ class TextilePayment extends Component {
                         <View style={forms.action_buttons_container}>
                           <TouchableOpacity style={
                             [forms.action_buttons, forms.submit_btn, { backgroundColor: (parseFloat(this.state.khataAmount) > this.state.grandNetAmount) && parseFloat(this.state.khataAmount) > 0 ? color.disableBackGround : color.accent }]}
-                            disabled={(!parseFloat(this.state.khataAmount) > this.state.grandNetAmount) && !parseFloat(this.state.khataAmount) > 0}
+                            disabled={(!parseFloat(this.state.khataAmount) > this.state.netPayableAmount) && !parseFloat(this.state.khataAmount) > 0}
                             onPress={() => this.confirmKathaModel()}>
                             <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
                           </TouchableOpacity>
