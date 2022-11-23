@@ -49,12 +49,12 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       printer.newline();
       printer.line('________________________________________________');
       printer.align('left');
-      printer.line('S.NO    BARCODE      QTY    MRP   DISC    AMOUNT');
+      printer.line('S.NO BARCODE  QTY   MRP    DISC     AMOUNT');
       printer.size(0, 0);
       printer.line('________________________________________________');
       printer.newline(); // Print Style 1
       for (let i = 0; i < object.length; i++) {
-        printer.line(' ' + String(parseInt(i) + 1) + '    ' + object[i].barcode + '      ' + object[i].quantity + '     ' + object[i].itemMrp + '     ' + object[i].itemDiscount + '      ' + object[i].totalMrp);
+        printer.line(' ' + String(parseInt(i) + 1) + ' ' + object[i].barcode + '  ' + parseInt(object[i].quantity) + '   ' + parseFloat(object[i].itemMrp).toFixed(2) + '  ' + parseFloat(object[i].itemDiscount).toFixed(2) + '  ' + parseFloat(object[i].totalMrp).toFixed(2));
         printer.line('------------------------------------------------');
       }
       // printer.newline(); // Print Style 2
@@ -68,20 +68,20 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       let totalqty = 0;
       let promoDiscount = 0;
       object.forEach(bardata => {
-        grandTotal = grandTotal + bardata.totalMrp;
-        promoDiscount = promoDiscount + bardata?.itemDiscount;
-        totalqty = totalqty + parseInt(bardata.quantity);
+        grandTotal = parseFloat(grandTotal) + parseFloat(bardata.totalMrp);
+        promoDiscount = parseFloat(promoDiscount) + parseFloat(bardata?.itemDiscount);
+        totalqty = parseInt(totalqty) + parseInt(bardata.quantity);
       });
       let netpayable = grandTotal - promoDiscount;
-      printer.text('Gross Amount: ' + grandTotal + '\n');
-      printer.text('TOTAL DISCOUNT: ' + promoDiscount + '\n');
+      printer.text('Gross Amount: ' + parseFloat(grandTotal).toFixed(2) + '\n');
+      printer.text('TOTAL DISCOUNT: ' + parseFloat(promoDiscount).toFixed(2) + '\n');
       printer.line('________________________________________________');
       printer.newline();
       printer.align('center');
       printer.size(2, 1);
-      printer.line('Total Qty: ' + totalqty);
+      printer.line('Total Qty: ' + parseInt(totalqty));
       printer.smooth();
-      printer.line('Net Payable: ' + netpayable);
+      printer.line('Net Payable: ' + parseFloat(netpayable).toFixed(2));
       printer.smooth();
       printer.newline();
       printer.barcode({ // For Barcode
@@ -141,12 +141,12 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       printer.text('* ITEMS LIST * \n');
       printer.align('left');
       printer.line('________________________________________________');
-      printer.line('S.NO    BARCODE      QTY    MRP   DISC    AMOUNT');
+      printer.line('S.NO BARCODE  QTY    MRP    DISC     AMOUNT');
       printer.line('________________________________________________');
       printer.size(0, 0);
       printer.newline();
       for (let i = 0; i < object.length; i++) {
-        printer.line(' ' + String(parseInt(i) + 1) + '    ' + object[i].barCode + '      ' + object[i].quantity + '     ' + object[i].itemPrice + '     ' + (object[i].manualDiscount + object[i].promoDiscount) + '      ' + object[i].grossValue);
+        printer.line(' ' + String(parseInt(i) + 1) + ' ' + object[i].barCode + '  ' + parseInt(object[i].quantity) + '   ' + parseFloat(object[i].itemPrice).toFixed(2) + '  ' + parseFloat(object[i].manualDiscount + object[i].promoDiscount).toFixed(2) + '  ' + parseFloat(object[i].grossValue).toFixed(2));
         printer.line('------------------------------------------------');
       }
       printer.newline();
@@ -155,26 +155,26 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       printer.align('right');
       printer.text('' + invoiceTax[0].grossAmount + '\n');
       printer.align('left');
-      printer.text('Promo Discount: ' + invoiceTax[0].totalPromoDisc +
+      printer.text('Promo Discount: ' + parseFloat(invoiceTax[0].totalPromoDisc).toFixed(2) +
         '\n');
-      printer.text('Manual Discount: ' + invoiceTax[0].totalManualDisc +
+      printer.text('Manual Discount: ' + parseFloat(invoiceTax[0].totalManualDisc).toFixed(2) +
         '\n');
       if (invoiceTax[0].returnSlipAmount > 0) {
-        printer.text('RT Amount: ' + invoiceTax[0].returnSlipAmount + '\n');
+        printer.text('RT Amount: ' + parseFloat(invoiceTax[0].returnSlipAmount).toFixed(2) + '\n');
       }
       if (invoiceTax[0].gvAppliedAmount > 0) {
-        printer.text('Coupon Amount: ' + invoiceTax[0].gvAppliedAmount + '\n');
+        printer.text('Coupon Amount: ' + parseFloat(invoiceTax[0].gvAppliedAmount).toFixed(2) + '\n');
       }
       printer.line('________________________________________________');
       printer.newline();
-      printer.text('Total Amount: ' + invoiceTax[0].netPayableAmount + '\n');
+      printer.text('Total Amount: ' + parseFloat(invoiceTax[0].netPayableAmount).toFixed(2) + '\n');
       printer.line('________________________________________________');
       printer.text('Tax  \n');
       printer.line('________________________________________________');
-      printer.text('SGST: ' + invoiceTax[0].sgst + '\n');
-      printer.text('CGST: ' + invoiceTax[0].cgst + '\n');
+      printer.text('SGST: ' + parseFloat(invoiceTax[0].sgst).toFixed(2) + '\n');
+      printer.text('CGST: ' + parseFloat(invoiceTax[0].cgst).toFixed(2) + '\n');
       printer.line('________________________________________________');
-      printer.text('Net Total(tax inc): ' + invoiceTax[0].netPayableAmount + '\n');
+      printer.text('Net Total(tax inc): ' + parseFloat(invoiceTax[0].netPayableAmount).toFixed(2) + '\n');
       printer.line('________________________________________________');
       printer.align('center')
       printer.barcode({ // For Barcode
