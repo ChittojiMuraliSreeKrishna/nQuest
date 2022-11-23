@@ -267,7 +267,7 @@ class GiftVocher extends Component {
       clientId: parseInt(this.state.clientId)
     };
     console.log("objjbjj", obj.fromDate, obj.toDate);
-    if (obj.fromDate !== null && obj.toDate !== null) {
+    if ((obj.fromDate !== null && obj.toDate !== null) || this.state.filterGvNumber !== "") {
       CustomerService.searchGiftVoucher(obj).then((res) => {
         this.setState({
           filterVouchersData: res.data.result,
