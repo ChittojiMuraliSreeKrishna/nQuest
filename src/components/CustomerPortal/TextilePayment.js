@@ -93,7 +93,7 @@ class TextilePayment extends Component {
       upiModelVisible: false,
       upiMobileNumber: '',
       paymentType: [],
-      rtNumber: '',
+      rtNumber: 'RT1669288067773',
       rtAmount: 0,
       rtValue: 0,
       netCardPayment: 0,
@@ -109,7 +109,7 @@ class TextilePayment extends Component {
       creditModel: false,
       creditModelVisible: false,
       creditAmount: 0,
-      payCreditAmount: 0,
+      payCreditAmount: 200,
       isCredit: false,
       isCreditAmount: false,
       balanceCreditAmount: "",
@@ -416,39 +416,42 @@ class TextilePayment extends Component {
   }
 
   confirmCreditModel() {
+    const obj = {
+      "paymentType": "PKTADVANCE",
+      "paymentAmount": this.state.payCreditAmount
+    }
+    this.state.paymentType.push(obj);
     var grandNetAmount = parseFloat(this.state.grandNetAmount)
     // if (this.state.payCreditAmount > grandNetAmount) {
     //   alert("please check the value")
     if (parseFloat(this.state.payCreditAmount) < grandNetAmount) {
       const amount = grandNetAmount - this.state.payCreditAmount;
       this.state.grandNetAmount = parseFloat(amount);
-      this.setState({ isPayment: true, isreturnCreditCash: true, balanceCreditAmount: amount, grandNetAmount: amount }, () => {
-        const obj = {
-          "paymentType": "PKTADVANCE",
-          "paymentAmount": this.state.payCreditAmount
-        }
-        this.state.paymentType.push(obj);
-        if (this.state.isRTApplied) {
-          this.setState({ payingAmount: this.state.payCreditAmount + this.state.rtAmount, payButtonEnable: true })
-        }
+      this.setState({ isPayment: true, isreturnCreditCash: true, balanceCreditAmount: amount, grandNetAmount: parseFloat(amount).toFixed(2) }, () => {
+        // if (this.state.isRTApplied) {
+        //   this.setState({ payingAmount: this.state.payCreditAmount + this.state.rtAmount, payButtonEnable: true })
+        // }
       })
     } else if (parseFloat(this.state.payCreditAmount) === grandNetAmount) {
       this.setState({ isPayment: true, payButtonEnable: true, isCheckPromo: true, isBillLevel: true, isTagCustomer: true })
-      const obj = {
-        "paymentType": "PKTADVANCE",
-        "paymentAmount": this.state.payCreditAmount
-      }
-      this.state.paymentType.push(obj);
+      // const obj = {
+      //   "paymentType": "PKTADVANCE",
+      //   "paymentAmount": this.state.payCreditAmount
+      // }
+      // this.state.paymentType.push(obj);
     }
-    this.setState({ recievedAmount: this.state.payCreditAmount, payingAmount: this.state.payCreditAmount })
-    const grandAmount = grandNetAmount >= this.state.payCreditAmount ? grandNetAmount - this.state.payCreditAmount : 0
-    this.setState({ isCreditAmount: true });
-    if (this.state.isRTApplied) {
-      this.setState({ payingAmount: grandNetAmount + this.state.rtAmount, payButtonEnable: true })
-    }
+    // this.setState({ recievedAmount: this.state.payCreditAmount, payingAmount: this.state.payCreditAmount })
+    // const grandAmount = grandNetAmount >= this.state.payCreditAmount ? grandNetAmount - this.state.payCreditAmount : 0
+    // this.setState({ isCreditAmount: true });
+    // if (this.state.isRTApplied) {
+    //   this.setState({ payingAmount: grandNetAmount + this.state.rtAmount, payButtonEnable: true })
+    // }
+    this.setState({ payingAmount: this.state.payCreditAmount })
+    this.setState({ isCreditAmount: true, creditAmount: this.state.creditAmount });
+    const grandAmount = this.state.grandNetAmount > this.state.payCreditAmount ? this.state.grandNetAmount - this.state.payCreditAmount : 0
     if (this.state.totalAmount === 0) {
       this.setState({
-        enableCoupon: false,
+        enableCoupon: false, payButtonEnable: true,
         isProccedtoCheck: true, enablePayment: false, isCheckPromo: true, isBillLevel: true, isTagCustomer: true
       })
     }
@@ -686,7 +689,7 @@ class TextilePayment extends Component {
   handlerecievedAmount = (text) => {
     this.setState({ recievedAmount: text });
     if (this.state.isCardOrCash === true) {
-      let grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10))
+      let grandNetAmount = (parseFloat(this.state.grandNetAmount))
       this.setState({ ccCardCash: grandNetAmount - text })
     }
   };
@@ -696,7 +699,6 @@ class TextilePayment extends Component {
   };
 
   verifycash() {
-    // alert(parseFloat(this.state.recievedAmount))
     const cash = parseInt(this.state.payCreditAmount) + parseInt(this.state.balanceCreditAmount)
     this.setState({
       balanceCreditAmount: 0,
@@ -738,13 +740,13 @@ class TextilePayment extends Component {
       }
     }
     else if (this.state.isCardOrCash === true) {
-      if ((parseFloat(this.state.recievedAmount) < (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)))) {
+      if ((parseFloat(this.state.recievedAmount) < (parseFloat(this.state.grandNetAmount)))) {
         this.setState({
           // cardModelVisible: true,
           payingAmount: grandNetAmount,
           // cardAutoModel: true, 
           verifiedCash: this.state.recievedAmount,
-          grandNetAmount: 0
+          grandNetAmount: 0, showVerified: true
         });
         this.pay()
       } else {
@@ -1034,6 +1036,18 @@ class TextilePayment extends Component {
       }
       this.state.paymentType.push(obj);
     }
+    let cCData
+    if (this.state.isCardOrCash === true) {
+      let paymentType = [{
+        "paymentType": "Cash",
+        "paymentAmount": parseFloat(this.state.recievedAmount)
+      },
+      {
+        "paymentType": "Card",
+        "paymentAmount": this.state.ccCardCash
+      }]
+      cCData = this.state.paymentType.concat(paymentType)
+    }
     let couponCode = this.state.giftCouponsList.map((item) => {
       return item.gvNumber
     })
@@ -1062,16 +1076,10 @@ class TextilePayment extends Component {
       "createdBy": this.state.createdBy,
       "recievedAmount": this.state.recievedAmount,
       "returnAmount": this.state.returnAmount,
-      "paymentAmountType": this.state.isCardOrCash === true ?
-        [{
-          "paymentType": "Cash",
-          "paymentAmount": parseFloat(this.state.recievedAmount)
-        },
-        {
-          "paymentType": "Card",
-          "paymentAmount": this.state.ccCardCash
-        }]
-        : this.state.paymentType,
+      "paymentAmountType":
+        this.state.isCardOrCash === true ?
+          cCData :
+          this.state.paymentType,
       "returnSlipNumbers": this.state.numRtList,
       "returnSlipAmount": (this.state.rtAmount === null ? 0 : this.state.rtAmount),
       "gvAppliedAmount": (this.state.couponAmount === null ? 0 : this.state.couponAmount),
@@ -1091,7 +1099,7 @@ class TextilePayment extends Component {
       console.log("Invoice data", JSON.stringify(res.data));
       if (res.data && res.data["isSuccess"] === "true") {
 
-        PrintService('INVOICE', res.data.result, this.state.barCodeList, invoiceTax)
+        // PrintService('INVOICE', res.data.result, this.state.barCodeList, invoiceTax)
 
         // const cardAmount = this.state.isCard || this.state.isCardOrCash ? JSON.stringify(Math.round(this.state.ccCardCash)) : JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString());
         alert("Order created " + res.data["result"]);
@@ -1366,7 +1374,7 @@ class TextilePayment extends Component {
       }
 
     }
-    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString();
+    var grandNetAmount = parseFloat(this.state.grandNetAmount);
     if (this.state.rtNumber.length > 0) {
       const storeId = await AsyncStorage.getItem("storeId");
       NewSaleService.getRTDetails([this.state.rtNumber], storeId).then(res => {
@@ -1397,21 +1405,22 @@ class TextilePayment extends Component {
             this.setState({
               isRTnumAplied: false,
               rtAmount: sumreturnedAmout,
-              payingAmount: this.state.rtAmount - grandNetAmount,
-              totalAmount: grandNetAmount - sumreturnedAmout,
+              payingAmount: parseFloat(this.state.rtAmount - grandNetAmount).toFixed(2),
+              // totalAmount: grandNetAmount - sumreturnedAmout,
               payButtonEnable: grandNetAmount - sumreturnedAmout === 0 ? true : false,
               isRTApplied: true,
-              grandNetAmount: this.state.grandNetAmount - sumreturnedAmout
+              isCheckPromo : true,
+              grandNetAmount: parseFloat(this.state.grandNetAmount - sumreturnedAmout).toFixed(2)
             })
           } else if (grandNetAmount === sumreturnedAmout) {
             this.setState({
               isRTnumAplied: false,
               rtAmount: sumreturnedAmout,
-              payingAmount: this.state.rtAmount - grandNetAmount,
-              totalAmount: grandNetAmount - sumreturnedAmout,
+              payingAmount: parseFloat(this.state.rtAmount - grandNetAmount).toFixed(2),
+              // totalAmount: grandNetAmount - sumreturnedAmout,
               payButtonEnable: grandNetAmount - sumreturnedAmout === 0 ? true : false,
               isRTApplied: true,
-              grandNetAmount: this.state.grandNetAmount - sumreturnedAmout,
+              grandNetAmount: parseFloat(this.state.grandNetAmount - sumreturnedAmout).toFixed(2),
               isCheckPromo: true, isBillLevel: true, isTagCustomer: true
             })
           }
@@ -2325,22 +2334,22 @@ class TextilePayment extends Component {
                           value={this.state.payCreditAmount}
                           onChangeText={(value) =>
                             this.setState({ payCreditAmount: value }, () => {
-                              if (this.state.creditAmount < this.state.payCreditAmount || this.state.creditAmount === this.state.grandNetAmount) {
-                                this.setState({
-                                  isCreditConfirm: true
-                                })
-                              } else {
-                                this.setState({
-                                  isCreditConfirm: false
-                                })
-                              }
+                              // if (this.state.creditAmount < this.state.payCreditAmount || this.state.creditAmount === this.state.grandNetAmount) {
+                              //   this.setState({
+                              //     isCreditConfirm: true
+                              //   })
+                              // } else {
+                              //   this.setState({
+                              //     isCreditConfirm: false
+                              //   })
+                              // }
                             })
                           }
                         // value={}
                         />
                         <View style={forms.action_buttons_container}>
-                          <TouchableOpacity style={[forms.action_buttons, forms.submit_btn, { backgroundColor: this.state.isCreditConfirm ? color.disableBackGround : color.accent }]}
-                            disabled={this.state.isCreditConfirm}
+                          <TouchableOpacity style={[forms.action_buttons, forms.submit_btn, { backgroundColor: (parseFloat(this.state.payCreditAmount) > (this.state.creditAmount)) || (parseFloat(this.state.payCreditAmount) > (this.state.grandNetAmount)) ? color.disableBackGround : color.accent }]}
+                            disabled={(parseFloat(this.state.payCreditAmount) > (this.state.creditAmount)) || (parseFloat(this.state.payCreditAmount) > (this.state.grandNetAmount))}
                             onPress={() => this.confirmCreditModel()}>
                             <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
                           </TouchableOpacity>
@@ -2599,7 +2608,7 @@ class TextilePayment extends Component {
                 )
               }
 
-              {
+              {/* {
                 this.state.isreturnCreditCash && (
                   <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
                     <Text style={{
@@ -2613,7 +2622,7 @@ class TextilePayment extends Component {
                       ₹ {parseFloat(this.state.balanceCreditAmount).toString()} </Text>
                   </View>
                 )
-              }
+              } */}
               {this.state.returnAmount >= 0 && (
                 <>
                   <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
