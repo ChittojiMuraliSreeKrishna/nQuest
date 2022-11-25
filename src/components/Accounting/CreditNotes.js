@@ -331,7 +331,7 @@ export default class CreditNotes extends Component {
                     <Text style={scss.textStyleLight}>
                       USED AMMOUNT: {item.usedAmount}
                     </Text>
-                    <Text style={scss.textStyleLight}>BALANCE: {item.amount}</Text>
+                    <Text style={scss.textStyleLight}>BALANCE: {parseFloat(item.amount).toFixed(2)}</Text>
                   </View>
                   <View style={scss.flatListFooter}>
                     <Text style={scss.footerText}>
@@ -481,7 +481,7 @@ export default class CreditNotes extends Component {
                           </View>
                           <View style={scss.model_text_container}>
                             <Text style={[scss.textStyleLight, , { textAlign: 'left' }]}>
-                              AMOUNT: {item.amount}
+                              AMOUNT: {parseFloat(item.amount).toFixed(2)}
                             </Text>
                             <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>
                               DATE:{" "}

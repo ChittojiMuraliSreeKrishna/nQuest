@@ -243,7 +243,7 @@ export default class DebitNotes extends Component {
                     {/* <Text style={textStyleLight}>PAID AMOUNT: {item.amount}</Text> */}
                   </View>
                   <View style={scss.textContainer}>
-                    <Text style={scss.textStyleLight}>BALANCE: {item.amount}</Text>
+                    <Text style={scss.textStyleLight}>BALANCE: {parseFloat(item.amount).toFixed(2)}</Text>
                     <Text style={scss.textStyleLight}>APPROVED BY: {"\n"}{item.apporvedBy}</Text>
                   </View>
                   <View style={scss.flatListFooter}>
@@ -376,7 +376,7 @@ export default class DebitNotes extends Component {
                               <Text style={scss.textStyleLight}>ACCOUNT TYPE: {"\n"}{item.accountType}</Text>
                             </View>
                             <View style={scss.model_text_container}>
-                              <Text style={scss.textStyleLight}>AMOUNT: {item.amount}</Text>
+                              <Text style={scss.textStyleLight}>AMOUNT: {parseFloat(item.amount).toFixed(2)}</Text>
                               <Text style={scss.textStyleLight}>DATE: {formatListDates(item.createdDate)}</Text>
                             </View>
                           </ScrollView>
