@@ -93,7 +93,7 @@ class TextilePayment extends Component {
       upiModelVisible: false,
       upiMobileNumber: '',
       paymentType: [],
-      rtNumber: 'RT1669288067773',
+      rtNumber: '',
       rtAmount: 0,
       rtValue: 0,
       netCardPayment: 0,
@@ -109,7 +109,7 @@ class TextilePayment extends Component {
       creditModel: false,
       creditModelVisible: false,
       creditAmount: 0,
-      payCreditAmount: 200,
+      payCreditAmount: 0,
       isCredit: false,
       isCreditAmount: false,
       balanceCreditAmount: "",
@@ -133,7 +133,8 @@ class TextilePayment extends Component {
       errors: {},
       netPayableAmount: 0,
       isBillLevel: false,
-      isCreditConfirm: false
+      isCreditConfirm: false,
+      enablePayment: false
     };
   }
 
@@ -197,7 +198,8 @@ class TextilePayment extends Component {
       barCodeList: this.props.route.params.barCodeList,
       isCreditFlag: this.props.route.params.isCredit,
       grandNetAmount: this.props.route.params.grandNetAmount,
-      billLevelDisc: this.props.route.params.discountAmount
+      billLevelDisc: this.props.route.params.discountAmount,
+      enablePayment: this.props.route.params.enablePayment
     });
     this.setState({ isTagCustomer: this.props.route.params.customerPhoneNumber.length >= 10 ? true : false });
     // var qtyarr = [...this.state.barCodeList]
@@ -383,8 +385,6 @@ class TextilePayment extends Component {
           this.cancelKathaModel();
         })
       } else {
-        console.log(this.state.grandNetAmount);
-        console.log(this.state.khataAmount);
         let netPayableAmt = parseFloat(this.state.grandNetAmount) - parseFloat(this.state.khataAmount);
         let grandNetAmount = parseFloat(netPayableAmt)
         this.setState({
@@ -393,7 +393,7 @@ class TextilePayment extends Component {
           kathaColleted: parseFloat(this.state.khataAmount)
         }, () => {
           this.cancelKathaModel();
-          if (this.state.netPayableAmount === 0) {
+          if (this.state.grandNetAmount === 0) {
             this.setState({ enablePayment: true })
           }
         })
@@ -433,7 +433,7 @@ class TextilePayment extends Component {
         // }
       })
     } else if (parseFloat(this.state.payCreditAmount) === grandNetAmount) {
-      this.setState({ isPayment: true, payButtonEnable: true, isCheckPromo: true, isBillLevel: true, isTagCustomer: true })
+      this.setState({ isPayment: true, payButtonEnable: true, isCheckPromo: true, enablePayment: false, isBillLevel: true, isTagCustomer: true })
       // const obj = {
       //   "paymentType": "PKTADVANCE",
       //   "paymentAmount": this.state.payCreditAmount
@@ -707,6 +707,7 @@ class TextilePayment extends Component {
       payCreditAmount: parseInt(this.state.payCreditAmount) + parseInt(this.state.balanceCreditAmount)
     })
     const grandNetAmount = this.state.grandNetAmount
+    // console.log("Received amount", this.state.recievedAmount, this.state.grandNetAmount);
     if (this.state.isCash === true && this.state.isCardOrCash === false) {
       if (parseFloat(this.state.recievedAmount) > parseFloat(this.state.grandNetAmount)) {
         this.setState({ returnAmount: parseFloat(this.state.recievedAmount) - parseFloat(this.state.grandNetAmount) });
@@ -715,9 +716,9 @@ class TextilePayment extends Component {
       } else if (parseFloat(this.state.recievedAmount) === parseFloat(this.state.grandNetAmount)) {
         this.setState({
           isPayment: false, returnAmount: parseFloat(this.state.recievedAmount) - parseFloat(this.state.grandNetAmount), showVerified: true,
-          payingAmount: this.state.grandNetAmount, grandNetAmount: 0,
+          payingAmount: this.state.grandNetAmount, grandNetAmount: 0.0,
         });
-      } else if (parseFloat(this.state.recievedAmount) < grandNetAmount || parseFloat(this.state.recievedAmount) !== "") {
+      } else if (parseFloat(this.state.recievedAmount) < parseFloat(this.state.grandNetAmount) || parseFloat(this.state.recievedAmount) !== "") {
         alert('Please collect sufficient amount');
         this.setState({ showVerified: false })
       } else {
@@ -1095,86 +1096,86 @@ class TextilePayment extends Component {
     if (this.state.isCard === true) {
       delete obj.paymentAmountType
     }
-    axios.post(NewSaleService.createOrder(), obj).then((res) => {
-      console.log("Invoice data", JSON.stringify(res.data));
-      if (res.data && res.data["isSuccess"] === "true") {
+    // axios.post(NewSaleService.createOrder(), obj).then((res) => {
+    //   console.log("Invoice data", JSON.stringify(res.data));
+    //   if (res.data && res.data["isSuccess"] === "true") {
 
-        // PrintService('INVOICE', res.data.result, this.state.barCodeList, invoiceTax)
+    //     // PrintService('INVOICE', res.data.result, this.state.barCodeList, invoiceTax)
 
-        // const cardAmount = this.state.isCard || this.state.isCardOrCash ? JSON.stringify(Math.round(this.state.ccCardCash)) : JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString());
-        alert("Order created " + res.data["result"]);
-        if (this.state.isKhata === true) {
-          this.props.route.params.onGoBack();
-          this.props.navigation.goBack();
-        }
-        if (this.state.cardManual === true) {
-          this.props.route.params.onGoBack();
-          this.props.navigation.goBack();
-        }
-        if (this.state.isCredit === true) {
-          this.props.route.params.onGoBack();
-          this.props.navigation.goBack();
-        }
-        if (this.state.isCash === true && this.state.isCardOrCash === false) {
-          this.props.route.params.onGoBack();
-          this.props.navigation.goBack();
-        }
-        let obj;
-        if (this.state.isCard === true) {
-          obj = {
-            "amount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)),
-            "info": "order creations",
-            "newsaleId": res.data["result"],
-          };
-        } else if (this.state.isCardOrCash === true) {
-          obj = {
-            "amount": this.state.ccCardCash,
-            "info": "order creations",
-            "newsaleId": res.data["result"],
-          };
+    //     // const cardAmount = this.state.isCard || this.state.isCardOrCash ? JSON.stringify(Math.round(this.state.ccCardCash)) : JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString());
+    //     alert("Order created " + res.data["result"]);
+    //     if (this.state.isKhata === true) {
+    //       this.props.route.params.onGoBack();
+    //       this.props.navigation.goBack();
+    //     }
+    //     if (this.state.cardManual === true) {
+    //       this.props.route.params.onGoBack();
+    //       this.props.navigation.goBack();
+    //     }
+    //     if (this.state.isCredit === true) {
+    //       this.props.route.params.onGoBack();
+    //       this.props.navigation.goBack();
+    //     }
+    //     if (this.state.isCash === true && this.state.isCardOrCash === false) {
+    //       this.props.route.params.onGoBack();
+    //       this.props.navigation.goBack();
+    //     }
+    //     let obj;
+    //     if (this.state.isCard === true) {
+    //       obj = {
+    //         "amount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)),
+    //         "info": "order creations",
+    //         "newsaleId": res.data["result"],
+    //       };
+    //     } else if (this.state.isCardOrCash === true) {
+    //       obj = {
+    //         "amount": this.state.ccCardCash,
+    //         "info": "order creations",
+    //         "newsaleId": res.data["result"],
+    //       };
 
-        }
-        // console.log('params aresdasd', obj);
-        axios.post(NewSaleService.payment(), obj).then((res) => {
-          // this.setState({isPayment: false});
-          const data = JSON.parse(res.data["result"]);
-          //console.log()
-          var options = {
-            description: 'Transaction',
-            image: 'https://i.imgur.com/3g7nmJC.png',
-            currency: data.currency,
-            order_id: data.id,
-            key: 'rzp_test_z8jVsg0bBgLQer', // Your api key
-            amount: data.amount,
-            name: 'OTSI',
-            prefill: {
-              name: "Kadali",
-              email: "kadali@gmail.com",
-              contact: "9999999999",
-            },
-            theme: { color: '#F37254' }
-          };
-          // console.log("options data", options);
-          RazorpayCheckout.open(options).then((data) => {
-            // handle success
-            this.setState({ tableData: [] });
-            alert(`Success: ${data.razorpay_payment_id}`);
-            this.props.route.params.onGoBack();
-            this.props.navigation.goBack();
-            //this.props.navigation.navigate('Orders', { total: this.state.totalAmount, payment: 'RazorPay' })
-          }).catch((error) => {
-            this.setState({ loading: false });
-            console.log(error);
-            // handle failure
-            alert(`Error: ${JSON.stringify(error.code)} || ${JSON.stringify(error.description)}`);
-          });
-        });
-      }
-      else {
-        // this.setState({ loading: false });
-        alert("duplicate record already exists");
-      }
-    });
+    //     }
+    //     // console.log('params aresdasd', obj);
+    //     axios.post(NewSaleService.payment(), obj).then((res) => {
+    //       // this.setState({isPayment: false});
+    //       const data = JSON.parse(res.data["result"]);
+    //       //console.log()
+    //       var options = {
+    //         description: 'Transaction',
+    //         image: 'https://i.imgur.com/3g7nmJC.png',
+    //         currency: data.currency,
+    //         order_id: data.id,
+    //         key: 'rzp_test_z8jVsg0bBgLQer', // Your api key
+    //         amount: data.amount,
+    //         name: 'OTSI',
+    //         prefill: {
+    //           name: "Kadali",
+    //           email: "kadali@gmail.com",
+    //           contact: "9999999999",
+    //         },
+    //         theme: { color: '#F37254' }
+    //       };
+    //       // console.log("options data", options);
+    //       RazorpayCheckout.open(options).then((data) => {
+    //         // handle success
+    //         this.setState({ tableData: [] });
+    //         alert(`Success: ${data.razorpay_payment_id}`);
+    //         this.props.route.params.onGoBack();
+    //         this.props.navigation.goBack();
+    //         //this.props.navigation.navigate('Orders', { total: this.state.totalAmount, payment: 'RazorPay' })
+    //       }).catch((error) => {
+    //         this.setState({ loading: false });
+    //         console.log(error);
+    //         // handle failure
+    //         alert(`Error: ${JSON.stringify(error.code)} || ${JSON.stringify(error.description)}`);
+    //       });
+    //     });
+    //   }
+    //   else {
+    //     // this.setState({ loading: false });
+    //     alert("duplicate record already exists");
+    //   }
+    // });
 
     // else if (global.domainName === "Retail") {
     //     let lineItems = [];
@@ -1409,13 +1410,14 @@ class TextilePayment extends Component {
               // totalAmount: grandNetAmount - sumreturnedAmout,
               payButtonEnable: grandNetAmount - sumreturnedAmout === 0 ? true : false,
               isRTApplied: true,
-              isCheckPromo : true,
+              isCheckPromo: true,
               grandNetAmount: parseFloat(this.state.grandNetAmount - sumreturnedAmout).toFixed(2)
             })
           } else if (grandNetAmount === sumreturnedAmout) {
             this.setState({
               isRTnumAplied: false,
               rtAmount: sumreturnedAmout,
+              enablePayment: false,
               payingAmount: parseFloat(this.state.rtAmount - grandNetAmount).toFixed(2),
               // totalAmount: grandNetAmount - sumreturnedAmout,
               payButtonEnable: grandNetAmount - sumreturnedAmout === 0 ? true : false,
@@ -1630,7 +1632,7 @@ class TextilePayment extends Component {
     return (
       <View style={styles.mainContainer}>
         {this.state.loading && <Loader loading={this.state.loading} />}
-        <Appbar style={styles.subContainer}>
+        <Appbar style={{ backgroundColor: color.white }}>
           <Appbar.BackAction
             onPress={() => this.handleBackButtonClick()}
           />
@@ -1638,155 +1640,168 @@ class TextilePayment extends Component {
         </Appbar>
 
         <ScrollView>
-          <View style={styles.container}>
+          <View>
+            {this.state.enablePayment && (
+              <>
+                <Text style={[scss.textStyleMedium, { margin: 5, color: '#828282' }]}> SELECT A MODE TO PAY ₹ {(parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString()} </Text>
+                <FlatList
+                  style={[scss.flatList, { height: Device.isTablet ? 130 : 100 }]}
+                  horizontal
+                  data={data}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
+                  renderItem={({ item, index }) => {
+                    if (item.key === 1) {
+                      return <View style={{
+                        height: Device.isTablet ? 80 : 50,
+                        width: Device.isTablet ? 80 : 50,
+                        backgroundColor: "#ffffff",
+                        borderRadius: 25,
+                        marginLeft: 10,
+                        marginTop: 10,
 
-            <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 15 }}> SELECT A MODE TO PAY ₹ {(parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString()} </Text>
-            <FlatList
-              style={styles.flatListContainer}
-              horizontal
-              data={data}
-              showsVerticalScrollIndicator={false}
-              showsHorizontalScrollIndicator={false}
-              renderItem={({ item, index }) => {
-                if (item.key === 1) {
-                  return <View style={{
-                    height: Device.isTablet ? 80 : 50,
-                    width: Device.isTablet ? 80 : 50,
-                    backgroundColor: "#ffffff",
-                    borderRadius: 25,
-                    marginLeft: 10,
-                    marginTop: 10,
+                      }}>
+                        <TouchableOpacity style={{
+                          marginLeft: 0, marginTop: 0,
+                        }} onPress={() => this.cashAction()}
+                          disabled={parseFloat(this.state.grandNetAmount) === 0}
+                        >
+                          <Image source={this.state.isCash ? require('../assets/images/cashselect.png') : require('../assets/images/cashunselect.png')} style={{
+                            marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
+                          }} />
+                        </TouchableOpacity>
+                        <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: Device.isTablet ? 19 : 14, color: this.state.isCash ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
+                          CASH
+                        </Text>
 
-                  }}>
-                    <TouchableOpacity style={{
-                      marginLeft: 0, marginTop: 0,
-                    }} onPress={() => this.cashAction()}>
-                      <Image source={this.state.isCash ? require('../assets/images/cashselect.png') : require('../assets/images/cashunselect.png')} style={{
-                        marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
-                      }} />
-                    </TouchableOpacity>
-                    <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: Device.isTablet ? 19 : 14, color: this.state.isCash ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
-                      CASH
-                    </Text>
+                      </View>;
+                    }
+                    if (item.key === 2) {
+                      return <View style={{
+                        height: Device.isTablet ? 80 : 50,
+                        width: Device.isTablet ? 80 : 50,
+                        backgroundColor: "#ffffff",
+                        borderRadius: 25,
+                        marginLeft: 20,
+                        marginTop: 10,
 
-                  </View>;
-                }
-                if (item.key === 2) {
-                  return <View style={{
-                    height: Device.isTablet ? 80 : 50,
-                    width: Device.isTablet ? 80 : 50,
-                    backgroundColor: "#ffffff",
-                    borderRadius: 25,
-                    marginLeft: 20,
-                    marginTop: 10,
+                      }}>
+                        <TouchableOpacity style={{
+                          marginLeft: 0, marginTop: 0,
+                        }} onPress={() => this.cardAction()}
+                          disabled={parseFloat(this.state.grandNetAmount) === 0}
+                        >
+                          <Image source={this.state.isCard ? require('../assets/images/cardselect.png') : require('../assets/images/cardunselect.png')} style={{
+                            marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
+                          }} />
+                        </TouchableOpacity>
+                        <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: Device.isTablet ? 19 : 14, color: this.state.isCard ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
+                          CARD
+                        </Text>
 
-                  }}>
-                    <TouchableOpacity style={{
-                      marginLeft: 0, marginTop: 0,
-                    }} onPress={() => this.cardAction()}>
-                      <Image source={this.state.isCard ? require('../assets/images/cardselect.png') : require('../assets/images/cardunselect.png')} style={{
-                        marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
-                      }} />
-                    </TouchableOpacity>
-                    <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: Device.isTablet ? 19 : 14, color: this.state.isCard ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
-                      CARD
-                    </Text>
+                      </View>;
+                    }
+                    if (item.key === 3) {
+                      return <View style={{
+                        height: Device.isTablet ? 80 : 50,
+                        width: Device.isTablet ? 80 : 50,
+                        backgroundColor: "#ffffff",
+                        borderRadius: 25,
+                        marginLeft: 20,
+                        marginTop: 10,
 
-                  </View>;
-                }
-                if (item.key === 3) {
-                  return <View style={{
-                    height: Device.isTablet ? 80 : 50,
-                    width: Device.isTablet ? 80 : 50,
-                    backgroundColor: "#ffffff",
-                    borderRadius: 25,
-                    marginLeft: 20,
-                    marginTop: 10,
+                      }}>
+                        <TouchableOpacity style={{
+                          marginLeft: 0, marginTop: 0,
+                        }} onPress={() => this.qrAction()}
+                          disabled={parseFloat(this.state.grandNetAmount) === 0}
+                        >
+                          <Image source={this.state.isCardOrCash ? require('../assets/images/qrselect.png') : require('../assets/images/qrunselect.png')} style={{
+                            marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
+                          }} />
+                        </TouchableOpacity>
+                        <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, width: Device.isTablet ? 70 : 50, fontSize: Device.isTablet ? 19 : 14, color: this.state.isCardOrCash ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
+                          CASH&CARD
+                        </Text>
 
-                  }}>
-                    <TouchableOpacity style={{
-                      marginLeft: 0, marginTop: 0,
-                    }} onPress={() => this.qrAction()}>
-                      <Image source={this.state.isCardOrCash ? require('../assets/images/qrselect.png') : require('../assets/images/qrunselect.png')} style={{
-                        marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
-                      }} />
-                    </TouchableOpacity>
-                    <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, width: Device.isTablet ? 70 : 50, fontSize: Device.isTablet ? 19 : 14, color: this.state.isCardOrCash ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
-                      CASH&CARD
-                    </Text>
+                      </View>;
 
-                  </View>;
+                    }
+                    if (item.key === 4) {
+                      return <View style={{
+                        height: Device.isTablet ? 80 : 50,
+                        width: Device.isTablet ? 80 : 50,
+                        backgroundColor: "#ffffff",
+                        borderRadius: 25,
+                        marginLeft: 20,
+                        marginTop: 10,
 
-                }
-                if (item.key === 4) {
-                  return <View style={{
-                    height: Device.isTablet ? 80 : 50,
-                    width: Device.isTablet ? 80 : 50,
-                    backgroundColor: "#ffffff",
-                    borderRadius: 25,
-                    marginLeft: 20,
-                    marginTop: 10,
+                      }}>
+                        <TouchableOpacity style={{
+                          marginLeft: 0, marginTop: 0,
+                        }} onPress={() => this.upiAction()}
+                          disabled={parseFloat(this.state.grandNetAmount) === 0}>
+                          <Image source={this.state.isUpi ? require('../assets/images/upiselect.png') : require('../assets/images/upiunselect.png')} style={{
+                            marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
+                          }} />
+                        </TouchableOpacity>
+                        <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: Device.isTablet ? 19 : 14, color: this.state.isUpi ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
+                          UPI
+                        </Text>
 
-                  }}>
-                    <TouchableOpacity style={{
-                      marginLeft: 0, marginTop: 0,
-                    }} onPress={() => this.upiAction()}>
-                      <Image source={this.state.isUpi ? require('../assets/images/upiselect.png') : require('../assets/images/upiunselect.png')} style={{
-                        marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
-                      }} />
-                    </TouchableOpacity>
-                    <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: Device.isTablet ? 19 : 14, color: this.state.isUpi ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
-                      UPI
-                    </Text>
+                      </View>;
+                    }
+                    if (item.key === 5 && this.state.isTagCustomer) {
+                      return <View style={{
+                        height: Device.isTablet ? 80 : 50,
+                        width: Device.isTablet ? 80 : 50,
+                        backgroundColor: "#ffffff",
+                        borderRadius: 25,
+                        marginLeft: 20,
+                        marginTop: 10,
+                      }}>
+                        <TouchableOpacity style={{
+                          marginLeft: 0, marginTop: 0,
+                        }} onPress={() => this.khataAction()}
+                          disabled={parseFloat(this.state.grandNetAmount) === 0}
+                        >
+                          <Image source={this.state.isKhata ? require('../assets/images/kathaselect.png') : require('../assets/images/kathaunselect.png')} style={{
+                            marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
+                          }} />
+                        </TouchableOpacity>
+                        <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: Device.isTablet ? 19 : 14, color: this.state.isKhata ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
+                          KHATA
+                        </Text>
 
-                  </View>;
-                }
-                if (item.key === 5 && this.state.isTagCustomer) {
-                  return <View style={{
-                    height: Device.isTablet ? 80 : 50,
-                    width: Device.isTablet ? 80 : 50,
-                    backgroundColor: "#ffffff",
-                    borderRadius: 25,
-                    marginLeft: 20,
-                    marginTop: 10,
-                  }}>
-                    <TouchableOpacity style={{
-                      marginLeft: 0, marginTop: 0,
-                    }} onPress={() => this.khataAction()}>
-                      <Image source={this.state.isKhata ? require('../assets/images/kathaselect.png') : require('../assets/images/kathaunselect.png')} style={{
-                        marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
-                      }} />
-                    </TouchableOpacity>
-                    <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: Device.isTablet ? 19 : 14, color: this.state.isKhata ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
-                      KHATA
-                    </Text>
-
-                  </View>;
-                }
-                if (item.key === 6 && this.state.isCreditFlag) {
-                  return <View style={{
-                    height: Device.isTablet ? 80 : 50,
-                    width: Device.isTablet ? 80 : 50,
-                    backgroundColor: "#ffffff",
-                    borderRadius: 25,
-                    marginLeft: 20,
-                    marginTop: 10,
-                  }}>
-                    <TouchableOpacity style={{
-                      marginLeft: 0, marginTop: 0,
-                    }} onPress={() => this.creditAction()}>
-                      <Image source={this.state.isCredit ? require('../assets/images/kathaselect.png') : require('../assets/images/kathaunselect.png')} style={{
-                        marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
-                      }} />
-                    </TouchableOpacity>
-                    <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: Device.isTablet ? 19 : 14, color: this.state.isCredit ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
-                      CREDIT
-                    </Text>
-                  </View>;
-                }
-              }}
-              ListFooterComponent={<View style={{ width: 15 }}></View>}
-            />
+                      </View>;
+                    }
+                    if (item.key === 6 && this.state.isCreditFlag) {
+                      return <View style={{
+                        height: Device.isTablet ? 80 : 50,
+                        width: Device.isTablet ? 80 : 50,
+                        backgroundColor: "#ffffff",
+                        borderRadius: 25,
+                        marginLeft: 20,
+                        marginTop: 10,
+                      }}>
+                        <TouchableOpacity style={{
+                          marginLeft: 0, marginTop: 0,
+                        }} onPress={() => this.creditAction()}
+                          disabled={parseFloat(this.state.grandNetAmount) === 0}>
+                          <Image source={this.state.isCredit ? require('../assets/images/kathaselect.png') : require('../assets/images/kathaunselect.png')} style={{
+                            marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
+                          }} />
+                        </TouchableOpacity>
+                        <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: Device.isTablet ? 19 : 14, color: this.state.isCredit ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
+                          CREDIT
+                        </Text>
+                      </View>;
+                    }
+                  }}
+                  ListFooterComponent={<View style={{ width: 15 }}></View>}
+                />
+              </>
+            )}
 
             <View style={{ flexDirection: 'row' }}>
               <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isBillLevel ? color.disableBackGround : color.accent }]}
@@ -1808,72 +1823,71 @@ class TextilePayment extends Component {
                 </Text>
               </TouchableOpacity>
             </View>
-            {
-              this.state.billmodelPop && (
-                <View>
-                  <Modal style={{ margin: 0 }} isVisible={this.state.billmodelPop}
-                    onBackButtonPress={() => this.billDiscountModelCancel()}
-                    onBackdropPress={() => this.billDiscountModelCancel()}
-                  >
-                    <View style={[forms.filterModelContainer, { width: '100%' }]}>
-                      <Text style={forms.popUp_decorator}>-</Text>
-                      <View style={forms.filterModelSub}>
-                        <TextInput
-                          style={forms.input_fld}
-                          mode="flat"
-                          activeUnderlineColor='#000'
-                          underlineColor={'#6f6f6f'}
-                          label={I18n.t("AMOUNT *")}
-                          keyboardType={'numeric'}
-                          value={this.state.manualDisc}
-                          onChangeText={(text) =>
-                            this.handleDiscountAmount(text)
-                          }
-                        />
-                        {!this.state.discountAmountValid && (
-                          <Message imp={true} message={this.state.errors["discountAmount"]} />
-                        )}
 
-                        <TextInput
-                          style={forms.input_fld}
-                          mode="flat"
-                          activeUnderlineColor='#000'
-                          underlineColor={'#6f6f6f'}
-                          label={I18n.t("APPROVED BY *")}
-                          value={this.state.approvedBy}
-                          onChangeText={(text) => this.handleApprovedBy(text)}
+            {this.state.billmodelPop && (
+              <View>
+                <Modal style={{ margin: 0 }} isVisible={this.state.billmodelPop}
+                  onBackButtonPress={() => this.billDiscountModelCancel()}
+                  onBackdropPress={() => this.billDiscountModelCancel()}
+                >
+                  <View style={[forms.filterModelContainer, { width: '100%' }]}>
+                    <Text style={forms.popUp_decorator}>-</Text>
+                    <View style={forms.filterModelSub}>
+                      <TextInput
+                        style={forms.input_fld}
+                        mode="flat"
+                        activeUnderlineColor='#000'
+                        underlineColor={'#6f6f6f'}
+                        label={I18n.t("AMOUNT *")}
+                        keyboardType={'numeric'}
+                        value={this.state.manualDisc}
+                        onChangeText={(text) =>
+                          this.handleDiscountAmount(text)
+                        }
+                      />
+                      {!this.state.discountAmountValid && (
+                        <Message imp={true} message={this.state.errors["discountAmount"]} />
+                      )}
+
+                      <TextInput
+                        style={forms.input_fld}
+                        mode="flat"
+                        activeUnderlineColor='#000'
+                        underlineColor={'#6f6f6f'}
+                        label={I18n.t("APPROVED BY *")}
+                        value={this.state.approvedBy}
+                        onChangeText={(text) => this.handleApprovedBy(text)}
+                      />
+                      <View style={[Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile, { width: "92%" }]}>
+                        <RNPickerSelect
+                          placeholder={{ label: 'REASON *', value: '' }}
+                          Icon={() => {
+                            return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
+                          }}
+                          items={
+                            this.state.discReasons
+                          }
+                          onValueChange={this.handleDiscountReason}
+                          style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
+                          value={this.state.reasonDiscount}
+                          useNativeAndroidPickerStyle={false}
                         />
-                        <View style={[Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile, { width: "92%" }]}>
-                          <RNPickerSelect
-                            placeholder={{ label: 'REASON *', value: '' }}
-                            Icon={() => {
-                              return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-                            }}
-                            items={
-                              this.state.discReasons
-                            }
-                            onValueChange={this.handleDiscountReason}
-                            style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
-                            value={this.state.reasonDiscount}
-                            useNativeAndroidPickerStyle={false}
-                          />
-                        </View>
-                        <View style={forms.action_buttons_container}>
-                          <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
-                            onPress={() => this.billDiscount()}>
-                            <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
-                            onPress={() => this.billDiscountModelCancel()}>
-                            <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
-                          </TouchableOpacity>
-                        </View>
+                      </View>
+                      <View style={forms.action_buttons_container}>
+                        <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                          onPress={() => this.billDiscount()}>
+                          <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                          onPress={() => this.billDiscountModelCancel()}>
+                          <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                        </TouchableOpacity>
                       </View>
                     </View>
-                  </Modal>
-                </View >
-              )
-            }
+                  </View>
+                </Modal>
+              </View >
+            )}
 
             {this.state.isBillLevel === false &&
               <>
@@ -1893,7 +1907,7 @@ class TextilePayment extends Component {
                     <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('CLEAR')} </Text>
                   </TouchableOpacity>
                 )}
-                <TextInput style={styles.input}
+                <TextInput
                   underlineColor="transparent"
                   label="ENTER RT NUMBER"
                   activeUnderlineColor='#000'
@@ -2013,7 +2027,7 @@ class TextilePayment extends Component {
                   <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('CLEAR')} </Text>
                 </TouchableOpacity>
               )}
-              <TextInput style={styles.input}
+              <TextInput
                 underlineColor="transparent"
                 label="Enter coupon code"
                 activeUnderlineColor='#000'
@@ -2047,17 +2061,16 @@ class TextilePayment extends Component {
             </View>
             }
             {(this.state.isCash === true || this.state.isCardOrCash === true) && (
-              <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 10 }}> {('CASH SUMMARY')} </Text>
+              <Text style={[scss.textStyleMedium, { color: '#828282', marginLeft: 10, marginTop: 10 }]}> {('CASH SUMMARY')} </Text>
             )}
 
             {(this.state.isCash === true || this.state.isCardOrCash === true) && (
-              <TextInput style={styles.input}
+              <TextInput
                 underlineColor="transparent"
                 activeUnderlineColor='#000'
                 label="Recieved Amount"
                 keyboardType='numeric'
                 value={this.state.recievedAmount}
-                //  onEndEditing
                 onChangeText={(text) => this.handlerecievedAmount(text)} />
               // onEndEditing={() => this.endEditing()}
             )}
@@ -2075,55 +2088,7 @@ class TextilePayment extends Component {
               </TouchableOpacity>
             )}
 
-            {/* {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.giftvoucher !== "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash === 0 && (
-              <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: this.state.showVerified === true ? '#28D266' : "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
-                onPress={() => this.verifycash()} >
-                {this.state.showVerified === true ?
-                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFIED')} </Text> :
-                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>}
-              </TouchableOpacity>
-            )}
-
-            {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.giftvoucher !== "" && this.state.loyaltyPoints === "" && this.state.verifiedCash === 0 && (
-              <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: this.state.showVerified === true ? '#28D266' : "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
-                onPress={() => this.verifycash()} >
-                {this.state.showVerified === true ?
-                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFIED')} </Text> :
-                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>}
-              </TouchableOpacity>
-            )}
-
-            {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.giftvoucher === "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash === 0 && (
-              <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: this.state.showVerified === true ? '#28D266' : "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
-                onPress={() => this.verifycash()} >
-                {this.state.showVerified === true ?
-                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFIED')} </Text> :
-                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>}
-              </TouchableOpacity>
-            )} */}
-
-            {/* {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.showVerified === true && (
-              <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
-              >
-                <Image style={{ position: 'absolute', right: Device.isTablet ? 83 : 68, top: Device.isTablet ? 11 : 9 }} source={require('../assets/images/applied.png')} />
-
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
-
-              </TouchableOpacity>
-            )} */}
-
-            {/* {(this.state.isCash === true || this.state.isCardOrCash === true) && this.state.verifiedCash !== 0 && (
-              <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10 }}> RETURN AMOUNT  ₹{this.state.returnAmount} </Text>
-
-              </View>
-            )} */}
-
-            {this.state.flagredeem && (
+            {/* {this.state.flagredeem && (
               <View>
                 <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
                   onBackButtonPress={() => this.modelCancel()}
@@ -2173,7 +2138,7 @@ class TextilePayment extends Component {
                     }}> Please enter how many points you want to redeem? </Text>
 
                     <View style={{ marginTop: 30, width: deviceWidth, }}>
-                      <TextInput style={styles.modelinput}
+                      <TextInput 
                         underlineColor="transparent"
                         activeUnderlineColor='#000'
                         label="ENTER POINTS"
@@ -2215,7 +2180,7 @@ class TextilePayment extends Component {
                     </TouchableOpacity>
                   </View>
                 </Modal>
-              </View>)}
+              </View>)} */}
 
 
             {this.state.upiToCustomerModel && (
@@ -2470,139 +2435,58 @@ class TextilePayment extends Component {
 
 
             <View style={{ width: deviceWidth, height: Device.isTablet ? 500 : 350, backgroundColor: '#FFFFFF', marginTop: 10, flexDirection: 'column', justifyContent: 'space-around' }}>
-              <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
-                <Text style={{
-                  color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                  fontSize: Device.isTablet ? 19 : 14,
-                }}>
-                  Total Amount </Text>
-                <Text style={{
-                  color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                  fontSize: Device.isTablet ? 19 : 14,
-                }}>
-                  ₹ {this.state.netPayableAmount} </Text>
+              <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                <Text style={scss.textStyleMedium}>Total Amount </Text>
+                <Text style={scss.textStyleMedium}>₹ {this.state.netPayableAmount} </Text>
               </View>
               {this.state.isTaxIncluded !== 'null' &&
-                <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
-                  <Text style={{
-                    color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                    fontSize: Device.isTablet ? 19 : 14,
-                  }}>
-                    CGST </Text>
-                  <Text style={{
-                    color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-
-                    fontSize: Device.isTablet ? 19 : 14,
-                  }}>
-                    ₹ {this.state.CGST} </Text>
+                <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                  <Text style={scss.textStyleMedium}>  CGST </Text>
+                  <Text style={scss.textStyleMedium}>₹ {this.state.CGST} </Text>
                 </View>}
               {this.state.isTaxIncluded !== 'null' &&
-                <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
-                  <Text style={{
-                    color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                    fontSize: Device.isTablet ? 19 : 14,
-                  }}>
-                    SGST </Text>
-                  <Text style={{
-                    color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                    fontSize: Device.isTablet ? 19 : 14,
-                  }}>
-                    ₹  {this.state.SGST} </Text>
+                <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                  <Text style={scss.textStyleMedium}>  SGST </Text>
+                  <Text style={scss.textStyleMedium}>₹  {this.state.SGST} </Text>
                 </View>}
 
-              <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
-                <Text style={{
-                  color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                  fontSize: Device.isTablet ? 19 : 14,
-                }}>
-                  Total Amount </Text>
-                <Text style={{
-                  color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                  fontSize: Device.isTablet ? 19 : 14,
-                }}>
-                  ₹  {this.state.totalAmount} </Text>
+              <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                <Text style={scss.textStyleMedium}> Total Amount </Text>
+                <Text style={scss.textStyleMedium}> ₹  {this.state.totalAmount} </Text>
               </View>
 
-              <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
-                <Text style={{
-                  color: "#2ADC09", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                  fontSize: Device.isTablet ? 19 : 14,
-                }}>
-                  Promo Discount </Text>
-                <Text style={{
-                  color: "#2ADC09", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                  fontSize: Device.isTablet ? 19 : 14,
-                }}>
-                  ₹  {this.state.totalPromoDisc} </Text>
+              <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                <Text style={[scss.textStyleMedium, { color: "#2ADC09" }]}>Promo Discount </Text>
+                <Text style={[scss.textStyleMedium, { color: "#2ADC09" }]}> ₹  {this.state.totalPromoDisc} </Text>
               </View>
 
-              <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
-                <Text style={{
-                  color: "#353C40", fontFamily: "bold", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                  fontSize: 20,
-                }}>
-                  Payable Amount </Text>
-                <Text style={{
-                  color: "#353C40", fontFamily: "bold", alignItems: 'center', fontSize: 20, justifyContent: 'center', textAlign: 'center',
-                  fontSize: 20,
-                }}>
-                  ₹ {this.state.grandNetAmount}
+              <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                <Text style={scss.textStyleMedium}>Payable Amount </Text>
+                <Text style={scss.textStyleMedium}>₹ {this.state.grandNetAmount}
                 </Text>
               </View>
               {this.state.isBillLevel &&
-                <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
-                  <Text style={{
-                    color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                    fontSize: Device.isTablet ? 19 : 14,
-                  }}>
-                    Billing Discount </Text>
-                  <Text style={{
-                    color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                    fontSize: Device.isTablet ? 19 : 14,
-                  }}>
-                    ₹  {this.state.manualDisc} </Text>
+                <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                  <Text style={scss.textStyleMedium}>Billing Discount </Text>
+                  <Text style={scss.textStyleMedium}>₹  {this.state.manualDisc} </Text>
                 </View>}
 
               {this.state.khataAmount > 0 &&
-                <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
-                  <Text style={{
-                    color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                    fontSize: Device.isTablet ? 19 : 14,
-                  }}>
-                    Katha Amount </Text>
-                  <Text style={{
-                    color: "#353C40", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                    fontSize: Device.isTablet ? 19 : 14,
-                  }}>
-                    ₹  {this.state.khataAmount} </Text>
+                <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                  <Text style={scss.textStyleMedium}>Katha Amount </Text>
+                  <Text style={scss.textStyleMedium}> ₹  {(parseFloat(this.state.khataAmount).toFixed(2))} </Text>
                 </View>}
 
               {
                 this.state.isCreditAmount && (
                   <>
-                    <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
-                      <Text style={{
-                        color: "#353C40", fontFamily: "bold", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                        fontSize: 16,
-                      }}>
-                        Credit Amount </Text>
-                      <Text style={{
-                        color: "#353C40", fontFamily: "bold", alignItems: 'center', fontSize: 20, justifyContent: 'center', textAlign: 'center',
-                        fontSize: 16,
-                      }}>
-                        ₹ {this.state.creditAmount}</Text>
+                    <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                      <Text style={scss.textStyleMedium}>Credit Amount </Text>
+                      <Text style={scss.textStyleMedium}> ₹ {(parseFloat(this.state.creditAmount).toFixed(2))}</Text>
                     </View>
-                    <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
-                      <Text style={{
-                        color: "#353C40", fontFamily: "bold", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                        fontSize: 16,
-                      }}>
-                        Payed Amount </Text>
-                      <Text style={{
-                        color: "#353C40", fontFamily: "bold", alignItems: 'center', fontSize: 20, justifyContent: 'center', textAlign: 'center',
-                        fontSize: 16,
-                      }}>
-                        ₹ {this.state.payCreditAmount} </Text>
+                    <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                      <Text style={scss.textStyleMedium}> Payed Amount </Text>
+                      <Text style={scss.textStyleMedium}> ₹ {(parseFloat(this.state.payCreditAmount).toFixed(2))} </Text>
                     </View>
                   </>
                 )
@@ -2625,72 +2509,39 @@ class TextilePayment extends Component {
               } */}
               {this.state.returnAmount >= 0 && (
                 <>
-                  <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
-                    <Text style={{
-                      color: "#353C40", fontFamily: "bold", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                      fontSize: 16,
-                    }}>Collected Amount </Text>
-                    <Text style={{
-                      color: "#353C40", fontFamily: "bold", alignItems: 'center', fontSize: 20, justifyContent: 'center', textAlign: 'center',
-                      fontSize: 16,
-                    }}>
-                      ₹ {parseFloat(this.state.recievedAmount).toString()} </Text>
+                  <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                    <Text style={scss.textStyleMedium}>Collected Amount </Text>
+                    <Text style={scss.textStyleMedium}> ₹ {parseFloat(this.state.recievedAmount).toFixed(2)} </Text>
                   </View>
 
-                  <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
-                    <Text style={{
-                      color: "#FFAF4C", fontFamily: "bold", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                      fontSize: 16,
-                    }}>
-                      Return Amount </Text>
-                    <Text style={{
-                      color: "#FFAF4C", fontFamily: "bold", alignItems: 'center', fontSize: 20, justifyContent: 'center', textAlign: 'center',
-                      fontSize: 16,
-                    }}>
-                      ₹ {this.state.returnAmount} </Text>
+                  <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                    <Text style={[scss.textStyleMedium, { color: "#FFAF4C" }]}>Return Amount </Text>
+                    <Text style={[scss.textStyleMedium, { color: "#FFAF4C" }]}> ₹ {(parseFloat(this.state.returnAmount).toFixed(2))} </Text>
                   </View>
                 </>)}
               {
                 this.state.couponAmount > 0 && (
-                  <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
-                    <Text style={{
-                      color: "#2ADC09", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                      fontSize: Device.isTablet ? 19 : 14,
-                    }}>
-                      Coupon Applied </Text>
-                    <Text style={{
-                      color: "#2ADC09", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                      fontSize: Device.isTablet ? 19 : 14,
-                    }}>
-                      ₹  {this.state.couponAmount} </Text>
+                  <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                    <Text style={[scss.textStyleMedium, { color: "#2ADC09" }]}>Coupon Applied </Text>
+                    <Text style={[scss.textStyleMedium, { color: "#2ADC09" }]}> ₹ {(parseFloat(this.state.couponAmount).toFixed(2))} </Text>
                   </View>
                 )
               }
 
               {this.state.isRTApplied === true && (
-                <View style={{ flexDirection: "row", justifyContent: 'space-between', marginLeft: Device.isTablet ? 20 : 10, marginRight: Device.isTablet ? 20 : 10 }}>
-                  <Text style={{
-                    color: "#2ADC09", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                    fontSize: Device.isTablet ? 19 : 14,
-                  }}>
-                    RT Amount </Text>
-                  <Text style={{
-                    color: "#2ADC09", fontFamily: "medium", alignItems: 'center', justifyContent: 'center', textAlign: 'center',
-                    fontSize: Device.isTablet ? 19 : 14,
-                  }}>
-                    ₹  {this.state.rtAmount} </Text>
+                <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                  <Text style={[scss.textStyleMedium, { color: "#2ADC09" }]}>  RT Amount </Text>
+                  <Text style={[scss.textStyleMedium, { color: "#2ADC09" }]}>₹  {(parseFloat(this.state.rtAmount).toFixed(2))} </Text>
                 </View>
               )}
 
               <View></View>
-              <View style={styles.TopcontainerforPay}>
+              <View style={forms.action_buttons_container}>
                 <TouchableOpacity
-                  style={[styles.signInButton, {
-                    backgroundColor: !this.state.payButtonEnable ? color.disableBackGround : color.accent
-                  }]}
+                  style={[forms.action_buttons, forms.submit_btn, { width: "95%" }]}
                   disabled={!this.state.payButtonEnable}
                   onPress={() => this.pay()} >
-                  <Text style={styles.signInButtonText}> Pay </Text>
+                  <Text style={forms.submit_btn_text}> Pay </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -2712,55 +2563,6 @@ const styles = StyleSheet.create({
   },
   subContainer: {
     backgroundColor: '#FFFFFF'
-  },
-  filterMainContainer: {
-    marginLeft: -40,
-    marginRight: -40,
-    backgroundColor: '#ffffff',
-    paddingLeft: Device.isTablet ? 0 : 20,
-    marginTop: Device.isTablet ? deviceheight - 400 : deviceheight - 300,
-    height: Device.isTablet ? 500 : 440,
-  },
-  modelCloseImage: {
-    position: 'absolute',
-    top: 10,
-    right: Device.isTablet ? 15 : 30,
-  },
-  TopcontainerforPay: {
-    flexDirection: 'row',
-    marginLeft: 0,
-    marginRight: 0,
-    // marginTop: 10,
-    width: '100%',
-    backgroundColor: '#ffffff',
-    borderColor: 'lightgray',
-    borderRadius: 0,
-    // height: 50,
-    // position: 'absolute',
-    // bottom: 0,
-  },
-  signInButton: {
-    justifyContent: 'center',
-    width: '95%',
-    marginLeft: 10,
-    height: 40,
-    borderRadius: 10,
-    fontWeight: 'bold',
-    margin: 5,
-    // alignSelf:'center',
-    // marginBottom:100,
-  },
-  signInButtonText: {
-    color: 'white',
-    alignSelf: 'center',
-    fontSize: Device.isTablet ? 19 : 14,
-    fontFamily: "regular",
-  },
-  flatListContainer: {
-    marginTop: 20,
-    backgroundColor: '#ffffff',
-    height: Device.isTablet ? 130 : 100,
-    width: deviceWidth,
   },
   rnSelectContainer_tablet: {
     justifyContent: 'center',
