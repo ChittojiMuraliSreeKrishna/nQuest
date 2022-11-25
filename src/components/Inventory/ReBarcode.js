@@ -418,7 +418,7 @@ export default class ReBarcode extends Component {
                         </View>
                         <View style={scss.model_text_container}>
                           <Text variant="bodyLarge">Name: {item.name}</Text>
-                          <Text variant="bodyLarge">Price: {item.itemMrp}</Text>
+                          <Text variant="bodyLarge">Price: {parseFloat(item.itemMrp).toFixed(2)}</Text>
                         </View>
                         <View style={scss.model_text_container}>
                           <Text variant="bodyLarge">Batch No: {item.batchNo}</Text>
@@ -440,7 +440,7 @@ export default class ReBarcode extends Component {
                               </View>
                               <View style={scss.model_text_container}>
                                 <Text variant="bodyMedium">Colour: {item.colour}</Text>
-                                <Text variant="bodyMedium">costPrice: {item.costPrice}</Text>
+                                <Text variant="bodyMedium">costPrice: {parseFloat(item.costPrice).toFixed(2)}</Text>
                               </View>
                               <View style={scss.model_text_container}>
                                 <Text variant="bodyMedium">Uom: {item.uom}</Text>
@@ -448,7 +448,7 @@ export default class ReBarcode extends Component {
                               </View>
                               <View style={scss.model_text_container}>
                                 <Text variant="bodyMedium">EMP Id: {item.empId}</Text>
-                                <Text variant="bodyMedium">VendorTax: {item.vendorTax}</Text>
+                                <Text variant="bodyMedium">VendorTax: {parseFloat(item.vendorTax).toFixed(2)}</Text>
                               </View>
                               {item.domainType === "Retail" && (
                                 <View style={scss.model_text_container}>

@@ -58,7 +58,7 @@ export default class ProductCombo extends Component {
     };
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     const storeId = await AsyncStorage.getItem("storeId");
     this.setState({ storeId: parseInt(storeId) });
     this.getAllProductsCombo();
@@ -68,13 +68,13 @@ export default class ProductCombo extends Component {
   }
 
   // Refreshing the codes
-  refresh () {
+  refresh() {
     this.setState({ productComboList: [] }, () => {
       this.getAllProductsCombo();
     });
   }
 
-  async getAllProductsCombo () {
+  async getAllProductsCombo() {
     this.setState({ loading: true, loadMoreActive: false });
     const { storeId, fromDate, toDate, pageNo } = this.state;
     let params = "?storeId=" + (storeId) + "&page=" + (pageNo) + "&size=10";
@@ -96,24 +96,24 @@ export default class ProductCombo extends Component {
       });
   }
 
-  filterAction () {
+  filterAction() {
     this.setState({ flagFilterOpen: true, modalVisible: true });
   }
 
-  clearFilterAction () {
+  clearFilterAction() {
     this.setState({ filterActive: false, flagFilterOpen: false, filteredProductsList: [], startDate: "", endDate: "" });
   }
 
-  modelCancel () {
+  modelCancel() {
     this.setState({ modalVisible: false, flagViewProduct: false, flagFilterOpen: false, viewProductData: [] });
   }
 
   // Date Actions
-  datepickerClicked () {
+  datepickerClicked() {
     this.setState({ datepickerOpen: true });
   }
 
-  enddatepickerClicked () {
+  enddatepickerClicked() {
     this.setState({ datepickerendOpen: true });
   }
 
@@ -137,7 +137,7 @@ export default class ProductCombo extends Component {
     this.setState({ endDate: value });
   };
 
-  handleAddProductCombo () {
+  handleAddProductCombo() {
     this.props.navigation.navigate("AddProduct", {
       isEdit: false,
       goBack: () => this.refresh(),
@@ -145,7 +145,7 @@ export default class ProductCombo extends Component {
     });
   }
 
-  applyBarcodeFilter () {
+  applyBarcodeFilter() {
     const { startDate, endDate, storeId, filterPageNo } = this.state;
     this.setState({ loadMoreActive: false });
     const filParams = `?storeId=${storeId}&fromDate=${startDate ? startDate : null}&page=${parseInt(filterPageNo)}&size=10`;
@@ -169,7 +169,7 @@ export default class ProductCombo extends Component {
     );
   }
 
-  viewProductActon (data, index) {
+  viewProductActon(data, index) {
     this.state.viewProductData.push({ data });
     this.setState({
       viewProductData: this.state.viewProductData,
@@ -177,7 +177,7 @@ export default class ProductCombo extends Component {
       flagViewProduct: true,
     });
     // console.log({ item }, item.barcode)
-    console.log(this.state.viewProductData[ 0 ].data.productTextiles);
+    console.log(this.state.viewProductData[0].data.productTextiles);
   }
 
   modalHandleForClose = () => {
@@ -217,7 +217,7 @@ export default class ProductCombo extends Component {
     }
   };
 
-  continuePagination () {
+  continuePagination() {
     if (this.state.filterActive) {
       if (this.state.totalPages > 1) {
         this.setState({ loadMoreActive: true });
@@ -234,7 +234,7 @@ export default class ProductCombo extends Component {
     }
   }
 
-  render () {
+  render() {
     return (
       <View>
         {this.state.loading && <Loader loading={this.state.loading} />}
@@ -307,7 +307,7 @@ export default class ProductCombo extends Component {
                       <Text style={scss.textStyleLight}>
                         No.of Items: {item.bundleQuantity}
                       </Text>
-                      <Text style={scss.textStyleLight}>Unit Price: {parseFloat(item.itemMrp)}</Text>
+                      <Text style={scss.textStyleLight}>Unit Price: {parseFloat(item.itemMrp).toFixed(2)}</Text>
                     </View>
                     <View style={scss.flatListFooter}>
                       <Text style={scss.footerText} selectable={true} >{item.barcode}</Text>
@@ -334,14 +334,14 @@ export default class ProductCombo extends Component {
                   {this.state.loadPrevActive && (
                     <View style={scss.page_navigation_subcontainer}>
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(0)}
                         name="chevron-double-left"
                         size={25}
                       />
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(this.state.pageNo - 1)}
                         name="chevron-left"
@@ -353,13 +353,13 @@ export default class ProductCombo extends Component {
                   {this.state.loadNextActive && (
                     <View style={scss.page_navigation_subcontainer}>
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         onPress={() => this.loadMoreList(this.state.pageNo + 1)}
                         name="chevron-right"
                         size={25}
                       />
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         onPress={() => this.loadMoreList(this.state.totalPages - 1)}
                         name="chevron-double-right"
                         size={25}
@@ -391,7 +391,7 @@ export default class ProductCombo extends Component {
                         </View>
                         <View style={scss.model_text_container}>
                           <Text variant="bodyLarge">Name: {item.data.name}</Text>
-                          <Text variant="bodyLarge">Price: {item.data.itemMrp}</Text>
+                          <Text variant="bodyLarge">Price: {parseFloat(item.data.itemMrp).toFixed(2)}</Text>
                         </View>
                         <View style={scss.model_subContainer}>
                           <ScrollView enableOnAndroid={true}>
@@ -403,7 +403,7 @@ export default class ProductCombo extends Component {
                                     <Text variant="bodyMedium">Name:  {data.name}</Text>
                                   </View>
                                   <View style={scss.model_text_container}>
-                                    <Text variant="bodyMedium">Price: {data.itemMrp}</Text>
+                                    <Text variant="bodyMedium">Price: {parseFloat(data.itemMrp).toFixed(2)}</Text>
                                     <Text variant="bodyMedium">Qty: {data.qty}</Text>
                                   </View>
                                   <View style={scss.model_text_container}>
@@ -486,11 +486,11 @@ export default class ProductCombo extends Component {
                       </View>
                     )}
                     <View style={forms.action_buttons_container}>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                         onPress={() => this.applyBarcodeFilter()}>
                         <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
                         onPress={() => this.modelCancel()}>
                         <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>

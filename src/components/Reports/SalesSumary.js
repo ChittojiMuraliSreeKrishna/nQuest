@@ -1,22 +1,19 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import DatePicker from 'react-native-date-picker';
+import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
 import { Appbar } from 'react-native-paper';
+import FilterIcon from 'react-native-vector-icons/FontAwesome';
+import forms from '../../commonUtils/assets/styles/formFields.scss';
+import scss from '../../commonUtils/assets/styles/style.scss';
+import DateSelector from '../../commonUtils/DateSelector';
 import { RH } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
-import FilterIcon from 'react-native-vector-icons/FontAwesome'
-import { flatListMainContainer, flatlistSubContainer, highText, textContainer, textStyleMedium, textStyleSmall } from '../Styles/Styles';
 import { color } from '../Styles/colorStyles';
 import { emptyTextStyle } from '../Styles/FormFields';
-import forms from '../../commonUtils/assets/styles/formFields.scss';
-import scss from '../../commonUtils/assets/styles/style.scss'
-import DateSelector from '../../commonUtils/DateSelector';
 
 
 var deviceWidth = Dimensions.get("window").width;
@@ -182,7 +179,7 @@ export class SalesSumary extends Component {
 
   clearFilterAction() {
     this.setState({
-      filterActive: false, flagFilterSalesSumary: false, modalVisible: false, startDate: "", endDate: "", dsList: []
+      filterActive: false, flagFilterSalesSumary: false, modalVisible: false, startDate: "", endDate: "", dsList: [], totMrp: null
     })
   }
 
@@ -200,6 +197,7 @@ export class SalesSumary extends Component {
               onPress={() => this.clearFilterAction()}
             /> :
             <FilterIcon
+              color='#000'
               name="sliders"
               size={25}
               style={{ marginRight: 10 }}
@@ -217,12 +215,23 @@ export class SalesSumary extends Component {
               return <View style={scss.flatListContainer}>
                 <View style={scss.flatListSubContainer}>
                   <View style={scss.textContainer}>
-                    <Text style={[scss.highText, { textAlign: 'left' }]} >{I18n.t("TRANSACTION")}: {"\n"}{item.transction} </Text>
-                    <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("TOTAL MRP")}: {"\n"}<Text style={scss.textStyleMedium}>₹ {item.totalMrp}</Text></Text>
+                    <Text style={[scss.textStyleLight, { textAlign: 'left' }]} >{I18n.t("TRANSACTION")}:{"\n"}<Text style={scss.highText}>{item.transction}</Text> </Text>
+                    <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("TOTAL MRP")}:{"\n"}<Text style={scss.textStyleMedium}>₹ {parseFloat(item.totalMrp).toFixed(2)}</Text></Text>
                   </View>
                   <View style={scss.textContainer}>
-                    <Text style={[scss.textStyleLight, { textAlign: 'left' }]}>{I18n.t("PROMO OFFER")}: {"\n"}<Text style={scss.textStyleMedium}>₹ {item.totalDiscount}</Text></Text>
-                    <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("INVOICE AMOUNT")}: {"\n"}<Text style={scss.textStyleMedium}>₹ {item.billValue}</Text></Text>
+                    <Text style={[scss.textStyleLight, { textAlign: 'left' }]}>{I18n.t("PROMO OFFER")}:{"\n"}<Text style={scss.textStyleMedium}>₹ {parseFloat(item.totalDiscount).toFixed(2)}</Text></Text>
+                    <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("INVOICE AMOUNT")}:{"\n"}<Text style={scss.textStyleMedium}>₹ {parseFloat(item.billValue).toFixed(2)}</Text></Text>
+                  </View>
+                  <View style={scss.textContainer}>
+                    <Text style={[scss.textStyleLight, { textAlign: 'left' }]}>{I18n.t("CGST")}:{"\n"}<Text style={scss.textStyleMedium}>₹ {parseFloat(item.totalCgst).toFixed(2)}</Text></Text>
+                    <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("SGST")}:{"\n"}<Text style={scss.textStyleMedium}>₹ {parseFloat(item.totalSgst).toFixed(2)}</Text></Text>
+                  </View>
+                  <View style={scss.textContainer}>
+                    <Text style={[scss.textStyleLight, { textAlign: 'left' }]}>{I18n.t("IGST")}:{"\n"}<Text style={scss.textStyleMedium}>₹ {parseFloat(item.totalIgst).toFixed(2)}</Text></Text>
+                    <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("CESS")}:{"\n"}<Text style={scss.textStyleMedium}>₹ {parseFloat(item.totalCess).toFixed(2)}</Text></Text>
+                  </View>
+                  <View style={scss.textContainer}>
+                    <Text style={[scss.textStyleLight, { textAlign: 'left' }]}>{I18n.t("STORE ID")}:{"\n"}<Text style={scss.textStyleMedium}>₹ {item.storeId}</Text></Text>
                   </View>
                 </View>
               </View>;
@@ -231,12 +240,23 @@ export class SalesSumary extends Component {
               return <View style={scss.flatListContainer} >
                 <View style={scss.flatListSubContainer}>
                   <View style={scss.textContainer}>
-                    <Text style={[scss.highText, { textAlign: 'left' }]} >{I18n.t("TRANSACTION")}: {"\n"}{item.transction} </Text>
-                    <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>TOTAL MRP: {"\n"}<Text style={scss.textStyleMedium}>₹ {item.totalMrp}</Text></Text>
+                    <Text style={[scss.textStyleLight, { textAlign: 'left' }]} >{I18n.t("TRANSACTION")}:{"\n"}<Text style={scss.highText}>{item.transction}</Text> </Text>
+                    <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>TOTAL MRP: {"\n"}<Text style={scss.textStyleMedium}>₹ {parseFloat(item.totalMrp).toFixed(2)}</Text></Text>
                   </View>
                   <View style={scss.textContainer}>
-                    <Text style={[scss.textStyleLight, { textAlign: 'left' }]}>{I18n.t("PROMO OFFER")}: {"\n"}<Text style={scss.textStyleMedium}>₹ {item.totalDiscount}</Text></Text>
-                    <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("INVOICE AMOUNT")}: {"\n"}<Text style={scss.textStyleMedium}>₹ {item.billValue}</Text></Text>
+                    <Text style={[scss.textStyleLight, { textAlign: 'left' }]}>{I18n.t("PROMO OFFER")}:{"\n"}<Text style={scss.textStyleMedium}>₹ {parseFloat(item.totalDiscount).toFixed(2)}</Text></Text>
+                    <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("INVOICE AMOUNT")}:{"\n"}<Text style={scss.textStyleMedium}>₹ {parseFloat(item.billValue).toFixed(2)}</Text></Text>
+                  </View>
+                  <View style={scss.textContainer}>
+                    <Text style={[scss.textStyleLight, { textAlign: 'left' }]}>{I18n.t("CGST")}:{"\n"}<Text style={scss.textStyleMedium}>₹ {parseFloat(item.totalCgst).toFixed(2)}</Text></Text>
+                    <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("SGST")}:{"\n"}<Text style={scss.textStyleMedium}>₹ {parseFloat(item.totalSgst).toFixed(2)}</Text></Text>
+                  </View>
+                  <View style={scss.textContainer}>
+                    <Text style={[scss.textStyleLight, { textAlign: 'left' }]}>{I18n.t("IGST")}:{"\n"}<Text style={scss.textStyleMedium}>₹ {parseFloat(item.totalIgst).toFixed(2)}</Text></Text>
+                    <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("CESS")}:{"\n"}<Text style={scss.textStyleMedium}>₹ {parseFloat(item.totalCess).toFixed(2)}</Text></Text>
+                  </View>
+                  <View style={scss.textContainer}>
+                    <Text style={[scss.textStyleLight, { textAlign: 'left' }]}>{I18n.t("STORE ID")}:{"\n"}<Text style={scss.textStyleMedium}>₹ {item.storeId}</Text></Text>
                   </View>
                 </View>
               </View>;
@@ -246,14 +266,14 @@ export class SalesSumary extends Component {
         />
 
         {this.state.totMrp !== null &&
-          <View style={[scss.flatListContainer, { backgroundColor: color.accent }]}>
+          <View style={[scss.flatListContainer, { backgroundColor: color.accentDull }]}>
             <View style={scss.flatListSubContainer}>
               <View style={scss.textContainer}>
-                <Text style={[scss.textStyleMedium, { color: color.white, textAlign: 'left' }]} >{I18n.t("TOTAL MRP")}: {"\n"}₹ {this.state.totMrp} </Text>
-                <Text style={[scss.textStyleMedium, { color: color.white, textAlign: 'right' }]}>{I18n.t("TOTAL PROMO OFFER")}:{"\n"}₹ {this.state.totalDiscount}</Text>
+                <Text style={[scss.textStyleLight, { textAlign: 'left' }]} >{I18n.t("TOTAL MRP")}:{"\n"} <Text style={scss.textStyleMedium}>₹ {parseFloat(this.state.totMrp).toFixed(2)}</Text>  </Text>
+                <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("TOTAL PROMO OFFER")}:{"\n"} <Text style={scss.textStyleMedium}>₹ {parseFloat(this.state.totalDiscount).toFixed(2)}</Text></Text>
               </View>
-              <View style={scss.textContainer}>
-                <Text style={[scss.textStyleMedium, { color: color.white, textAlign: 'left' }]}>{I18n.t("GRAND TOTAL")}: {"\n"}₹ {this.state.billValue}</Text>
+              <View style={[scss.textContainer, { justifyContent: 'center' }]}>
+                <Text style={[scss.textStyleMedium, { color: color.accent, textAlign: 'center' }]}>{I18n.t("GRAND TOTAL")}:{"\n"}₹ {parseFloat(this.state.billValue).toFixed(2)}</Text>
               </View>
             </View>
           </View>

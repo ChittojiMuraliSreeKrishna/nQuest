@@ -1,5 +1,6 @@
 export const color = {
   accent: '#ED1C24',
+  accentDull: '#ED1C2422',
   dark: "#353C40",
   lightDark: '#808080',
   light: '#FBFBFB',
@@ -14,6 +15,6 @@ export const color = {
   lightBorder: "#00000010",
   disabledBorder: "#A6A6A6",
   grey: "#6f6f6f",
-  mediumDark :'#B4B7B8',
-  disableBackGround:'#d0d0d0'
+  mediumDark: '#B4B7B8',
+  disableBackGround: '#d0d0d0'
 }

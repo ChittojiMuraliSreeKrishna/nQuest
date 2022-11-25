@@ -902,7 +902,7 @@ class AddBarcode extends Component {
                     <View>
                       <Text style={inputHeading}>{items.name}</Text>
                       <TextInput
-                        activeOutlineColor="#d6d6d6"
+                        activeUnderlineColor="#d6d6d6"
                         mode="flat"
                         style={[
                           forms.input_fld,
@@ -929,7 +929,7 @@ class AddBarcode extends Component {
             <View>
               <Text style={inputHeading}> {I18n.t("Brand Name")} </Text>
               <TextInput
-                activeOutlineColor="#d6d6d6"
+                activeUnderlineColor="#d6d6d6"
                 mode="flat"
                 style={[
                   forms.input_fld,
@@ -1003,7 +1003,7 @@ class AddBarcode extends Component {
             {I18n.t("Name")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
-            activeOutlineColor="#d6d6d6"
+            activeUnderlineColor="#d6d6d6"
             mode="flat"
             underlineColor={"#d6d6d6"}
             style={[
@@ -1024,7 +1024,7 @@ class AddBarcode extends Component {
             {I18n.t("Batch No")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
-            activeOutlineColor="#d6d6d6"
+            activeUnderlineColor="#d6d6d6"
             mode="flat"
             underlineColor={"#d6d6d6"}
             style={[
@@ -1045,7 +1045,7 @@ class AddBarcode extends Component {
             {I18n.t("Cost Price")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
-            activeOutlineColor="#d6d6d6"
+            activeUnderlineColor="#d6d6d6"
             mode="flat"
             underlineColor={"#d6d6d6"}
             style={[
@@ -1065,33 +1065,10 @@ class AddBarcode extends Component {
             onChangeText={this.handleCostPrice}
           />
           <Text style={inputHeading}>
-            {I18n.t("MRP")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
-          </Text>
-          <TextInput
-            activeOutlineColor="#d6d6d6"
-            mode="flat"
-            underlineColor={"#d6d6d6"}
-            style={[
-              forms.input_fld,
-              forms.active_fld,
-            ]}
-            underlineColorAndroid="transparent"
-            placeholder={I18n.t("MRP")}
-            keyboardType={"numeric"}
-            textContentType="telephoneNumber"
-            placeholderTextColor={"#676767"}
-            textAlignVertical="center"
-            autoCapitalize="none"
-            maxLength={10}
-            value={this.state.listPrice}
-            onChangeText={this.handleListPrice}
-            onBlur={this.handleListPriceValid}
-          />
-          <Text style={inputHeading}>
             {I18n.t("Vendor Tax")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
-            activeOutlineColor="#d6d6d6"
+            activeUnderlineColor="#d6d6d6"
             mode="flat"
             underlineColor={"#d6d6d6"}
             style={[
@@ -1109,6 +1086,29 @@ class AddBarcode extends Component {
             value={this.state.vendorTax}
             onChangeText={this.handleVendorTax}
             onBlur={this.handleVendorTaxValid}
+          />
+          <Text style={inputHeading}>
+            {I18n.t("MRP")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
+          </Text>
+          <TextInput
+            activeUnderlineColor="#d6d6d6"
+            mode="flat"
+            underlineColor={"#d6d6d6"}
+            style={[
+              forms.input_fld,
+              forms.active_fld,
+            ]}
+            underlineColorAndroid="transparent"
+            placeholder={I18n.t("MRP")}
+            keyboardType={"numeric"}
+            textContentType="telephoneNumber"
+            placeholderTextColor={"#676767"}
+            textAlignVertical="center"
+            autoCapitalize="none"
+            maxLength={10}
+            value={this.state.listPrice}
+            onChangeText={this.handleListPrice}
+            onBlur={this.handleListPriceValid}
           />
           <Text style={inputHeading}>
             {I18n.t("UOM")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -1174,7 +1174,7 @@ class AddBarcode extends Component {
             {I18n.t("EMP ID")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
-            activeOutlineColor="#000"
+            activeUnderlineColor="#000"
             mode="flat"
             underlineColor={"#d6d6d6"}
             keyboardType="numeric"
@@ -1225,7 +1225,7 @@ class AddBarcode extends Component {
             QTY <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
-            activeOutlineColor="#000"
+            activeUnderlineColor="#000"
             mode="flat"
             underlineColor={"#d6d6d6"}
             style={[
@@ -1246,7 +1246,7 @@ class AddBarcode extends Component {
             Barcode
           </Text>
           <TextInput
-            activeOutlineColor="#000"
+            activeUnderlineColor="#000"
             mode="flat"
             underlineColor={"#d6d6d6"}
             style={[

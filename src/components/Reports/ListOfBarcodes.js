@@ -290,7 +290,7 @@ export class ListOfBarcodes extends Component {
                   </View>
                   <View style={scss.textContainer}>
                     <Text style={scss.textStyleLight}>QTY: {"\n"} {item.qty}</Text>
-                    <Text style={scss.textStyleLight}>{I18n.t("MRP")}:{"\n"} {item.itemMrp}</Text>
+                    <Text style={scss.textStyleLight}>{I18n.t("MRP")}:{"\n"} {parseFloat(item.itemMrp).toFixed(2)}</Text>
                   </View>
                   <View style={scss.flatListFooter}>
                     <Text style={scss.footerText}>
@@ -529,8 +529,8 @@ export class ListOfBarcodes extends Component {
                               <Txt variant='bodyMedium' style={{ textAlign: 'right' }}>EmpId:{"\n"}{item.empId}</Txt>
                             </View>
                             <View style={scss.model_text_container}>
-                              <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>CostPrice:{"\n"}{item.costPrice}</Txt>
-                              <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>MRP:{"\n"}{item.itemMrp}</Txt>
+                              <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>CostPrice:{"\n"}{parseFloat(item.costPrice).toFixed(2)}</Txt>
+                              <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>MRP:{"\n"}{parseFloat(item.itemMrp).toFixed(2)}</Txt>
                             </View>
                             <View style={scss.model_text_container}>
                               <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>CreatedDate:{"\n"}{item.originalBarcodeCreatedAt}</Txt>

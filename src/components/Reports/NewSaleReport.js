@@ -114,7 +114,7 @@ export default class NewSaleReport extends Component {
         "dateFrom": this.state.startDate,
         "dateTo": this.state.endDate,
         invoiceNumber: this.state.invoiceNumber,
-        custMobileNumber: this.state.mobile,
+        custMobileNumber: this.state.mobile ? "+91" + this.state.mobile : this.state.mobile,
         billStatus: this.state.billPosition,
         storeId: this.state.storeId,
         domainId: this.state.domainId
@@ -236,7 +236,7 @@ export default class NewSaleReport extends Component {
   clearFilterAction() {
     this.setState({
       loadMoreActive: false, loadNextActive: false,
-      filterActive: false, newSale: [], fromDate: "", toDate: "", billPosition: "", invoiceNumber: "", mobileNumber: "", empId: ""
+      filterActive: false, newSale: [], fromDate: "", toDate: "", billPosition: "", invoiceNumber: "", mobileNumber: "", empId: "", startDate: "", endDate: "", mobile: ""
     });
   }
 
@@ -288,7 +288,7 @@ export default class NewSaleReport extends Component {
                   </View>
 
                   <View style={scss.textContainer}>
-                    <Text style={scss.textStyleLight} >{I18n.t("NET AMOUNT")}: ₹ {item.netPayableAmount} </Text>
+                    <Text style={scss.textStyleLight} >{I18n.t("NET AMOUNT")}: ₹ {parseFloat(item.netPayableAmount).toFixed(2)} </Text>
                   </View>
                   <View style={scss.flatListFooter}>
                     <Text style={scss.footerText}>
@@ -587,23 +587,23 @@ export default class NewSaleReport extends Component {
                                   </View>
                                   <View style={scss.model_text_container}>
                                     <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>QTY: {data.quantity}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>MRP: {data.itemPrice}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>MRP: {parseFloat(data.itemPrice).toFixed(2)}</Txt>
                                   </View>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>DISC: {data.discount}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>DISC: {data.discount ? parseFloat(data.discount).toFixed(2) : ""}</Txt>
                                     <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Approved By: {data.approvedBy}</Txt>
                                   </View>
                                   <View style={scss.model_text_container}>
                                     <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>Reason: {data.reason}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Tax Amount: {data.taxValue}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Tax Amount: {parseFloat(data.taxValue).toFixed(2)}</Txt>
                                   </View>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>CGST: {data.cgst}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>SGST: {data.sgst}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>CGST: {parseFloat(data.cgst).toFixed(2)}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>SGST: {parseFloat(data.sgst).toFixed(2)}</Txt>
                                   </View>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>IGST: {data.igst}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>NET: {data.netValue}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>IGST: {parseFloat(data.igst).toFixed(2)}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>NET: {parseFloat(data.netValue).toFixed(2)}</Txt>
                                   </View>
                                 </View>
                               );
@@ -612,19 +612,19 @@ export default class NewSaleReport extends Component {
                         </View>
                         <View style={{ backgroundColor: '#d9d9d980' }}>
                           <View style={scss.model_text_container}>
-                            <Text style={{ textAlign: 'left', fontWeight: 'bold' }}>MANUAL DISCOUNT:{"\n"}{item.totalManualDisc}</Text>
-                            <Text style={{ textAlign: 'right', fontWeight: 'bold' }}>INVOICE PROMO DISCOUNT:{"\n"}{item.totalPromoDisc}</Text>
+                            <Text style={{ textAlign: 'left', fontWeight: 'bold' }}>MANUAL DISCOUNT:{"\n"}{parseFloat(item.totalManualDisc).toFixed(2)}</Text>
+                            <Text style={{ textAlign: 'right', fontWeight: 'bold' }}>INVOICE PROMO DISCOUNT:{"\n"}{parseFloat(item.totalPromoDisc).toFixed(2)}</Text>
                           </View>
                           <View style={scss.model_text_container}>
                             <Text style={[scss.highText, { textAlign: 'left' }]}>
-                              GV APPLIED AMOUNT:{"\n"}{item.gvAppliedAmount}</Text>
+                              GV APPLIED AMOUNT:{"\n"}{parseFloat(item.gvAppliedAmount).toFixed(2)}</Text>
                             <Text style={[scss.highText, { textAlign: 'right' }]}>RT CLAIM AMOUNT:
-                              {"\n"}{item.returnSlipAmount}</Text>
+                              {"\n"}{parseFloat(item.returnSlipAmount).toFixed(2)}</Text>
                           </View>
                           <View style={scss.model_text_container}>
                             <Text></Text>
                             <Text style={[scss.highText, { textAlign: 'center' }]}>TOTAL AMOUNT
-                              :{item.netPayableAmount}</Text>
+                              :{parseFloat(item.netPayableAmount).toFixed(2)}</Text>
                             <Text></Text>
                           </View>
                         </View>

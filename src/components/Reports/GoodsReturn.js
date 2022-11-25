@@ -59,7 +59,7 @@ export class GoodsReturn extends Component {
     };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     if (global.domainName === "Textile") {
       this.setState({ domainId: 1 });
     }
@@ -85,11 +85,11 @@ export class GoodsReturn extends Component {
   }
 
 
-  datepickerClicked () {
+  datepickerClicked() {
     this.setState({ datepickerOpen: true });
   }
 
-  enddatepickerClicked () {
+  enddatepickerClicked() {
     this.setState({ datepickerendOpen: true });
   }
 
@@ -113,7 +113,7 @@ export class GoodsReturn extends Component {
     this.setState({ endDate: value });
   };
 
-  applyGoodsReturn (pageNumber) {
+  applyGoodsReturn(pageNumber) {
     this.setState({ loading: true, loadMoreActive: false });
     const obj = {
       dateFrom: this.state.startDate ? this.state.startDate : undefined,
@@ -188,7 +188,7 @@ export class GoodsReturn extends Component {
     }
   };
 
-  continuePagination () {
+  continuePagination() {
     if (this.state.totalPages > 1) {
       this.setState({ loadMoreActive: true });
     } else {
@@ -209,16 +209,16 @@ export class GoodsReturn extends Component {
     this.setState({ empId: value });
   };
 
-  handledeleteNewSale () {
+  handledeleteNewSale() {
     this.setState({ flagDeleteGoodsReturn: true, modalVisible: true });
   }
 
 
-  filterAction () {
+  filterAction() {
     this.setState({ flagFilterGoodsReturn: true, modalVisible: true });
   }
 
-  modelCancel () {
+  modelCancel() {
     this.setState({
       flagFilterGoodsReturn: false, modalVisible: false,
       startDate: '', endDate: '',
@@ -231,17 +231,17 @@ export class GoodsReturn extends Component {
     this.setState({ rtStatus: value });
   };
 
-  clearFilterAction () {
+  clearFilterAction() {
     this.setState({
       loadMoreActive: false, loadNextActive: false,
       filterActive: false, flagFilterGoodsReturn: false, modalVisible: false,
       startDate: "", endDate: "",
       returnSlip: "", barCode: "",
-      rtStatus: "", goodsReturn: []
+      rtStatus: "", goodsReturn: [], returnSlipNumber: ""
     });
   }
 
-  handleViewGoods (item, index) {
+  handleViewGoods(item, index) {
     const rtNumber = item.rtNumber;
     let items = [];
     items.push(item);
@@ -279,12 +279,12 @@ export class GoodsReturn extends Component {
     });
   }
 
-  closeView () {
+  closeView() {
     this.setState({ viewGoods: [], flagViewGoods: false });
   }
 
 
-  render () {
+  render() {
     return (
       <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
         <Appbar>
@@ -314,17 +314,17 @@ export class GoodsReturn extends Component {
           keyExtractor={(item, i) => i.toString()}
           ListEmptyComponent={<Text style={emptyTextStyle}>&#9888; {I18n.t("Results not loaded")}</Text>}
           renderItem={({ item, index }) => (
-            <View style={[ flatListMainContainer, { backgroundColor: "#FFF" } ]} >
+            <View style={[flatListMainContainer, { backgroundColor: "#FFF" }]} >
               <View style={flatlistSubContainer}>
                 <View style={textContainer}>
                   <Text style={highText} >S NO: {index + 1} </Text>
                   <Text selectable={true} style={textStyleSmall}>{I18n.t("RTS NUMBER")}: {"\n"}{item.rtNumber}</Text>
-                  <Text style={textStyleSmall}>{I18n.t("BARCODE")}: {"\n"}{item && item.barcodes.length !== 0 ? item.barcodes[ 0 ].barCode : '-'}</Text>
+                  <Text style={textStyleSmall}>{I18n.t("BARCODE")}: {"\n"}{item && item.barcodes.length !== 0 ? item.barcodes[0].barCode : '-'}</Text>
                 </View>
                 <View style={textContainer}>
                   <Text style={textStyleSmall} >{I18n.t("EMP ID")}: {item.createdBy} </Text>
                   <Text style={textStyleSmall}>{I18n.t("RTS DATE & TIME")}: {"\n"} {formatDate(item.createdInfo)}</Text>
-                  <Text style={textStyleSmall}>{I18n.t("AMOUNT")}: {"\n"} ₹{item.amount}</Text>
+                  <Text style={textStyleSmall}>{I18n.t("AMOUNT")}: {"\n"} ₹{parseFloat(item.amount).toFixed(2)}</Text>
                 </View>
                 <View style={textContainer}>
                   <View style={styles.buttons}>
@@ -357,14 +357,14 @@ export class GoodsReturn extends Component {
                   {this.state.loadPrevActive && (
                     <View style={scss.page_navigation_subcontainer}>
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(0)}
                         name="chevron-double-left"
                         size={25}
                       />
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(this.state.pageNo - 1)}
                         name="chevron-left"
@@ -376,13 +376,13 @@ export class GoodsReturn extends Component {
                   {this.state.loadNextActive && (
                     <View style={scss.page_navigation_subcontainer}>
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         onPress={() => this.loadMoreList(this.state.pageNo + 1)}
                         name="chevron-right"
                         size={25}
                       />
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         onPress={() => this.loadMoreList(this.state.totalPages - 1)}
                         name="chevron-double-right"
                         size={25}
@@ -424,7 +424,7 @@ export class GoodsReturn extends Component {
                         </View>
                         <View style={scss.model_text_container}>
                           <TEXT variant='titleLight'>Barcode:{"\n"}{item.barCode}</TEXT>
-                          <TEXT variant='titleLight' style={{ textAlign: 'right' }}>Amount:{"\n"}{item.amount}</TEXT>
+                          <TEXT variant='titleLight' style={{ textAlign: 'right' }}>Amount:{"\n"}{parseFloat(item.amount).toFixed(2)}</TEXT>
                         </View>
                         <View style={scss.model_text_container}>
                           <TEXT variant='titleLight'>EMPID:{"\n"}{item.createdBy}</TEXT>
@@ -528,11 +528,11 @@ export class GoodsReturn extends Component {
                       onChangeText={this.handleBarCode}
                     />
                     <View style={forms.action_buttons_container}>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                         onPress={() => this.applyGoodsReturn(this.state.pageNo)}>
                         <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
                         onPress={() => this.modelCancel()}>
                         <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>

@@ -372,7 +372,7 @@ export default class Barcode extends Component {
                           </Text>
                         </Text>
                         <Text style={scss.textStyleLight}>
-                          {I18n.t("VALUE")}: ₹{parseFloat(item.value)}
+                          {I18n.t("VALUE")}: ₹{parseFloat(item.value).toFixed(2)}
                         </Text>
                       </View>
                       <View style={scss.textContainer}>
