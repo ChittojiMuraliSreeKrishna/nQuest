@@ -10,6 +10,8 @@ import { errorLength, urmErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
 import CreateDeliverySlip from '../services/CreateDeliverySlip';
 import { rnPicker, rnPickerContainer } from '../Styles/FormFields';
+import scss from '../../commonUtils/assets/styles/style.scss';
+import forms from '../../commonUtils/assets/styles/formFields.scss';
 
 var deviceheight = Dimensions.get('window').height;
 var deviceheight = Dimensions.get('window').height;
@@ -233,12 +235,12 @@ export default class AddCustomer extends Component {
     const { nameValid, mobileValid, emailValid, gstValid } = this.state;
 
     return (
-      <View style={{ backgroundColor: '#FFFFFF', flex: 1 }}>
+      <View style={[scss.container, { padding: 10 }]}>
         <ScrollView>
-          <Text style={Device.isTablet ? styles.headerText_tablet : styles.hederText_mobile}>{I18n.t("Personal Details")}</Text>
-          <Text style={styles.headings}>{I18n.t("Customer Name")} <Text style={{ color: 'red' }}>*</Text></Text>
+          <Text style={[scss.highText, { fontSize: 16, padding: 10 }]}>{I18n.t("Personal Details")}</Text>
+          <Text style={scss.textStyleLight}>{I18n.t("Customer Name")} <Text style={{ color: 'red' }}>*</Text></Text>
           <TextInput
-            style={nameValid ? Device.isTablet ? styles.input_tablet : styles.input_mobile : Device.isTablet ? styles.inputError_tablet : styles.inputError_mobile}
+            style={forms.input_fld}
             mode="flat"
             activeOutlineColor='#d6d6d6'
             underlineColor={nameValid ? '#d6d6d6' : "#dd0000"}
@@ -249,9 +251,9 @@ export default class AddCustomer extends Component {
             onChangeText={(text) => this.handleCustomerName(text)}
           />
           {!nameValid && <Message imp={true} message={this.state.errors["name"]} />}
-          <Text style={styles.headings}>{I18n.t("Mobile Number")} <Text style={{ color: 'red' }}>*</Text></Text>
+          <Text style={scss.textStyleLight}>{I18n.t("Mobile Number")} <Text style={{ color: 'red' }}>*</Text></Text>
           <TextInput
-            style={mobileValid ? Device.isTablet ? styles.input_tablet : styles.input_mobile : Device.isTablet ? styles.inputError_tablet : styles.inputError_mobile}
+            style={forms.input_fld}
             mode="flat"
             activeOutlineColor='#d6d6d6'
             underlineColor={mobileValid ? '#d6d6d6' : "#dd0000"}
@@ -264,8 +266,10 @@ export default class AddCustomer extends Component {
             onChangeText={(text) => this.handleMobileNumber(text)}
           />
           {!mobileValid && <Message imp={true} message={this.state.errors["mobile"]} />}
-          <Text style={styles.headings}>{I18n.t("Email")}</Text>
-          <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
+          <Text style={scss.textStyleLight}>{I18n.t("Email")}</Text>
+          <TextInput
+            style={forms.input_fld}
+            // style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
             mode="flat"
             activeOutlineColor='#d6d6d6'
             underlineColor={emailValid ? '#d6d6d6' : "#dd0000"}
@@ -276,8 +280,10 @@ export default class AddCustomer extends Component {
             onChangeText={(text) => this.handleEmail(text)}
           />
           {!emailValid && <Message imp={false} message={this.state.errors["email"]} />}
-          <Text style={styles.headings}>{I18n.t("Address")}</Text>
-          <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
+          <Text style={scss.textStyleLight}>{I18n.t("Address")}</Text>
+          <TextInput
+            style={forms.input_fld}
+            // style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
             mode="flat"
             activeOutlineColor='#d6d6d6'
             outlineColor='#d6d6d6'
@@ -285,8 +291,9 @@ export default class AddCustomer extends Component {
             value={this.state.address}
             onChangeText={(text) => this.handleAddress(text)}
           />
-          <Text style={styles.headings}>{I18n.t("GST Number")}</Text>
-          <TextInput style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
+          <Text style={scss.textStyleLight}>{I18n.t("GST Number")}</Text>
+          <TextInput
+            style={forms.input_fld}
             mode="flat"
             activeOutlineColor='#d6d6d6'
             outlineColor='#d6d6d6'
@@ -296,10 +303,9 @@ export default class AddCustomer extends Component {
             onChangeText={(text) => this.handleGstNumber(text)}
           />
           {!gstValid && <Message imp={false} message={this.state.errors["gst"]} />}
-          <Text style={styles.headings}>{I18n.t("Gender")}</Text>
+          <Text style={scss.textStyleLight}>{I18n.t("Gender")}</Text>
           <View style={rnPickerContainer}>
             <RNPickerSelect
-              // style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
               placeholder={{ label: 'GENDER', value: '' }}
               Icon={() => {
                 return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
@@ -314,14 +320,16 @@ export default class AddCustomer extends Component {
               useNativeAndroidPickerStyle={false}
             />
           </View>
-          <TouchableOpacity
-            style={Device.isTablet ? styles.signInButton_tablet : styles.signInButton_mobile}
-            onPress={() => this.addCustomer()}
-          >
-            <Text style={Device.isTablet ? styles.signInButtonText_tablet : styles.signInButtonText_mobile}>{I18n.t("Add Customer")}</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </View>
+          <View style={forms.action_buttons_container}>
+            <TouchableOpacity
+              style={[forms.action_buttons, forms.submit_btn, { width: "90%" }]}
+              onPress={() => this.addCustomer()} >
+              <Text style={forms.submit_btn_text}>
+                {I18n.t("Add Customer")} </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView >
+      </View >
     );
   }
 }

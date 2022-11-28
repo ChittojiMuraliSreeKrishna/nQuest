@@ -134,7 +134,8 @@ class TextilePayment extends Component {
       netPayableAmount: 0,
       isBillLevel: false,
       isCreditConfirm: false,
-      enablePayment: false
+      enablePayment: false,
+      isBillingDiscount: false
     };
   }
 
@@ -471,7 +472,7 @@ class TextilePayment extends Component {
       this.cancelCardModel()
     } else {
       this.setState({ cashAmount: parseFloat(grandNetAmount) })
-      this.setState({enablePayment: false ,isBillLevel:true ,isTagCustomer:true,isCheckPromo:true,enableCoupon:false})        
+      this.setState({ enablePayment: false, isBillLevel: true, isTagCustomer: true, isCheckPromo: true, enableCoupon: false })
       this.manualCardPayment()
     }
   }
@@ -700,20 +701,24 @@ class TextilePayment extends Component {
   };
 
   verifycash() {
-    const cash = parseInt(this.state.payCreditAmount) + parseInt(this.state.balanceCreditAmount)
-    this.setState({
-      balanceCreditAmount: 0,
-      // cashAmount:  parseInt(this.state.payCreditAmount) + parseInt(this.state.balanceCreditAmount),
-      recievedAmount: cash ? cash : this.state.recievedAmount,
-      payCreditAmount: parseInt(this.state.payCreditAmount) + parseInt(this.state.balanceCreditAmount)
-    })
-    const grandNetAmount = this.state.grandNetAmount
+    // const cash = parseInt(this.state.payCreditAmount) + parseInt(this.state.balanceCreditAmount)
+    // this.setState({
+    //   balanceCreditAmount: 0,
+    //   // cashAmount:  parseInt(this.state.payCreditAmount) + parseInt(this.state.balanceCreditAmount),
+    //   recievedAmount: cash ? cash : this.state.recievedAmount,
+    //   payCreditAmount: parseInt(this.state.payCreditAmount) + parseInt(this.state.balanceCreditAmount)
+    // })
     // console.log("Received amount", this.state.recievedAmount, this.state.grandNetAmount);
     if (this.state.isCash === true && this.state.isCardOrCash === false) {
       if (parseFloat(this.state.recievedAmount) > parseFloat(this.state.grandNetAmount)) {
         this.setState({ returnAmount: parseFloat(this.state.recievedAmount) - parseFloat(this.state.grandNetAmount) });
         this.state.returnAmount = ((this.state.returnAmount).toFixed(2))
-        this.setState({ verifiedCash: parseFloat(this.state.totalAmount), payingAmount: grandNetAmount, grandNetAmount: 0, showVerified: true });
+        this.setState({
+          verifiedCash: parseFloat(this.state.totalAmount),
+          payingAmount: this.state.grandNetAmount,
+          grandNetAmount: 0.0,
+          showVerified: true
+        });
       } else if (parseFloat(this.state.recievedAmount) === parseFloat(this.state.grandNetAmount)) {
         this.setState({
           isPayment: false, returnAmount: parseFloat(this.state.recievedAmount) - parseFloat(this.state.grandNetAmount), showVerified: true,
@@ -729,9 +734,9 @@ class TextilePayment extends Component {
         this.state.receivedAmount = 0;
         this.setState({ isCash: false });
       }
-      if (this.state.isreturnCreditCash) {
-        this.setState({ grandNetAmount: this.state.balanceCreditAmount })
-      }
+      // if (this.state.isreturnCreditCash) {
+      //   this.setState({ grandNetAmount: this.state.balanceCreditAmount })
+      // }
       const obj = {
         "paymentType": "Cash",
         "paymentAmount": parseFloat(this.state.grandNetAmount)
@@ -745,7 +750,7 @@ class TextilePayment extends Component {
       if ((parseFloat(this.state.recievedAmount) < (parseFloat(this.state.grandNetAmount)))) {
         this.setState({
           // cardModelVisible: true,
-          payingAmount: grandNetAmount,
+          payingAmount: this.state.grandNetAmount,
           // cardAutoModel: true, 
           verifiedCash: this.state.recievedAmount,
           grandNetAmount: 0, showVerified: true
@@ -756,9 +761,9 @@ class TextilePayment extends Component {
       }
 
     }
-    if (this.state.isreturnCreditCash) {
-      this.setState({ grandNetAmount: this.state.balanceCreditAmount })
-    }
+    // if (this.state.isreturnCreditCash) {
+    //   this.setState({ grandNetAmount: this.state.balanceCreditAmount })
+    // }
   }
 
   async applyPromocode() {
@@ -777,7 +782,7 @@ class TextilePayment extends Component {
       if (count != 1) {
         NewSaleService.getCoupons(this.state.clientId, gvNumbers).then(res => {
           if (Array.isArray(res.data.result)) {
-            let grandAmount = this.state.totalAmount;
+            let grandAmount = this.state.grandNetAmount;
             const couponsListList = res.data.result.map((item) => {
               if (grandAmount > item.value) {
                 grandAmount = grandAmount - item.value;
@@ -795,7 +800,6 @@ class TextilePayment extends Component {
                 // this.setState({ promocode: "" });
               }
               this.setState({
-                totalAmount: grandAmount,
                 grandNetAmount: this.state.grandNetAmount - item.value,
                 couponAmount: this.state.couponAmount + item.value
               });
@@ -900,62 +904,62 @@ class TextilePayment extends Component {
   pay = () => {
     var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString();
     var obj;
-    if (this.state.isRTApplied) {
-      this.setState({ payingAmount: grandNetAmount + this.state.rtAmount });
-      const obj = {
-        "paymentType": "RTSlip",
-        "paymentAmount": this.state.rtAmount
-      };
-      this.state.paymentType.push(obj);
+    // if (this.state.isRTApplied) {
+    //   this.setState({ payingAmount: grandNetAmount + this.state.rtAmount });
+    //   const obj = {
+    //     "paymentType": "RTSlip",
+    //     "paymentAmount": this.state.rtAmount
+    //   };
+    //   this.state.paymentType.push(obj);
 
-      if (this.state.rtAmount < grandNetAmount) {
-        if (this.state.isCash) {
-          const obj = {
-            "paymentAmountType": [
-              {
-                "paymentType": "RTSlip",
-                "paymentAmount": this.state.rtAmount
-              },
-              {
-                "paymentType": "Cash",
-                "paymentAmount": this.state.cashAmount
-              }
-            ]
-          };
-          this.state.paymentType.push(obj);
-        }
-        if (this.state.isKhata) {
-          const obj = {
-            "paymentAmountType": [
-              {
-                "paymentType": "RTSlip",
-                "paymentAmount": this.state.rtAmount
-              },
-              {
-                "paymentType": "PKTPENDING",
-                "paymentAmount": grandNetAmount
-              }
-            ]
-          };
-          this.state.paymentType.push(obj);
-        }
-        if (this.state.isCredit) {
-          const obj = {
-            "paymentAmountType": [
-              {
-                "paymentType": "RTSlip",
-                "paymentAmount": this.state.rtAmount
-              },
-              {
-                "paymentType": "PKTADVANCE",
-                "paymentAmount": grandNetAmount
-              }
-            ]
-          };
-          this.state.paymentType.push(obj);
-        }
-      }
-    }
+    //   if (this.state.rtAmount < grandNetAmount) {
+    //     if (this.state.isCash) {
+    //       const obj = {
+    //         "paymentAmountType": [
+    //           {
+    //             "paymentType": "RTSlip",
+    //             "paymentAmount": this.state.rtAmount
+    //           },
+    //           {
+    //             "paymentType": "Cash",
+    //             "paymentAmount": this.state.cashAmount
+    //           }
+    //         ]
+    //       };
+    //       this.state.paymentType.push(obj);
+    //     }
+    //     if (this.state.isKhata) {
+    //       const obj = {
+    //         "paymentAmountType": [
+    //           {
+    //             "paymentType": "RTSlip",
+    //             "paymentAmount": this.state.rtAmount
+    //           },
+    //           {
+    //             "paymentType": "PKTPENDING",
+    //             "paymentAmount": grandNetAmount
+    //           }
+    //         ]
+    //       };
+    //       this.state.paymentType.push(obj);
+    //     }
+    //     if (this.state.isCredit) {
+    //       const obj = {
+    //         "paymentAmountType": [
+    //           {
+    //             "paymentType": "RTSlip",
+    //             "paymentAmount": this.state.rtAmount
+    //           },
+    //           {
+    //             "paymentType": "PKTADVANCE",
+    //             "paymentAmount": grandNetAmount
+    //           }
+    //         ]
+    //       };
+    //       this.state.paymentType.push(obj);
+    //     }
+    //   }
+    // }
     if (this.state.isCash === true && this.state.isCardOrCash === false && this.state.recievedAmount === "") {
       alert('Please collect sufficient amount and then only pay');
     }
@@ -1105,19 +1109,7 @@ class TextilePayment extends Component {
 
         // const cardAmount = this.state.isCard || this.state.isCardOrCash ? JSON.stringify(Math.round(this.state.ccCardCash)) : JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString());
         alert("Order created " + res.data["result"]);
-        if (this.state.isKhata === true) {
-          this.props.route.params.onGoBack();
-          this.props.navigation.goBack();
-        }
-        if (this.state.cardManual === true) {
-          this.props.route.params.onGoBack();
-          this.props.navigation.goBack();
-        }
-        if (this.state.isCredit === true) {
-          this.props.route.params.onGoBack();
-          this.props.navigation.goBack();
-        }
-        if (this.state.isCash === true && this.state.isCardOrCash === false) {
+        if (this.state.isRTApplied === true || this.state.isKhata === true || this.state.cardManual === true || this.state.isCredit === true || this.state.isCash === true && this.state.isCardOrCash === false) {
           this.props.route.params.onGoBack();
           this.props.navigation.goBack();
         }
@@ -1406,7 +1398,7 @@ class TextilePayment extends Component {
           if (grandNetAmount > sumreturnedAmout) {
             this.setState({
               isRTnumAplied: false,
-              rtAmount: sumreturnedAmout,
+              rtAmount: this.state.rtAmount + sumreturnedAmout,
               payingAmount: parseFloat(this.state.rtAmount - grandNetAmount).toFixed(2),
               // totalAmount: grandNetAmount - sumreturnedAmout,
               payButtonEnable: grandNetAmount - sumreturnedAmout === 0 ? true : false,
@@ -1414,10 +1406,15 @@ class TextilePayment extends Component {
               isCheckPromo: true,
               grandNetAmount: parseFloat(this.state.grandNetAmount - sumreturnedAmout).toFixed(2)
             })
+            const obj = {
+              "paymentType": "RTSlip",
+              "paymentAmount": this.state.rtAmount
+            }
+            this.state.paymentType.push(obj);
           } else if (grandNetAmount === sumreturnedAmout) {
             this.setState({
               isRTnumAplied: false,
-              rtAmount: sumreturnedAmout,
+              rtAmount: this.state.rtAmount + sumreturnedAmout,
               enablePayment: false,
               payingAmount: parseFloat(this.state.rtAmount - grandNetAmount).toFixed(2),
               // totalAmount: grandNetAmount - sumreturnedAmout,
@@ -1426,6 +1423,11 @@ class TextilePayment extends Component {
               grandNetAmount: parseFloat(this.state.grandNetAmount - sumreturnedAmout).toFixed(2),
               isCheckPromo: true, isBillLevel: true, isTagCustomer: true
             })
+            const obj = {
+              "paymentType": "RTSlip",
+              "paymentAmount": this.state.rtAmount
+            }
+            this.state.paymentType.push(obj);
           }
           else {
             alert("Please purchase greater than return amount")
@@ -1620,7 +1622,7 @@ class TextilePayment extends Component {
         const promDisc = parseInt(this.state.manualDisc) + this.state.totalPromoDisc;
         this.setState({
           showDiscReason: true, promoDiscount: promDisc, isCheckPromo: false,
-          billmodelPop: false, modalVisible: false, isBillLevel: true
+          billmodelPop: false, modalVisible: false, isBillLevel: true, isBillingDiscount: true
         });
       }
     }
@@ -2463,19 +2465,13 @@ class TextilePayment extends Component {
 
               <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
                 <Text style={scss.textStyleMedium}>Payable Amount </Text>
-                <Text style={scss.textStyleMedium}>₹ {this.state.grandNetAmount}
+                <Text style={scss.textStyleMedium}>₹ {(parseFloat(this.state.grandNetAmount).toFixed(2))}
                 </Text>
               </View>
-              {this.state.isBillLevel &&
+              {this.state.isBillingDiscount &&
                 <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
                   <Text style={scss.textStyleMedium}>Billing Discount </Text>
                   <Text style={scss.textStyleMedium}>₹  {this.state.manualDisc} </Text>
-                </View>}
-
-              {this.state.khataAmount > 0 &&
-                <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
-                  <Text style={scss.textStyleMedium}>Katha Amount </Text>
-                  <Text style={scss.textStyleMedium}> ₹  {(parseFloat(this.state.khataAmount).toFixed(2))} </Text>
                 </View>}
 
               {
@@ -2508,6 +2504,12 @@ class TextilePayment extends Component {
                   </View>
                 )
               } */}
+              {this.state.khataAmount > 0 &&
+                <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                  <Text style={scss.textStyleMedium}>Katha Amount </Text>
+                  <Text style={scss.textStyleMedium}> ₹ {(parseFloat(this.state.khataAmount).toFixed(2))} </Text>
+                </View>}
+
               {this.state.returnAmount >= 0 && (
                 <>
                   <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
