@@ -8,7 +8,7 @@ import { formatDate } from '../../commonUtils/DateFormate';
 import Loader from '../../commonUtils/loader';
 import { RF, RH, RW } from '../../Responsive';
 import CustomerService from '../services/CustomerService';
-import { flatListTitle, textContainer, textStyleMedium } from '../Styles/Styles';
+import { flatListTitle, listEmptyMessage, textContainer, textStyleMedium } from '../Styles/Styles';
 import Modal from "react-native-modal";
 import { Chevron } from 'react-native-shapes';
 import RNPickerSelect from 'react-native-picker-select';
@@ -112,6 +112,7 @@ export default class DayClosure extends Component {
   }
 
   deleteEstimationSlip(dsNumber) {
+    console.log(dsNumber);
     CustomerService.deleteEstimationSlip(dsNumber).then((res) => {
       if (res.data.result) {
         alert(res.data.result);
@@ -158,7 +159,7 @@ export default class DayClosure extends Component {
   }
 
   getPendingDeliverySlips(selectedDate) {
-    const selectdate = selectedDate ? selectedDate.split("T")[0]: ''
+    const selectdate = selectedDate ? selectedDate.split("T")[0] : ''
     CustomerService.getPendingDeliverySlips(selectdate, this.state.storeId).then(res => {
       if (res) {
         this.setState({ pendingDayCloserList: res.data.result.deliverySlips, toadayValue: res.data.result.saleValue, dayCloserList: res.data.result.deliverySlips });
@@ -283,7 +284,7 @@ export default class DayClosure extends Component {
             <Text style={flatListTitle}>List of Pending DL slips - <Text style={{ color: '#ED1C24' }}>{this.state.dayClosureList.length}</Text> </Text>
             {/* {this.state.isdayCloser && ( */}
             <TouchableOpacity
-              style={[forms.action_buttons, forms.submit_btn, { width: "40%",backgroundColor: this.state.isdayCloser ? color.disableBackGround : color.accent }]}
+              style={[forms.action_buttons, forms.submit_btn, { width: "40%", backgroundColor: this.state.isdayCloser ? color.disableBackGround : color.accent }]}
               disabled={this.state.isdayCloser}
               onPress={() => this.closeDay()} >
               <Text style={forms.submit_btn_text}> Day Closure </Text>
@@ -295,7 +296,7 @@ export default class DayClosure extends Component {
           onRefresh={() => this.refresh()}
           removeClippedSubviews={false}
           ListEmptyComponent={
-            <Text style={styles.emptyText}>
+            <Text style={listEmptyMessage}>
               {this.state.isdayCloser && <Text>Day Alreday Closed</Text>}
               {this.state.ystDayCloser && <Text >Yesterday Day Closer Not Done </Text>}
             </Text>
@@ -318,11 +319,11 @@ export default class DayClosure extends Component {
                   <Text style={scss.textStyleLight}>SalesMan: {item.salesMan}</Text>
                 </View>
                 <View style={[textContainer, { justifyContent: 'flex-end' }]}>
-                  <View style={styles.buttons}>
-                    <TouchableOpacity style={styles.deleteButton} onPress={() => this.deleteEstimationSlip(item.dsNumber)}>
-                      <Image style={{ alignSelf: 'center', top: 5, height: Device.isTablet ? 30 : 20, width: Device.isTablet ? 30 : 20 }} source={require('../assets/images/delete.png')} />
-                    </TouchableOpacity>
-                  </View>
+                  <TouchableOpacity
+                    onPress={() => this.deleteEstimationSlip(item.dsNumber)}>
+                    <Image style={scss.deleteButton}
+                      source={require('../assets/images/delete.png')} />
+                  </TouchableOpacity>
                 </View>
               </View>
             </View>
@@ -491,58 +492,6 @@ export default class DayClosure extends Component {
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    backgroundColor: '#686868',
-    marginTop: 30,
-    display: 'flex',
-    flexDirection: 'row',
-    width: deviceWidth,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingLeft: RW(20),
-    paddingRight: RW(20)
-
-  },
-  title: {
-    fontSize: RF(16),
-    fontFamily: 'medium',
-    color: '#ffffff90',
-    textAlign: 'center',
-    marginTop: RH(20),
-    marginBottom: RH(20)
-  },
-  closeBtn: {
-    width: RW(150),
-    height: RH(40),
-    backgroundColor: '#ED1C24',
-    borderRadius: Device.isTablet ? 10 : 5,
-  },
-  closeBtnText: {
-    color: '#fff',
-    fontSize: RF(14),
-    textAlign: 'center',
-    fontFamily: 'medium',
-    marginTop: 5
-  },
-  emptyText: {
-    fontSize: RF(14),
-    fontFamily: 'medium',
-    marginTop: deviceheight / 3,
-    textAlign: 'center',
-    color: '#ED1C24'
-  },
-  buttons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  deleteButton: {
-    width: Device.isTablet ? 50 : 30,
-    height: Device.isTablet ? 50 : 30,
-    borderBottomRightRadius: 5,
-    borderTopRightRadius: 5,
-    borderWidth: 1,
-    borderColor: "lightgray",
-  },
   rnSelectContainer_tablet: {
     justifyContent: 'center',
     margin: 20,
