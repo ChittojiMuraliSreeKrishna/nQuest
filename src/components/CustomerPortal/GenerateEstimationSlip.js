@@ -14,6 +14,7 @@ import { Chevron } from 'react-native-shapes';
 import { openDatabase } from 'react-native-sqlite-storage';
 import { default as MinusIcon, default as PlusIcon, default as ScanIcon } from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
+import scss from '../../commonUtils/assets/styles/style.scss'
 import Loader from '../../commonUtils/loader';
 import PrintService from '../../commonUtils/Printer/printService';
 import { RF } from '../../Responsive';
@@ -42,8 +43,6 @@ class GenerateEstimationSlip extends Component {
     this.state = {
       barcodeId: "",
       smnumber: "",
-      mobileNumber: "",
-      altMobileNo: "",
       name: "",
       loading: false,
       arrayData: [],
@@ -58,19 +57,9 @@ class GenerateEstimationSlip extends Component {
       saleQuantity: 0,
       gender: "Male",
       gstNumber: "",
-      dob: "2021-06-21T18:30:00.000Z",
-      address: "",
       modalVisible: true,
-      flagone: true,
-      flagqtyModelOpen: false,
-      flagCustomerOpen: false,
-      alertPopup: true,
-      alertVisible: true,
-      flagtwo: false,
       productItemId: 0,
       productuom: "",
-      flagthree: false,
-      flagfour: false,
       inventoryBarcodeId: '',
       inventoryProductName: '',
       estimationSlip: false,
@@ -87,7 +76,6 @@ class GenerateEstimationSlip extends Component {
       domainId: 1,
       tableHead: ['S.No', 'Barcode', 'Product', 'Price Per Qty', 'Qty', 'Sales Rate'],
       // tableData: [],
-      privilages: [{ bool: false, name: "Check Promo Disc" }],
       inventoryDelete: false,
       lineItemDelete: false,
       uom: '',
@@ -172,24 +160,6 @@ class GenerateEstimationSlip extends Component {
   onEndReached() {
     // this.listRef.scrollToOffset({ offset: 0, animated: true });
   }
-
-  // topbarAction1 = (item, index) => {
-  //   if (this.state.privilages[index].bool === true) {
-  //     this.state.privilages[index].bool = false;
-  //   }
-  //   else {
-  //     this.state.privilages[index].bool = true;
-  //   }
-  //   for (let i = 0; i < this.state.privilages.length; i++) {
-  //     if (item.name === 'Check Promo Disc') {
-  //       this.checkPromo();
-  //     }
-  //     if (index != i) {
-  //       this.state.privilages[i].bool = false;
-  //     }
-  //     this.setState({ privilages: this.state.privilages });
-  //   }
-  // };
 
   checkPromo() {
     const { storeId, domainId, barList } = this.state;
@@ -596,16 +566,13 @@ class GenerateEstimationSlip extends Component {
     });
     console.log("ES Number", this.state.resultDsNumber);
     return (
-      <View style={styles.container}>
+      <View style={scss.container}>
         {this.state.loading && <Loader loading={this.state.loading} />}
-        {this.state.flagone && (
-          <ScrollView>
-            < View
-              style={{
-                flex: 1,
-                marginTop: 10,
-              }}>
-              <View>
+        <ScrollView>
+          <View
+            style={{ flex: 1, marginTop: 10 }}>
+            <View>
+              <View style={{ flexDirection: 'row' }}>
                 <View style={Device.isTablet ? styles.rnSelectContainer_tablet_newsale : styles.rnSelectContainer_mobile_newsale}>
                   <RNPickerSelect
                     placeholder={{
@@ -628,7 +595,8 @@ class GenerateEstimationSlip extends Component {
                   />
                 </View>
                 <>
-                  <TextInput style={[Device.isTablet ? styles.input_tablet_normal : styles.input_mobile_normal, { width: Device.isTablet ? 200 : 150 }]}
+                  <TextInput
+                    style={[forms.input_fld, { width: "35%", minWidth: "35%", maxWidth: "35%" }]}
                     mode="flat"
                     activeUnderlineColor='#000'
                     underlineColor='#6f6f6f'
@@ -644,202 +612,167 @@ class GenerateEstimationSlip extends Component {
                     )}
                   </View>
                 </>
-                <View style={{ flexDirection: 'row' }}>
-                  <TextInput style={Device.isTablet ? styles.input_tablet_normal_start : styles.input_mobile_normal_start}
-                    mode="flat"
-                    activeUnderlineColor='#000'
-                    underlineColor='#6f6f6f'
-                    placeholder={I18n.t("BARCODE")}
-                    value={this.state.barcodeId}
-                    onChangeText={this.handleBarCode}
-                    onEndEditing={() => this.endEditing()}
-                  />
-                  <TouchableOpacity style={{ padding: RF(10) }} onPress={() => this.navigateToScanCode()} >
-                    <ScanIcon name='barcode-scan' size={25} color={color.black} />
-                  </TouchableOpacity>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Checkbox
-                      status={this.state.checked ? 'checked' : 'unchecked'}
-                      onPress={() => {
-                        this.setState({ checked: !this.state.checked, smnumber: '' });
-                      }}
-                    /><Text>Remember Sales Man</Text>
-                  </View>
-                </View>
-                {!this.state.barcodeIdValid && (
-                  <Message imp={true} message={this.state.errors["barcodeId"]} />
-                )}
-                <TouchableOpacity style={{ width: '90%', marginHorizontal: '5%', height: 35, borderWidth: 2, borderColor: '#6f6f6f', borderRadius: 5 }} onPress={() => this.handleViewPrinter()}>
-                  <Text style={{ textAlign: 'center', marginVertical: 5, fontSize: 16, fontWeight: 'bold', color: '#6f6f6f' }}>Connect Printer</Text>
-                </TouchableOpacity>
-                
-                {this.state.uom === "Pieces" && (
-                  <TextInput style={[Device.isTablet ? styles.input_tablet_notedit : styles.input_mobile_notedit, { marginLeft: Device.isTablet ? deviceWidth / 2.4 : deviceWidth / 2.15, width: Device.isTablet ? 160 : 80 }]}
-                    mode="flat"
-                    activeUnderlineColor='#000'
-                    underlineColor='#6f6f6f'
-                    label={"QTY"}
-                    editable={false} selectTextOnFocus={false}
-                  />
-                )}
-
-                {this.state.uom === "Meters" && (
-                  <TextInput style={[Device.isTablet ? styles.input_tablet_normal : styles.input_mobile_normal, { marginLeft: Device.isTablet ? deviceWidth / 1.8 : deviceWidth / 2.15, width: Device.isTablet ? 200 : 80 }]}
-                    mode="flat"
-                    activeUnderlineColor='#000'
-                    underlineColor='#6f6f6f'
-                    label={"QTY"}
-                    value={this.state.saleQuantity}
-                    onChangeText={this.handleQty}
-                  />
-                )}
               </View>
-
-
-              {this.state.itemsList.length !== 0 && (
-                // <FlatList
-                //   style={styles.flatList}
-                //   horizontal
-                //   data={this.state.privilages}
-                //   showsVerticalScrollIndicator={false}
-                //   showsHorizontalScrollIndicator={false}
-                //   renderItem={({ item, index }) => (
-                <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isCheckPromo ? color.disableBackGround : color.accent, width: '90%' }]}
-                  onPress={() => {
-                    this.checkPromo();
-                  }}
-                  disabled={this.state.isCheckPromo}>
-                  <Text style={forms.button_text}>
-                    {"Check Promo Disc"}
-                  </Text>
-                </TouchableOpacity>
-                // <TouchableOpacity style={[checkPromoDiscountBtn, {
-                //   backgroundColor: item.bool ? '#ED1C24' : color.white, borderColor: item.bool ? '#ED1C24' : color.lightBlack,
-
-                // }]} onPress={() =>
-                //   this.setState({ isCheckPromo: true })
-                //   // this.topbarAction1(item, index)
-                // }>
-                //   {/* <Image source={require('../../commonUtils/assets/Images/check_promo_disc.png')} /> */}
-                //   <Text style={{ padding: RF(1), color: item.bool ? "#FFFFFF" : color.dark, fontFamily: 'regular', fontSize: 15 }}>{item.name}</Text>
-                // </TouchableOpacity>
-                //   )}
-                // />
-              )}
-
-              {this.state.itemsList.length !== 0 && (
-                <View style={{ flex: 1, flexDirection: 'row', marginLeft: RF(10) }}>
-                  <Text style={textStyle}>Total Scanned Items - </Text>
-                  <Text style={[textStyle, { color: color.accent }]}>{('0' + this.state.totalQuantity).slice(-2)} </Text>
-                </View>
-              )}
-              {this.state.barList.length !== 0 &&
-                <FlatList style={{ marginTop: 20, marginBottom: 20 }}
-                  data={this.state.barList}
-                  keyExtractor={item => item}
-                  onEndReached={this.onEndReached.bind(this)}
-                  renderItem={({ item, index }) => (
-                    <>
-                      <View style={[flatListMainContainer, { backgroundColor: color.white }]}>
-                        <View style={flatlistSubContainer}>
-                          <View style={textContainer}>
-                            <Text style={textStyleMediumColor}>{I18n.t("Item")}</Text>
-                            <Text style={textStyleMediumColor}>{I18n.t("MRP")}</Text>
-                            <Text style={textStyleMediumColor}>{I18n.t("QTY")}</Text>
-                          </View>
-                          <View style={textContainer}>
-                            <Text style={textStyleMedium}>{item.barcode}</Text>
-                            <Text style={textStyleMedium}>₹ {parseFloat((item.itemMrp)).toFixed(2) }</Text>
-                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                              <TouchableOpacity
-                                onPress={() => this.incrementForTable(item, index)}>
-                                <PlusIcon name="plus-circle-outline" size={20} color={"red"} />
-                              </TouchableOpacity>
-                              <TextInput
-                                style={{
-                                  fontFamily: 'regular',
-                                  fontSize: RF(10),
-                                }}
-                                keyboardType={'number-pad'}
-                                underlineColor='#6f6f6f'
-                                activeUnderlineColor='#000'
-                                value={String(item.quantity)}
-                                textAlign={'center'}
-                                onChangeText={(text) => this.updateQuanty(text, index, item)}
-                              />
-                              <TouchableOpacity
-                                onPress={() => this.decreamentForTable(item, index)}>
-                                <MinusIcon name="minus-circle-outline" size={20} color={"red"} />
-                              </TouchableOpacity>
-                            </View>
-                          </View>
-
-                          <View style={textContainer}>
-                            <Text style={textStyleMediumColor}>{I18n.t("SM Number")}</Text>
-                            <Text style={textStyleMediumColor}>{I18n.t("Discount Type")} </Text>
-                            <Text style={textStyleMediumColor}>{I18n.t("Discount")} </Text>
-                          </View>
-
-                          <View style={textContainer}>
-                            <Text style={textStyleMedium}>{this.state.smnumber}</Text>
-                            <Text style={textStyleMedium}>{ }</Text>
-                            <Text style={[textStyleMedium, { color: '#2ADC09' }]}>₹{item.itemDiscount}</Text>
-                          </View>
-                        </View>
-                      </View>
-                      <View style={flatListTextStyle}>
-                        <Text style={{ fontFamily: 'bold' }}>{I18n.t("TOTAL")} :  ₹{item.totalMrp}</Text>
-                      </View>
-                    </>
-                  )}
+              <View style={{ flexDirection: 'row' }}>
+                <TextInput
+                  style={[forms.input_fld, { width: "30%", minWidth: "30%", maxWidth: "55%" }]}
+                  mode="flat"
+                  activeUnderlineColor='#000'
+                  underlineColor='#6f6f6f'
+                  placeholder={I18n.t("BARCODE")}
+                  value={this.state.barcodeId}
+                  onChangeText={this.handleBarCode}
+                  onEndEditing={() => this.endEditing()}
                 />
-              }
-
-              {this.state.itemsList.length != 0 && (
-                <View style={{ width: deviceWidth, height: 240, backgroundColor: '#FFFFFF' }}>
-                  <Text style={{
-                    color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 30, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                    fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
-                  }}>
-                    Total Qty </Text>
-                  <Text style={{
-                    color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 30, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                    fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
-                  }}>
-                    {this.state.totalQuantity} </Text>
-                  <Text style={{
-                    color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 60, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                    fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
-                  }}>
-                    Promo Discount </Text>
-                  <Text style={{
-                    color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 60, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                    fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
-                  }}>
-                    ₹ {this.state.promoDisc} </Text>
-                  <Text style={{
-                    color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 90, fontSize: 20, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                    fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
-                  }}>
-                    Grand Total </Text>
-                  <Text style={{
-                    color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 90, fontSize: 20, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                    fontSize: Device.isTablet ? 19 : 14, position: 'absolute',
-                  }}>
-                    ₹ {parseFloat(this.state.mrpAmount).toFixed(2)} </Text>
-                  <View style={styles.TopcontainerforPay}>
-                    <TouchableOpacity
-                      style={Device.isTablet ? styles.signInButton_tablet : styles.signInButton_mobile}
-                      onPress={() => this.generateEstimationSlip()} >
-                      <Text style={Device.isTablet ? styles.signInButtonText_tablet : styles.signInButtonText_mobile}> Generate Estimation Slip </Text>
-                    </TouchableOpacity>
-                  </View>
+                <TouchableOpacity style={{ paddingTop: RF(10) }} onPress={() => this.navigateToScanCode()} >
+                  <ScanIcon name='barcode-scan' size={25} color={color.black} />
+                </TouchableOpacity>
+                <View style={scss.radio_item}>
+                  <Checkbox
+                    status={this.state.checked ? 'checked' : 'unchecked'}
+                    onPress={() => {
+                      this.setState({ checked: !this.state.checked, smnumber: '' });
+                    }}
+                  /><Text>Remember Sales Man</Text>
                 </View>
+              </View>
+              {!this.state.barcodeIdValid && (
+                <Message imp={true} message={this.state.errors["barcodeId"]} />
+              )}
+              <TouchableOpacity style={[forms.button_active, { backgroundColor: color.white, borderColor: color.greyYellow, width: '90%' }]} onPress={() => this.handleViewPrinter()}>
+                <Text style={[forms.button_text, { color: color.black }]}>Connect Printer</Text>
+              </TouchableOpacity>
+
+              {this.state.uom === "Pieces" && (
+                <TextInput
+                  style={[forms.input_fld, { width: "30%", minWidth: "30%", maxWidth: "55%" }]}
+                  mode="flat"
+                  activeUnderlineColor='#000'
+                  underlineColor='#6f6f6f'
+                  label={"QTY"}
+                  editable={false} selectTextOnFocus={false}
+                />
+              )}
+
+              {this.state.uom === "Meters" && (
+                <TextInput
+                  style={[forms.input_fld, { width: "30%", minWidth: "30%", maxWidth: "55%" }]}
+                  mode="flat"
+                  activeUnderlineColor='#000'
+                  underlineColor='#6f6f6f'
+                  label={"QTY"}
+                  value={this.state.saleQuantity}
+                  onChangeText={this.handleQty}
+                />
               )}
             </View>
-          </ScrollView >
-        )
-        }
+
+
+            {this.state.itemsList.length !== 0 && (
+              <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isCheckPromo ? color.disableBackGround : color.accent, width: '90%' }]}
+                onPress={() => {
+                  this.checkPromo();
+                }}
+                disabled={this.state.isCheckPromo}>
+                <Text style={forms.button_text}>
+                  {"Check Promo Disc"}
+                </Text>
+              </TouchableOpacity>
+            )}
+
+            {this.state.itemsList.length !== 0 && (
+              <View style={{ flex: 1, flexDirection: 'row', marginLeft: RF(10) }}>
+                <Text style={textStyle}>Total Scanned Items - </Text>
+                <Text style={[textStyle, { color: color.accent }]}>{('0' + this.state.totalQuantity).slice(-2)} </Text>
+              </View>
+            )}
+            {this.state.barList.length !== 0 &&
+              <FlatList style={{ marginTop: 20, marginBottom: 20 }}
+                data={this.state.barList}
+                keyExtractor={item => item}
+                onEndReached={this.onEndReached.bind(this)}
+                renderItem={({ item, index }) => (
+                  <>
+                    <View style={[flatListMainContainer, { backgroundColor: color.white }]}>
+                      <View style={flatlistSubContainer}>
+                        <View style={textContainer}>
+                          <Text style={textStyleMediumColor}>{I18n.t("Item")}</Text>
+                          <Text style={textStyleMediumColor}>{I18n.t("MRP")}</Text>
+                          <Text style={textStyleMediumColor}>{I18n.t("QTY")}</Text>
+                        </View>
+                        <View style={textContainer}>
+                          <Text style={textStyleMedium}>{item.barcode}</Text>
+                          <Text style={textStyleMedium}>₹ {parseFloat((item.itemMrp)).toFixed(2)}</Text>
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <TouchableOpacity
+                              onPress={() => this.incrementForTable(item, index)}>
+                              <PlusIcon name="plus-circle-outline" size={20} color={"red"} />
+                            </TouchableOpacity>
+                            <TextInput
+                              style={{
+                                fontFamily: 'regular',
+                                fontSize: RF(10),
+                              }}
+                              keyboardType={'number-pad'}
+                              underlineColor='#6f6f6f'
+                              activeUnderlineColor='#000'
+                              value={String(item.quantity)}
+                              textAlign={'center'}
+                              onChangeText={(text) => this.updateQuanty(text, index, item)}
+                            />
+                            <TouchableOpacity
+                              onPress={() => this.decreamentForTable(item, index)}>
+                              <MinusIcon name="minus-circle-outline" size={20} color={"red"} />
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+
+                        <View style={textContainer}>
+                          <Text style={textStyleMediumColor}>{I18n.t("SM Number")}</Text>
+                          <Text style={textStyleMediumColor}>{I18n.t("Discount Type")} </Text>
+                          <Text style={textStyleMediumColor}>{I18n.t("Discount")} </Text>
+                        </View>
+
+                        <View style={textContainer}>
+                          <Text style={textStyleMedium}>{this.state.smnumber}</Text>
+                          <Text style={textStyleMedium}>{ }</Text>
+                          <Text style={[textStyleMedium, { color: '#2ADC09' }]}>₹{item.itemDiscount}</Text>
+                        </View>
+                      </View>
+                    </View>
+                    <View style={flatListTextStyle}>
+                      <Text style={{ fontFamily: 'bold' }}>{I18n.t("TOTAL")} :  ₹{item.totalMrp}</Text>
+                    </View>
+                  </>
+                )}
+              />
+            }
+
+            {this.state.itemsList.length != 0 && (
+              <View style={{ margin: 5 }}>
+                <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
+                  <Text style={scss.textStyleMedium}> Total Qty </Text>
+                  <Text style={scss.textStyleMedium}>{this.state.totalQuantity} </Text>
+                </View>
+                <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
+                  <Text style={scss.textStyleMedium}> Promo Discount </Text>
+                  <Text style={scss.textStyleMedium}>₹ {this.state.promoDisc} </Text>
+                </View>
+                <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
+                  <Text style={scss.textStyleMedium}>Grand Total </Text>
+                  <Text style={scss.textStyleMedium}>₹ {parseFloat(this.state.mrpAmount).toFixed(2)} </Text>
+                </View>
+                <View style={forms.action_buttons_container}>
+                  <TouchableOpacity
+                    style={[forms.action_buttons, forms.submit_btn, { width: "95%" }]}
+                    onPress={() => this.generateEstimationSlip()} >
+                    <Text style={forms.submit_btn_text}> Generate Estimation Slip </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+          </View>
+        </ScrollView>
 
         {this.state.resultModel && (
           <View>
@@ -863,8 +796,8 @@ class GenerateEstimationSlip extends Component {
               </View>
             </Modal>
           </View>
-        )
-        }
+        )}
+
         {this.state.showPrinter && (
           <View>
             <Modal style={{ margin: 0 }} isVisible={this.state.modalVisible}
@@ -896,12 +829,11 @@ class GenerateEstimationSlip extends Component {
           </View>
         )}
 
-      </View >
+      </View>
     );
   }
 }
 export default GenerateEstimationSlip;
-
 
 
 const styles = StyleSheet.create({
@@ -910,1031 +842,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#FFFFFF'
   },
-  viewswidth: {
-    backgroundColor: '#FFFFFF',
-    width: deviceWidth,
-    textAlign: 'center',
-    fontSize: 24,
-    height: 84,
-  },
-  input: {
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 100,
-    height: 44,
-    marginTop: 5,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 14,
-  },
-  phoneinput: {
-    justifyContent: 'center',
-    margin: 20,
-    height: 44,
-    marginTop: 5,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 14,
-  },
-  createUserinput: {
-    justifyContent: 'center',
-    margin: Device.isTablet ? 40 : 20,
-    height: Device.isTablet ? 54 : 44,
-    marginTop: Device.isTablet ? 10 : 5,
-    marginBottom: Device.isTablet ? 10 : 5,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: Device.isTablet ? 20 : 14,
-  },
-  navButton_mobile: {
-    position: 'absolute',
-    right: 20, top: 37,
-    backgroundColor: '#ED1C24',
-    borderRadius: 5,
-    width: 105,
-    height: 32,
-  },
-  signInButton: {
-    backgroundColor: '#ED1C24',
-    justifyContent: 'center',
-    width: '95%',
-    marginLeft: 10,
-    height: 40,
-    borderRadius: 10,
-    fontWeight: 'bold',
-    margin: 5,
-    // alignSelf:'center',
-    // marginBottom:100,
-  },
-  qty: {
-    backgroundColor: '#ED1C24',
-    justifyContent: 'center',
-    width: '18%',
-    marginTop: 10,
-    height: 40,
-    margin: 5,
-    borderRadius: 5,
-    fontWeight: 'bold',
-  },
   imagealign: {
     marginTop: Device.isTablet ? 25 : 20,
     marginRight: Device.isTablet ? 30 : 20,
-  },
-  itemscount: {
-    backgroundColor: '#ED1C24',
-    justifyContent: 'center',
-    width: '18%',
-    marginLeft: 0,
-    marginTop: 10,
-    height: 40,
-    borderRadius: 5,
-    fontWeight: 'bold',
-    margin: 5,
-    // alignSelf:'center',
-    // marginBottom:100,
-  },
-  itemDetail: {
-    backgroundColor: '#ffffff',
-
-    width: '60%',
-    marginLeft: 0,
-    marginTop: 10,
-    height: 40,
-    borderRadius: 5,
-    fontWeight: 'bold',
-    margin: 5,
-    // alignSelf:'center',
-    // marginBottom:100,
-  },
-  signInButtonRight: {
-    backgroundColor: '#ED1C24',
-    justifyContent: 'center',
-    width: '46%',
-    marginRight: 10,
-    marginTop: 10,
-    height: 40,
-    borderRadius: 10,
-    fontWeight: 'bold',
-    margin: 5,
-    // alignSelf:'center',
-    // marginBottom:100,
-  },
-  signInButtonText: {
-    color: 'white',
-    alignSelf: 'center',
-    fontSize: 14,
-    fontFamily: "regular",
-  },
-  signInFieldStyle: {
-    color: 'black',
-    marginLeft: 20,
-    marginTop: 5,
-    fontSize: 18,
-    fontFamily: "regular",
-    textAlign: 'left',
-  },
-  findIteminput: {
-    marginLeft: 30,
-    marginRight: 30,
-    marginTop: 20,
-    marginBottom: 1000,
-    height: 50,
-    backgroundColor: "#DEF1FF",
-    borderRadius: 10,
-    color: '#001B4A',
-    fontFamily: "regular",
-    fontSize: 12,
-  },
-  qtyInput: {
-    width: 50,
-    height: 25,
-    // marginTop: 20,
-    // marginBottom: 1000,
-    // height: 50,
-    // backgroundColor: "#DEF1FF",
-    // borderRadius: 10,
-    // color: '#001B4A',
-    // fontFamily: "regular",
-    // fontSize: 12,
-  },
-  signUptext: {
-    marginTop: 40,
-    fontFamily: "regular",
-    alignSelf: 'center',
-    color: '#FFFFFF',
-    fontSize: 28,
-  },
-  saleBillsText: {
-    marginLeft: 0,
-    marginTop: -20,
-    marginBottom: 10,
-    fontFamily: "bold",
-    color: '#0F2851',
-    fontSize: 14,
-  },
-  tablecontainer: {
-    flex: 1,
-    // width:deviceWidth,
-    marginLeft: 20,
-    marginRight: 20,
-    padding: 20,
-    paddingTop: 30,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 10,
-  },
-  head: {
-    height: 45,
-    borderColor: '#FAFAFF',
-    borderWidth: 1,
-    borderRadius: 10,
-  },
-  text: {
-    margin: 6,
-    color: "#ED1C24",
-    fontFamily: "semibold",
-    fontSize: 11,
-  },
-  textData: {
-    margin: 6,
-    color: "#48596B",
-    fontFamily: "regular",
-    fontSize: 10,
-  },
-
-  Topcontainer: {
-    flexDirection: 'row',
-    marginLeft: 20,
-    marginRight: 20,
-    borderRadius: 5,
-    marginTop: 20,
-    borderColor: '#ED1C24',
-    width: '90%',
-    //backgroundColor: '#ffffff',
-    height: 50,
-  },
-
-  TopcontainerforModel: {
-    flexDirection: 'row',
-    marginLeft: 0,
-    marginRight: 0,
-    marginTop: 10,
-    width: '100%',
-    backgroundColor: 'grey',
-    borderRadius: 20,
-    height: 50,
-  },
-  TopcontainerforPay: {
-    flexDirection: 'row',
-    marginLeft: 0,
-    marginRight: 0,
-    // marginTop: 10,
-    width: '100%',
-    backgroundColor: '#ffffff',
-    borderColor: 'lightgray',
-    borderRadius: 0,
-    height: 50,
-    position: 'absolute',
-    bottom: 30,
-  },
-  TopcontainerforItems: {
-    flexDirection: 'row',
-    marginLeft: 0,
-    marginRight: 0,
-    marginTop: 10,
-    width: '100%',
-    backgroundColor: '#ffffff',
-    borderColor: 'lightgray',
-    borderRadius: 0,
-    height: 50,
-  },
-  redbox: {
-    backgroundColor: "#1CA2FF",
-    alignSelf: "flex-start",
-
-    //marginHorizontal: "1%",
-    marginBottom: 6,
-    width: "25%",
-    height: 45,
-    textAlign: "center",
-  },
-  bluebox: {
-    backgroundColor: "#ED1C24",
-    alignSelf: "flex-start",
-    //marginHorizontal: "1%",
-    marginBottom: 6,
-    width: "25%",
-    height: 45,
-    textAlign: "center",
-  },
-  blackbox: {
-    backgroundColor: "#ED1C24",
-    alignSelf: "flex-start",
-    //marginHorizontal: "1%",
-    marginBottom: 6,
-    width: "25%",
-    height: 45,
-    textAlign: "center",
-  },
-  greenbox: {
-    backgroundColor: "#ED1C24",
-    alignSelf: "flex-start",
-    //marginHorizontal: "1%",
-    marginBottom: 6,
-    width: "25%",
-    height: 45,
-    textAlign: "center",
-  },
-
-
-
-
-
-  tabBar: {
-    flexDirection: 'row',
-    paddingTop: Constants.statusBarHeight,
-  },
-  tabItem: {
-    flex: 1,
-    alignItems: 'center',
-    padding: 16,
-  },
-  box: {
-    width: 50,
-    height: 50,
-  },
-  row: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  button: {
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    //borderRadius: 4,
-    backgroundColor: "#ED1C24",
-    alignSelf: "flex-start",
-    //marginHorizontal: "1%",
-    marginBottom: 6,
-    width: "25%",
-    height: 45,
-    textAlign: "center",
-  },
-  selected: {
-    backgroundColor: "#BBE3FF",
-    borderWidth: 0,
-    backgroundColor: "#ED1C24",
-  },
-  buttonLabel: {
-    textAlign: "center",
-    color: "#BBE3FF",
-    fontFamily: "regular",
-    fontSize: 14,
-  },
-  selectedLabel: {
-    color: "white",
-    textAlign: "center",
-    alignSelf: "center",
-    marginTop: 10,
-    fontFamily: "regular",
-    fontSize: 14,
-  },
-  label: {
-    textAlign: "center",
-    marginBottom: 10,
-    fontSize: 24,
-  },
-
-  //model
-  modelcontainer: {
-    alignItems: 'center',
-    backgroundColor: '#ede3f2',
-    padding: 100
-  },
-  modal: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#f7021a',
-    padding: 100
-  },
-  modeltext: {
-    color: '#3f2949',
-    marginTop: 10
-  },
-  btn: {
-    width: 40, height: 18, borderWidth: 0.2, borderColor: '#48596B', fontFamily: "regular",
-    fontSize: 10,
-  },
-  btnText: { textAlign: 'center', color: '#fff' }
-
-
-  ,
-  preview: {
-    margin: 20,
-    height: 300,
-    marginTop: 5,
-    marginBottom: 10,
-    justifyContent: 'flex-end',
-    alignItems: 'center'
-  },
-  overlay: {
-    position: 'absolute',
-    padding: 16,
-    right: 0,
-    left: 0,
-    alignItems: 'center'
-  },
-  topOverlay: {
-    top: 0,
-    flex: 1,
-    marginLeft: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  bottomOverlay: {
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  enterBarcodeManualButton: {
-    padding: 15,
-    backgroundColor: 'white',
-    borderRadius: 40
-  },
-  scanScreenMessage: {
-    fontSize: 14,
-    color: 'white',
-    textAlign: 'center',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-
-
-  // Styles For Mobile
-  viewsWidth_mobile: {
-    backgroundColor: '#ffffff',
-    width: deviceWidth,
-    textAlign: 'center',
-    fontSize: 24,
-    height: Device.isAndroid ? 70 : 84,
-  },
-  menuButton_mobile: {
-    position: 'absolute',
-    left: 10,
-    bottom: 0,
-    width: 40,
-    height: 40,
-  },
-  headerTitle_mobile: {
-    position: 'absolute',
-    left: 70,
-    bottom: 10,
-    width: 300,
-    height: 25,
-    fontFamily: 'bold',
-    fontSize: 18,
-    color: '#353C40'
-  },
-  input_mobile: {
-    justifyContent: 'center',
-    marginLeft: deviceWidth / 2 + 30,
-    width: deviceWidth / 2 - 40,
-    height: 44,
-    marginTop: -55,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 14,
-  },
-  input_mobile_notedit: {
-    justifyContent: 'center',
-    marginLeft: deviceWidth / 3 + 30,
-    width: deviceWidth / 3 - 40,
-    height: 44,
-    marginTop: -55,
-    marginBottom: 10,
-    borderColor: '#DCE3F2',
-    borderRadius: 3,
-    backgroundColor: '#DCE3F2',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 14,
-  },
-  input_mobile_normal: {
-    justifyContent: 'center',
-    marginLeft: deviceWidth / 2 + 30,
-    width: deviceWidth / 2 - 40,
-    height: 44,
-    marginTop: -55,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    // fontFamily: 'regular',
-    paddingLeft: 15,
-    paddingRight: 15,
-    fontSize: RF(14),
-  },
-  input_mobilebutton_normal: {
-    justifyContent: 'center',
-    marginLeft: deviceWidth - 120,
-    width: deviceWidth / 4 - 10,
-    height: 44,
-    marginTop: -55,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 10,
-    backgroundColor: '#ED1C24',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 14,
-  },
-
-  input_mobile_normal_start: {
-    justifyContent: 'center',
-    marginLeft: 20,
-    width: deviceWidth / 3,
-    height: 44,
-    marginTop: 5,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    // fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 14,
-  },
-  rnSelect_mobile: {
-    color: '#8F9EB7',
-    fontSize: 15
-  },
-  rnSelectContainer_mobile: {
-    justifyContent: 'center',
-    margin: 20,
-    height: 44,
-    marginTop: 5,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 14,
-  },
-  rnSelectContainer_mobile_newsale: {
-    justifyContent: 'center',
-    marginLeft: 20,
-    height: 44,
-    marginTop: 5,
-    marginBottom: 10,
-    width: deviceWidth / 2,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 14,
-  },
-  saveButton_mobile: {
-    margin: 8,
-    height: 50,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  saveButtonText_mobile: {
-    textAlign: 'center',
-    marginTop: 15,
-    color: "#ffffff",
-    fontSize: 15,
-    fontFamily: "regular"
-  },
-  scanButton_mobile: {
-    position: 'absolute',
-    right: 28,
-    top: 20,
-    width: 50, height: 50,
-  },
-  scanButtonImage_mobile: {
-    color: '#ED1C24',
-    fontFamily: 'regular',
-    fontSize: 12,
-    position: 'absolute',
-    right: 30,
-  },
-  scanButtonText_mobile: {
-    color: '#ED1C24',
-    fontFamily: 'regular',
-    fontSize: 12,
-    position: 'absolute',
-    right: 0,
-  },
-  tagCustomerButton_mobile: {
-    position: 'absolute',
-    right: 5, top: 10,
-    backgroundColor: '#ED1C24',
-    borderRadius: 5,
-    width: 90,
-    height: 32,
-  },
-  tagCustomerButtonText_mobile: {
-    fontSize: 12,
-    fontFamily: 'regular',
-    color: '#ffffff',
-    marginLeft: 10,
-    marginTop: 8,
-    alignSelf: 'center'
-  },
-  signInButton_mobile: {
-    backgroundColor: '#ED1C24',
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 20,
-    width: deviceWidth - 40,
-    height: 50,
-    borderRadius: 10,
-    fontWeight: 'bold',
-    // marginBottom:100,
-  },
-  signInButtonText_mobile: {
-    color: 'white',
-    alignSelf: 'center',
-    fontSize: 15,
-    fontFamily: "regular",
-  },
-
-  // Styles For Tablet
-  viewsWidth_tablet: {
-    backgroundColor: '#ffffff',
-    width: deviceWidth,
-    textAlign: 'center',
-    fontSize: 28,
-    height: 90,
-  },
-  menuButton_tablet: {
-    position: 'absolute',
-    left: 10,
-    top: 38,
-    width: 90,
-    height: 90,
-  },
-  headerTitle_tablet: {
-    position: 'absolute',
-    left: 70,
-    top: 40,
-    width: 300,
-    height: 40,
-    fontFamily: 'bold',
-    fontSize: 24,
-    color: '#353C40'
-  },
-  input_tablet: {
-    justifyContent: 'center',
-    marginLeft: deviceWidth / 2 + 30,
-    width: deviceWidth / 2 - 50,
-    height: 55,
-    marginTop: -65,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 22,
-  },
-  input_tablet_notedit: {
-    justifyContent: 'center',
-    marginLeft: deviceWidth / 3 + 30,
-    width: deviceWidth / 3 - 50,
-    height: 55,
-    marginTop: -65,
-    marginBottom: 10,
-    borderColor: '#DCE3F2',
-    borderRadius: 3,
-    backgroundColor: '#DCE3F2',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 22,
-  },
-  input_tablet_normal: {
-    justifyContent: 'center',
-    marginLeft: deviceWidth / 2 + 30,
-    width: deviceWidth / 2 - 50,
-    height: 55,
-    marginTop: -65,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    // fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: RF(14),
-  },
-  input_tabletbutton_normal: {
-    justifyContent: 'center',
-    marginLeft: deviceWidth - 145,
-    width: deviceWidth / 3 - 100,
-    height: 55,
-    borderRadius: 10,
-    marginTop: -65,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    backgroundColor: '#ED1C24',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 22,
-  },
-  navButton_tablet: {
-    position: 'absolute',
-    right: 20, top: 27,
-    backgroundColor: '#ED1C24',
-    borderRadius: 5,
-    width: 155,
-    height: 42,
-  },
-  input_tablet_normal_start: {
-    justifyContent: 'center',
-    marginLeft: 20,
-    width: deviceWidth / 4,
-    height: 55,
-    marginTop: 0,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    // fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: RF(14),
-  },
-  rnSelect_tablet: {
-    color: '#8F9EB7',
-    fontSize: 20
-  },
-  rnSelectContainer_tablet: {
-    justifyContent: 'center',
-    margin: 20,
-    height: 54,
-    marginTop: 5,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 20,
-  },
-
-  saveButton_tablet: {
-    margin: 8,
-    height: 60,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  saveButtonText_tablet: {
-    textAlign: 'center',
-    marginTop: 15,
-    color: "#ffffff",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  scanButton_tablet: {
-    position: 'absolute',
-    right: 28,
-    top: 20,
-    width: 70,
-    height: 70,
-  },
-  scanButtonImage_tablet: {
-    color: '#ED1C24',
-    fontFamily: 'regular',
-    fontSize: 18,
-    position: 'absolute',
-    right: 43,
-    top: 5,
-  },
-  scanButtonText_tablet: {
-    color: '#ED1C24',
-    fontFamily: 'regular',
-    fontSize: 18,
-    position: 'absolute',
-    right: 0,
-  },
-  tagCustomerButton_tablet: {
-    position: 'absolute',
-    right: 30, top: 15,
-    backgroundColor: '#ED1C24',
-    borderRadius: 5,
-    width: 120,
-    height: 42,
-  },
-  tagCustomerButtonText_tablet: {
-    fontSize: 16,
-    fontFamily: 'regular',
-    color: '#ffffff',
-    marginLeft: 10,
-    marginTop: 8,
-    alignSelf: 'center'
-  },
-  navButton_tablet: {
-    position: 'absolute',
-    right: 20, top: 27,
-    backgroundColor: '#ED1C24',
-    borderRadius: 5,
-    width: 155,
-    height: 42,
-  },
-  navButtonText_tablet: {
-    fontSize: 22,
-    fontFamily: 'regular',
-    color: '#ffffff',
-    marginLeft: 10,
-    marginTop: 8,
-    alignSelf: 'center'
-  },
-
-
-  // Styles For Mobile
-  viewsWidth_mobile: {
-    backgroundColor: '#ffffff',
-    width: deviceWidth,
-    textAlign: 'center',
-    fontSize: 24,
-    height: Device.isAndroid ? 70 : 84,
-  },
-  menuButton_mobile: {
-    position: 'absolute',
-    left: 10,
-    bottom: 0,
-    width: 40,
-    height: 40,
-  },
-  headerTitle_mobile: {
-    position: 'absolute',
-    left: 70,
-    bottom: 10,
-    width: 300,
-    height: 25,
-    fontFamily: 'bold',
-    fontSize: 18,
-    color: '#353C40'
-  },
-  input_mobile: {
-    justifyContent: 'center',
-    marginLeft: 10,
-    width: deviceWidth - 20,
-    height: 44,
-    marginTop: 10,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 14,
-  },
-  // input_mobile_normal_start: {
-  //     justifyContent: 'center',
-  //     marginLeft: 20,
-  //     width: deviceWidth / 2,
-  //     height: 44,
-  //     marginTop: 0,
-  //     marginBottom: 10,
-  //     borderColor: '#8F9EB717',
-  //     borderRadius: 3,
-  //     backgroundColor: '#FBFBFB',
-  //     borderWidth: 1,
-  //     fontFamily: 'regular',
-  //     paddingLeft: 15,
-  //     fontSize: 14,
-  // },
-  rnSelect_mobile: {
-    color: '#8F9EB7',
-    fontSize: 15
-  },
-  rnSelectContainer_mobile: {
-    justifyContent: 'center',
-    margin: 20,
-    height: 44,
-    marginTop: 5,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 14,
-  },
-  rnSelectContainer_mobile_newsale: {
-    justifyContent: 'center',
-    marginLeft: 20,
-    height: 44,
-    marginTop: 5,
-    marginBottom: 10,
-    width: deviceWidth / 2,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 14,
-  },
-  saveButton_mobile: {
-    margin: 8,
-    height: 50,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  saveButtonText_mobile: {
-    textAlign: 'center',
-    marginTop: 15,
-    color: "#ffffff",
-    fontSize: 15,
-    fontFamily: "regular"
-  },
-  scanButton_mobile: {
-    position: 'absolute',
-    right: 28,
-    top: 20,
-    width: 50, height: 50,
-  },
-  scanButtonImage_mobile: {
-    color: '#ED1C24',
-    fontFamily: 'regular',
-    fontSize: 12,
-    position: 'absolute',
-    right: 30,
-  },
-  scanButtonText_mobile: {
-    color: '#ED1C24',
-    fontFamily: 'regular',
-    fontSize: 12,
-    position: 'absolute',
-    right: 0,
-  },
-  tagCustomerButton_mobile: {
-    position: 'absolute',
-    right: 5, top: 10,
-    backgroundColor: '#ED1C24',
-    borderRadius: 5,
-    width: 90,
-    height: 32,
-  },
-  tagCustomerButtonText_mobile: {
-    fontSize: 12,
-    fontFamily: 'regular',
-    color: '#ffffff',
-    marginLeft: 10,
-    marginTop: 8,
-    alignSelf: 'center'
-  },
-  navButtonText_mobile: {
-    fontSize: 17,
-    fontFamily: 'regular',
-    color: '#ffffff',
-    marginLeft: 10,
-    marginTop: 0,
-    alignSelf: 'center'
-  },
-
-  // Styles For Tablet
-  viewsWidth_tablet: {
-    backgroundColor: '#ffffff',
-    width: deviceWidth,
-    textAlign: 'center',
-    fontSize: 28,
-    height: 90,
-  },
-  menuButton_tablet: {
-    position: 'absolute',
-    left: 10,
-    top: 38,
-    width: 90,
-    height: 90,
-  },
-  headerTitle_tablet: {
-    position: 'absolute',
-    left: 70,
-    top: 40,
-    width: 300,
-    height: 40,
-    fontFamily: 'bold',
-    fontSize: 24,
-    color: '#353C40'
-  },
-  input_tablet: {
-    justifyContent: 'center',
-    marginLeft: 10,
-    width: deviceWidth - 20,
-    height: 55,
-    marginTop: 10,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 22,
-  },
-  navButton_tablet: {
-    position: 'absolute',
-    right: 20, top: 27,
-    backgroundColor: '#ED1C24',
-    borderRadius: 5,
-    width: 155,
-    height: 42,
-  },
-
-  rnSelect_tablet: {
-    color: '#8F9EB7',
-    fontSize: 20
-  },
-  rnSelectContainer_tablet: {
-    justifyContent: 'center',
-    margin: 20,
-    height: 54,
-    marginTop: 5,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 20,
   },
   rnSelectContainer_tablet_newsale: {
     justifyContent: 'center',
@@ -1951,228 +861,19 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     fontSize: 20,
   },
-  saveButton_tablet: {
-    margin: 8,
-    height: 60,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  saveButtonText_tablet: {
-    textAlign: 'center',
-    marginTop: 15,
-    color: "#ffffff",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  scanButton_tablet: {
-    position: 'absolute',
-    right: 28,
-    top: 20,
-    width: 70,
-    height: 70,
-  },
-  scanButtonImage_tablet: {
-    color: '#ED1C24',
-    fontFamily: 'regular',
-    fontSize: 18,
-    position: 'absolute',
-    right: 43,
-    top: 5,
-  },
-  scanButtonText_tablet: {
-    color: '#ED1C24',
-    fontFamily: 'regular',
-    fontSize: 18,
-    position: 'absolute',
-    right: 0,
-  },
-  tagCustomerButton_tablet: {
-    position: 'absolute',
-    right: 30, top: 15,
-    backgroundColor: '#ED1C24',
-    borderRadius: 5,
-    width: 120,
-    height: 42,
-  },
-  tagCustomerButtonText_tablet: {
-    fontSize: 16,
-    fontFamily: 'regular',
-    color: '#ffffff',
-    marginLeft: 10,
-    marginTop: 8,
-    alignSelf: 'center'
-  },
-  navButton_tablet: {
-    position: 'absolute',
-    right: 20, top: 27,
-    backgroundColor: '#ED1C24',
-    borderRadius: 5,
-    width: 155,
-    height: 42,
-  },
-
-
-  // Styles for mobile
-  filterMainContainer_mobile: {
-    width: deviceWidth,
-    alignItems: 'center',
-    backgroundColor: "#ffffff",
-    marginTop: deviceHeight - 300,
-  },
-  filterByTitle_mobile: {
-    position: 'absolute',
-    left: 20,
-    top: 15,
-    width: 300,
-    height: 20,
-    fontFamily: 'medium',
-    fontSize: 16,
-    color: '#353C40'
-  },
-  filterByTitleDecoration_mobile: {
-    height: Device.isTablet ? 2 : 1,
-    width: deviceWidth,
-    backgroundColor: 'lightgray',
-    marginTop: 50,
-  },
-  filterCloseButton_mobile: {
-    position: 'absolute',
-    right: 8,
-    top: 15,
-    width: 50, height: 50,
-  },
-  filterCloseImage_mobile: {
-    color: '#ED1C24',
-    fontFamily: 'regular',
-    fontSize: 12,
-    position: 'absolute',
-    top: 10,
-    right: 0,
-  },
-  filterApplyButton_mobile: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-    height: 50,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  filterButtonText_mobile: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#ffffff",
-    fontSize: 15,
-    fontFamily: "regular"
-  },
-  filterCancelButton_mobile: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-    height: 50,
-    backgroundColor: "#ffffff",
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#353C4050",
-  },
-  filterButtonCancelText_mobile: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#000000",
-    fontSize: 15,
-    fontFamily: "regular"
-  },
-
-
-  // Styles for Tablet
-  filterMainContainer_tablet: {
-    width: deviceWidth,
-    alignItems: 'center',
-    backgroundColor: "#ffffff",
-    height: 400,
-    marginTop: deviceHeight - 400,
-  },
-  filterByTitle_tablet: {
-    position: 'absolute',
-    left: 20,
-    top: 15,
-    width: 300,
-    height: 30,
-    fontFamily: 'medium',
-    fontSize: 21,
-    color: '#353C40'
-  },
-  filterByTitleDecoration_tablet: {
-    height: Device.isTablet ? 2 : 1,
-    width: deviceWidth,
-    backgroundColor: 'lightgray',
-    marginTop: 60,
-  },
-  filterCloseButton_tablet: {
-    position: 'absolute',
-    right: 24,
-    top: 10,
-    width: 60, height: 60,
-  },
-  filterCloseImage_tablet: {
-    color: '#ED1C24',
-    fontFamily: 'regular',
-    fontSize: 17,
-    position: 'absolute',
-    top: 10,
-    right: 24,
-  },
-  filterApplyButton_tablet: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-    height: 60,
-    backgroundColor: "#ED1C24",
-    borderRadius: 5,
-  },
-  filterButtonText_tablet: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#ffffff",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  filterCancelButton_tablet: {
-    width: deviceWidth - 40,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 20,
-    height: 60,
-    backgroundColor: "#ffffff",
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: "#353C4050",
-  },
-  filterButtonCancelText_tablet: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: "#000000",
-    fontSize: 20,
-    fontFamily: "regular"
-  },
-  signInButton_tablet: {
-    backgroundColor: '#ED1C24',
+  rnSelectContainer_mobile_newsale: {
     justifyContent: 'center',
     marginLeft: 20,
-    marginRight: 20,
-    width: deviceWidth - 40,
-    height: 60,
-    borderRadius: 10,
-    fontWeight: 'bold',
-    // marginBottom:100,
-  },
-  signInButtonText_tablet: {
-    color: 'white',
-    alignSelf: 'center',
-    fontSize: 20,
-    fontFamily: "regular",
-  },
-
+    height: 44,
+    marginTop: 5,
+    marginBottom: 10,
+    width: deviceWidth / 2,
+    borderColor: '#8F9EB717',
+    borderRadius: 3,
+    backgroundColor: '#FBFBFB',
+    borderWidth: 1,
+    fontFamily: 'regular',
+    paddingLeft: 15,
+    fontSize: 14,
+  }
 });
