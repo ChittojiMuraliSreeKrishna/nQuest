@@ -471,6 +471,7 @@ class TextilePayment extends Component {
       this.cancelCardModel()
     } else {
       this.setState({ cashAmount: parseFloat(grandNetAmount) })
+      this.setState({enablePayment: false ,isBillLevel:true ,isTagCustomer:true,isCheckPromo:true,enableCoupon:false})        
       this.manualCardPayment()
     }
   }
@@ -1096,86 +1097,86 @@ class TextilePayment extends Component {
     if (this.state.isCard === true) {
       delete obj.paymentAmountType
     }
-    // axios.post(NewSaleService.createOrder(), obj).then((res) => {
-    //   console.log("Invoice data", JSON.stringify(res.data));
-    //   if (res.data && res.data["isSuccess"] === "true") {
+    axios.post(NewSaleService.createOrder(), obj).then((res) => {
+      console.log("Invoice data", JSON.stringify(res.data));
+      if (res.data && res.data["isSuccess"] === "true") {
 
-    //     // PrintService('INVOICE', res.data.result, this.state.barCodeList, invoiceTax)
+        // PrintService('INVOICE', res.data.result, this.state.barCodeList, invoiceTax)
 
-    //     // const cardAmount = this.state.isCard || this.state.isCardOrCash ? JSON.stringify(Math.round(this.state.ccCardCash)) : JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString());
-    //     alert("Order created " + res.data["result"]);
-    //     if (this.state.isKhata === true) {
-    //       this.props.route.params.onGoBack();
-    //       this.props.navigation.goBack();
-    //     }
-    //     if (this.state.cardManual === true) {
-    //       this.props.route.params.onGoBack();
-    //       this.props.navigation.goBack();
-    //     }
-    //     if (this.state.isCredit === true) {
-    //       this.props.route.params.onGoBack();
-    //       this.props.navigation.goBack();
-    //     }
-    //     if (this.state.isCash === true && this.state.isCardOrCash === false) {
-    //       this.props.route.params.onGoBack();
-    //       this.props.navigation.goBack();
-    //     }
-    //     let obj;
-    //     if (this.state.isCard === true) {
-    //       obj = {
-    //         "amount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)),
-    //         "info": "order creations",
-    //         "newsaleId": res.data["result"],
-    //       };
-    //     } else if (this.state.isCardOrCash === true) {
-    //       obj = {
-    //         "amount": this.state.ccCardCash,
-    //         "info": "order creations",
-    //         "newsaleId": res.data["result"],
-    //       };
+        // const cardAmount = this.state.isCard || this.state.isCardOrCash ? JSON.stringify(Math.round(this.state.ccCardCash)) : JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString());
+        alert("Order created " + res.data["result"]);
+        if (this.state.isKhata === true) {
+          this.props.route.params.onGoBack();
+          this.props.navigation.goBack();
+        }
+        if (this.state.cardManual === true) {
+          this.props.route.params.onGoBack();
+          this.props.navigation.goBack();
+        }
+        if (this.state.isCredit === true) {
+          this.props.route.params.onGoBack();
+          this.props.navigation.goBack();
+        }
+        if (this.state.isCash === true && this.state.isCardOrCash === false) {
+          this.props.route.params.onGoBack();
+          this.props.navigation.goBack();
+        }
+        let obj;
+        if (this.state.isCard === true) {
+          obj = {
+            "amount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)),
+            "info": "order creations",
+            "newsaleId": res.data["result"],
+          };
+        } else if (this.state.isCardOrCash === true) {
+          obj = {
+            "amount": this.state.ccCardCash,
+            "info": "order creations",
+            "newsaleId": res.data["result"],
+          };
 
-    //     }
-    //     // console.log('params aresdasd', obj);
-    //     axios.post(NewSaleService.payment(), obj).then((res) => {
-    //       // this.setState({isPayment: false});
-    //       const data = JSON.parse(res.data["result"]);
-    //       //console.log()
-    //       var options = {
-    //         description: 'Transaction',
-    //         image: 'https://i.imgur.com/3g7nmJC.png',
-    //         currency: data.currency,
-    //         order_id: data.id,
-    //         key: 'rzp_test_z8jVsg0bBgLQer', // Your api key
-    //         amount: data.amount,
-    //         name: 'OTSI',
-    //         prefill: {
-    //           name: "Kadali",
-    //           email: "kadali@gmail.com",
-    //           contact: "9999999999",
-    //         },
-    //         theme: { color: '#F37254' }
-    //       };
-    //       // console.log("options data", options);
-    //       RazorpayCheckout.open(options).then((data) => {
-    //         // handle success
-    //         this.setState({ tableData: [] });
-    //         alert(`Success: ${data.razorpay_payment_id}`);
-    //         this.props.route.params.onGoBack();
-    //         this.props.navigation.goBack();
-    //         //this.props.navigation.navigate('Orders', { total: this.state.totalAmount, payment: 'RazorPay' })
-    //       }).catch((error) => {
-    //         this.setState({ loading: false });
-    //         console.log(error);
-    //         // handle failure
-    //         alert(`Error: ${JSON.stringify(error.code)} || ${JSON.stringify(error.description)}`);
-    //       });
-    //     });
-    //   }
-    //   else {
-    //     // this.setState({ loading: false });
-    //     alert("duplicate record already exists");
-    //   }
-    // });
+        }
+        // console.log('params aresdasd', obj);
+        axios.post(NewSaleService.payment(), obj).then((res) => {
+          // this.setState({isPayment: false});
+          const data = JSON.parse(res.data["result"]);
+          //console.log()
+          var options = {
+            description: 'Transaction',
+            image: 'https://i.imgur.com/3g7nmJC.png',
+            currency: data.currency,
+            order_id: data.id,
+            key: 'rzp_test_z8jVsg0bBgLQer', // Your api key
+            amount: data.amount,
+            name: 'OTSI',
+            prefill: {
+              name: "Kadali",
+              email: "kadali@gmail.com",
+              contact: "9999999999",
+            },
+            theme: { color: '#F37254' }
+          };
+          // console.log("options data", options);
+          RazorpayCheckout.open(options).then((data) => {
+            // handle success
+            this.setState({ tableData: [] });
+            alert(`Success: ${data.razorpay_payment_id}`);
+            this.props.route.params.onGoBack();
+            this.props.navigation.goBack();
+            //this.props.navigation.navigate('Orders', { total: this.state.totalAmount, payment: 'RazorPay' })
+          }).catch((error) => {
+            this.setState({ loading: false });
+            console.log(error);
+            // handle failure
+            alert(`Error: ${JSON.stringify(error.code)} || ${JSON.stringify(error.description)}`);
+          });
+        });
+      }
+      else {
+        // this.setState({ loading: false });
+        alert("duplicate record already exists");
+      }
+    });
 
     // else if (global.domainName === "Retail") {
     //     let lineItems = [];
@@ -1630,7 +1631,7 @@ class TextilePayment extends Component {
 
   render() {
     return (
-      <View style={styles.mainContainer}>
+      <View style={scss.container}>
         {this.state.loading && <Loader loading={this.state.loading} />}
         <Appbar style={{ backgroundColor: color.white }}>
           <Appbar.BackAction

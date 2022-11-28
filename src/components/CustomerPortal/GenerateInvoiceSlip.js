@@ -6,24 +6,18 @@ import React, { Component } from 'react';
 import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import RNBeep from 'react-native-a-beep';
 import { RNCamera } from 'react-native-camera';
-import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from "react-native-modal";
 import { TextInput } from 'react-native-paper';
-import RNPickerSelect from 'react-native-picker-select';
-import { Chevron } from 'react-native-shapes';
 import { default as MinusIcon, default as PlusIcon, default as ScanIcon } from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import PrintService from '../../commonUtils/Printer/printService';
-import PrivilagesList from '../../commonUtils/PrivilagesList';
 import { RF, RW } from '../../Responsive';
 import { customerErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
 import CustomerService from '../services/CustomerService';
 import { color } from '../Styles/colorStyles';
-import { inputField } from '../Styles/FormFields';
 import { sucessBtn, sucessBtnText } from '../Styles/PopupStyles';
 import { listEmptyMessage } from '../Styles/Styles';
 
@@ -1283,7 +1277,7 @@ class GenerateInvoiceSlip extends Component {
 
   render() {
     return (
-      <View style={{ flex: 1 }}>
+      <View style={scss.container}>
         <ScrollView>
           <View
             style={{

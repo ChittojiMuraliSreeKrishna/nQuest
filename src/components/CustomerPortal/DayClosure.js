@@ -12,8 +12,8 @@ import { flatListTitle, textContainer, textStyleMedium } from '../Styles/Styles'
 import Modal from "react-native-modal";
 import { Chevron } from 'react-native-shapes';
 import RNPickerSelect from 'react-native-picker-select';
-import forms from '../../commonUtils/assets/styles/formFields.scss';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import forms from '../../commonUtils/assets/styles/formFields.scss';
 import I18n from 'react-native-i18n';
 import moment from 'moment';
 import { TextInput } from 'react-native-paper';
@@ -158,7 +158,7 @@ export default class DayClosure extends Component {
   }
 
   getPendingDeliverySlips(selectedDate) {
-    const selectdate = selectedDate.split("T")[0];
+    const selectdate = selectedDate ? selectedDate.split("T")[0]: ''
     CustomerService.getPendingDeliverySlips(selectdate, this.state.storeId).then(res => {
       if (res) {
         this.setState({ pendingDayCloserList: res.data.result.deliverySlips, toadayValue: res.data.result.saleValue, dayCloserList: res.data.result.deliverySlips });
@@ -215,6 +215,8 @@ export default class DayClosure extends Component {
             toadayValue: '',
             penlitydeskValue: '',
             applicability: ''
+          }, () => {
+            this.getPendingDeliverySlips();
           });
         }
       });
@@ -260,7 +262,10 @@ export default class DayClosure extends Component {
         toadaydeskValue: '',
         toadayValue: '',
         penlitydeskValue: '',
-        applicability: ''
+        applicability: '',
+        dayCloserList: []
+      }, () => {
+        this.getPendingDeliverySlips();
       });
     });
     this.hideModal();
@@ -268,64 +273,61 @@ export default class DayClosure extends Component {
 
   render() {
     return (
-      <View>
+      <View style={scss.container}>
         {this.state.loading &&
           <Loader
             loading={this.state.loading} />
         }
-        <View>
-          <FlatList
-            style={{ backgroundColor: '#FFF' }}
-            ListHeaderComponent={<View style={scss.headerContainer}>
-              <Text style={flatListTitle}>List of Pending DL slips - <Text style={{ color: '#ED1C24' }}>{this.state.dayClosureList.length}</Text> </Text>
-              {/* {this.state.isdayCloser && ( */}
-              <TouchableOpacity style={[styles.closeBtn, { backgroundColor: this.state.isdayCloser ? color.disableBackGround : color.accent }]} onPress={() => this.closeDay()}
-                disabled={this.state.isdayCloser}
-              >
-                <Text style={styles.closeBtnText}>Day Closure</Text>
-              </TouchableOpacity>
-              {/* )} */}
-            </View>}
-            data={this.state.dayClosureList}
-            scrollEnabled={true}
-            refreshing={this.state.isFetching}
-            onRefresh={() => this.refresh()}
-            removeClippedSubviews={false}
-            ListEmptyComponent={
-              <Text style={styles.emptyText}>
-                {this.state.isdayCloser && <Text>Day Alreday Closed</Text>}
-                {this.state.ystDayCloser && <Text >Yesterday Day Closer Not Done </Text>}
-              </Text>
-            }
-            renderItem={({ item, index }) => (
-              <View style={scss.flatListContainer}>
-                <View style={scss.flatListSubContainer}>
-                  <View style={scss.textContainer}>
-                    <Text style={scss.highText}>S.No: {index + 1}</Text>
-                    <Text style={scss.textStyleLight}>Created Date :
-                      <Text style={scss.textStyleMedium}>{"\n"}
-                        {formatDate(item.createdDate)}
-                      </Text>
+        <FlatList
+          ListHeaderComponent={<View style={scss.headerContainer}>
+            <Text style={flatListTitle}>List of Pending DL slips - <Text style={{ color: '#ED1C24' }}>{this.state.dayClosureList.length}</Text> </Text>
+            {/* {this.state.isdayCloser && ( */}
+            <TouchableOpacity
+              style={[forms.action_buttons, forms.submit_btn, { width: "40%",backgroundColor: this.state.isdayCloser ? color.disableBackGround : color.accent }]}
+              disabled={this.state.isdayCloser}
+              onPress={() => this.closeDay()} >
+              <Text style={forms.submit_btn_text}> Day Closure </Text>
+            </TouchableOpacity>
+          </View>}
+          data={this.state.dayClosureList}
+          scrollEnabled={true}
+          refreshing={this.state.isFetching}
+          onRefresh={() => this.refresh()}
+          removeClippedSubviews={false}
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>
+              {this.state.isdayCloser && <Text>Day Alreday Closed</Text>}
+              {this.state.ystDayCloser && <Text >Yesterday Day Closer Not Done </Text>}
+            </Text>
+          }
+          renderItem={({ item, index }) => (
+            <View style={scss.flatListContainer}>
+              <View style={scss.flatListSubContainer}>
+                <View style={scss.textContainer}>
+                  <Text style={scss.highText}>S.No: {index + 1}</Text>
+                  <Text style={scss.textStyleLight}>Created Date :
+                    <Text style={scss.textStyleMedium}>{"\n"}
+                      {formatDate(item.createdDate)}
                     </Text>
-                  </View>
-                  <View style={scss.textContainer}>
-                    <Text selectable={true} style={scss.textStyleLight}>ESNumber:
-                      <Text style={scss.textStyleMedium}>{"\n"}{item.dsNumber}</Text>
-                    </Text>
-                    <Text style={scss.textStyleLight}>SalesMan: {item.salesMan}</Text>
-                  </View>
-                  <View style={[textContainer, { justifyContent: 'flex-end' }]}>
-                    <View style={styles.buttons}>
-                      <TouchableOpacity style={styles.deleteButton} onPress={() => this.deleteEstimationSlip(item.dsNumber)}>
-                        <Image style={{ alignSelf: 'center', top: 5, height: Device.isTablet ? 30 : 20, width: Device.isTablet ? 30 : 20 }} source={require('../assets/images/delete.png')} />
-                      </TouchableOpacity>
-                    </View>
+                  </Text>
+                </View>
+                <View style={scss.textContainer}>
+                  <Text selectable={true} style={scss.textStyleLight}>ESNumber:
+                    <Text style={scss.textStyleMedium}>{"\n"}{item.dsNumber}</Text>
+                  </Text>
+                  <Text style={scss.textStyleLight}>SalesMan: {item.salesMan}</Text>
+                </View>
+                <View style={[textContainer, { justifyContent: 'flex-end' }]}>
+                  <View style={styles.buttons}>
+                    <TouchableOpacity style={styles.deleteButton} onPress={() => this.deleteEstimationSlip(item.dsNumber)}>
+                      <Image style={{ alignSelf: 'center', top: 5, height: Device.isTablet ? 30 : 20, width: Device.isTablet ? 30 : 20 }} source={require('../assets/images/delete.png')} />
+                    </TouchableOpacity>
                   </View>
                 </View>
               </View>
-            )}
-          />
-        </View>
+            </View>
+          )}
+        />
         <>
           <Modal style={{ margin: 0 }} isVisible={this.state.isDates}
             onBackButtonPress={() => this.hidedayModel()}
