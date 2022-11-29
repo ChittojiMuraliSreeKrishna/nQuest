@@ -43,7 +43,6 @@ export default class DayClosure extends Component {
       toadayValue: '',
       toadaydeskValue: '',
       penlitydeskValue: 0,
-      daycheckCloseDates: [],
       selectedDate: "",
       isEnabeldDayCloser: false
     };
@@ -65,15 +64,16 @@ export default class DayClosure extends Component {
 
   getalltoDates() {
     CustomerService.getDates(this.state.storeId).then(res => {
-      if (res.data.length > 0) {
-        this.setState({ daycheckCloseDates: res.data });
-        if (this.state.daycheckCloseDates.length === 0) {
-          this.setState({ isdayCloser: true });
-        } else if (this.state.daycheckCloseDates.length > 1 && this.state.daycheckCloseDates[0].dayClose.split("T")[0] !== this.state.toDay) {
-          this.setState({ ystDayCloser: true });
-        }
+      if (res.data.length > 0 && res.status === 200) {
+        this.setState({ daycheckCloseDates: res.data }, () => {
+          if (this.state.daycheckCloseDates.length === 0) {
+            this.setState({ isdayCloser: true });
+          } else if (this.state.daycheckCloseDates.length > 1 && this.state.daycheckCloseDates[0].dayClose.split("T")[0] !== this.state.toDay) {
+            this.setState({ ystDayCloser: true });
+          }
+        })
       }
-    });
+    })
   }
 
   getAllDayCloser() {
@@ -95,18 +95,11 @@ export default class DayClosure extends Component {
   }
 
   closeDay() {
-    // const param = "?storeId=" + this.state.storeId;
-    // axios.put(CustomerService.dayCloseActivity() + param).then(res => {
-    //   if (res) {
-    //     alert(res.data.result);
-    //     this.getAllDayCloser();
-    //   }
-    // });
     this.setState({ isCloseDay: true });
-    if (this.state.daycheckCloseDates.length === 1) {
+    if (this.state.daycheckCloseDates && this.state.daycheckCloseDates.length === 1) {
       this.setState({ isDayClose: true, ystDayCloser: false })
     }
-    else if (this.state.daycheckCloseDates.length > 1) {
+    else if (this.state.daycheckCloseDates && this.state.daycheckCloseDates.length > 1) {
       this.setState({ isDates: true })
     }
   }
@@ -125,7 +118,7 @@ export default class DayClosure extends Component {
 
   getallPendingDate() {
     CustomerService.getDates(this.state.storeId).then(res => {
-      if (res && res.data.length > 1) {
+      if (res && res.data.length > 1 && res.status === 200) {
         if (res.data.length > 1) {
           this.setState({ datesDaycloser: res.data })
           this.state.datesDaycloser.pop();

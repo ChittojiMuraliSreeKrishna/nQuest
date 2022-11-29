@@ -21,6 +21,7 @@ import LoginService from '../services/LoginService';
 import NewSaleService from '../services/NewSaleService';
 import PromotionsService from '../services/PromotionsService';
 import { color } from '../Styles/colorStyles';
+import IconFA from 'react-native-vector-icons/FontAwesome';
 
 
 var deviceWidth = Dimensions.get('window').width;
@@ -120,7 +121,7 @@ class TextilePayment extends Component {
       cardModelVisible: false,
       cardPaymentType: 'Manual',
       cardManual: false,
-      khataAmount: 0,
+      khataAmount: 200,
       payingAmount: 0,
       grandNetAmount: 0,
       showVerified: false,
@@ -135,7 +136,9 @@ class TextilePayment extends Component {
       isBillLevel: false,
       isCreditConfirm: false,
       enablePayment: false,
-      isBillingDiscount: false
+      isBillingDiscount: false,
+      isCreditDone: false,
+      isKathaDone: false
     };
   }
 
@@ -380,6 +383,7 @@ class TextilePayment extends Component {
         this.setState({
           payButtonEnable: true,
           enableCoupon: false,
+          isKathaDone: true,
           enablePayment: false, isCheckPromo: true, isBillLevel: true, grandNetAmount: 0.0,
           kathaColleted: parseFloat(this.state.khataAmount)
         }, () => {
@@ -390,6 +394,7 @@ class TextilePayment extends Component {
         let grandNetAmount = parseFloat(netPayableAmt)
         this.setState({
           grandNetAmount: (grandNetAmount.toFixed(2)),
+          isKathaDone: true,
           payingAmount: parseFloat(this.state.netPayableAmount) - parseFloat(this.state.khataAmount),
           kathaColleted: parseFloat(this.state.khataAmount)
         }, () => {
@@ -428,13 +433,13 @@ class TextilePayment extends Component {
     if (parseFloat(this.state.payCreditAmount) < grandNetAmount) {
       const amount = grandNetAmount - this.state.payCreditAmount;
       this.state.grandNetAmount = parseFloat(amount);
-      this.setState({ isPayment: true, isreturnCreditCash: true, balanceCreditAmount: amount, grandNetAmount: parseFloat(amount).toFixed(2) }, () => {
+      this.setState({ isPayment: true, isreturnCreditCash: true, isCreditDone: true, balanceCreditAmount: amount, grandNetAmount: parseFloat(amount).toFixed(2) }, () => {
         // if (this.state.isRTApplied) {
         //   this.setState({ payingAmount: this.state.payCreditAmount + this.state.rtAmount, payButtonEnable: true })
         // }
       })
     } else if (parseFloat(this.state.payCreditAmount) === grandNetAmount) {
-      this.setState({ isPayment: true, payButtonEnable: true, isCheckPromo: true, enablePayment: false, isBillLevel: true, isTagCustomer: true })
+      this.setState({ isPayment: true, payButtonEnable: true, isCheckPromo: true, isCreditDone: true, enablePayment: false, isBillLevel: true, isTagCustomer: true })
       // const obj = {
       //   "paymentType": "PKTADVANCE",
       //   "paymentAmount": this.state.payCreditAmount
@@ -1476,6 +1481,8 @@ class TextilePayment extends Component {
       obj.originalBarcodeCreatedAt = item.createdDate;
       obj.batchNo = item.batchNo;
       obj.promoDiscount = 0;
+      obj.totalPromoDiscount = 0.0;
+      obj.distributedPromoDiscount = 0.0
       return obj;
     });
     if (this.state.isEstimationEnable === "true") {
@@ -1485,7 +1492,16 @@ class TextilePayment extends Component {
             barCodeList: res.data.result,
             isCheckPromo: true,
           });
-
+          res.data.result.forEach((ele, index) => {
+            this.state.barCodeList.forEach((item, idx) => {
+              // item.distributedPromoDiscount= ele.distributedPromoDiscount;
+              // item.totalPromoDiscount = ele.totalPromoDiscount
+              if (item.barCode === ele.barCode) {
+                item.distributedPromoDiscount = ele.distributedPromoDiscount;
+                item.totalPromoDiscount = ele.totalPromoDiscount
+              }
+            })
+          })
           this.state.barCodeList.forEach((barCode, index) => {
             costPrice = costPrice + barCode.itemPrice;
             discount = discount + barCode.totalPromoDiscount;
@@ -1493,12 +1509,12 @@ class TextilePayment extends Component {
           });
 
           discount = discount + this.state.manualDisc;
-          discAppliedTotal = this.state.grandNetAmount - discount;
+          discAppliedTotal = parseFloat(this.state.grandNetAmount - discount).toFixed(2);
           this.setState({
-            netPayableAmount: (total.toFixed(2)),
-            totalPromoDisc: (discount.toFixed(2)),
+            netPayableAmount: parseFloat(total).toFixed(2),
+            totalPromoDisc: (parseFloat(this.state.totalPromoDisc) + parseFloat(discount)).toFixed(2),
             grossAmount: costPrice,
-            grandNetAmount: (discAppliedTotal.toFixed(2))
+            grandNetAmount: discAppliedTotal
           });
           if (this.state.barCodeList.length > 0) {
             this.setState({ enablePayment: true });
@@ -1511,7 +1527,7 @@ class TextilePayment extends Component {
         }
       });
     } else {
-      CustomerService.getCheckPromoAmount(storeId, 1, barCodeList).then(res => {
+      CustomerService.getCheckPromoAmount(storeId, 1, requestObj).then(res => {
         let calculatedDisc = res.data.result.calculatedDiscountVo;
         if (res.status === 200) {
           this.setState({
@@ -1535,7 +1551,7 @@ class TextilePayment extends Component {
                     }
                   }
                 } else {
-                  barCodeData.itemDiscount = "No discount";
+                  barcodeData.itemDiscount = "No discount";
                 }
               }
             });
@@ -1655,149 +1671,74 @@ class TextilePayment extends Component {
                   showsHorizontalScrollIndicator={false}
                   renderItem={({ item, index }) => {
                     if (item.key === 1) {
-                      return <View style={{
-                        height: Device.isTablet ? 80 : 50,
-                        width: Device.isTablet ? 80 : 50,
-                        backgroundColor: "#ffffff",
-                        borderRadius: 25,
-                        marginLeft: 10,
-                        marginTop: 10,
-
-                      }}>
-                        <TouchableOpacity style={{
-                          marginLeft: 0, marginTop: 0,
-                        }} onPress={() => this.cashAction()}
-                          disabled={parseFloat(this.state.grandNetAmount) === 0}
-                        >
+                      return <View style={scss.paymentIcon}>
+                        <TouchableOpacity onPress={() => this.cashAction()}
+                          disabled={parseFloat(this.state.grandNetAmount) === 0}>
                           <Image source={this.state.isCash ? require('../assets/images/cashselect.png') : require('../assets/images/cashunselect.png')} style={{
                             marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
                           }} />
                         </TouchableOpacity>
-                        <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: Device.isTablet ? 19 : 14, color: this.state.isCash ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
-                          CASH
-                        </Text>
-
+                        <Text style={[scss.textStyleLight, { color: this.state.isCard ? color.accent : color.lightDark, textAlign: 'center' }]}>CASH</Text>
                       </View>;
                     }
                     if (item.key === 2) {
-                      return <View style={{
-                        height: Device.isTablet ? 80 : 50,
-                        width: Device.isTablet ? 80 : 50,
-                        backgroundColor: "#ffffff",
-                        borderRadius: 25,
-                        marginLeft: 20,
-                        marginTop: 10,
-
-                      }}>
-                        <TouchableOpacity style={{
-                          marginLeft: 0, marginTop: 0,
-                        }} onPress={() => this.cardAction()}
-                          disabled={parseFloat(this.state.grandNetAmount) === 0}
-                        >
+                      return <View style={scss.paymentIcon}>
+                        <TouchableOpacity onPress={() => this.cardAction()}
+                          disabled={parseFloat(this.state.grandNetAmount) === 0}>
                           <Image source={this.state.isCard ? require('../assets/images/cardselect.png') : require('../assets/images/cardunselect.png')} style={{
                             marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
                           }} />
                         </TouchableOpacity>
-                        <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: Device.isTablet ? 19 : 14, color: this.state.isCard ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
-                          CARD
-                        </Text>
-
+                        <Text style={[scss.textStyleLight, { color: this.state.isCard ? color.accent : color.lightDark, textAlign: 'center' }]}>CARD</Text>
                       </View>;
                     }
                     if (item.key === 3) {
-                      return <View style={{
-                        height: Device.isTablet ? 80 : 50,
-                        width: Device.isTablet ? 80 : 50,
-                        backgroundColor: "#ffffff",
-                        borderRadius: 25,
-                        marginLeft: 20,
-                        marginTop: 10,
-
-                      }}>
-                        <TouchableOpacity style={{
-                          marginLeft: 0, marginTop: 0,
-                        }} onPress={() => this.qrAction()}
-                          disabled={parseFloat(this.state.grandNetAmount) === 0}
-                        >
+                      return <View style={scss.paymentIcon}>
+                        <TouchableOpacity onPress={() => this.qrAction()}
+                          disabled={parseFloat(this.state.grandNetAmount) === 0}>
                           <Image source={this.state.isCardOrCash ? require('../assets/images/qrselect.png') : require('../assets/images/qrunselect.png')} style={{
                             marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
                           }} />
                         </TouchableOpacity>
-                        <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, width: Device.isTablet ? 70 : 50, fontSize: Device.isTablet ? 19 : 14, color: this.state.isCardOrCash ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
-                          CASH&CARD
-                        </Text>
-
+                        <Text style={[scss.textStyleLight, { color: this.state.isCardOrCash ? color.accent : color.lightDark, textAlign: 'center' }]}>CC</Text>
                       </View>;
 
                     }
                     if (item.key === 4) {
-                      return <View style={{
-                        height: Device.isTablet ? 80 : 50,
-                        width: Device.isTablet ? 80 : 50,
-                        backgroundColor: "#ffffff",
-                        borderRadius: 25,
-                        marginLeft: 20,
-                        marginTop: 10,
-
-                      }}>
-                        <TouchableOpacity style={{
-                          marginLeft: 0, marginTop: 0,
-                        }} onPress={() => this.upiAction()}
+                      return <View style={scss.paymentIcon}>
+                        <TouchableOpacity onPress={() => this.upiAction()}
                           disabled={parseFloat(this.state.grandNetAmount) === 0}>
                           <Image source={this.state.isUpi ? require('../assets/images/upiselect.png') : require('../assets/images/upiunselect.png')} style={{
                             marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
                           }} />
                         </TouchableOpacity>
-                        <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: Device.isTablet ? 19 : 14, color: this.state.isUpi ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
-                          UPI
-                        </Text>
-
+                        <Text style={[scss.textStyleLight, { color: this.state.isUpi ? color.accent : color.lightDark, textAlign: 'center' }]}>UPI</Text>
                       </View>;
                     }
                     if (item.key === 5 && this.state.isTagCustomer) {
-                      return <View style={{
-                        height: Device.isTablet ? 80 : 50,
-                        width: Device.isTablet ? 80 : 50,
-                        backgroundColor: "#ffffff",
-                        borderRadius: 25,
-                        marginLeft: 20,
-                        marginTop: 10,
-                      }}>
+                      return <View style={scss.paymentIcon}>
                         <TouchableOpacity style={{
-                          marginLeft: 0, marginTop: 0,
+                          // backgroundColor: this.state.isKathaDone ? color.disableBackGround : color.white
                         }} onPress={() => this.khataAction()}
-                          disabled={parseFloat(this.state.grandNetAmount) === 0}
-                        >
+                          disabled={parseFloat(this.state.grandNetAmount) === 0 || this.state.isKathaDone}>
                           <Image source={this.state.isKhata ? require('../assets/images/kathaselect.png') : require('../assets/images/kathaunselect.png')} style={{
-                            marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
+                            marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0
                           }} />
                         </TouchableOpacity>
-                        <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: Device.isTablet ? 19 : 14, color: this.state.isKhata ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
-                          KHATA
-                        </Text>
-
+                        <Text style={[scss.textStyleLight, { color: this.state.isKhata ? color.accent : color.lightDark, textAlign: 'center' }]}>KHATA</Text>
                       </View>;
                     }
                     if (item.key === 6 && this.state.isCreditFlag) {
-                      return <View style={{
-                        height: Device.isTablet ? 80 : 50,
-                        width: Device.isTablet ? 80 : 50,
-                        backgroundColor: "#ffffff",
-                        borderRadius: 25,
-                        marginLeft: 20,
-                        marginTop: 10,
-                      }}>
+                      return <View style={scss.paymentIcon}>
                         <TouchableOpacity style={{
-                          marginLeft: 0, marginTop: 0,
+                          // backgroundColor: this.state.isCreditDone ? color.disableBackGround : color.white
                         }} onPress={() => this.creditAction()}
-                          disabled={parseFloat(this.state.grandNetAmount) === 0}>
+                          disabled={parseFloat(this.state.grandNetAmount) === 0 || this.state.isCreditDone}>
                           <Image source={this.state.isCredit ? require('../assets/images/kathaselect.png') : require('../assets/images/kathaunselect.png')} style={{
                             marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
                           }} />
                         </TouchableOpacity>
-                        <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: Device.isTablet ? 19 : 14, color: this.state.isCredit ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
-                          CREDIT
-                        </Text>
+                        <Text style={[scss.textStyleLight, { color: this.state.isCredit ? color.accent : color.lightDark,textAlign: 'center'  }]}>CREDIT</Text>
                       </View>;
                     }
                   }}

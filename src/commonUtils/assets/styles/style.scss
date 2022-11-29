@@ -285,7 +285,17 @@
 	justify-content: center;
 	background-color: $white;
 }
-.deleteButton{
+
+.deleteButton {
 	width: 25px;
 	height: 25px;
+}
+
+.paymentIcon {
+	height: 50px;
+	width: 50px;
+	background-color: $white;
+	border-radius: 25px;
+	margin-left: 20px;
+	margin-top: 10px;
 }
