@@ -472,13 +472,11 @@ export class ListOfEstimationSlip extends Component {
                         value={this.state.dsStatus}
                         useNativeAndroidPickerStyle={false}
                       />
-
-
                     </View>
                     <TextInput
-                      outlineColor='#d8d8d8'
-                      mode='outlined'
-                      activeOutlineColor='#d8d8d8'
+                      underlineColor='#efefef'
+                      mode='flat'
+                      activeUnderlineColor='#efefef'
                       style={forms.input_fld}
                       underlineColorAndroid="transparent"
                       placeholder={I18n.t("DS NUMBER")}
@@ -489,9 +487,9 @@ export class ListOfEstimationSlip extends Component {
                       onChangeText={this.handleDsNumber}
                     />
                     <TextInput
-                      outlineColor='#d8d8d8'
-                      mode='outlined'
-                      activeOutlineColor='#d8d8d8'
+                      underlineColor='#d8d8d8'
+                      mode='flat'
+                      activeUnderlineColor='#efefef'
                       style={forms.input_fld}
                       underlineColorAndroid="transparent"
                       placeholder={I18n.t("BARCODE")}

@@ -13,7 +13,6 @@ import { Chevron } from 'react-native-shapes';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import Loader from '../../commonUtils/loader';
-import PrintService from '../../commonUtils/Printer/printService';
 import { customerErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
 import CustomerService from '../services/CustomerService';
@@ -1816,15 +1815,17 @@ class TextilePayment extends Component {
                   {"Bill Level Discount"}
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isBillLevel || this.state.isCheckPromo ? color.disableBackGround : color.accent }]}
-                onPress={() => {
-                  this.checkPromo();
-                }}
-                disabled={this.state.isBillLevel || this.state.isCheckPromo}>
-                <Text style={forms.button_text}>
-                  {"Check Promo Disc"}
-                </Text>
-              </TouchableOpacity>
+              {this.state.isEstimationEnable === "true" && (
+                <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isBillLevel || this.state.isCheckPromo ? color.disableBackGround : color.accent }]}
+                  onPress={() => {
+                    this.checkPromo();
+                  }}
+                  disabled={this.state.isBillLevel || this.state.isCheckPromo}>
+                  <Text style={forms.button_text}>
+                    {"Check Promo Disc"}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
 
             {this.state.billmodelPop && (
@@ -2434,7 +2435,7 @@ class TextilePayment extends Component {
                 </Modal>
               </View>)}
 
-            <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 10 }}> {('PRICE SUMMARY')} </Text>
+            <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 10 }}> {('BILLING SUMMARY')} </Text>
 
 
             <View style={{ width: deviceWidth, height: Device.isTablet ? 500 : 350, backgroundColor: '#FFFFFF', marginTop: 10, flexDirection: 'column', justifyContent: 'space-around' }}>

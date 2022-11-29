@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
 import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import DatePicker from 'react-native-date-picker';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -14,6 +13,8 @@ import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import { dateFormat, formatDate, formatMonth } from '../../commonUtils/DateFormate';
+import DateSelector from '../../commonUtils/DateSelector';
+import { RH } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
 
 var deviceWidth = Dimensions.get("window").width;
@@ -209,10 +210,17 @@ export default class NewSaleReport extends Component {
     this.setState({ enddoneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
 
-  datepickerCancelClicked() {
-    this.setState({ date: new Date(), enddate: new Date(), datepickerOpen: false, datepickerendOpen: false });
-  }
+  datepickerCancelClicked = () => {
+    this.setState({
+      datepickerOpen: false,
+    });
+  };
 
+  datepickerEndCancelClicked = () => {
+    this.setState({
+      datepickerendOpen: false,
+    });
+  };
   handleBillPositions = (value) => {
     this.setState({ billPosition: value });
   };
@@ -231,6 +239,14 @@ export default class NewSaleReport extends Component {
 
   modelCancel() {
     this.setState({ modalVisible: false, flagFilterNewSale: false });
+  }
+
+  handleDate = (value) => {
+    this.setState({ startDate: value })
+  }
+
+  handleEndDate = (value) => {
+    this.setState({ endDate: value })
   }
 
   clearFilterAction() {
@@ -434,44 +450,18 @@ export default class NewSaleReport extends Component {
                       </TouchableOpacity>
                     </View>
                     {this.state.datepickerOpen && (
-                      <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
-                        <TouchableOpacity
-                          style={Device.isTablet ? styles.datePickerButton_tablet : styles.datePickerButton_mobile} onPress={() => this.datepickerCancelClicked()}
-                        >
-                          <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Cancel </Text>
-
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={Device.isTablet ? styles.datePickerEndButton_tablet : styles.datePickerEndButton_mobile} onPress={() => this.datepickerDoneClicked()}
-                        >
-                          <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Done </Text>
-
-                        </TouchableOpacity>
-                        <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
-                          date={this.state.date}
-                          mode={'date'}
-                          onDateChange={(date) => this.setState({ date })}
+                      <View style={{ height: RH(280), width: deviceWidth, backgroundColor: '#ffffff' }}>
+                        <DateSelector
+                          dateCancel={this.datepickerCancelClicked}
+                          setDate={this.handleDate}
                         />
-                      </View>
-                    )}
+                      </View>)}
 
                     {this.state.datepickerendOpen && (
-                      <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
-                        <TouchableOpacity
-                          style={Device.isTablet ? styles.datePickerButton_tablet : styles.datePickerButton_mobile} onPress={() => this.datepickerCancelClicked()}
-                        >
-                          <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Cancel </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={Device.isTablet ? styles.datePickerEndButton_tablet : styles.datePickerEndButton_mobile} onPress={() => this.datepickerendDoneClicked()}
-                        >
-                          <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Done </Text>
-
-                        </TouchableOpacity>
-                        <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
-                          date={this.state.enddate}
-                          mode={'date'}
-                          onDateChange={(enddate) => this.setState({ enddate })}
+                      <View style={{ height: RH(280), width: deviceWidth, backgroundColor: '#ffffff' }}>
+                        <DateSelector
+                          dateCancel={this.datepickerEndCancelClicked}
+                          setDate={this.handleEndDate}
                         />
                       </View>
                     )}
@@ -494,9 +484,9 @@ export default class NewSaleReport extends Component {
                       />
                     </View>
                     <TextInput
-                      outlineColor='#d8d8d8'
-                      mode='outlined'
-                      activeOutlineColor='#d8d8d8'
+                      underlineColor='#efefef'
+                      mode='flat'
+                      activeUnderlineColor='#efefef'
                       style={forms.input_fld}
                       underlineColorAndroid="transparent"
                       placeholder={I18n.t("INVOICE NUMBER")}
@@ -507,9 +497,9 @@ export default class NewSaleReport extends Component {
                       onChangeText={this.handleInvoiceNumber}
                     />
                     <TextInput
-                      outlineColor='#d8d8d8'
-                      mode='outlined'
-                      activeOutlineColor='#d8d8d8'
+                      underlineColor='#efefef'
+                      mode='flat'
+                      activeUnderlineColor='#efefef'
                       style={forms.input_fld}
                       underlineColorAndroid="transparent"
                       placeholder={I18n.t("MOBILE NUMBER")}
@@ -522,12 +512,13 @@ export default class NewSaleReport extends Component {
                       onChangeText={this.handleMobile}
                     />
                     <TextInput
-                      outlineColor='#d8d8d8'
-                      mode='outlined'
-                      activeOutlineColor='#d8d8d8'
+                      underlineColor='#efefef'
+                      mode='flat'
+                      activeUnderlineColor='#efefef'
                       style={forms.input_fld}
                       underlineColorAndroid="transparent"
                       placeholder={I18n.t("EMP ID")}
+                      keyboardType='number-pad'
                       placeholderTextColor="#6F6F6F"
                       textAlignVertical="center"
                       autoCapitalize="none"

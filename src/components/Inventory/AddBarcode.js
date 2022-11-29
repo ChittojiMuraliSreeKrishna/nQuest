@@ -365,6 +365,7 @@ class AddBarcode extends Component {
     this.setState({ storesList: [] });
     let storesList = [];
     const { clientId } = this.state;
+    console.log({ clientId })
     InventoryService.getAllStores(clientId).then((res) => {
       console.log("Stores", res.data);
       if (res?.data) {

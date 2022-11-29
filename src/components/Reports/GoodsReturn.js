@@ -1,11 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
-import { Appbar, Text as TEXT } from 'react-native-paper';
+import { Appbar, Text as TEXT, TextInput } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
 import { default as FilterIcon, default as Icon } from 'react-native-vector-icons/FontAwesome';
@@ -507,10 +507,14 @@ export class GoodsReturn extends Component {
                     </View>
                     <Text style={styles.headings}>{I18n.t("RT Number")}</Text>
                     <TextInput
+                      mode='flat'
+                      underlineColor='#efefef'
+                      activeUnderlineColor='#efefef'
                       style={forms.input_fld}
                       underlineColorAndroid="transparent"
                       placeholder={I18n.t("RT Number")}
                       placeholderTextColor="#6F6F6F"
+                      clearButtonMode='while-editing'
                       textAlignVertical="center"
                       autoCapitalize="none"
                       value={this.state.returnSlipNumber}
@@ -518,6 +522,8 @@ export class GoodsReturn extends Component {
                     />
                     <Text style={styles.headings}>{I18n.t("Barcode")}</Text>
                     <TextInput
+                      underlineColor='#efefef'
+                      activeUnderlineColor='#efefef'
                       style={forms.input_fld}
                       underlineColorAndroid="transparent"
                       placeholder={I18n.t("Barcode")}
