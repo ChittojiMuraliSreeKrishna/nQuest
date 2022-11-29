@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -379,7 +379,11 @@ export class ListOfBarcodes extends Component {
                           <Text
                             style={forms.filter_dates_text}
                           >{this.state.startDate == "" ? 'START DATE' : this.state.startDate}</Text>
-                          <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                          <IconFA
+                            name="calendar"
+                            size={18}
+                            style={forms.calender_image}
+                          />
                         </TouchableOpacity>
                         <TouchableOpacity
                           style={forms.filter_dates}
@@ -389,7 +393,11 @@ export class ListOfBarcodes extends Component {
                           <Text
                             style={forms.filter_dates_text}
                           >{this.state.endDate == "" ? 'END DATE' : this.state.endDate}</Text>
-                          <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                          <IconFA
+                            name="calendar"
+                            size={18}
+                            style={forms.calender_image}
+                          />
                         </TouchableOpacity>
                       </View>
                       {this.state.datepickerOpen && (

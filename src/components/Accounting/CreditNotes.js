@@ -378,9 +378,10 @@ export default class CreditNotes extends Component {
                             ? "START DATE"
                             : this.state.startDate}
                         </Text>
-                        <Image
+                        <IconFA
+                          name="calendar"
+                          size={18}
                           style={forms.calender_image}
-                          source={require("../assets/images/calender.png")}
                         />
                       </TouchableOpacity>
                       <TouchableOpacity
@@ -393,9 +394,10 @@ export default class CreditNotes extends Component {
                             ? "END DATE"
                             : this.state.endDate}
                         </Text>
-                        <Image
+                        <IconFA
+                          name="calendar"
+                          size={18}
                           style={forms.calender_image}
-                          source={require("../assets/images/calender.png")}
                         />
                       </TouchableOpacity>
                     </View>

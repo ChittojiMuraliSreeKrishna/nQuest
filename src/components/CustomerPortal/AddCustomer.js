@@ -242,7 +242,7 @@ export default class AddCustomer extends Component {
           <TextInput
             style={forms.input_fld}
             mode="flat"
-            activeOutlineColor='#d6d6d6'
+            activeUnderlineColor='#d6d6d6'
             underlineColor={nameValid ? '#d6d6d6' : "#dd0000"}
             label={I18n.t('CUSTOMER NAME')}
             maxLength={25}
@@ -255,7 +255,7 @@ export default class AddCustomer extends Component {
           <TextInput
             style={forms.input_fld}
             mode="flat"
-            activeOutlineColor='#d6d6d6'
+            activeUnderlineColor='#d6d6d6'
             underlineColor={mobileValid ? '#d6d6d6' : "#dd0000"}
             label={I18n.t('MOBILE NUMBER')}
             maxLength={10}
@@ -271,7 +271,7 @@ export default class AddCustomer extends Component {
             style={forms.input_fld}
             // style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
             mode="flat"
-            activeOutlineColor='#d6d6d6'
+            activeUnderlineColor='#d6d6d6'
             underlineColor={emailValid ? '#d6d6d6' : "#dd0000"}
             label={I18n.t('EMAIL')}
             keyboardType='email-address'
@@ -285,7 +285,7 @@ export default class AddCustomer extends Component {
             style={forms.input_fld}
             // style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
             mode="flat"
-            activeOutlineColor='#d6d6d6'
+            activeUnderlineColor='#d6d6d6'
             outlineColor='#d6d6d6'
             label={I18n.t('ADDRESS')}
             value={this.state.address}
@@ -295,7 +295,7 @@ export default class AddCustomer extends Component {
           <TextInput
             style={forms.input_fld}
             mode="flat"
-            activeOutlineColor='#d6d6d6'
+            activeUnderlineColor='#d6d6d6'
             outlineColor='#d6d6d6'
             label={I18n.t('GST Number')}
             value={this.state.gstNumber}

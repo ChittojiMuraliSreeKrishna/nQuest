@@ -3,8 +3,7 @@ import axios from "axios";
 import React, { Component } from "react";
 import {
   Dimensions,
-  FlatList,
-  Image, ScrollView, StyleSheet,
+  FlatList, ScrollView, StyleSheet,
   TouchableOpacity, View
 } from "react-native";
 import Device from "react-native-device-detection";
@@ -500,9 +499,10 @@ export default class ReBarcode extends Component {
                             ? "Start Date"
                             : this.state.startDate}
                         </Text>
-                        <Image
+                        <IconFA
+                          name="calendar"
+                          size={18}
                           style={forms.calender_image}
-                          source={require("../assets/images/calender.png")}
                         />
                       </TouchableOpacity>
                       <TouchableOpacity
@@ -515,9 +515,10 @@ export default class ReBarcode extends Component {
                             ? "End Date"
                             : this.state.endDate}
                         </Text>
-                        <Image
+                        <IconFA
+                          name="calendar"
+                          size={18}
                           style={forms.calender_image}
-                          source={require("../assets/images/calender.png")}
                         />
                       </TouchableOpacity>
                     </View>

@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -8,7 +8,7 @@ import Modal from 'react-native-modal';
 import { Appbar, Text as TEXT, TextInput } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
-import { default as FilterIcon, default as Icon } from 'react-native-vector-icons/FontAwesome';
+import IconFA, { default as FilterIcon, default as Icon } from 'react-native-vector-icons/FontAwesome';
 import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from "../../commonUtils/assets/styles/style.scss";
@@ -19,6 +19,7 @@ import { RH } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
 import { emptyTextStyle } from '../Styles/FormFields';
 import { flatListMainContainer, flatlistSubContainer, highText, textContainer, textStyleSmall } from '../Styles/Styles';
+
 
 
 var deviceWidth = Dimensions.get("window").width;
@@ -457,7 +458,11 @@ export class GoodsReturn extends Component {
                         <Text
                           style={forms.filter_dates_text}
                         >{this.state.startDate == "" ? 'START DATE' : this.state.startDate}</Text>
-                        <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                        <IconFA
+                          name="calendar"
+                          size={18}
+                          style={forms.calender_image}
+                        />
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={forms.filter_dates}
@@ -467,7 +472,11 @@ export class GoodsReturn extends Component {
                         <Text
                           style={forms.filter_dates_text}
                         >{this.state.endDate == "" ? 'END DATE' : this.state.endDate}</Text>
-                        <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                        <IconFA
+                          name="calendar"
+                          size={18}
+                          style={forms.calender_image}
+                        />
                       </TouchableOpacity>
                     </View>
 

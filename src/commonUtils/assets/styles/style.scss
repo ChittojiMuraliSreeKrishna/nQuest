@@ -27,7 +27,8 @@
 .flatListContainer {
   background-color: $white;
   border-radius: 6px;
-  border: 1px solid $border-box;
+  border-width: 1px;
+  border-color: $border-box;
   display: flex;
   flex-direction: row;
   justify-content: space-between;

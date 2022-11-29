@@ -58,7 +58,7 @@ export const inputHeading = {
 
 export const rnPickerContainer = {
   justifyContent: "center",
-  margin: '5%',
+  margin: '4%',
   height: RH(45),
   marginTop: RH(5),
   marginBottom: RH(5),
@@ -69,7 +69,7 @@ export const rnPickerContainer = {
   fontFamily: "regular",
   // paddingLeft: RW(13),
   fontSize: RF(14),
-  width: '90%',
+  width: '92%',
 };
 
 export const rnPicker = {
@@ -203,16 +203,22 @@ export const cancelBtnText = {
 
 export const dateSelector = {
   width: deviceWidth - RW(40),
-  marginLeft: RW(20),
-  marginRight: RW(20),
-  marginTop: RH(10),
-  marginBottom: RH(10),
+  // marginLeft: RW(20),
+  // marginRight: RW(20),
+  // marginTop: RH(10),
+  // marginBottom: RH(10),
   borderWidth: RW(1),
   borderColor: color.border,
   height: RH(50),
   backgroundColor: color.light,
   borderRadius: 5,
   justifyContent: "center",
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  paddingLeft: 10,
+  paddingRight: 10,
 };
 
 export const datePickerButton1 = {
@@ -254,7 +260,7 @@ export const datePicker = {
 };
 
 export const dateText = {
-  marginLeft: RW(16),
+  // marginLeft: RW(16),
   // marginTop: Device.isTablet ? 0 : RW(10),
   color: color.grey,
   fontSize: RF(15),

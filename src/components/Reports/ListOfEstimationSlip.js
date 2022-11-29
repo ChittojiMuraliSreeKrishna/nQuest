@@ -8,7 +8,7 @@ import Modal from 'react-native-modal';
 import { Appbar, Text as Txt, TextInput } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
 import { Chevron } from 'react-native-shapes';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { default as Icon, default as IconFA } from 'react-native-vector-icons/FontAwesome';
 import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
@@ -16,8 +16,10 @@ import { formatDate } from '../../commonUtils/DateFormate';
 import DateSelector from '../../commonUtils/DateSelector';
 import { RF, RH, RW } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
+import { rnPicker, rnPickerContainer } from '../Styles/FormFields';
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
+
 
 export class ListOfEstimationSlip extends Component {
 
@@ -378,7 +380,6 @@ export class ListOfEstimationSlip extends Component {
                 </View>
                 <View style={{ backgroundColor: "#ffffff", height: Device.isTablet ? RH(300) : RH(250) }}>
                   <Text style={{
-                    // height: Device.isTablet ? 40 : 20,
                     textAlign: 'center',
                     fontFamily: 'regular',
                     marginTop: 15,
@@ -386,7 +387,7 @@ export class ListOfEstimationSlip extends Component {
                     color: '#353C40'
                   }}> {I18n.t("Are you sure want to delete Estimation Slip")} ?  </Text>
                   <TouchableOpacity
-                    style={[Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile, { marginTop: Device.isTablet ? RH(40) : RH(30) }]} onPress={() => this.deleteEstimationSlip(item, index)}
+                    style={[Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile, { marginTop: Device.isTablet ? RH(40) : RH(30) }]}
                   >
                     <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile}  > {I18n.t("DELETE")} </Text>
 
@@ -423,7 +424,11 @@ export class ListOfEstimationSlip extends Component {
                         <Text
                           style={forms.filter_dates_text}
                         >{this.state.startDate == "" ? 'START DATE' : this.state.startDate}</Text>
-                        <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                        <IconFA
+                          name="calendar"
+                          size={18}
+                          style={forms.calender_image}
+                        />
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={forms.filter_dates}
@@ -433,7 +438,11 @@ export class ListOfEstimationSlip extends Component {
                         <Text
                           style={forms.filter_dates_text}
                         >{this.state.endDate == "" ? 'END DATE' : this.state.endDate}</Text>
-                        <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                        <IconFA
+                          name="calendar"
+                          size={18}
+                          style={forms.calender_image}
+                        />
                       </TouchableOpacity>
                     </View>
                     {this.state.datepickerOpen && (
@@ -453,9 +462,8 @@ export class ListOfEstimationSlip extends Component {
                         />
                       </View>
                     )}
-                    <View style={[styles.rnSelectContainer_mobile, { width: '92%' }]}>
+                    <View style={[rnPickerContainer, { width: '92%' }]}>
                       <RNPickerSelect
-                        // style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
                         placeholder={{
                           label: 'DS STATUS'
                         }}
@@ -468,7 +476,7 @@ export class ListOfEstimationSlip extends Component {
                           { label: 'Cancelled', value: 'Cancelled' },
                         ]}
                         onValueChange={this.handleDsStatus}
-                        style={pickerSelectStyles_mobile}
+                        style={rnPicker}
                         value={this.state.dsStatus}
                         useNativeAndroidPickerStyle={false}
                       />
@@ -574,36 +582,6 @@ export class ListOfEstimationSlip extends Component {
   }
 }
 
-const pickerSelectStyles_mobile = StyleSheet.create({
-  placeholder: {
-    color: "#6F6F6F",
-    fontFamily: "regular",
-    fontSize: RF(14),
-  },
-  inputIOS: {
-    justifyContent: 'center',
-    height: RH(42),
-    width: '92%',
-    borderRadius: 3,
-    borderWidth: Device.isTablet ? 2 : 1,
-    fontFamily: 'regular',
-    fontSize: RF(14),
-    borderColor: '#FBFBFB',
-    backgroundColor: '#FBFBFB',
-  },
-  inputAndroid: {
-    justifyContent: 'center',
-    height: RF(44),
-    width: '92%',
-    borderRadius: 3,
-    borderWidth: Device.isTablet ? 2 : 1,
-    fontFamily: 'regular',
-    fontSize: RF(14),
-    borderColor: '#FBFBFB',
-    backgroundColor: '#FBFBFB',
-    color: '#001B4A',
-  },
-});
 
 const styles = StyleSheet.create({
   imagealign: {
