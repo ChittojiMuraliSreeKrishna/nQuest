@@ -296,7 +296,7 @@ export default class NewSaleReport extends Component {
                 <View style={scss.flatListSubContainer}>
                   <View style={scss.textContainer}>
                     <Text style={scss.highText} >S.NO: {index + 1} </Text>
-                    <Text style={scss.textStyleMedium}>INVOICE NUMBER: {"\n"} {item.invoiceNumber}</Text>
+                    <Text style={scss.textStyleMedium}>INVOICE NUMBER:{"\n"} {item.invoiceNumber}</Text>
                   </View>
                   <View style={scss.textContainer}>
                     <Text style={scss.textStyleLight}>{I18n.t("EMP ID")}: {item.empId} </Text>
@@ -556,12 +556,12 @@ export default class NewSaleReport extends Component {
                     renderItem={({ item, index }) => (
                       <View style={{ backgroundColor: '#FFF' }}>
                         <View style={scss.model_text_container}>
-                          <Txt style={{ textAlign: 'left' }} variant='titleMedium' selectable={true} key={Math.random()}>Memo.no: {"\n"}{item.invoiceNumber}</Txt>
-                          <Txt style={{ textAlign: 'right' }} variant='bodyLarge'>Customer: {"\n"}{item.customerName}</Txt>
+                          <Txt style={{ textAlign: 'left' }} variant='titleMedium' selectable={true} key={Math.random()}>Memo.no:{"\n"}{item.invoiceNumber}</Txt>
+                          <Txt style={{ textAlign: 'right' }} variant='bodyLarge'>Customer:{"\n"}{item.customerName}</Txt>
                         </View>
                         <View style={scss.model_text_container}>
-                          <Txt style={{ textAlign: 'left' }} variant='bodyLarge'>Mobile: {"\n"}{item.mobileNumber}</Txt>
-                          <Txt style={{ textAlign: 'right' }} variant='bodyLarge'>Date: {"\n"}{formatDate(item.createdDate)}</Txt>
+                          <Txt style={{ textAlign: 'left' }} variant='bodyLarge'>Mobile:{"\n"}{item.mobileNumber}</Txt>
+                          <Txt style={{ textAlign: 'right' }} variant='bodyLarge'>Date:{"\n"}{formatDate(item.createdDate)}</Txt>
                         </View>
                         <View style={scss.model_subContainer}>
                           <ScrollView>
@@ -569,32 +569,32 @@ export default class NewSaleReport extends Component {
                               return (
                                 <View id={index} style={scss.model_subbody}>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>Barcode: {"\n"}{data.barCode}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Section: {data.section}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>Barcode:{"\n"}{data.barCode}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Section:{"\n"}{data.section}</Txt>
                                   </View>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>HsnCode: {data.hsnCode}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>EmpId: {item.empId}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>HsnCode:{"\n"}{data.hsnCode}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>EmpId:{"\n"}{item.empId}</Txt>
                                   </View>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>QTY: {data.quantity}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>MRP: {parseFloat(data.itemPrice).toFixed(2)}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>QTY:{"\n"}{data.quantity}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>MRP:{"\n"}{parseFloat(data.itemPrice).toFixed(2)}</Txt>
                                   </View>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>DISC: {data.discount ? parseFloat(data.discount).toFixed(2) : ""}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Approved By: {data.approvedBy}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>DISC:{"\n"}{data.discount ? parseFloat(data.discount).toFixed(2) : ""}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Approved By:{"\n"}{data.approvedBy}</Txt>
                                   </View>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>Reason: {data.reason}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Tax Amount: {parseFloat(data.taxValue).toFixed(2)}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>Reason:{"\n"}{data.reason}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Tax Amount:{"\n"}{parseFloat(data.taxValue).toFixed(2)}</Txt>
                                   </View>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>CGST: {parseFloat(data.cgst).toFixed(2)}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>SGST: {parseFloat(data.sgst).toFixed(2)}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>CGST:{"\n"}{parseFloat(data.cgst).toFixed(2)}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>SGST:{"\n"}{parseFloat(data.sgst).toFixed(2)}</Txt>
                                   </View>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>IGST: {parseFloat(data.igst).toFixed(2)}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>NET: {parseFloat(data.netValue).toFixed(2)}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>IGST:{"\n"}{parseFloat(data.igst).toFixed(2)}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>NET:{"\n"}{parseFloat(data.netValue).toFixed(2)}</Txt>
                                   </View>
                                 </View>
                               );
@@ -609,8 +609,7 @@ export default class NewSaleReport extends Component {
                           <View style={scss.model_text_container}>
                             <Text style={[scss.highText, { textAlign: 'left' }]}>
                               GV APPLIED AMOUNT:{"\n"}{parseFloat(item.gvAppliedAmount).toFixed(2)}</Text>
-                            <Text style={[scss.highText, { textAlign: 'right' }]}>RT CLAIM AMOUNT:
-                              {"\n"}{parseFloat(item.returnSlipAmount).toFixed(2)}</Text>
+                            <Text style={[scss.highText, { textAlign: 'right' }]}>RT CLAIM AMOUNT:{"\n"}{parseFloat(item.returnSlipAmount).toFixed(2)}</Text>
                           </View>
                           <View style={scss.model_text_container}>
                             <Text></Text>
