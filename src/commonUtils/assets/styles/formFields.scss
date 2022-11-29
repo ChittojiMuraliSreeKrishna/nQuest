@@ -109,8 +109,8 @@
 
 .filter_dates {
   width: 48%;
-  border-color: $grey;
-  background-color: #F6F6F6;
+  border-color: $border;
+  background-color: $white;
   border-width: 1px;
   max-height: 45px;
   border-radius: 5px;
@@ -178,7 +178,7 @@
 
 
 .cancel_btn_text {
-  color: $black;
+  color: $blue;
   text-align: center;
   font-size: 16px;
   padding: 10px 0;
@@ -191,7 +191,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin: 10px 2.5%;
+  margin: 10px 5%;
 }
 
 .datePickerBtns {

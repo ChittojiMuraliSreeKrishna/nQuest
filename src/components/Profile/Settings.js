@@ -48,7 +48,7 @@ export default class Settings extends Component {
       showStores: false
     };
   }
-  clearAllData () {
+  clearAllData() {
     AsyncStorage.getAllKeys()
       .then(keys => AsyncStorage.multiRemove(keys));
   }
@@ -92,12 +92,12 @@ export default class Settings extends Component {
   };
 
   // Date Picker Actions
-  datepickerCancelClicked () {
+  datepickerCancelClicked() {
     this.setState({ date: new Date() });
     this.setState({ datepickerOpen: false });
   }
 
-  datepickerDoneClicked () {
+  datepickerDoneClicked() {
     if (parseInt(this.state.date.getDate()) < 10) {
       this.setState({
         dateOfBirth:
@@ -120,12 +120,12 @@ export default class Settings extends Component {
     this.setState({ datepickerOpen: false });
   }
 
-  datepickerClicked () {
+  datepickerClicked() {
     this.setState({ datepickerOpen: true });
   }
 
   // Component Did Mount
-  async componentDidMount () {
+  async componentDidMount() {
     const username = await AsyncStorage.getItem("username");
     const roleName = await AsyncStorage.getItem("rolename");
     const phonenumber = await AsyncStorage.getItem("phone_number");
@@ -151,50 +151,50 @@ export default class Settings extends Component {
     });
   }
 
-  validationForm () {
+  validationForm() {
     let isFormValid = true;
     let errors = {};
     const emailReg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     if (this.state.mobileNumber.length !== 13) {
       isFormValid = false;
-      errors[ "mobile" ] = "Please Enter a valid 10 digit mobile number With state code";
+      errors["mobile"] = "Please Enter a valid 10 digit mobile number With state code";
       this.setState({ mobileNumberValid: true });
     }
     if (emailReg.test(this.state.emailId) === false) {
       isFormValid = false;
-      errors[ "email" ] = "Please Enter a valid email id";
+      errors["email"] = "Please Enter a valid email id";
       this.setState({ emailValid: true });
     }
     this.setState({ errors: errors });
     return isFormValid;
   }
 
-  profileUpdate () {
+  profileUpdate() {
     const isFormValid = this.validationForm();
     if (isFormValid) {
     }
   }
 
-  changePassword () {
+  changePassword() {
     this.props.navigation.navigate("ForgotPassword", {
       username: this.state.userName,
     });
   }
 
-  editUser () {
+  editUser() {
     this.setState({ isEdit: !this.state.isEdit });
   }
 
-  handleBackAction () {
+  handleBackAction() {
     this.props.navigation.navigate("TopBarNavigation");
     return true;
   }
 
-  handleViewStores () {
+  handleViewStores() {
     this.setState({ showStores: !this.state.showStores });
   }
 
-  render () {
+  render() {
     const { mobileNumberValid, emailValid, errors } = this.state;
     return (
       <View style={scss.container}>
@@ -237,9 +237,9 @@ export default class Settings extends Component {
               isVisible={this.state.showStores}
               onBackdropPress={() => this.handleViewStores()}
               style={{ margin: 0 }}>
-              <View style={[ popUp.popUp ]}>
+              <View style={[popUp.popUp]}>
                 <Text style={popUp.popUp_decorator}></Text>
-                <View style={[ popUp.popupModelContainer ]}>
+                <View style={[popUp.popupModelContainer]}>
                   <Text>
                     {this.state.stores.map((item, index) => {
                       return (
@@ -291,7 +291,7 @@ export default class Settings extends Component {
                 value={this.state.emailId}
                 onChangeText={(value) => this.handleEmail(value)}
               />
-              {emailValid && <Message imp={true} message={this.state.errors[ "email" ]} />}
+              {emailValid && <Message imp={true} message={this.state.errors["email"]} />}
               <TextInput
                 mode='flat'
                 activeUnderlineColor='#000'
@@ -303,7 +303,7 @@ export default class Settings extends Component {
                 value={this.state.mobileNumber}
                 onChangeText={(value) => this.handleMobileNumber(value)}
               />
-              {mobileNumberValid && <Message imp={true} message={this.state.errors[ "mobile" ]} />}
+              {mobileNumberValid && <Message imp={true} message={this.state.errors["mobile"]} />}
               <View
                 style={
                   Device.isTablet
@@ -454,7 +454,7 @@ export default class Settings extends Component {
                 onChange={(value) => this.handleAddress(value)}
               />
               <Button style={scss.submitBtn} textColor="#fff" onPress={() => this.profileUpdate()} mode='elevated'>SAVE</Button>
-              <Button style={scss.changeBtn} textColor="#000" onPress={() => this.changePassword()} mode='outlined'>Change Password</Button>
+              <Button style={scss.changeBtn} textColor="#000" onPress={() => this.changePassword()} mode='flat'>Change Password</Button>
               <View style={{ margin: 25 }}></View>
             </KeyboardAwareScrollView>
           </ScrollView>

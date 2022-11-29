@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
 import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import DatePicker from 'react-native-date-picker';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -14,6 +13,8 @@ import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import { dateFormat, formatDate, formatMonth } from '../../commonUtils/DateFormate';
+import DateSelector from '../../commonUtils/DateSelector';
+import { RH } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
 
 var deviceWidth = Dimensions.get("window").width;
@@ -209,10 +210,17 @@ export default class NewSaleReport extends Component {
     this.setState({ enddoneButtonClicked: true, datepickerOpen: false, datepickerendOpen: false });
   }
 
-  datepickerCancelClicked() {
-    this.setState({ date: new Date(), enddate: new Date(), datepickerOpen: false, datepickerendOpen: false });
-  }
+  datepickerCancelClicked = () => {
+    this.setState({
+      datepickerOpen: false,
+    });
+  };
 
+  datepickerEndCancelClicked = () => {
+    this.setState({
+      datepickerendOpen: false,
+    });
+  };
   handleBillPositions = (value) => {
     this.setState({ billPosition: value });
   };
@@ -231,6 +239,14 @@ export default class NewSaleReport extends Component {
 
   modelCancel() {
     this.setState({ modalVisible: false, flagFilterNewSale: false });
+  }
+
+  handleDate = (value) => {
+    this.setState({ startDate: value })
+  }
+
+  handleEndDate = (value) => {
+    this.setState({ endDate: value })
   }
 
   clearFilterAction() {
@@ -280,7 +296,7 @@ export default class NewSaleReport extends Component {
                 <View style={scss.flatListSubContainer}>
                   <View style={scss.textContainer}>
                     <Text style={scss.highText} >S.NO: {index + 1} </Text>
-                    <Text style={scss.textStyleMedium}>INVOICE NUMBER: {"\n"} {item.invoiceNumber}</Text>
+                    <Text style={scss.textStyleMedium}>INVOICE NUMBER:{"\n"} {item.invoiceNumber}</Text>
                   </View>
                   <View style={scss.textContainer}>
                     <Text style={scss.textStyleLight}>{I18n.t("EMP ID")}: {item.empId} </Text>
@@ -434,44 +450,18 @@ export default class NewSaleReport extends Component {
                       </TouchableOpacity>
                     </View>
                     {this.state.datepickerOpen && (
-                      <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
-                        <TouchableOpacity
-                          style={Device.isTablet ? styles.datePickerButton_tablet : styles.datePickerButton_mobile} onPress={() => this.datepickerCancelClicked()}
-                        >
-                          <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Cancel </Text>
-
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={Device.isTablet ? styles.datePickerEndButton_tablet : styles.datePickerEndButton_mobile} onPress={() => this.datepickerDoneClicked()}
-                        >
-                          <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Done </Text>
-
-                        </TouchableOpacity>
-                        <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
-                          date={this.state.date}
-                          mode={'date'}
-                          onDateChange={(date) => this.setState({ date })}
+                      <View style={{ height: RH(280), width: deviceWidth, backgroundColor: '#ffffff' }}>
+                        <DateSelector
+                          dateCancel={this.datepickerCancelClicked}
+                          setDate={this.handleDate}
                         />
-                      </View>
-                    )}
+                      </View>)}
 
                     {this.state.datepickerendOpen && (
-                      <View style={{ height: 280, width: deviceWidth, backgroundColor: '#ffffff' }}>
-                        <TouchableOpacity
-                          style={Device.isTablet ? styles.datePickerButton_tablet : styles.datePickerButton_mobile} onPress={() => this.datepickerCancelClicked()}
-                        >
-                          <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Cancel </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={Device.isTablet ? styles.datePickerEndButton_tablet : styles.datePickerEndButton_mobile} onPress={() => this.datepickerendDoneClicked()}
-                        >
-                          <Text style={Device.isTablet ? styles.datePickerButtonText_tablet : styles.datePickerButtonText_mobile}  > Done </Text>
-
-                        </TouchableOpacity>
-                        <DatePicker style={{ width: deviceWidth, height: 200, marginTop: 50, }}
-                          date={this.state.enddate}
-                          mode={'date'}
-                          onDateChange={(enddate) => this.setState({ enddate })}
+                      <View style={{ height: RH(280), width: deviceWidth, backgroundColor: '#ffffff' }}>
+                        <DateSelector
+                          dateCancel={this.datepickerEndCancelClicked}
+                          setDate={this.handleEndDate}
                         />
                       </View>
                     )}
@@ -494,9 +484,9 @@ export default class NewSaleReport extends Component {
                       />
                     </View>
                     <TextInput
-                      outlineColor='#d8d8d8'
-                      mode='outlined'
-                      activeOutlineColor='#d8d8d8'
+                      underlineColor='#efefef'
+                      mode='flat'
+                      activeUnderlineColor='#efefef'
                       style={forms.input_fld}
                       underlineColorAndroid="transparent"
                       placeholder={I18n.t("INVOICE NUMBER")}
@@ -507,9 +497,9 @@ export default class NewSaleReport extends Component {
                       onChangeText={this.handleInvoiceNumber}
                     />
                     <TextInput
-                      outlineColor='#d8d8d8'
-                      mode='outlined'
-                      activeOutlineColor='#d8d8d8'
+                      underlineColor='#efefef'
+                      mode='flat'
+                      activeUnderlineColor='#efefef'
                       style={forms.input_fld}
                       underlineColorAndroid="transparent"
                       placeholder={I18n.t("MOBILE NUMBER")}
@@ -522,12 +512,13 @@ export default class NewSaleReport extends Component {
                       onChangeText={this.handleMobile}
                     />
                     <TextInput
-                      outlineColor='#d8d8d8'
-                      mode='outlined'
-                      activeOutlineColor='#d8d8d8'
+                      underlineColor='#efefef'
+                      mode='flat'
+                      activeUnderlineColor='#efefef'
                       style={forms.input_fld}
                       underlineColorAndroid="transparent"
                       placeholder={I18n.t("EMP ID")}
+                      keyboardType='number-pad'
                       placeholderTextColor="#6F6F6F"
                       textAlignVertical="center"
                       autoCapitalize="none"
@@ -565,12 +556,12 @@ export default class NewSaleReport extends Component {
                     renderItem={({ item, index }) => (
                       <View style={{ backgroundColor: '#FFF' }}>
                         <View style={scss.model_text_container}>
-                          <Txt style={{ textAlign: 'left' }} variant='titleMedium' selectable={true} key={Math.random()}>Memo.no: {"\n"}{item.invoiceNumber}</Txt>
-                          <Txt style={{ textAlign: 'right' }} variant='bodyLarge'>Customer: {"\n"}{item.customerName}</Txt>
+                          <Txt style={{ textAlign: 'left' }} variant='titleMedium' selectable={true} key={Math.random()}>Memo.no:{"\n"}{item.invoiceNumber}</Txt>
+                          <Txt style={{ textAlign: 'right' }} variant='bodyLarge'>Customer:{"\n"}{item.customerName}</Txt>
                         </View>
                         <View style={scss.model_text_container}>
-                          <Txt style={{ textAlign: 'left' }} variant='bodyLarge'>Mobile: {"\n"}{item.mobileNumber}</Txt>
-                          <Txt style={{ textAlign: 'right' }} variant='bodyLarge'>Date: {"\n"}{formatDate(item.createdDate)}</Txt>
+                          <Txt style={{ textAlign: 'left' }} variant='bodyLarge'>Mobile:{"\n"}{item.mobileNumber}</Txt>
+                          <Txt style={{ textAlign: 'right' }} variant='bodyLarge'>Date:{"\n"}{formatDate(item.createdDate)}</Txt>
                         </View>
                         <View style={scss.model_subContainer}>
                           <ScrollView>
@@ -578,32 +569,32 @@ export default class NewSaleReport extends Component {
                               return (
                                 <View id={index} style={scss.model_subbody}>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>Barcode: {"\n"}{data.barCode}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Section: {data.section}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>Barcode:{"\n"}{data.barCode}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Section:{"\n"}{data.section}</Txt>
                                   </View>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>HsnCode: {data.hsnCode}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>EmpId: {item.empId}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>HsnCode:{"\n"}{data.hsnCode}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>EmpId:{"\n"}{item.empId}</Txt>
                                   </View>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>QTY: {data.quantity}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>MRP: {parseFloat(data.itemPrice).toFixed(2)}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>QTY:{"\n"}{data.quantity}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>MRP:{"\n"}{parseFloat(data.itemPrice).toFixed(2)}</Txt>
                                   </View>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>DISC: {data.discount ? parseFloat(data.discount).toFixed(2) : ""}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Approved By: {data.approvedBy}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>DISC:{"\n"}{data.discount ? parseFloat(data.discount).toFixed(2) : ""}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Approved By:{"\n"}{data.approvedBy}</Txt>
                                   </View>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>Reason: {data.reason}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Tax Amount: {parseFloat(data.taxValue).toFixed(2)}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>Reason:{"\n"}{data.reason}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>Tax Amount:{"\n"}{parseFloat(data.taxValue).toFixed(2)}</Txt>
                                   </View>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>CGST: {parseFloat(data.cgst).toFixed(2)}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>SGST: {parseFloat(data.sgst).toFixed(2)}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>CGST:{"\n"}{parseFloat(data.cgst).toFixed(2)}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>SGST:{"\n"}{parseFloat(data.sgst).toFixed(2)}</Txt>
                                   </View>
                                   <View style={scss.model_text_container}>
-                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>IGST: {parseFloat(data.igst).toFixed(2)}</Txt>
-                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>NET: {parseFloat(data.netValue).toFixed(2)}</Txt>
+                                    <Txt style={{ textAlign: 'left' }} variant='bodyMedium'>IGST:{"\n"}{parseFloat(data.igst).toFixed(2)}</Txt>
+                                    <Txt style={{ textAlign: 'right' }} variant='bodyMedium'>NET:{"\n"}{parseFloat(data.netValue).toFixed(2)}</Txt>
                                   </View>
                                 </View>
                               );
@@ -618,8 +609,7 @@ export default class NewSaleReport extends Component {
                           <View style={scss.model_text_container}>
                             <Text style={[scss.highText, { textAlign: 'left' }]}>
                               GV APPLIED AMOUNT:{"\n"}{parseFloat(item.gvAppliedAmount).toFixed(2)}</Text>
-                            <Text style={[scss.highText, { textAlign: 'right' }]}>RT CLAIM AMOUNT:
-                              {"\n"}{parseFloat(item.returnSlipAmount).toFixed(2)}</Text>
+                            <Text style={[scss.highText, { textAlign: 'right' }]}>RT CLAIM AMOUNT:{"\n"}{parseFloat(item.returnSlipAmount).toFixed(2)}</Text>
                           </View>
                           <View style={scss.model_text_container}>
                             <Text></Text>

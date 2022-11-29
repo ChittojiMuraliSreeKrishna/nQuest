@@ -150,7 +150,7 @@ class EditBarcode extends Component {
       reBar: editBcode.reBar,
       loading: true,
     });
-    console.log({ editBcode }, editBcode.item.metadata[1].selectedValue);
+    console.log({ editBcode }, editBcode.item.metadata);
     // alert(editBcode.item.vendorTax)
     this.setState(
       {
@@ -186,13 +186,16 @@ class EditBarcode extends Component {
         designCode: editBcode.item.designcode,
         vendorTax: String(editBcode.item.vendorTax),
         alist: editBcode.item.metadata,
-        selectedValue: editBcode.item.metadata[0].selectedValue,
-        selectedDValue: editBcode.item.metadata[1].selectedValue,
       },
       () => {
-        const { selectedDomain } = this.state;
-        if (selectedDomain === "Textile") {
+        if (editBcode.item.metadata.length > 0) {
+          this.setState({
+            selectedValue: editBcode.item.metadata[0].selectedValue,
+            selectedDValue: editBcode.item.metadata[1].selectedValue,
+          })
         }
+        const { selectedDomain } = this.state;
+        console.log({ selectedDomain })
         this.getAllCatogiries(selectedDomain);
         this.getAllstores(selectedDomain);
         this.getAllHSNCodes();

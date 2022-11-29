@@ -323,7 +323,7 @@ export default class DebitNotes extends Component {
                     <TextInput
                       style={forms.input_fld}
                       underlineColorAndroid="transparent"
-                      mode='outlined'
+                      mode='flat'
                       placeholder="MOBILE"
                       outlineColor='#d6d6d6'
                       activeOutlineColor='#d6d6d6'

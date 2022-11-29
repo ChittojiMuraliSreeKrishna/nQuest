@@ -1,9 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import Constants from 'expo-constants';
 import moment from 'moment';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import RNBeep from 'react-native-a-beep';
 import { RNCamera } from 'react-native-camera';
 import I18n from 'react-native-i18n';
@@ -13,7 +12,7 @@ import { default as MinusIcon, default as PlusIcon, default as ScanIcon } from '
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import PrintService from '../../commonUtils/Printer/printService';
-import { RF, RW } from '../../Responsive';
+import { RF } from '../../Responsive';
 import { customerErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
 import CustomerService from '../services/CustomerService';
@@ -75,7 +74,7 @@ class GenerateInvoiceSlip extends Component {
       domainId: 1,
       tableHead: ['S.No', 'Barcode', 'Product', 'Price Per Qty', 'Qty', 'Sales Rate'],
       tableData: [],
-      privilages: [{ bool: false, name: "Tag Customer" }, { bool: false, name: "Bill Level Discount" }, { bool: false, name: "Check Promo Disc" }],
+      privilages: [],
       inventoryDelete: false,
       lineItemDelete: false,
       uom: [],
@@ -298,7 +297,7 @@ class GenerateInvoiceSlip extends Component {
       if (this.state.dayCloseDates.length === 1 && this.state.dayCloseDates[0].dayClose.split("T")[0] === this.state.toDay) {
         if (isEsSlipEnabled === "true") {
           isEstimationEnable = true;
-          this.setState({ isEstimationEnable: true });
+          this.setState({ isEstimationEnable: true, privilages: [{ bool: false, name: "Tag Customer" }, { bool: false, name: "Bill Level Discount" }, { bool: false, name: "Check Promo Disc" }] });
           // if (this.state.dsCompareList.length === 0) {
           //   this.state.dsNumberList2.push(obj);
           //   this.setState({
@@ -328,7 +327,7 @@ class GenerateInvoiceSlip extends Component {
           // }
         } else {
           isEstimationEnable = false;
-          this.setState({ isEstimationEnable: false });
+          this.setState({ isEstimationEnable: false, privilages: [{ bool: false, name: "Tag Customer" }, { bool: false, name: "Bill Level Discount" }] });
         }
         CustomerService.getDsSlip(esNumber.trim(), isEstimationEnable, storeId).then((res) => {
           console.log("data in getDeliverySlipDetails", esNumber, isEstimationEnable, storeId);

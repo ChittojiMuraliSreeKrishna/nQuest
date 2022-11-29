@@ -410,9 +410,9 @@ export class ListOfBarcodes extends Component {
                         </View>
                       )}
                       <TextInput
-                        outlineColor='#d8d8d8'
-                        mode='outlined'
-                        activeOutlineColor='#d8d8d8'
+                        underlineColor='#efefef'
+                        mode='flat'
+                        activeUnderlineColor='#efefef'
                         style={forms.input_fld}
                         underlineColorAndroid="transparent"
                         placeholder={I18n.t("BARCODE")}
@@ -423,9 +423,9 @@ export class ListOfBarcodes extends Component {
                         onChangeText={this.handleBarCode}
                       />
                       <TextInput
-                        outlineColor='#d8d8d8'
-                        mode='outlined'
-                        activeOutlineColor='#d8d8d8'
+                        underlineColor='#efefef'
+                        mode='flat'
+                        activeUnderlineColor='#efefef'
 
                         style={forms.input_fld}
                         underlineColorAndroid="transparent"
@@ -437,9 +437,9 @@ export class ListOfBarcodes extends Component {
                         onChangeText={this.handleEmpId}
                       />
                       <TextInput
-                        outlineColor='#d8d8d8'
-                        mode='outlined'
-                        activeOutlineColor='#d8d8d8'
+                        underlineColor='#efefef'
+                        mode='flat'
+                        activeUnderlineColor='#efefef'
                         style={forms.input_fld}
                         underlineColorAndroid="transparent"
                         placeholder={I18n.t("PRICE <")}
@@ -450,9 +450,9 @@ export class ListOfBarcodes extends Component {
                         onChangeText={this.handleFromPrice}
                       />
                       <TextInput
-                        outlineColor='#d8d8d8'
-                        mode='outlined'
-                        activeOutlineColor='#d8d8d8'
+                        underlineColor='#efefef'
+                        mode='flat'
+                        activeUnderlineColor='#efefef'
 
                         style={forms.input_fld}
                         underlineColorAndroid="transparent"
