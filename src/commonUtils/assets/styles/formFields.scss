@@ -3,10 +3,10 @@
 .input_fld {
   justify-content: center;
   height: 50px;
-  margin: 5px 5%;
-  min-width: 90%;
-  width: 90%;
-  max-width: 90%;
+  margin: 5px 4%;
+  min-width: 92%;
+  width: 92%;
+  max-width: 92%;
   font-weight: normal;
   padding-left: 10px;
   font-size: 15px;
@@ -62,7 +62,7 @@
 .cancel_btn {
   height: 55px;
   width: 45%;
-  background-color: $white;
+  background-color: $blue;
   border: 1px solid $border;
   border-radius: 5px;
   text-align: center;
@@ -118,17 +118,19 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-between;
+  padding: 0 10px;
 }
 
 .calender_image {
-  margin-top: 5px;
+  margin: 10px 0;
+  color: $grey;
 }
 
 .filter_dates_text {
   font-size: 14px;
   text-align: center;
-  color: $grey-darker
+  color: $place-holder-color;
 }
 
 .action_buttons {

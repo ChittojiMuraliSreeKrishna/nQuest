@@ -1,12 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
 import { Appbar } from 'react-native-paper';
-import FilterIcon from 'react-native-vector-icons/FontAwesome';
+import { default as FilterIcon, default as IconFA } from 'react-native-vector-icons/FontAwesome';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import DateSelector from '../../commonUtils/DateSelector';
@@ -14,6 +14,7 @@ import { RH } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
 import { color } from '../Styles/colorStyles';
 import { emptyTextStyle } from '../Styles/FormFields';
+
 
 
 var deviceWidth = Dimensions.get("window").width;
@@ -297,7 +298,11 @@ export class SalesSumary extends Component {
                         <Text
                           style={forms.filter_dates_text}
                         >{this.state.startDate == "" ? 'START DATE' : this.state.startDate}</Text>
-                        <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                        <IconFA
+                          name="calendar"
+                          size={18}
+                          style={forms.calender_image}
+                        />
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={forms.filter_dates}
@@ -307,7 +312,11 @@ export class SalesSumary extends Component {
                         <Text
                           style={forms.filter_dates_text}
                         >{this.state.endDate == "" ? 'END DATE' : this.state.endDate}</Text>
-                        <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                        <IconFA
+                          name="calendar"
+                          size={18}
+                          style={forms.calender_image}
+                        />
                       </TouchableOpacity>
                     </View>
                     {this.state.datepickerOpen && (
