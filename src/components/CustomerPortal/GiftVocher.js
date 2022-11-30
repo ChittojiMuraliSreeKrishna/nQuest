@@ -16,8 +16,10 @@ import { customerErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
 import CustomerService from '../services/CustomerService';
 import { color } from '../Styles/colorStyles';
-import { dateSelector, dateText } from '../Styles/FormFields';
-import { flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleLight, textStyleMedium, textStyleMediumColor } from '../Styles/Styles';
+
+import { dateSelector, dateText, inputField, submitBtn, submitBtnText } from '../Styles/FormFields';
+import { filterBtn, flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleLight, textStyleMedium, textStyleMediumColor } from '../Styles/Styles';
+import scss from '../../commonUtils/assets/styles/style.scss';
 
 
 
@@ -419,7 +421,7 @@ class GiftVocher extends Component {
               ListHeaderComponent={<View style={flatListHeaderContainer}>
                 <Text style={[flatListTitle, { color: color.accent }]}>{I18n.t('Gift Vouchers')}</Text>
                 <TouchableOpacity
-                  style={styles.filterBtnStyle}
+                  style={filterBtn}
                   onPress={() => this.state.filterActive ? this.clearFilter() : this.filterAction()} >
                   <FilterIcon
                     name="sliders"
