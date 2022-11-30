@@ -192,24 +192,30 @@ export default class ReBarcode extends Component {
 
   // View RebarCode
   seeDetails = (item, index) => {
-    this.setState({ barcodesData: [] });
+    this.setState({ barcodesData: [], loading: true });
     const params = {
       barcode: item.currentBarcodeId,
       storeId: this.state.storeId,
     };
-    console.log({ params });
+    console.log({ params }, this.state.viewBarcodeData);
+    let viewBarcodeData = []
     let domainDetails = {};
     InventoryService.getBarcodesDetails(this.state.storeId, domainDetails, item.currentBarcodeId).then(res => {
       if (res?.data) {
         console.log({ res });
         let viewData = res.data;
         if (res.status === 200) {
-          this.state.viewBarcodeData.push(res.data);
-          this.setState({ viewBarcodeData: this.state.viewBarcodeData, viewBarcode: true });
+          viewBarcodeData.push(res.data);
+          const uniqueData = viewBarcodeData.filter((val, id, array) => {
+            return array.indexOf(val) == id;
+          })
+          this.setState({ viewBarcodeData: uniqueData, viewBarcode: true });
         }
         console.log({ viewData }, this.state.viewBarcodeData.barcode);
       }
+      this.setState({ loading: false })
     }).catch((err) => {
+      this.setState({ loading: false })
       console.log({ err });
     });
   };
@@ -319,8 +325,8 @@ export default class ReBarcode extends Component {
               <View style={scss.flatListContainer}>
                 <View style={scss.flatListSubContainer}>
                   <View style={scss.textContainer}>
-                    <Text style={scss.highText}>
-                      {I18n.t("PARENT BARCODE")}: {item.toBeBarcodeId}
+                    <Text style={scss.textStyleMedium} selectable={true}>
+                      {I18n.t("PARENT BARCODE")}: <Text style={scss.highText}>{item.toBeBarcodeId}</Text>
                     </Text>
                   </View>
                   <View style={scss.textContainer}>

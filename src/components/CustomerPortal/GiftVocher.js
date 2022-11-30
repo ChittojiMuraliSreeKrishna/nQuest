@@ -9,15 +9,15 @@ import Modal from 'react-native-modal';
 import { TextInput } from 'react-native-paper';
 import FilterIcon from 'react-native-vector-icons/FontAwesome';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
+import scss from '../../commonUtils/assets/styles/style.scss';
 import DateSelector from '../../commonUtils/DateSelector';
 import { RF, RH, RW } from '../../Responsive';
 import { customerErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
 import CustomerService from '../services/CustomerService';
 import { color } from '../Styles/colorStyles';
-import { dateSelector, dateText, inputField, submitBtn, submitBtnText } from '../Styles/FormFields';
+import { dateSelector, dateText, inputField } from '../Styles/FormFields';
 import { flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleLight, textStyleMedium, textStyleMediumColor } from '../Styles/Styles';
-import scss from '../../commonUtils/assets/styles/style.scss';
 
 
 var deviceheight = Dimensions.get('window').height;
