@@ -7,19 +7,17 @@ import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import Modal from 'react-native-modal';
 import { TextInput } from 'react-native-paper';
-import RNPickerSelect from 'react-native-picker-select';
-import { Chevron } from 'react-native-shapes';
 import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
-import scss from '../../commonUtils/assets/styles/style.scss'
-import { RF, RW } from '../../Responsive';
+import scss from '../../commonUtils/assets/styles/style.scss';
+import RnPicker from '../../commonUtils/RnPicker';
+import { RF } from '../../Responsive';
 import { customerErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
 import CustomerService from '../services/CustomerService';
 import { color } from '../Styles/colorStyles';
-import { checkPromoDiscountBtn, inputField, textStyle } from '../Styles/FormFields';
+import { textStyle } from '../Styles/FormFields';
 import { flatListMainContainer, flatlistSubContainer, highText, highText_black, textContainer, textStyleMedium, textStyleMediumColor } from '../Styles/Styles';
-import RnPicker from '../../commonUtils/RnPicker';
 
 
 var deviceheight = Dimensions.get('window').height;
@@ -36,7 +34,7 @@ export default class GenerateReturnSlip extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      invoiceNumber: "EAS20223071720",
+      invoiceNumber: "",
       mobileNumber: "",
       customerTagging: false,
       modelVisible: true,
@@ -211,16 +209,16 @@ export default class GenerateReturnSlip extends Component {
                 console.log("clearList", clearList)
                 this.state.returnInvoice = clearList
                 console.log("returnslipsList", this.state.returnInvoice)
-                  this.state.returnInvoice.forEach((element) => {
-                    netValue = netValue + element.netValue;
-                    costprice = costprice + element.mrp;
-                    quantity = quantity + element.quantity;
-                    if (element.quantity >= 1) {
-                      element.returnQty = parseInt("0");
-                      element.returnedAmout = parseInt("0")
-                    }
-                    element.isChecked = false;
-                  });
+                this.state.returnInvoice.forEach((element) => {
+                  netValue = netValue + element.netValue;
+                  costprice = costprice + element.mrp;
+                  quantity = quantity + element.quantity;
+                  if (element.quantity >= 1) {
+                    element.returnQty = parseInt("0");
+                    element.returnedAmout = parseInt("0")
+                  }
+                  element.isChecked = false;
+                });
                 if (this.state.returnInvoice.length === 1 && quantity === 1) {
                   this.setState({ returnSlipTotal: netValue });
                 }
@@ -246,7 +244,7 @@ export default class GenerateReturnSlip extends Component {
     }
   };
 
-  itemSelected( index, selectedElement) {
+  itemSelected(index, selectedElement) {
     if (selectedElement.isChecked === true) {
       if (selectedElement.quantity === 1) {
         selectedElement.returnQty = selectedElement.quantity;
@@ -732,7 +730,7 @@ export default class GenerateReturnSlip extends Component {
                     <>
                       <View style={[flatListMainContainer, { backgroundColor: color.white }]}>
                         {this.state.returnInvoice.length > 1 && item.quantity >= 1 &&
-                          <TouchableOpacity onPress={(e) => this.itemSelected( index, item)} style={{ width: 20, height: 20 }}>
+                          <TouchableOpacity onPress={(e) => this.itemSelected(index, item)} style={{ width: 20, height: 20 }}>
                             <Image style={{}} source={
                               //require('../assets/images/chargeunselect.png')}
                               item.isChecked ?
@@ -748,7 +746,8 @@ export default class GenerateReturnSlip extends Component {
                           <View style={textContainer}>
                             <Text style={textStyleMediumColor}> {I18n.t("QTY")}</Text>
                             {this.state.returnInvoice.length >= 1 && this.state.quantity >= 1 &&
-                              <Text style={textStyleMediumColor}> {I18n.t("RETURN QTY")}</Text>}
+                              <Text style={textStyleMediumColor}> {I18n.t("RETURN QTY")}</Text>
+                            }
                           </View>
                           <View style={textContainer}>
                             <Text style={textStyleMedium}>{item.quantity}</Text>
@@ -756,7 +755,7 @@ export default class GenerateReturnSlip extends Component {
                               {this.state.returnInvoice.length > 1 && item.quantity >= 1 &&
                                 <Text style={textStyleMedium}>{item.returnQty}</Text>
                               }
-                              {this.state.returnInvoice.length === 1 && item.quantity > 1 &&
+                              {this.state.returnInvoice.length > 0 && item.quantity > 1 &&
                                 <>
                                   <TouchableOpacity
                                     onPress={() => this.incrementForTable(item, index)}>
