@@ -12,12 +12,17 @@ import CreateDeliverySlip from '../services/CreateDeliverySlip';
 import { rnPicker, rnPickerContainer } from '../Styles/FormFields';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
+import RnPicker from '../../commonUtils/RnPicker';
 
 var deviceheight = Dimensions.get('window').height;
 var deviceheight = Dimensions.get('window').height;
 var deviceWidth = Dimensions.get("window").width;
 
 var mobileNumber = '';
+const picketData = [
+  { label: 'Male', value: 'male' },
+  { label: 'Female', value: 'female' },
+]
 
 export default class AddCustomer extends Component {
 
@@ -304,22 +309,10 @@ export default class AddCustomer extends Component {
           />
           {!gstValid && <Message imp={false} message={this.state.errors["gst"]} />}
           <Text style={scss.textStyleLight}>{I18n.t("Gender")}</Text>
-          <View style={rnPickerContainer}>
-            <RNPickerSelect
-              placeholder={{ label: 'GENDER', value: '' }}
-              Icon={() => {
-                return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-              }}
-              items={[
-                { label: 'Male', value: 'male' },
-                { label: 'Female', value: 'female' },
-              ]}
-              onValueChange={this.handlegender}
-              style={rnPicker}
-              value={this.state.gender}
-              useNativeAndroidPickerStyle={false}
-            />
-          </View>
+          <RnPicker
+            items={picketData}
+            setValue={this.handlegender}
+          />
           <View style={forms.action_buttons_container}>
             <TouchableOpacity
               style={[forms.action_buttons, forms.submit_btn, { width: "90%" }]}
