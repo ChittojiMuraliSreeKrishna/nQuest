@@ -18,6 +18,7 @@ import I18n from 'react-native-i18n';
 import moment from 'moment';
 import { TextInput } from 'react-native-paper';
 import { color } from '../Styles/colorStyles';
+import RnPicker from '../../commonUtils/RnPicker';
 
 
 var deviceheight = Dimensions.get('window').height;
@@ -43,7 +44,6 @@ export default class DayClosure extends Component {
       toadayValue: '',
       toadaydeskValue: '',
       penlitydeskValue: 0,
-      daycheckCloseDates: [],
       selectedDate: "",
       isEnabeldDayCloser: false
     };
@@ -65,15 +65,16 @@ export default class DayClosure extends Component {
 
   getalltoDates() {
     CustomerService.getDates(this.state.storeId).then(res => {
-      if (res.data.length > 0) {
-        this.setState({ daycheckCloseDates: res.data });
-        if (this.state.daycheckCloseDates.length === 0) {
-          this.setState({ isdayCloser: true });
-        } else if (this.state.daycheckCloseDates.length > 1 && this.state.daycheckCloseDates[0].dayClose.split("T")[0] !== this.state.toDay) {
-          this.setState({ ystDayCloser: true });
-        }
+      if (res.data.length > 0 && res.status === 200) {
+        this.setState({ daycheckCloseDates: res.data }, () => {
+          if (this.state.daycheckCloseDates.length === 0) {
+            this.setState({ isdayCloser: true });
+          } else if (this.state.daycheckCloseDates.length > 1 && this.state.daycheckCloseDates[0].dayClose.split("T")[0] !== this.state.toDay) {
+            this.setState({ ystDayCloser: true });
+          }
+        })
       }
-    });
+    })
   }
 
   getAllDayCloser() {
@@ -95,18 +96,11 @@ export default class DayClosure extends Component {
   }
 
   closeDay() {
-    // const param = "?storeId=" + this.state.storeId;
-    // axios.put(CustomerService.dayCloseActivity() + param).then(res => {
-    //   if (res) {
-    //     alert(res.data.result);
-    //     this.getAllDayCloser();
-    //   }
-    // });
     this.setState({ isCloseDay: true });
-    if (this.state.daycheckCloseDates.length === 1) {
+    if (this.state.daycheckCloseDates && this.state.daycheckCloseDates.length === 1) {
       this.setState({ isDayClose: true, ystDayCloser: false })
     }
-    else if (this.state.daycheckCloseDates.length > 1) {
+    else if (this.state.daycheckCloseDates && this.state.daycheckCloseDates.length > 1) {
       this.setState({ isDates: true })
     }
   }
@@ -125,7 +119,7 @@ export default class DayClosure extends Component {
 
   getallPendingDate() {
     CustomerService.getDates(this.state.storeId).then(res => {
-      if (res && res.data.length > 1) {
+      if (res && res.data.length > 1 && res.status === 200) {
         if (res.data.length > 1) {
           this.setState({ datesDaycloser: res.data })
           this.state.datesDaycloser.pop();
@@ -337,19 +331,10 @@ export default class DayClosure extends Component {
               <Text style={forms.popUp_decorator}>-</Text>
               <View style={forms.filterModelSub}>
                 <KeyboardAwareScrollView>
-                  <View style={[Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile, { width: "92%" }]}>
-                    <RNPickerSelect
-                      placeholder={{ label: 'Pending Dates *', value: '' }}
-                      Icon={() => {
-                        return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-                      }}
-                      items={this.state.dayCloseDates}
-                      onValueChange={this.handleSelectPendingDates}
-                      style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
-                      value={this.state.applicability}
-                      useNativeAndroidPickerStyle={false}
-                    />
-                  </View>
+                  <RnPicker
+                    items={this.state.dayCloseDates}
+                    setValue={this.handleSelectPendingDates}
+                  />
                   <View style={forms.action_buttons_container}>
                     <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                       onPress={() => this.pendingConfirmDayCloser()}>

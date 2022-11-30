@@ -7,23 +7,28 @@ import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import Modal from 'react-native-modal';
 import { TextInput } from 'react-native-paper';
-import RNPickerSelect from 'react-native-picker-select';
-import { Chevron } from 'react-native-shapes';
 import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
-import scss from '../../commonUtils/assets/styles/style.scss'
-import { RF, RW } from '../../Responsive';
+import scss from '../../commonUtils/assets/styles/style.scss';
+import RnPicker from '../../commonUtils/RnPicker';
+import { RF } from '../../Responsive';
 import { customerErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
 import CustomerService from '../services/CustomerService';
 import { color } from '../Styles/colorStyles';
-import { checkPromoDiscountBtn, inputField, textStyle } from '../Styles/FormFields';
+import { textStyle } from '../Styles/FormFields';
 import { flatListMainContainer, flatlistSubContainer, highText, highText_black, textContainer, textStyleMedium, textStyleMediumColor } from '../Styles/Styles';
 
 
 var deviceheight = Dimensions.get('window').height;
 var deviceWidth = Dimensions.get("window").width;
 
+const pickerData = [
+  { label: 'Not Fitting', value: 'Not Fitting' },
+  { label: 'Damaged Piece', value: 'Damaged Piece' },
+  { label: 'Quality is Not Good', value: 'Quality is Not Good' },
+  { label: 'Others', value: 'Others' },
+]
 export default class GenerateReturnSlip extends Component {
 
   constructor(props) {
@@ -204,7 +209,6 @@ export default class GenerateReturnSlip extends Component {
                 console.log("clearList", clearList)
                 this.state.returnInvoice = clearList
                 console.log("returnslipsList", this.state.returnInvoice)
-
                 this.state.returnInvoice.forEach((element) => {
                   netValue = netValue + element.netValue;
                   costprice = costprice + element.mrp;
@@ -240,8 +244,8 @@ export default class GenerateReturnSlip extends Component {
     }
   };
 
-  itemSelected(e, index, selectedElement) {
-    if (item.isChecked === true) {
+  itemSelected(index, selectedElement) {
+    if (selectedElement.isChecked === true) {
       if (selectedElement.quantity === 1) {
         selectedElement.returnQty = selectedElement.quantity;
         selectedElement.returnedAmout = (selectedElement.netValue) / selectedElement.returnQty
@@ -254,12 +258,12 @@ export default class GenerateReturnSlip extends Component {
         returnQty: selectedElement.returnQty,
       };
       this.state.netValueList.push(obj);
-      item.isChecked = false;
+      selectedElement.isChecked = false;
       // let index = this.state.netValueList.findIndex(ele => ele.barCode === item.barCode);
       // this.state.netValueList.splice(index, 1);
     }
     else {
-      item.isChecked = true;
+      selectedElement.isChecked = true;
       // const obj = {
       //   amount: item.value,
       //   barCode: item.barCode,
@@ -277,11 +281,11 @@ export default class GenerateReturnSlip extends Component {
     // });
     this.state.returnInvoice.forEach((element, ind) => {
       if (element.returnQty && element.returnQty !== 0 && ind == index) {
-        element.returnedAmout = (parseInt(element.returnQty) * element.netValue) / element.quantity
+        element.returnedAmout = (parseFloat(element.returnQty) * element.netValue) / element.quantity
       } else {
-        element.returnedAmout = parseInt(element.returnQty) * element.netValue
+        element.returnedAmout = parseFloat(element.returnQty) * element.netValue
       }
-      element.returnedAmout = (parseInt(element.returnQty) * element.netValue) / element.quantity
+      element.returnedAmout = (parseFloat(element.returnQty) * element.netValue) / element.quantity
     });
     let sumreturnedAmout = this.state.returnInvoice.reduce((accumulator, curValue) => {
       if (curValue.returnQty && curValue.returnQty !== '0') {
@@ -290,7 +294,7 @@ export default class GenerateReturnSlip extends Component {
       return accumulator;
 
     }, 0);
-    this.setState({ returnSlipTotal: (sumreturnedAmout).toFixed(2) });
+    this.setState({ returnSlipTotal: (sumreturnedAmout) });
 
   }
 
@@ -313,21 +317,6 @@ export default class GenerateReturnSlip extends Component {
 
   generateNewSlip(item, index) {
     console.log(this.state.storeId);
-    // const qtyarr = [...this.state.returnInvoice];
-    // let finallist = [];
-    // qtyarr.forEach((item, index) => {
-    //   if (item.returnQty > 0) {
-    //     finallist.push({
-    //       barCode: item.barCode,
-    //       amount: item.value,
-    //       qty: item.quantity,
-    //       returnQty: item.returnQty,
-    //       returnAmount: item.value / item.quantity * item.returnQty
-    //     });
-    //   }
-    // });
-    // console.log("returnSlipList", this.state.netValueList);
-    // const isFormValid = this.validationForReturnSlip()
     let barList = [];
     if (this.state.returnInvoice.length >= 1 && this.state.quantity > 1) {
       this.state.returnInvoice.forEach((element) => {
@@ -336,7 +325,7 @@ export default class GenerateReturnSlip extends Component {
           barCode: element.barcode,
           qty: element.quantity,
           returnQty: element.returnQty ? parseInt(element.returnQty) : 0,
-          returnAmount: element.returnedAmout ? (element.returnedAmout).toFixed(2) : 0
+          returnAmount: element.returnedAmout ? (element.returnedAmout) : 0
         };
         barList.push(obj);
       });
@@ -348,7 +337,7 @@ export default class GenerateReturnSlip extends Component {
           barCode: element.barcode,
           qty: element.quantity,
           returnQty: element.quantity ? parseInt(element.quantity) : 0,
-          returnAmount: element.netValue ? (element.netValue).toFixed(2) : 0
+          returnAmount: element.netValue ? (element.netValue) : 0
         };
         barList.push(obj);
         this.setState({ retBarList: barList })
@@ -475,7 +464,7 @@ export default class GenerateReturnSlip extends Component {
       return accumulator;
 
     }, 0);
-    this.setState({ returnSlipTotal: (sumreturnedAmout).toFixed(2) });
+    this.setState({ returnSlipTotal: (sumreturnedAmout) });
     // let grandTotal = 0;
     // let totalqty = 0;
     // this.state.returnInvoice.forEach(bardata => {
@@ -524,7 +513,7 @@ export default class GenerateReturnSlip extends Component {
       return accumulator;
 
     }, 0);
-    this.setState({ returnSlipTotal: (sumreturnedAmout).toFixed(2) });
+    this.setState({ returnSlipTotal: (sumreturnedAmout) });
     // this.setState({ totalQuantity: totalqty });
     // this.state.totalQuantity = (parseInt(this.state.totalQuantity) + 1);
   };
@@ -556,7 +545,7 @@ export default class GenerateReturnSlip extends Component {
         return accumulator;
 
       }, 0);
-      this.setState({ returnSlipTotal: (sumreturnedAmout).toFixed(2) });
+      this.setState({ returnSlipTotal: (sumreturnedAmout) });
       // this.setState({  totalQuantity: totalqty });
       this.setState({ returnInvoice: qtyarr });
     } else {
@@ -740,8 +729,8 @@ export default class GenerateReturnSlip extends Component {
                   renderItem={({ item, index }) => (
                     <>
                       <View style={[flatListMainContainer, { backgroundColor: color.white }]}>
-                        {this.state.returnInvoice.length > 1 && quantity >= 1 &&
-                          <TouchableOpacity onPress={(e) => this.itemSelected(e, index, item)} style={{ width: 20, height: 20 }}>
+                        {this.state.returnInvoice.length > 1 && item.quantity >= 1 &&
+                          <TouchableOpacity onPress={(e) => this.itemSelected(index, item)} style={{ width: 20, height: 20 }}>
                             <Image style={{}} source={
                               //require('../assets/images/chargeunselect.png')}
                               item.isChecked ?
@@ -757,7 +746,8 @@ export default class GenerateReturnSlip extends Component {
                           <View style={textContainer}>
                             <Text style={textStyleMediumColor}> {I18n.t("QTY")}</Text>
                             {this.state.returnInvoice.length >= 1 && this.state.quantity >= 1 &&
-                              <Text style={textStyleMediumColor}> {I18n.t("RETURN QTY")}</Text>}
+                              <Text style={textStyleMediumColor}> {I18n.t("RETURN QTY")}</Text>
+                            }
                           </View>
                           <View style={textContainer}>
                             <Text style={textStyleMedium}>{item.quantity}</Text>
@@ -765,7 +755,7 @@ export default class GenerateReturnSlip extends Component {
                               {this.state.returnInvoice.length > 1 && item.quantity >= 1 &&
                                 <Text style={textStyleMedium}>{item.returnQty}</Text>
                               }
-                              {this.state.returnInvoice.length === 1 && item.quantity > 1 &&
+                              {this.state.returnInvoice.length > 0 && item.quantity > 1 &&
                                 <>
                                   <TouchableOpacity
                                     onPress={() => this.incrementForTable(item, index)}>
@@ -828,7 +818,7 @@ export default class GenerateReturnSlip extends Component {
                   <Text style={[highText]}> ₹ {this.state.returnSlipTotal} </Text>
                 </View>
                 <Text style={[textStyleMediumColor]}>{I18n.t("Return For Reason")} </Text>
-                <View style={Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile}>
+                {/* <View style={Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile}>
                   <RNPickerSelect
                     placeholder={{ label: 'REASON', value: '' }}
                     Icon={() => {
@@ -845,7 +835,12 @@ export default class GenerateReturnSlip extends Component {
                     value={this.state.reason}
                     useNativeAndroidPickerStyle={false}
                   />
-                </View>
+                </View> */}
+
+                <RnPicker
+                  items={pickerData}
+                  setValue={this.handleReason}
+                />
                 {!this.state.reasonValid && (
                   <Message imp={true} message={this.state.errors["reason"]} />
                 )}

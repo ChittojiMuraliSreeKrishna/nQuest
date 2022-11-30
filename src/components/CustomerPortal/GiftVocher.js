@@ -1,13 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
 import { TextInput } from 'react-native-paper';
-import FilterIcon from 'react-native-vector-icons/FontAwesome';
+import { default as FilterIcon, default as IconFA } from 'react-native-vector-icons/FontAwesome';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import DateSelector from '../../commonUtils/DateSelector';
@@ -16,8 +16,10 @@ import { customerErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
 import CustomerService from '../services/CustomerService';
 import { color } from '../Styles/colorStyles';
-import { dateSelector, dateText, inputField } from '../Styles/FormFields';
-import { flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleLight, textStyleMedium, textStyleMediumColor } from '../Styles/Styles';
+
+import { dateSelector, dateText, inputField, submitBtn, submitBtnText } from '../Styles/FormFields';
+import { filterBtn, flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleLight, textStyleMedium, textStyleMediumColor } from '../Styles/Styles';
+
 
 
 var deviceheight = Dimensions.get('window').height;
@@ -351,7 +353,11 @@ class GiftVocher extends Component {
                         <Text
                           style={forms.filter_dates_text}
                         >{this.state.filterStartDate == "" ? 'START DATE' : this.state.filterStartDate}</Text>
-                        <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                        <IconFA
+                          name="calendar"
+                          size={18}
+                          style={forms.calender_image}
+                        />
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={forms.filter_dates}
@@ -361,7 +367,11 @@ class GiftVocher extends Component {
                         <Text
                           style={forms.filter_dates_text}
                         >{this.state.filterEndDate == "" ? 'END DATE' : this.state.filterEndDate}</Text>
-                        <Image style={forms.calender_image} source={require('../assets/images/calender.png')} />
+                        <IconFA
+                          name="calendar"
+                          size={18}
+                          style={forms.calender_image}
+                        />
                       </TouchableOpacity>
                     </View>
                     {this.state.filterStartPickerOpen && (
@@ -386,7 +396,7 @@ class GiftVocher extends Component {
                       activeUnderlineColor='#000'
                       underlineColor={'#6f6f6f'}
                       label={('GV Number')}
-                      style={[inputField, { borderColor: '#8F9EB717' }]}
+                      style={[forms.input_fld, { borderColor: '#8F9EB717' }]}
                       value={this.state.filterGvNumber}
                       onChangeText={(text) => this.handleFilterGvNumber(text)}
                     />
@@ -410,7 +420,7 @@ class GiftVocher extends Component {
               ListHeaderComponent={<View style={flatListHeaderContainer}>
                 <Text style={[flatListTitle, { color: color.accent }]}>{I18n.t('Gift Vouchers')}</Text>
                 <TouchableOpacity
-                  style={styles.filterBtnStyle}
+                  style={filterBtn}
                   onPress={() => this.state.filterActive ? this.clearFilter() : this.filterAction()} >
                   <FilterIcon
                     name="sliders"
@@ -468,7 +478,11 @@ class GiftVocher extends Component {
                   onPress={() => this.datepickerClicked()}
                 >
                   <Text style={dateText}>{this.state.startDate === "" ? 'DD/MM/YYYY' : this.state.startDate}</Text>
-                  <Image style={styles.calenderpng} source={require('../assets/images/calender.png')} />
+                  <IconFA
+                    name="calendar"
+                    size={25}
+                    style={forms.calender_image}
+                  />
                 </TouchableOpacity>
                 {this.state.datepickerOpen && (
                   <View style={styles.dateTopView}>
@@ -490,7 +504,11 @@ class GiftVocher extends Component {
                   <Text
                     style={dateText}
                   >{this.state.endDate === '' ? 'DD/MM/YYYY' : this.state.endDate}</Text>
-                  <Image style={styles.calenderpng} source={require('../assets/images/calender.png')} />
+                  <IconFA
+                    name="calendar"
+                    size={25}
+                    style={forms.calender_image}
+                  />
                 </TouchableOpacity>
 
                 {this.state.datepickerendOpen && (
@@ -557,7 +575,7 @@ class GiftVocher extends Component {
                       activeUnderlineColor='#000'
                       underlineColor={'#6f6f6f'}
                       label={('GV Number')}
-                      style={[inputField, { borderColor: '#8F9EB717' }]}
+                      style={[forms.input_fld, { borderColor: '#8F9EB717' }]}
                       value={this.state.activeGVNumber}
                       disabled
                     />

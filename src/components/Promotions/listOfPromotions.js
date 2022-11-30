@@ -992,9 +992,10 @@ class ListOfPromo extends Component {
                           ? "Start Date"
                           : this.state.startDate}{" "}
                       </Text>
-                      <Image
+                      <IconFA
+                        name="calendar"
+                        size={18}
                         style={{ position: "absolute", top: 10, right: 0 }}
-                        source={require("../assets/images/calender.png")}
                       />
                     </TouchableOpacity>
 

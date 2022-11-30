@@ -27,7 +27,8 @@
 .flatListContainer {
   background-color: $white;
   border-radius: 6px;
-  border: 1px solid $border-box;
+  border-width: 1px;
+  border-color: $border-box;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -281,12 +282,21 @@
 }
 
 .container {
-  flex: 1;
-  justify-content: center;
-  background-color: $white;
+	flex: 1;
+	justify-content: center;
+	background-color: $white;
 }
 
 .deleteButton {
-  width: 25px;
-  height: 25px;
+	width: 25px;
+	height: 25px;
+}
+
+.paymentIcon {
+	height: 50px;
+	width: 50px;
+	background-color: $white;
+	border-radius: 25px;
+	margin-left: 20px;
+	margin-top: 10px;
 }

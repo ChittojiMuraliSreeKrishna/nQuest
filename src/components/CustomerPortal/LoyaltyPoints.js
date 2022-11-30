@@ -342,7 +342,7 @@ export default class LoyaltyPoints extends Component {
                   <KeyboardAwareScrollView>
                     <TextInput
                       mode="flat"
-                      activeOutlineColor="#b9b9b9"
+                      activeUnderlineColor="#b9b9b9"
                       outlineColor="#b9b9b9"
                       style={forms.input_fld}
                       underlineColorAndroid="transparent"
@@ -355,7 +355,7 @@ export default class LoyaltyPoints extends Component {
                     />
                     <TextInput
                       mode="flat"
-                      activeOutlineColor="#b9b9b9"
+                      activeUnderlineColor="#b9b9b9"
                       outlineColor="#b9b9b9"
                       style={forms.input_fld}
                       underlineColorAndroid="transparent"
@@ -396,7 +396,7 @@ export default class LoyaltyPoints extends Component {
                   <KeyboardAwareScrollView>
                     <TextInput
                       mode="flat"
-                      activeOutlineColor="#b9b9b9"
+                      activeUnderlineColor="#b9b9b9"
                       outlineColor="#b9b9b9"
                       style={forms.input_fld}
                       underlineColorAndroid="transparent"
@@ -410,7 +410,7 @@ export default class LoyaltyPoints extends Component {
                     />
                     <TextInput
                       mode="flat"
-                      activeOutlineColor="#b9b9b9"
+                      activeUnderlineColor="#b9b9b9"
                       outlineColor="#b9b9b9"
                       style={forms.input_fld}
                       underlineColorAndroid="transparent"
@@ -424,7 +424,7 @@ export default class LoyaltyPoints extends Component {
                     />
                     <TextInput
                       mode="flat"
-                      activeOutlineColor="#b9b9b9"
+                      activeUnderlineColor="#b9b9b9"
                       outlineColor="#b9b9b9"
                       style={forms.input_fld}
                       underlineColorAndroid="transparent"
@@ -435,7 +435,7 @@ export default class LoyaltyPoints extends Component {
                     />
                     <TextInput
                       mode="flat"
-                      activeOutlineColor="#b9b9b9"
+                      activeUnderlineColor="#b9b9b9"
                       outlineColor="#b9b9b9"
                       style={forms.input_fld}
                       underlineColorAndroid="transparent"

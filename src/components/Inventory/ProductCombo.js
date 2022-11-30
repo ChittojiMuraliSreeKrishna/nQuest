@@ -2,9 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { Component } from "react";
 import {
   Dimensions,
-  FlatList,
-  Image,
-  ScrollView,
+  FlatList, ScrollView,
   StyleSheet,
   TouchableOpacity,
   View
@@ -449,9 +447,10 @@ export default class ProductCombo extends Component {
                             ? "Start Date"
                             : this.state.startDate}
                         </Text>
-                        <Image
+                        <IconFA
+                          name="calendar"
+                          size={18}
                           style={forms.calender_image}
-                          source={require("../assets/images/calender.png")}
                         />
                       </TouchableOpacity>
                       <TouchableOpacity
@@ -464,9 +463,10 @@ export default class ProductCombo extends Component {
                             ? "End Date"
                             : this.state.endDate}
                         </Text>
-                        <Image
+                        <IconFA
+                          name="calendar"
+                          size={18}
                           style={forms.calender_image}
-                          source={require("../assets/images/calender.png")}
                         />
                       </TouchableOpacity>
                     </View>
