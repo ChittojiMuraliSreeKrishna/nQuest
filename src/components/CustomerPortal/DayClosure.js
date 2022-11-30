@@ -18,6 +18,7 @@ import I18n from 'react-native-i18n';
 import moment from 'moment';
 import { TextInput } from 'react-native-paper';
 import { color } from '../Styles/colorStyles';
+import RnPicker from '../../commonUtils/RnPicker';
 
 
 var deviceheight = Dimensions.get('window').height;
@@ -330,19 +331,10 @@ export default class DayClosure extends Component {
               <Text style={forms.popUp_decorator}>-</Text>
               <View style={forms.filterModelSub}>
                 <KeyboardAwareScrollView>
-                  <View style={[Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile, { width: "92%" }]}>
-                    <RNPickerSelect
-                      placeholder={{ label: 'Pending Dates *', value: '' }}
-                      Icon={() => {
-                        return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-                      }}
-                      items={this.state.dayCloseDates}
-                      onValueChange={this.handleSelectPendingDates}
-                      style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
-                      value={this.state.applicability}
-                      useNativeAndroidPickerStyle={false}
-                    />
-                  </View>
+                  <RnPicker
+                    items={this.state.dayCloseDates}
+                    setValue={this.handleSelectPendingDates}
+                  />
                   <View style={forms.action_buttons_container}>
                     <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                       onPress={() => this.pendingConfirmDayCloser()}>
