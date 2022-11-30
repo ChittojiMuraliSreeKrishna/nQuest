@@ -168,14 +168,17 @@ export default class ProductCombo extends Component {
   }
 
   viewProductActon(data, index) {
-    this.state.viewProductData.push({ data });
+    let viewProduct = []
+    viewProduct.push({ data });
+    const uniqueData = viewProduct.filter((val, id, array) => {
+      return array.indexOf(val) == id;
+    })
+    console.log({ uniqueData }, uniqueData.data)
     this.setState({
-      viewProductData: this.state.viewProductData,
+      viewProductData: uniqueData,
       modalVisibleView: true,
       flagViewProduct: true,
     });
-    // console.log({ item }, item.barcode)
-    console.log(this.state.viewProductData[0].data.productTextiles);
   }
 
   modalHandleForClose = () => {

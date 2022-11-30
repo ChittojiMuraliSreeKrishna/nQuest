@@ -13,6 +13,7 @@ import { Chevron } from 'react-native-shapes';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import Loader from '../../commonUtils/loader';
+import PrintService from '../../commonUtils/Printer/printService';
 import { customerErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
 import CustomerService from '../services/CustomerService';
@@ -1109,7 +1110,7 @@ class TextilePayment extends Component {
       console.log("Invoice data", JSON.stringify(res.data));
       if (res.data && res.data["isSuccess"] === "true") {
 
-        // PrintService('INVOICE', res.data.result, this.state.barCodeList, invoiceTax)
+        PrintService('INVOICE', res.data.result, this.state.barCodeList, invoiceTax)
 
         // const cardAmount = this.state.isCard || this.state.isCardOrCash ? JSON.stringify(Math.round(this.state.ccCardCash)) : JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString());
         alert("Order created " + res.data["result"]);
