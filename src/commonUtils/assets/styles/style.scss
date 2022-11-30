@@ -9,6 +9,11 @@
   margin: 5px 0;
 }
 
+.clipboard {
+  height: 30px;
+  width: 30px;
+}
+
 .subHeader {
   background-color: $white;
   display: flex;
@@ -83,7 +88,6 @@
 
 .textStyleLight {
   font-size: 14px;
-  font-weight: medium;
   color: $grey-light;
 }
 
@@ -95,7 +99,6 @@
 
 .footerText {
   color: $grey-darker;
-  font-weight: bold;
 }
 
 .buttonContainer {
@@ -299,16 +302,4 @@
   border-radius: 25px;
   margin-left: 20px;
   margin-top: 10px;
-}
-
-.verifyText {
-  border-radius: 5px;
-  width: 90px;
-  height: 32px;
-  border-color: $primary-color;
-  border-width: 1px;
-  align-self: flex-end;
-  justify-content: center;
-  align-items: center;
-  // { backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 
 }

@@ -17,6 +17,7 @@ import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconMAA from 'react-native-vector-icons/MaterialIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from "../../commonUtils/assets/styles/style.scss";
+import Clipbrd from "../../commonUtils/Clipboard";
 import { formatListDates } from "../../commonUtils/DateFormate";
 import DateSelector from "../../commonUtils/DateSelector";
 import Loader from "../../commonUtils/loader";
@@ -380,8 +381,9 @@ export default class Barcode extends Component {
                         <Text style={scss.textStyleLight}>QTY: {item.qty}</Text>
                       </View>
                       <View style={scss.textContainer}>
-                        <Text style={scss.textStyleMedium} selectable={true}>
-                          {item.barcode}
+                        <Text style={scss.textStyleMedium}>
+                          {item.barcode}{"  "}
+                          <Clipbrd data={item.barcode} />
                         </Text>
                       </View>
                       <View style={scss.flatListFooter}>

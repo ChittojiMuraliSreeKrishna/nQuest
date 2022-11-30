@@ -12,11 +12,10 @@ import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Appbar } from "react-native-paper";
-import RNPickerSelect from "react-native-picker-select";
-import { Chevron } from "react-native-shapes";
 import forms from "../../commonUtils/assets/styles/formFields.scss";
 import DateSelector from "../../commonUtils/DateSelector";
 import Loader from "../../commonUtils/loader";
+import RnPicker from "../../commonUtils/RnPicker";
 import { RF, RH, RW } from "../../Responsive";
 import { inventoryErrorMessages } from "../Errors/errors";
 import Message from "../Errors/Message";
@@ -24,11 +23,7 @@ import InventoryService from "../services/InventoryService";
 import {
   dateSelector,
   dateText,
-  inputHeading,
-  rnPicker,
-  rnPickerContainer,
-  rnPickerDisabled,
-  rnPickerError
+  inputHeading
 } from "../Styles/FormFields";
 
 var deviceWidth = Dimensions.get("window").width;
@@ -564,33 +559,11 @@ class EditBarcode extends Component {
               <Text style={inputHeading}>
                 {I18n.t("Status Type")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
               </Text>
-              <View
-                style={[
-                  rnPickerContainer,
-                  { borderColor: divisionValid ? "#8F9EB718" : "#dd0000" },
-                ]}
-              >
-                <RNPickerSelect
-                  placeholder={{
-                    label: "Select",
-                  }}
-                  disabled={true}
-                  Icon={() => {
-                    return (
-                      <Chevron
-                        style={styles.imagealign}
-                        size={1.5}
-                        color={divisionValid ? "gray" : "#dd0000"}
-                      />
-                    );
-                  }}
-                  items={status1}
-                  onValueChange={this.handleStatus}
-                  style={divisionValid ? rnPicker : rnPickerError}
-                  value={this.state.selectedStatus}
-                  useNativeAndroidPickerStyle={false}
-                />
-              </View>
+              <RnPicker
+                items={status1}
+                setValue={this.handleStatus}
+              />
+
               <Text style={inputHeading}>
                 Stock Validity <Text style={{ color: "#aa0000" }}>*</Text>{" "}
               </Text>
@@ -694,32 +667,10 @@ class EditBarcode extends Component {
           {this.state.dynamicAttributes.length > 0 && (
             <View>
               <Text style={inputHeading}>{this.state.dynamicAttributesName}</Text>
-              <View
-                style={[
-                  rnPickerContainer,
-                  { borderColor: "#d6d6d6" },
-                ]}
-              >
-                <RNPickerSelect
-                  placeholder={{
-                    label: "Select",
-                  }}
-                  Icon={() => {
-                    return (
-                      <Chevron
-                        style={styles.imagealign}
-                        size={1.5}
-                        color={"gray"}
-                      />
-                    );
-                  }}
-                  items={this.state.dynamicAttributes}
-                  onValueChange={(value, data) => this.handleSize(value, data)}
-                  style={rnPicker}
-                  value={this.state.size}
-                  useNativeAndroidPickerStyle={false}
-                />
-              </View>
+              <RnPicker
+                items={this.state.dynamicAttributes}
+                setValue={this.handleSize}
+              />
             </View>
           )}
           <Text style={inputHeading}>
@@ -851,34 +802,10 @@ class EditBarcode extends Component {
           <Text style={inputHeading}>
             {I18n.t("Store")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
-          <View
-            style={[
-              rnPickerContainer,
-              { borderColor: "#8F9EB718", backgroundColor: '#b9b9b9' },
-            ]}
-          >
-            <RNPickerSelect
-              editable={false}
-              placeholder={{
-                label: "Store",
-              }}
-              disabled={true}
-              Icon={() => {
-                return (
-                  <Chevron
-                    style={styles.imagealign}
-                    size={1.5}
-                    color={storeValid ? "gray" : "#dd0000"}
-                  />
-                );
-              }}
-              items={this.state.storesList}
-              onValueChange={(value) => this.handleStore(value)}
-              style={rnPickerDisabled}
-              value={this.state.store}
-              useNativeAndroidPickerStyle={false}
-            />
-          </View>
+          <RnPicker
+            items={this.state.storesList}
+            setValue={this.handleStore}
+          />
           {!storeValid && (
             <Message imp={true} message={this.state.errors["store"]} />
           )}

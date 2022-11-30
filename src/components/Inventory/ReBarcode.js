@@ -15,6 +15,7 @@ import IconFA from 'react-native-vector-icons/FontAwesome';
 import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from "../../commonUtils/assets/styles/style.scss";
+import Clipbrd from "../../commonUtils/Clipboard";
 import { formatListDates } from "../../commonUtils/DateFormate";
 import DateSelector from "../../commonUtils/DateSelector";
 import Loader from "../../commonUtils/loader";
@@ -324,13 +325,13 @@ export default class ReBarcode extends Component {
               <View style={scss.flatListContainer}>
                 <View style={scss.flatListSubContainer}>
                   <View style={scss.textContainer}>
-                    <Text style={scss.textStyleMedium} selectable={true}>
-                      {I18n.t("PARENT BARCODE")}: <Text style={scss.highText}>{item.toBeBarcodeId}</Text>
+                    <Text style={[scss.textStyleLight, { color: '#000' }]}>
+                      {I18n.t("PARENT BARCODE")}: <Text style={scss.highText}>{item.toBeBarcodeId}{"  "}<Clipbrd data={item.toBeBarcodeId} /> </Text>
                     </Text>
                   </View>
                   <View style={scss.textContainer}>
-                    <Text style={scss.textStyleMedium} selectable={true}>
-                      {item.currentBarcodeId}
+                    <Text style={scss.textStyleMedium}>
+                      {item.currentBarcodeId}{"  "}<Clipbrd data={item.currentBarcodeId} />
                     </Text>
                     <Text style={scss.textStyleLight}>
                       {I18n.t("EMPLOYEE ID")}: {"\n"}
@@ -418,7 +419,7 @@ export default class ReBarcode extends Component {
                     renderItem={({ item, index }) => (
                       <View>
                         <View style={scss.model_text_container}>
-                          <Text variant="titleMedium" selectable={true} key={Math.random()}>{item.barcode}</Text>
+                          <Text variant="titleMedium" key={Math.random()}>{item.barcode}{"  "}<Clipbrd data={item.barcode} /> </Text>
                           <Text variant="bodyLarge">Qty: {item.qty}</Text>
                         </View>
                         <View style={scss.model_text_container}>

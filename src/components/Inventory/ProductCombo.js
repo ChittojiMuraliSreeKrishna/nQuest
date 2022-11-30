@@ -17,6 +17,7 @@ import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconMAA from 'react-native-vector-icons/MaterialIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from "../../commonUtils/assets/styles/style.scss";
+import Clipbrd from "../../commonUtils/Clipboard";
 import DateSelector from "../../commonUtils/DateSelector";
 import Loader from "../../commonUtils/loader";
 import { RH, RW } from "../../Responsive";
@@ -311,7 +312,7 @@ export default class ProductCombo extends Component {
                       <Text style={scss.textStyleLight}>Unit Price: {parseFloat(item.itemMrp).toFixed(2)}</Text>
                     </View>
                     <View style={scss.flatListFooter}>
-                      <Text style={scss.footerText} selectable={true} >{item.barcode}</Text>
+                      <Text style={scss.footerText} >{item.barcode}{"  "}<Clipbrd data={item.barcode} /> </Text>
                       <IconFA
                         name="eye"
                         size={20}
@@ -387,7 +388,7 @@ export default class ProductCombo extends Component {
                     renderItem={({ item, index }) => (
                       <View>
                         <View style={scss.model_text_container}>
-                          <Text variant="titleMedium" selectable={true} key={Math.random()}>{item.data.barcode}</Text>
+                          <Text variant="titleMedium" key={Math.random()}>{item.data.barcode}{"  "}<Clipbrd data={item.data.barcode} /> </Text>
                           <Text variant="bodyLarge">Qty: {item.data.bundleQuantity}</Text>
                         </View>
                         <View style={scss.model_text_container}>
