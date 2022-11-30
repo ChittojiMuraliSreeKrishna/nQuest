@@ -12,6 +12,7 @@ import { accountingErrorMessages } from '../Errors/errors';
 import Message from "../Errors/Message"
 import { cancelBtn, cancelBtnText, inputField, inputHeading, rnPicker, rnPickerContainer, rnPickerError, submitBtn, submitBtnText } from '../Styles/FormFields';
 import { backButton, backButtonImage, headerTitle, headerTitleContainer, headerTitleSubContainer, headerTitleSubContainer2, menuButton } from '../Styles/Styles';
+import RnPicker from '../../commonUtils/RnPicker';
 
 var deviceWidth = Dimensions.get('window').width;
 export default class AddDomain extends Component {
@@ -77,7 +78,7 @@ export default class AddDomain extends Component {
         }
 
         if (this.state.domainName !== "") {
-            this.setState({domainValid: true})
+            this.setState({ domainValid: true })
         }
     };
 
@@ -100,10 +101,10 @@ export default class AddDomain extends Component {
         if (this.state.domainName === "") {
             errors["domain"] = accountingErrorMessages.domain
             formIsValid = false
-            this.setState({domainValid: false})
+            this.setState({ domainValid: false })
         }
 
-        this.setState({errors: errors})
+        this.setState({ errors: errors })
         return formIsValid
     }
 
@@ -150,33 +151,20 @@ export default class AddDomain extends Component {
                 }
                 <View style={headerTitleContainer} >
                     <View style={headerTitleSubContainer}>
-                    <TouchableOpacity style={backButton} onPress={() => this.handleBackButtonClick()}>
-                        <Image style={backButtonImage} source={require('../assets/images/backButton.png')} />
-                    </TouchableOpacity>
-                    <Text style={headerTitle}>
-                        {I18n.t("Add Domain")}
-                    </Text>
+                        <TouchableOpacity style={backButton} onPress={() => this.handleBackButtonClick()}>
+                            <Image style={backButtonImage} source={require('../assets/images/backButton.png')} />
+                        </TouchableOpacity>
+                        <Text style={headerTitle}>
+                            {I18n.t("Add Domain")}
+                        </Text>
                     </View>
                 </View>
                 <ScrollView>
                     <Text style={inputHeading}>{I18n.t("Domain")} <Text style={{ color: 'red', fontFamily: 'bold' }}>*</Text></Text>
-                    <View
-                        style={[inputField,  {borderColor: domainValid ? "grey" : '#dd0000'} ]}>
-                        <RNPickerSelect
-                            // style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
-                            placeholder={{
-                                label: 'DOMAIN'
-                            }}
-                            Icon={() => {
-                                return <Chevron style={styles.imagealign} size={1.5} color={domainValid ? "gray" : "#dd0000"} />;
-                            }}
-                            items={this.state.domains}
-                            onValueChange={this.handleDomain}
-                            style={domainValid ? rnPicker : rnPickerError}
-                            value={this.state.domainName}
-                            useNativeAndroidPickerStyle={false}
-                        />
-                    </View>
+                    <RnPicker
+                        items={this.state.domains}
+                        setValue={this.handleDomain}
+                    />
                     {!domainValid && <Message imp={true} message={this.state.errors["domain"]} />}
                     <TextInput
                         style={Device.isTablet ? styles.input_tablet : styles.input_mobile}

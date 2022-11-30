@@ -39,6 +39,11 @@ class ReportsService {
     return axios.get(BASE_URL + "/new-sale/return_slip/getReturnSlipsDetails" + "?rtNumber=" + rtNumber);
   }
 
+  deleteEstimationSlip (dsNumber) {
+    const param2 = '?dsNumber=' + dsNumber;
+    return axios.delete(BASE_URL + REPORTS_URL.deleteDsNumber + param2 );
+  }
+
 }
 
 export default new ReportsService();

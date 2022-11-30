@@ -7,9 +7,7 @@ import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from "react-native-modal";
 import { Appbar, RadioButton, TextInput } from 'react-native-paper';
-import RNPickerSelect from 'react-native-picker-select';
 import RazorpayCheckout from 'react-native-razorpay';
-import { Chevron } from 'react-native-shapes';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import Loader from '../../commonUtils/loader';
@@ -21,7 +19,7 @@ import LoginService from '../services/LoginService';
 import NewSaleService from '../services/NewSaleService';
 import PromotionsService from '../services/PromotionsService';
 import { color } from '../Styles/colorStyles';
-import IconFA from 'react-native-vector-icons/FontAwesome';
+import RnPicker from '../../commonUtils/RnPicker';
 
 
 var deviceWidth = Dimensions.get('window').width;
@@ -121,7 +119,7 @@ class TextilePayment extends Component {
       cardModelVisible: false,
       cardPaymentType: 'Manual',
       cardManual: false,
-      khataAmount: 200,
+      khataAmount: 0,
       payingAmount: 0,
       grandNetAmount: 0,
       showVerified: false,
@@ -861,7 +859,7 @@ class TextilePayment extends Component {
   }
 
   clearPromocode() {
-    this.setState({ promoDiscount: "0", giftvoucher: "", promocode: "" });
+    this.setState({ promoDiscount: 0, giftvoucher: "", promocode: "" });
   }
 
   clearCashSammary() {
@@ -1667,6 +1665,7 @@ class TextilePayment extends Component {
                   style={[scss.flatList, { height: Device.isTablet ? 130 : 100 }]}
                   horizontal
                   data={data}
+                  keyExtractor={(item, index) => index.toString()}
                   showsVerticalScrollIndicator={false}
                   showsHorizontalScrollIndicator={false}
                   renderItem={({ item, index }) => {
@@ -1738,7 +1737,7 @@ class TextilePayment extends Component {
                             marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
                           }} />
                         </TouchableOpacity>
-                        <Text style={[scss.textStyleLight, { color: this.state.isCredit ? color.accent : color.lightDark,textAlign: 'center'  }]}>CREDIT</Text>
+                        <Text style={[scss.textStyleLight, { color: this.state.isCredit ? color.accent : color.lightDark, textAlign: 'center' }]}>CREDIT</Text>
                       </View>;
                     }
                   }}
@@ -1804,7 +1803,7 @@ class TextilePayment extends Component {
                         value={this.state.approvedBy}
                         onChangeText={(text) => this.handleApprovedBy(text)}
                       />
-                      <View style={[Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile, { width: "92%" }]}>
+                      {/* <View style={[Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile, { width: "92%" }]}>
                         <RNPickerSelect
                           placeholder={{ label: 'REASON *', value: '' }}
                           Icon={() => {
@@ -1818,7 +1817,11 @@ class TextilePayment extends Component {
                           value={this.state.reasonDiscount}
                           useNativeAndroidPickerStyle={false}
                         />
-                      </View>
+                      </View> */}
+                      <RnPicker
+                        items={this.state.discReasons}
+                        setValue={this.handleDiscountReason}
+                      />
                       <View style={forms.action_buttons_container}>
                         <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                           onPress={() => this.billDiscount()}>
@@ -1837,8 +1840,8 @@ class TextilePayment extends Component {
 
             {this.state.isBillLevel === false &&
               <>
-                <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 10 }}> {('HAVE A RT NUMBER?')} </Text>
-                {this.state.loyaltyPoints !== "" && (
+                <Text style={[scss.textStyleMedium, { color: '#828282', marginLeft: 10, marginTop: 10 }]}> {('HAVE A RT NUMBER?')} </Text>
+                {/* {this.state.loyaltyPoints !== "" && (
                   <TouchableOpacity
                     style={{ borderRadius: 5, width: 90, height: 20, alignSelf: 'flex-end', marginTop: -20 }}
                     onPress={() => this.clearTaggedCustomer()} >
@@ -1852,25 +1855,26 @@ class TextilePayment extends Component {
                     onPress={() => this.clearTaggedCustomer()} >
                     <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('CLEAR')} </Text>
                   </TouchableOpacity>
-                )}
-                <TextInput
-                  underlineColor="transparent"
-                  label="ENTER RT NUMBER"
-                  activeUnderlineColor='#000'
-                  value={this.state.rtNumber}
-                  onChangeText={(text) => this.setState({ rtNumber: text })}
-                // onEndEditing={() => this.endEditing()}
-                />
-                {this.state.loyaltyPoints === "" && this.state.notfound !== "not found" && (
-                  <TouchableOpacity
-                    style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, alignSelf: 'flex-end', right: 10, marginTop: Device.isTablet ? -47 : -37 }}
-                    onPress={() => this.applyRt()}
-                  >
-                    <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>
-                  </TouchableOpacity>
-                )}
-
-                {this.state.notfound === "not found" && this.state.loyaltyPoints == "" && (
+                )} */}
+                <View style={[scss.radio_group, { margin: 5 }]}>
+                  <TextInput
+                    style={[forms.input_fld, { width: "60%", minWidth: "60%", maxWidth: "70%" }]}
+                    underlineColor="transparent"
+                    label="ENTER RT NUMBER"
+                    activeUnderlineColor='#000'
+                    value={this.state.rtNumber}
+                    onChangeText={(text) => this.setState({ rtNumber: text })}
+                  // onEndEditing={() => this.endEditing()}
+                  />
+                  <View style={{ justifyContent: 'center' }}>
+                    <TouchableOpacity
+                      style={scss.verifyText}
+                      onPress={() => this.applyRt()} >
+                      <Text style={[scss.textStyleLight, { color: color.accent }]}> {('VERIFY')} </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                {/* {this.state.notfound === "not found" && this.state.loyaltyPoints == "" && (
                   <TouchableOpacity
                     style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, alignSelf: 'flex-end', right: 10, marginTop: Device.isTablet ? -47 : -37 }}
                   >
@@ -1900,7 +1904,7 @@ class TextilePayment extends Component {
                     <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
 
                   </TouchableOpacity>
-                )}
+                )} */}
 
                 {/* {this.state.notfound === "not found" && this.state.giftvoucher !== "" && (
                             <TouchableOpacity
@@ -1913,7 +1917,7 @@ class TextilePayment extends Component {
                             </TouchableOpacity>
                         )} */}
 
-                {this.state.loyaltyPoints !== "" && this.state.giftvoucher !== "" && (
+                {/* {this.state.loyaltyPoints !== "" && this.state.giftvoucher !== "" && (
                   <TouchableOpacity
                     style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, position: 'absolute', right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
                   >
@@ -1950,48 +1954,48 @@ class TextilePayment extends Component {
                 )}
 
                 {this.state.loyaltyPoints !== "" && this.state.redeemedPints === "0" && (
-                  <View style={{ height: 0, backgroundColor: "#ffffff", }}>
-                    {/* <View style={{ height: Device.isTablet ? 2 : 1, backgroundColor: "#22222240",marginTop:-20, }}> */}
+                  <View style={{ height: 0, backgroundColor: "#ffffff", }}> */}
+                {/* <View style={{ height: Device.isTablet ? 2 : 1, backgroundColor: "#22222240",marginTop:-20, }}> */}
 
-                    <TouchableOpacity
+                {/* <TouchableOpacity
                       style={{ backgroundColor: '#ED1C24', borderRadius: 5, width: 150, height: 32, alignSelf: 'flex-end', marginTop: -45, right: 10 }}
                       onPress={() => this.redeemPoints()} >
                       <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ffffff', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('REDEEM POINTS')} </Text>
-                    </TouchableOpacity>
-                    {/* </View> */}
-                  </View>
-                )}
+                    </TouchableOpacity> */}
+                {/* </View> */}
+                {/* </View>
+                )} */}
 
               </>}
 
             {this.state.isBillLevel === false && <View>
-              <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 10 }}> {('HAVE A COUPON CODE ?')} </Text>
-              {this.state.giftvoucher !== "" && (
+              <Text style={[scss.textStyleMedium, { color: '#828282', marginLeft: 10, marginTop: 10 }]}> {('HAVE A COUPON CODE ?')} </Text>
+              {/* {this.state.giftvoucher !== "" && (
                 <TouchableOpacity
                   style={{ borderRadius: 5, width: 90, height: 20, alignSelf: 'flex-end', marginTop: -20 }}
                   onPress={() => this.clearPromocode()} >
                   <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('CLEAR')} </Text>
                 </TouchableOpacity>
-              )}
-              <TextInput
-                underlineColor="transparent"
-                label="Enter coupon code"
-                activeUnderlineColor='#000'
-                value={this.state.promocode}
-                maxLength={8}
-
-                onChangeText={(text) => this.handlePromocode(text)}
-              // onEndEditing={() => this.applyPromocode()}
-              />
-              {this.state.giftvoucher === "" && (
-                <TouchableOpacity
-                  style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
-                  onPress={() => this.applyPromocode()} >
-                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('APPLY')} </Text>
-                </TouchableOpacity>
-              )}
-
-              {this.state.giftvoucher !== "" && (
+              )} */}
+              <View style={[scss.radio_group, { margin: 5 }]}>
+                <TextInput
+                  style={[forms.input_fld, { width: "60%", minWidth: "60%", maxWidth: "70%" }]}
+                  underlineColor="transparent"
+                  label="Enter coupon code"
+                  activeUnderlineColor='#000'
+                  value={this.state.promocode}
+                  maxLength={8}
+                  onChangeText={(text) => this.handlePromocode(text)}
+                />
+                <View style={{ justifyContent: 'center' }}>
+                  <TouchableOpacity
+                    style={scss.verifyText}
+                    onPress={() => this.applyPromocode()} >
+                    <Text style={[scss.textStyleLight, { color: color.accent }]}> {('APPLY')} </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              {/* {this.state.giftvoucher !== "" && (
                 <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
                   <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10 }}> {this.state.giftvoucher} </Text>
 
@@ -2003,7 +2007,7 @@ class TextilePayment extends Component {
                   <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10 }}> {"Enter GV Number"} </Text>
 
                 </View>
-              )}
+              )} */}
             </View>
             }
             {(this.state.isCash === true || this.state.isCardOrCash === true) && (
@@ -2011,27 +2015,29 @@ class TextilePayment extends Component {
             )}
 
             {(this.state.isCash === true || this.state.isCardOrCash === true) && (
-              <TextInput
-                underlineColor="transparent"
-                activeUnderlineColor='#000'
-                label="Recieved Amount"
-                keyboardType='numeric'
-                value={this.state.recievedAmount}
-                onChangeText={(text) => this.handlerecievedAmount(text)} />
-              // onEndEditing={() => this.endEditing()}
-            )}
-
-            {(this.state.isCash === true || this.state.isCardOrCash === true) && (
-              <TouchableOpacity
-                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: Device.isTablet ? 100 : 90, height: Device.isTablet ? 42 : 32, borderColor: this.state.showVerified === true ? '#28D266' : "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: Device.isTablet ? -47 : -37 }}
-                onPress={() => this.verifycash()} >
-                {this.state.showVerified ?
-                  <>
-                    <Image style={{ position: 'absolute', right: Device.isTablet ? 83 : 68, top: Device.isTablet ? 11 : 9 }} source={require('../assets/images/applied.png')} />
-                    <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFIED')} </Text>
-                  </> :
-                  <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>}
-              </TouchableOpacity>
+              <View style={[scss.radio_group, { margin: 5 }]}>
+                <TextInput
+                  style={[forms.input_fld, { width: "60%", minWidth: "60%", maxWidth: "70%" }]}
+                  underlineColor="transparent"
+                  activeUnderlineColor='#000'
+                  label="Recieved Amount"
+                  keyboardType='numeric'
+                  value={this.state.recievedAmount}
+                  onChangeText={(text) => this.handlerecievedAmount(text)} />
+                {/* // onEndEditing={() => this.endEditing()} */}
+                <View style={{ justifyContent: 'center' }}>
+                  <TouchableOpacity
+                    style={[scss.verifyText, { borderColor: this.state.showVerified ? color.white : color.accent }]}
+                    onPress={() => this.verifycash()} >
+                    {this.state.showVerified ?
+                      <>
+                        <Image style={{ position: 'absolute', right: Device.isTablet ? 83 : 68, top: Device.isTablet ? 11 : 9 }} source={require('../assets/images/applied.png')} />
+                        <Text style={[scss.textStyleLight, { color: color.success, marginLeft: 12 }]}> {('VERIFIED')} </Text>
+                      </> :
+                      <Text style={[scss.textStyleLight, { color: color.accent }]}> {('VERIFY')} </Text>}
+                  </TouchableOpacity>
+                </View>
+              </View>
             )}
 
             {/* {this.state.flagredeem && (
@@ -2377,42 +2383,42 @@ class TextilePayment extends Component {
                 </Modal>
               </View>)}
 
-            <Text style={{ fontSize: Device.isTablet ? 17 : 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 10 }}> {('BILLING SUMMARY')} </Text>
+            <Text style={[scss.textStyleMedium, { color: '#828282', marginLeft: 10, marginTop: 10 }]}> {('BILLING SUMMARY')} </Text>
 
 
-            <View style={{ width: deviceWidth, height: Device.isTablet ? 500 : 350, backgroundColor: '#FFFFFF', marginTop: 10, flexDirection: 'column', justifyContent: 'space-around' }}>
-              <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+            <View style={{ margin: 5 }}>
+              <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
                 <Text style={scss.textStyleMedium}>Total Amount </Text>
                 <Text style={scss.textStyleMedium}>₹ {this.state.netPayableAmount} </Text>
               </View>
               {this.state.isTaxIncluded !== 'null' &&
-                <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
                   <Text style={scss.textStyleMedium}>  CGST </Text>
                   <Text style={scss.textStyleMedium}>₹ {this.state.CGST} </Text>
                 </View>}
               {this.state.isTaxIncluded !== 'null' &&
-                <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
                   <Text style={scss.textStyleMedium}>  SGST </Text>
                   <Text style={scss.textStyleMedium}>₹  {this.state.SGST} </Text>
                 </View>}
 
-              <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+              <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
                 <Text style={scss.textStyleMedium}> Total Amount </Text>
                 <Text style={scss.textStyleMedium}> ₹  {this.state.totalAmount} </Text>
               </View>
 
-              <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+              <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
                 <Text style={[scss.textStyleMedium, { color: "#2ADC09" }]}>Promo Discount </Text>
                 <Text style={[scss.textStyleMedium, { color: "#2ADC09" }]}> ₹  {this.state.totalPromoDisc} </Text>
               </View>
 
-              <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+              <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
                 <Text style={scss.textStyleMedium}>Payable Amount </Text>
                 <Text style={scss.textStyleMedium}>₹ {(parseFloat(this.state.grandNetAmount).toFixed(2))}
                 </Text>
               </View>
               {this.state.isBillingDiscount &&
-                <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
                   <Text style={scss.textStyleMedium}>Billing Discount </Text>
                   <Text style={scss.textStyleMedium}>₹  {this.state.manualDisc} </Text>
                 </View>}
@@ -2420,11 +2426,11 @@ class TextilePayment extends Component {
               {
                 this.state.isCreditAmount && (
                   <>
-                    <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                    <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
                       <Text style={scss.textStyleMedium}>Credit Amount </Text>
                       <Text style={scss.textStyleMedium}> ₹ {(parseFloat(this.state.creditAmount).toFixed(2))}</Text>
                     </View>
-                    <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                    <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
                       <Text style={scss.textStyleMedium}> Payed Amount </Text>
                       <Text style={scss.textStyleMedium}> ₹ {(parseFloat(this.state.payCreditAmount).toFixed(2))} </Text>
                     </View>
@@ -2448,26 +2454,26 @@ class TextilePayment extends Component {
                 )
               } */}
               {this.state.khataAmount > 0 &&
-                <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
                   <Text style={scss.textStyleMedium}>Katha Amount </Text>
                   <Text style={scss.textStyleMedium}> ₹ {(parseFloat(this.state.khataAmount).toFixed(2))} </Text>
                 </View>}
 
               {this.state.returnAmount >= 0 && (
                 <>
-                  <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                  <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
                     <Text style={scss.textStyleMedium}>Collected Amount </Text>
                     <Text style={scss.textStyleMedium}> ₹ {parseFloat(this.state.recievedAmount).toFixed(2)} </Text>
                   </View>
 
-                  <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                  <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
                     <Text style={[scss.textStyleMedium, { color: "#FFAF4C" }]}>Return Amount </Text>
                     <Text style={[scss.textStyleMedium, { color: "#FFAF4C" }]}> ₹ {(parseFloat(this.state.returnAmount).toFixed(2))} </Text>
                   </View>
                 </>)}
               {
                 this.state.couponAmount > 0 && (
-                  <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                  <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
                     <Text style={[scss.textStyleMedium, { color: "#2ADC09" }]}>Coupon Applied </Text>
                     <Text style={[scss.textStyleMedium, { color: "#2ADC09" }]}> ₹ {(parseFloat(this.state.couponAmount).toFixed(2))} </Text>
                   </View>
@@ -2475,7 +2481,7 @@ class TextilePayment extends Component {
               }
 
               {this.state.isRTApplied === true && (
-                <View style={[scss.radio_group, { marginLeft: 10, marginRight: 10 }]}>
+                <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
                   <Text style={[scss.textStyleMedium, { color: "#2ADC09" }]}>  RT Amount </Text>
                   <Text style={[scss.textStyleMedium, { color: "#2ADC09" }]}>₹  {(parseFloat(this.state.rtAmount).toFixed(2))} </Text>
                 </View>
@@ -2498,121 +2504,3 @@ class TextilePayment extends Component {
   }
 }
 export default TextilePayment;
-
-
-
-const styles = StyleSheet.create({
-  mainContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    // backgroundColor: '#FAFAFF'
-  },
-  subContainer: {
-    backgroundColor: '#FFFFFF'
-  },
-  rnSelectContainer_tablet: {
-    justifyContent: 'center',
-    margin: 20,
-    height: 54,
-    marginTop: 5,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 20,
-  },
-  rnSelectContainer_mobile: {
-    justifyContent: 'center',
-    margin: 20,
-    height: 44,
-    marginTop: 5,
-    marginBottom: 10,
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: 15,
-    fontSize: 14,
-  },
-  imagealign: {
-    marginTop: Device.isTablet ? 25 : 20,
-    marginRight: Device.isTablet ? 30 : 20,
-  },
-});
-
-const pickerSelectStyles_mobile = StyleSheet.create({
-  placeholder: {
-    color: "#6F6F6F",
-    fontFamily: "regular",
-    fontSize: 15,
-  },
-  inputIOS: {
-    justifyContent: 'center',
-    height: 42,
-    borderRadius: 3,
-    borderWidth: 1,
-    fontFamily: 'regular',
-    //paddingLeft: -20,
-    fontSize: 15,
-    borderColor: '#FBFBFB',
-    backgroundColor: '#FBFBFB',
-  },
-  inputAndroid: {
-    justifyContent: 'center',
-    height: 42,
-    borderRadius: 3,
-    borderWidth: 1,
-    fontFamily: 'regular',
-    //paddingLeft: -20,
-    fontSize: 15,
-    borderColor: '#FBFBFB',
-    backgroundColor: '#FBFBFB',
-    color: '#001B4A',
-
-    // marginLeft: 20,
-    // marginRight: 20,
-    // marginTop: 10,
-    // height: 40,
-    // backgroundColor: '#ffffff',
-    // borderBottomColor: '#456CAF55',
-    // color: '#001B4A',
-    // fontFamily: "bold",
-    // fontSize: 16,
-    // borderRadius: 3,
-  },
-});
-
-const pickerSelectStyles_tablet = StyleSheet.create({
-  placeholder: {
-    color: "#6F6F6F",
-    fontFamily: "regular",
-    fontSize: 20,
-  },
-  inputIOS: {
-    justifyContent: 'center',
-    height: 52,
-    borderRadius: 3,
-    borderWidth: 1,
-    fontFamily: 'regular',
-    //paddingLeft: -20,
-    fontSize: 20,
-    borderColor: '#FBFBFB',
-    backgroundColor: '#FBFBFB',
-  },
-  inputAndroid: {
-    justifyContent: 'center',
-    height: 52,
-    borderRadius: 3,
-    borderWidth: 1,
-    fontFamily: 'regular',
-    //paddingLeft: -20,
-    fontSize: 20,
-    borderColor: '#FBFBFB',
-    backgroundColor: '#FBFBFB',
-    color: '#001B4A',
-  },
-});

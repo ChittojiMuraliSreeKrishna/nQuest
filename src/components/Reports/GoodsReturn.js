@@ -19,12 +19,17 @@ import { RH } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
 import { emptyTextStyle } from '../Styles/FormFields';
 import { flatListMainContainer, flatlistSubContainer, highText, textContainer, textStyleSmall } from '../Styles/Styles';
-
+import RnPicker from '../../commonUtils/RnPicker'
 
 
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
 
+
+const pickerData = [
+  { value: 'PENDING', label: 'Pending', },
+  { value: 'COMPLETED', label: 'Completed', },
+]
 export class GoodsReturn extends Component {
 
   constructor(props) {
@@ -497,23 +502,10 @@ export class GoodsReturn extends Component {
                       </View>
                     )}
                     <Text style={styles.headings}>{I18n.t("RT Status")}</Text>
-                    <View style={styles.rnSelectContainer}>
-                      <RNPickerSelect
-                        // style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
-                        placeholder={{ label: 'RT Status', value: '' }}
-                        Icon={() => {
-                          return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-                        }}
-                        items={[
-                          { value: 'PENDING', label: 'Pending', },
-                          { value: 'COMPLETED', label: 'Completed', },
-                        ]}
-                        onValueChange={this.handleRTStatus}
-                        style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
-                        value={this.state.rtStatus}
-                        useNativeAndroidPickerStyle={false}
-                      />
-                    </View>
+                    <RnPicker
+                      items={pickerData}
+                      setValue={this.handleRTStatus}
+                    />
                     <Text style={styles.headings}>{I18n.t("RT Number")}</Text>
                     <TextInput
                       mode='flat'

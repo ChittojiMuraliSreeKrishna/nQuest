@@ -26,21 +26,10 @@ var deviceHeight = Dimensions.get('window').height;
 class GenerateInvoiceSlip extends Component {
   constructor(props) {
     super(props);
-    this.camera = null;
-    this.barcodeCodes = [];
     this.state = {
-      barcodeId: "",
       mobileNumber: "",
-      altMobileNo: "",
-      name: "",
       loading: false,
-      arrayData: [],
-      temp: [],
-      error: null,
-      search: null,
       totalQty: 0,
-      qty: [false],
-      quantity: '',
       totalAmount: 0,
       totalDiscount: 0,
       gender: "Male",
@@ -49,90 +38,32 @@ class GenerateInvoiceSlip extends Component {
       address: "",
       modalVisible: true,
       customerTagging: false,
-      handleBillDiscount: false,
       billmodelPop: false,
-      flagCustomerOpen: false,
-      flagtwo: false,
-      productItemId: 0,
-      productuom: "",
-      flagthree: false,
-      flagfour: false,
-      inventoryBarcodeId: '',
-      inventoryProductName: '',
-      inventoryQuantity: '',
-      inventoryMRP: '',
-      inventoryDiscount: '',
-      inventoryNetAmount: '',
       customerPhoneNumber: '',
       customerEmail: '',
       customerGender: '',
       customerAddress: '',
       customerGSTNumber: '',
-      reasonDiscount: '',
-      discountAmount: 0,
-      approvedBy: '',
       domainId: 1,
-      tableHead: ['S.No', 'Barcode', 'Product', 'Price Per Qty', 'Qty', 'Sales Rate'],
-      tableData: [],
-      privilages: [],
-      inventoryDelete: false,
       lineItemDelete: false,
-      uom: [],
-      store: '',
-      camera: {
-        type: RNCamera.Constants.Type.back,
-        flashMode: RNCamera.Constants.FlashMode.auto,
-      },
-      openn: false,
-      isSubOpen: false,
       dsNumber: "",
       manualDisc: 0,
-      isCash: false,
-      isCard: false,
-      btnDisabled: true,
-      isCardSelected: false,
-      isCashSelected: false,
-      isCalculator: false,
-      isPayment: true,
       cashAmount: 0.0,
       taxAmount: 0,
       cardAmount: 0.0,
       cardDigits: "",
       rBarCodeList: [],
-      discReasons: [],
-      selectedDisc: {},
       userId: null,
-      deliverySlipData: {
-        barcode: [],
-        mrp: "",
-        netAmount: 0.0,
-        promoDisc: "",
-        taxAmount: null,
-      },
       dlslips: [],
-      finalList: [],
       barCodeList: [],
       mobilenumber: "",
       customerName: "",
-      gender: "",
       customerEmail: "",
-      couponCode: "",
-      ccCollectedCash: "",
-      dob: "",
       customerGST: "",
       address: "",
       dropValue: "",
       grandNetAmount: 0.0,
-      grandReceivedAmount: 0.0,
-      grandBalance: 0,
-      returnCash: 0,
-      input: {},
-      isBillingDetails: false,
       errors: {},
-      isBillingDisc: false,
-      showDiscReason: false,
-      discApprovedBy: "",
-      showTable: false,
       dsNumberList: [],
       mobileData: {
         address: "",
@@ -147,37 +78,13 @@ class GenerateInvoiceSlip extends Component {
       },
       grossAmount: 0,
       totalPromoDisc: 0,
-      totalManualDisc: 0,
-      netPayableAmount: 0,
-      netCardPayment: 0,
       promoDiscount: 0,
-      genderList: [
-        {
-          value: "female",
-          label: "Female",
-        },
-        {
-          value: "male",
-          label: "Male",
-        },
-      ],
       customerFullName: "-",
       customerMobilenumber: "",
-      isTextile: false,
-      lineItemsList: [],
-      paymentOrderId: "",
       idClient: "",
       stateGST: 0,
       centralGST: 0,
-      isCouponApplied: true,
-      enablePayment: false,
-      isCCModel: false,
-      isCCPay: false,
       storeId: 0,
-      returnModel: false,
-      returnData: "",
-      disableButton: false,
-      discountAmountValid: true,
       errors: {},
       dsNumberValid: true,
       isEstimationEnable: false,
@@ -194,8 +101,7 @@ class GenerateInvoiceSlip extends Component {
       toDay: moment(new Date()).format("YYYY-MM-DD").toString(),
       isTagCustomer: false,
       showPrinter: false,
-      printerIp: "",
-
+      printerIp: ""
     };
   }
 
@@ -228,13 +134,6 @@ class GenerateInvoiceSlip extends Component {
   modelCancel() {
     this.setState({
       modalVisible: false, mobileNumber: "", billmodelPop: false, lineItemDelete: false, flagCustomerOpen: false, customerTagging: false
-    });
-  }
-
-  billDiscountModelCancel() {
-    this.setState({
-      reasonDiscount: '', discApprovedBy: '', discountAmount: '',
-      discountAmountValid: true, modalVisible: false, billmodelPop: false
     });
   }
 
@@ -297,7 +196,7 @@ class GenerateInvoiceSlip extends Component {
       if (this.state.dayCloseDates.length === 1 && this.state.dayCloseDates[0].dayClose.split("T")[0] === this.state.toDay) {
         if (isEsSlipEnabled === "true") {
           isEstimationEnable = true;
-          this.setState({ isEstimationEnable: true, privilages: [{ bool: false, name: "Tag Customer" }, { bool: false, name: "Bill Level Discount" }, { bool: false, name: "Check Promo Disc" }] });
+          this.setState({ isEstimationEnable: true });
           // if (this.state.dsCompareList.length === 0) {
           //   this.state.dsNumberList2.push(obj);
           //   this.setState({
@@ -327,7 +226,7 @@ class GenerateInvoiceSlip extends Component {
           // }
         } else {
           isEstimationEnable = false;
-          this.setState({ isEstimationEnable: false, privilages: [{ bool: false, name: "Tag Customer" }, { bool: false, name: "Bill Level Discount" }] });
+          this.setState({ isEstimationEnable: false });
         }
         CustomerService.getDsSlip(esNumber.trim(), isEstimationEnable, storeId).then((res) => {
           console.log("data in getDeliverySlipDetails", esNumber, isEstimationEnable, storeId);
@@ -705,7 +604,6 @@ class GenerateInvoiceSlip extends Component {
       manualDisc: this.state.manualDisc,
       taxAmount: this.state.taxAmount,
       approvedBy: this.state.approvedBy,
-      reasonDiscount: this.state.reasonDiscount,
       manualDisc: this.state.discountAmount,
       userId: this.state.userId,
       dsNumberList: this.state.dsNumberList,
@@ -742,10 +640,6 @@ class GenerateInvoiceSlip extends Component {
 
   handleDsNumber = (text) => {
     this.setState({ dsNumber: text });
-  };
-
-  handleBarcode = (text) => {
-    this.setState({ barcodeId: text });
   };
 
   addCustomer() {
@@ -824,7 +718,7 @@ class GenerateInvoiceSlip extends Component {
           address: res.data.result.address,
         });
       } else {
-        toast.error("No Data Found");
+        alert("No Data Found");
       }
     }).catch(() => {
       this.setState({ loading: false });
@@ -844,60 +738,6 @@ class GenerateInvoiceSlip extends Component {
 
     this.setState({ errors: errors });
     return isFormValid;
-  }
-
-
-  handleDiscountAmount(value) {
-    this.setState({ discountAmount: value });
-  }
-
-  handleApprovedBy(text) {
-    this.setState({ approvedBy: text });
-  }
-
-  handleDiscountReason = (value) => {
-    this.setState({ reasonDiscount: value });
-  };
-
-  billValidation() {
-    let isFormValid = true;
-    let errors = {};
-
-    if (this.state.discountAmount > this.state.netPayableAmount) {
-      isFormValid = false;
-      errors["discountAmount"] = customerErrorMessages.discountAmount;
-      this.setState({ discountAmountValid: false });
-    }
-    this.setState({ errors: errors });
-    return isFormValid;
-  }
-
-  billDiscount() {
-    const isFormValid = this.billValidation();
-    if (isFormValid) {
-      if (this.state.discountAmount === 0 || this.state.approvedBy === "" || this.state.reasonDiscount === "") {
-        alert("Please enter all fields");
-      } else {
-        // this.state.netPayableAmount = 0;
-        const totalDisc =
-          this.state.totalPromoDisc + parseInt(this.state.discountAmount);
-        if (totalDisc < this.state.grandNetAmount) {
-          const netPayableAmount = this.state.grandNetAmount - totalDisc;
-          this.state.netPayableAmount = netPayableAmount;
-          this.setState({ netPayableAmount: netPayableAmount });
-          // this.getTaxAmount();
-        }
-        const promDisc = parseInt(this.state.discountAmount) + this.state.totalPromoDisc;
-        this.setState({ showDiscReason: true, promoDiscount: promDisc });
-
-        this.setState({ billmodelPop: false, handleBillDiscount: false },
-          () => {
-            this.setState({ disableButton: true, reasonDiscount: "" });
-            this.state.privilages[1].bool = false;
-          });
-        this.setState({ customerTagging: false, handleCheckPromo: false })
-      }
-    }
   }
 
   navigateToScan() {

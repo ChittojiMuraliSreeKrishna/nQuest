@@ -12,6 +12,7 @@ import { Appbar, TextInput } from "react-native-paper";
 import RNPickerSelect from "react-native-picker-select";
 import { Chevron } from "react-native-shapes";
 import forms from '../../commonUtils/assets/styles/formFields.scss';
+import RnPicker from "../../commonUtils/RnPicker";
 import AccountingService from "../services/AccountingService";
 import {
   inputField,
@@ -45,7 +46,7 @@ export default class AddHsnCode extends Component {
       descriptionList: [],
       taxAppliesArray: [],
       taxAppliesList: [],
-      slabValues: [ { priceFrom: "", priceTo: "", taxId: "" } ],
+      slabValues: [{ priceFrom: "", priceTo: "", taxId: "" }],
       isEdit: false,
       navText: "",
       taxLabel: "",
@@ -59,7 +60,7 @@ export default class AddHsnCode extends Component {
     };
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     this.setState({ isEdit: this.props.route.params.isEdit }, () => {
       console.log(this.state.isEdit);
       if (this.state.isEdit === true) {
@@ -99,7 +100,7 @@ export default class AddHsnCode extends Component {
     this.getTaxAppliesOn();
   }
 
-  getAllTaxes () {
+  getAllTaxes() {
     let taxList = [];
     AccountingService.getAllMasterTax().then((res) => {
       if (res) {
@@ -107,7 +108,7 @@ export default class AddHsnCode extends Component {
         let len = res.data.result.length;
         if (len > 0) {
           for (let i = 0; i < len; i++) {
-            let number = res.data.result[ i ];
+            let number = res.data.result[i];
             taxList.push({
               value: number.id,
               label: number.taxLabel,
@@ -121,21 +122,21 @@ export default class AddHsnCode extends Component {
     });
   }
 
-  getDescription () {
+  getDescription() {
     let descriptionList = [];
     AccountingService.getDescrition().then((res) => {
       if (res) {
         let len = res.data.result.length;
         if (len > 0) {
           for (let i = 0; i < len; i++) {
-            let number = res.data.result[ i ];
+            let number = res.data.result[i];
             this.state.descriptionArray.push({
               name: number.name,
               id: number.id,
             });
             descriptionList.push({
-              value: this.state.descriptionArray[ i ].name,
-              label: this.state.descriptionArray[ i ].name,
+              value: this.state.descriptionArray[i].name,
+              label: this.state.descriptionArray[i].name,
             });
           }
           this.setState({
@@ -147,21 +148,21 @@ export default class AddHsnCode extends Component {
     });
   }
 
-  getTaxAppliesOn () {
+  getTaxAppliesOn() {
     let taxAppliesList = [];
     AccountingService.getTaxAppliesOn().then((res) => {
       if (res) {
         let len = res.data.result.length;
         if (len > 0) {
           for (let i = 0; i < len; i++) {
-            let number = res.data.result[ i ];
+            let number = res.data.result[i];
             this.state.taxAppliesArray.push({
               name: number.name,
               id: number.id,
             });
             taxAppliesList.push({
-              value: this.state.taxAppliesArray[ i ].name,
-              label: this.state.taxAppliesArray[ i ].name,
+              value: this.state.taxAppliesArray[i].name,
+              label: this.state.taxAppliesArray[i].name,
             });
           }
           this.setState({
@@ -173,7 +174,7 @@ export default class AddHsnCode extends Component {
     });
   }
 
-  handleBackButtonClick () {
+  handleBackButtonClick() {
     this.props.navigation.goBack(null);
     return true;
   }
@@ -205,15 +206,15 @@ export default class AddHsnCode extends Component {
   handlefromPrice = (value) => {
     this.setState({ fromPrice: value });
     let slabValues = this.state.slabValues;
-    slabValues[ "priceFrom" ] = value;
+    slabValues["priceFrom"] = value;
   };
 
   handleToPrice = (value) => {
     this.setState({ toPrice: value });
     let slabValues = this.state.slabValues;
-    slabValues[ "priceTo" ] = value;
+    slabValues["priceTo"] = value;
   };
-  updateHsnCode () {
+  updateHsnCode() {
     const {
       taxAppliesOn,
       taxId,
@@ -233,7 +234,7 @@ export default class AddHsnCode extends Component {
       taxId: taxType === "Hsncode" ? taxId : null,
       slabs:
         taxType === "Priceslab"
-          ? [ { priceFrom: fromPrice, priceTo: toPrice, taxId: taxId } ]
+          ? [{ priceFrom: fromPrice, priceTo: toPrice, taxId: taxId }]
           : [],
       id: parseInt(id),
     };
@@ -248,7 +249,7 @@ export default class AddHsnCode extends Component {
       });
     }
   }
-  saveHsnCode () {
+  saveHsnCode() {
     const {
       taxAppliesOn,
       taxId,
@@ -268,7 +269,7 @@ export default class AddHsnCode extends Component {
       taxId: taxType === "Hsncode" ? taxId : null,
       slabs:
         taxType === "Priceslab"
-          ? [ { priceFrom: fromPrice, priceTo: toPrice, taxId: taxId } ]
+          ? [{ priceFrom: fromPrice, priceTo: toPrice, taxId: taxId }]
           : [],
     };
     console.log(obj, domainType);
@@ -285,13 +286,13 @@ export default class AddHsnCode extends Component {
       });
     }
   }
-  cancel () {
+  cancel() {
     this.props.navigation.goBack(null);
     this.props.route.params.onGoBack(null);
     return true;
   }
 
-  render () {
+  render() {
     return (
       <View style={styles.mainContainer}>
         <Appbar mode="center-aligned">
@@ -316,28 +317,10 @@ export default class AddHsnCode extends Component {
           {this.state.taxType === "Priceslab" ? (
             <View>
               <Text style={inputHeading}>Tax Label</Text>
-              <View style={rnPickerContainer}>
-                <RNPickerSelect
-                  placeholder={{
-                    label: "Select",
-                    value: "",
-                  }}
-                  Icon={() => {
-                    return (
-                      <Chevron
-                        style={styles.imagealign}
-                        size={1.5}
-                        color="gray"
-                      />
-                    );
-                  }}
-                  items={this.state.taxList}
-                  onValueChange={this.handleTaxLabel}
-                  style={rnPicker}
-                  value={this.state.taxLabel}
-                  useNativeAndroidPickerStyle={false}
-                />
-              </View>
+              <RnPicker
+                items={this.state.taxList}
+                setValue={this.handleTaxLabel}
+              />
               <Text style={inputHeading}>From Price</Text>
               <TextInput
                 style={inputField}
@@ -364,112 +347,39 @@ export default class AddHsnCode extends Component {
           ) : (
             <View>
               <Text style={inputHeading}>Tax Label</Text>
-              <View style={rnPickerContainer}>
-                <RNPickerSelect
-                  placeholder={{
-                    label: "Select",
-                    value: "",
-                  }}
-                  Icon={() => {
-                    return (
-                      <Chevron
-                        style={styles.imagealign}
-                        size={1.5}
-                        color="gray"
-                      />
-                    );
-                  }}
-                  items={this.state.taxList}
-                  onValueChange={this.handleTaxLabel}
-                  style={rnPicker}
-                  value={this.state.taxLabel}
-                  useNativeAndroidPickerStyle={false}
-                />
-              </View>
+              <RnPicker
+                items={this.state.taxList}
+                setValue={this.handleTaxLabel}
+              />
             </View>
           )}
           <Text style={inputHeading}>Tax Applies On</Text>
-          <View style={rnPickerContainer}>
-            <RNPickerSelect
-              placeholder={{
-                label: "Select",
-              }}
-              Icon={() => {
-                return (
-                  <Chevron style={styles.imagealign} size={1.5} color="gray" />
-                );
-              }}
-              items={this.state.taxAppliesList}
-              onValueChange={this.handleAppliesOn}
-              style={rnPicker}
-              value={this.state.taxAppliesOn}
-              useNativeAndroidPickerStyle={false}
-            />
-          </View>
+          <RnPicker
+            items={this.state.taxAppliesList}
+            setValue={this.handleAppliesOn}
+          />
           <Text style={inputHeading}>Description</Text>
-          <View style={rnPickerContainer}>
-            <RNPickerSelect
-              placeholder={{
-                label: "Select",
-              }}
-              Icon={() => {
-                return (
-                  <Chevron style={styles.imagealign} size={1.5} color="gray" />
-                );
-              }}
-              items={this.state.descriptionList}
-              onValueChange={this.handleDescription}
-              style={rnPicker}
-              value={this.state.description}
-              useNativeAndroidPickerStyle={false}
-            />
-          </View>
-
+          <RnPicker
+            items={this.state.descriptionList}
+            setValue={this.handleDescription}
+          />
           <Text style={inputHeading}>Tax Applied Type</Text>
-          <View style={rnPickerContainer}>
-            <RNPickerSelect
-              placeholder={{
-                label: "Select",
-              }}
-              Icon={() => {
-                return (
-                  <Chevron style={styles.imagealign} size={1.5} color="gray" />
-                );
-              }}
-              items={this.state.taxAppliedTypes}
-              onValueChange={this.handleTaxApplicableType}
-              style={rnPicker}
-              value={this.state.taxType}
-              useNativeAndroidPickerStyle={false}
-            />
-          </View>
+          <RnPicker
+            items={this.state.taxAppliedTypes}
+            setValue={this.handleTaxApplicableType}
+          />
           <Text style={inputHeading}>Domain</Text>
-          <View style={[ rnPickerContainer, {
-            // backgroundColor: this.state.isEdit ? color.disabledBorder : color.light
-          } ]}>
-            <RNPickerSelect
-              placeholder={{
-                label: "Select",
-              }}
-              Icon={() => {
-                return (
-                  <Chevron style={styles.imagealign} size={1.5} color="gray" />
-                );
-              }}
-              disabled={this.state.isEdit}
-              items={this.state.domainTypes}
-              onValueChange={this.handleDomainType}
-              style={rnPicker}
-              value={this.state.domainType}
-              useNativeAndroidPickerStyle={false}
-            />
-          </View>
+          <RnPicker
+            items={this.state.domainTypes}
+            disabled = {this.state.isEdit}
+            setValue={this.handleDomainType}
+          />
           <View style={forms.action_buttons_container}>
-            <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+            <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
               onPress={() => this.state.isEdit ? this.updateHsnCode() : this.saveHsnCode()}>
               <Text style={forms.submit_btn_text} >{I18n.t("SAVE")}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+            <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
               onPress={() => this.cancel()}>
               <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
             </TouchableOpacity>

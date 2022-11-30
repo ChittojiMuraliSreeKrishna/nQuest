@@ -51,6 +51,7 @@ export class RnPicker extends Component {
           style={rnPicker}
           value={this.state.selectedValue}
           useNativeAndroidPickerStyle={false}
+          disabled={this.props.disabled}
         />
       </View>
     )
