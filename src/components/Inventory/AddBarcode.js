@@ -10,11 +10,10 @@ import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Appbar, TextInput } from "react-native-paper";
-import RNPickerSelect from "react-native-picker-select";
-import { Chevron } from "react-native-shapes";
 import forms from "../../commonUtils/assets/styles/formFields.scss";
 import DateSelector from "../../commonUtils/DateSelector";
 import Loader from "../../commonUtils/loader";
+import RnPicker from "../../commonUtils/RnPicker";
 import { RF, RH, RW } from "../../Responsive";
 import {
   errorLength
@@ -24,9 +23,7 @@ import { color } from "../Styles/colorStyles";
 import {
   dateSelector,
   dateText,
-  inputHeading,
-  rnPicker,
-  rnPickerContainer
+  inputHeading
 } from "../Styles/FormFields";
 
 var deviceWidth = Dimensions.get("window").width;
@@ -326,7 +323,7 @@ class AddBarcode extends Component {
   handleSize = (value, data) => {
     this.state.alist[0].selectedValue = value
     this.setState({ alist: this.state.alist, selectedValue: value });
-    console.log({ value, data }, this.state.alist);
+    console.log({ value }, this.state.alist);
   };
 
   handleSelectChange = (value, data) => {
@@ -660,179 +657,51 @@ class AddBarcode extends Component {
           <Text style={inputHeading}>
             {I18n.t("Domian")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
-          <View
-            style={[
-              rnPickerContainer,
-            ]}
-          >
-            <RNPickerSelect
-              placeholder={{
-                label: "Select",
-              }}
-              Icon={() => {
-                return (
-                  <Chevron
-                    style={styles.imagealign}
-                    size={1.5}
-                    color="grey"
-                  />
-                );
-              }}
-              items={data1}
-              onValueChange={(value) => {
-                this.handleDomain(value);
-              }}
-              on
-              style={rnPicker}
-              value={this.state.selectedDomain}
-              useNativeAndroidPickerStyle={false}
-            />
-          </View>
+          <RnPicker
+            items={data1}
+            setValue={this.handleDomain}
+          />
           <View>
             <Text style={inputHeading}>
               {I18n.t("Division")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
             </Text>
-            <View
-              style={[
-                rnPickerContainer,
-              ]}
-            >
-              <RNPickerSelect
-                placeholder={{
-                  label: "Select",
-                }}
-                Icon={() => {
-                  return (
-                    <Chevron
-                      style={styles.imagealign}
-                      size={1.5}
-                      color="grey"
-                    />
-                  );
-                }}
-                items={this.state.divisionsList}
-                onValueChange={(value) => this.handleDivision(value)}
-                style={rnPicker}
-                value={this.state.selectedDivision}
-                useNativeAndroidPickerStyle={false}
-              />
-            </View>
+            <RnPicker
+              items={this.state.divisionsList}
+              setValue={this.handleDivision}
+            />
             <Text style={inputHeading}>
               {I18n.t("Section")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
             </Text>
-            <View
-              style={[
-                rnPickerContainer,
-              ]}
-            >
-              <RNPickerSelect
-                placeholder={{
-                  label: "Select",
-                }}
-                Icon={() => {
-                  return (
-                    <Chevron
-                      style={styles.imagealign}
-                      size={1.5}
-                      color="grey"
-                    />
-                  );
-                }}
-                items={this.state.sectionsList}
-                onValueChange={this.handleSection}
-                style={rnPicker}
-                value={this.state.section}
-                useNativeAndroidPickerStyle={false}
-              />
-            </View>
+            <RnPicker
+              items={this.state.sectionsList}
+              setValue={this.handleSection}
+            />
             <Text style={inputHeading}>
               {I18n.t("Sub Section")}{" "}
               <Text style={{ color: "#aa0000" }}>*</Text>{" "}
             </Text>
-            <View
-              style={[
-                rnPickerContainer,
-              ]}
-            >
-              <RNPickerSelect
-                placeholder={{
-                  label: "Select",
-                }}
-                Icon={() => {
-                  return (
-                    <Chevron
-                      style={styles.imagealign}
-                      size={1.5}
-                      color="grey"
-                    />
-                  );
-                }}
-                items={this.state.subSectionsList}
-                onValueChange={this.handleSubSection}
-                style={rnPicker}
-                value={this.state.subSection}
-                useNativeAndroidPickerStyle={false}
-              />
-            </View>
+            <RnPicker
+              items={this.state.subSectionsList}
+              setValue={this.handleSubSection}
+            />
             <Text style={inputHeading}>
               {I18n.t("Category")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
             </Text>
-            <View
-              style={[
-                rnPickerContainer,
-              ]}
-            >
-              <RNPickerSelect
-                placeholder={{
-                  label: "Select",
-                }}
-                Icon={() => {
-                  return (
-                    <Chevron
-                      style={styles.imagealign}
-                      size={1.5}
-                      color="grey"
-                    />
-                  );
-                }}
-                items={this.state.categoriesList}
-                onValueChange={this.handleCateory}
-                style={rnPicker}
-                value={this.state.category}
-                useNativeAndroidPickerStyle={false}
-              />
-            </View>
+            <RnPicker
+              items={this.state.categoriesList}
+              setValue={this.handleCateory}
+            />
+
           </View>
           {this.state.selectedDomain === "Retail" && ( // For Retail Domain only
             <View>
               <Text style={inputHeading}>
                 {I18n.t("Status Type")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
               </Text>
-              <View
-                style={[
-                  rnPickerContainer,
-                ]}
-              >
-                <RNPickerSelect
-                  placeholder={{
-                    label: "Select",
-                  }}
-                  Icon={() => {
-                    return (
-                      <Chevron
-                        style={styles.imagealign}
-                        size={1.5}
-                        color="grey"
-                      />
-                    );
-                  }}
-                  items={retailStatus}
-                  onValueChange={this.handleStatus}
-                  style={rnPicker}
-                  value={this.state.selectedStatus}
-                  useNativeAndroidPickerStyle={false}
-                />
-              </View>
+              <RnPicker
+                items={retailStatus}
+                setValue={this.handleStatus}
+              />
               <Text style={inputHeading}>
                 Stock Validity <Text style={{ color: "#aa0000" }}>*</Text>{" "}
               </Text>
@@ -869,34 +738,12 @@ class AddBarcode extends Component {
                   {items.type === "select" && (
                     <View>
                       <Text style={inputHeading}>{items.name}</Text>
-                      <View
-                        style={[
-                          rnPickerContainer,
-                          { borderColor: "#d6d6d6" },
-                        ]}
-                      >
-                        <RNPickerSelect
-                          placeholder={{
-                            label: "Select",
-                          }}
-                          Icon={() => {
-                            return (
-                              <Chevron
-                                style={styles.imagealign}
-                                size={1.5}
-                                color={"gray"}
-                              />
-                            );
-                          }}
-                          items={items.values.map((item) => (
-                            { label: item, value: item }
-                          ))}
-                          onValueChange={(value, items) => this.handleSize(value, items)}
-                          style={rnPicker}
-                          value={this.state.selectedValue}
-                          useNativeAndroidPickerStyle={false}
-                        />
-                      </View>
+                      <RnPicker
+                        items={items.values.map((item) => (
+                          { label: item, value: item }
+                        ))}
+                        setValue={this.handleSize}
+                      />
                     </View>
                   )}
                   {items.type === "input" && (
@@ -975,31 +822,10 @@ class AddBarcode extends Component {
           <Text style={inputHeading}>
             {I18n.t("Colour")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
-          <View
-            style={[
-              rnPickerContainer,
-            ]}
-          >
-            <RNPickerSelect
-              placeholder={{
-                label: "Select",
-              }}
-              Icon={() => {
-                return (
-                  <Chevron
-                    style={styles.imagealign}
-                    size={1.5}
-                    color="grey"
-                  />
-                );
-              }}
-              items={this.state.colorsRes}
-              onValueChange={this.handleColor}
-              style={rnPicker}
-              value={this.state.selectedColor}
-              useNativeAndroidPickerStyle={false}
-            />
-          </View>
+          <RnPicker
+            items={this.state.colorsRes}
+            setValue={this.handleColor}
+          />
           <Text style={inputHeading}>
             {I18n.t("Name")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
@@ -1114,62 +940,18 @@ class AddBarcode extends Component {
           <Text style={inputHeading}>
             {I18n.t("UOM")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
-          <View
-            style={[
-              rnPickerContainer,
-              { borderColor: "#d6d6d6" },
-            ]}
-          >
-            <RNPickerSelect
-              placeholder={{
-                label: "Select",
-              }}
-              Icon={() => {
-                return (
-                  <Chevron
-                    style={styles.imagealign}
-                    size={1.5}
-                    color={"gray"}
-                  />
-                );
-              }}
-              items={this.state.uomList}
-              onValueChange={this.handleUOM}
-              style={rnPicker}
-              value={this.state.uomName}
-              useNativeAndroidPickerStyle={false}
-            />
-          </View>
+          <RnPicker
+            items={this.state.uomList}
+            setValue={this.handleUOM}
+          />
           {(this.state.isTaxIncluded === "true" || this.state.isTaxIncluded === "false") && this.state.isTaxIncluded !== null && (<View >
             <Text style={inputHeading}>
               {I18n.t("HSN Code")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
             </Text>
-            <View
-              style={[
-                rnPickerContainer,
-                { borderColor: "#d6d6d6" },
-              ]}
-            >
-              <RNPickerSelect
-                placeholder={{
-                  label: "Enter HSN Code",
-                }}
-                Icon={() => {
-                  return (
-                    <Chevron
-                      style={styles.imagealign}
-                      size={1.5}
-                      color={"gray"}
-                    />
-                  );
-                }}
-                items={this.state.hsnCodesList}
-                onValueChange={this.handleHSNCode}
-                style={rnPicker}
-                value={this.state.hsnCode}
-                useNativeAndroidPickerStyle={false}
-              />
-            </View>
+            <RnPicker
+              items={this.state.hsnCodesList}
+              setValue={this.handleHSNCode}
+            />
           </View>)}
           <Text style={inputHeading}>
             {I18n.t("EMP ID")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -1196,32 +978,10 @@ class AddBarcode extends Component {
           <Text style={inputHeading}>
             {I18n.t("Store")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
-          <View
-            style={[
-              rnPickerContainer,
-              { borderColor: "#d6d6d6" },
-            ]}
-          >
-            <RNPickerSelect
-              placeholder={{
-                label: "Select",
-              }}
-              Icon={() => {
-                return (
-                  <Chevron
-                    style={styles.imagealign}
-                    size={1.5}
-                    color={"gray"}
-                  />
-                );
-              }}
-              items={this.state.storesList}
-              onValueChange={this.handleStore}
-              style={rnPicker}
-              value={this.state.store}
-              useNativeAndroidPickerStyle={false}
-            />
-          </View>
+          <RnPicker
+            items={this.state.storesList}
+            setValue={this.handleStore}
+          />
           <Text style={inputHeading}>
             QTY <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
