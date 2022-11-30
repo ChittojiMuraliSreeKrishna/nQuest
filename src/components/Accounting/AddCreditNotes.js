@@ -9,6 +9,7 @@ import RazorpayCheckout from 'react-native-razorpay';
 import { Chevron } from 'react-native-shapes';
 import { ACCOUNTING_PORTAL } from '../../commonUtils/ApiConstants';
 import { BASE_URL } from '../../commonUtils/Base';
+import RnPicker from '../../commonUtils/RnPicker';
 import AccountingService from '../services/AccountingService';
 import NewSaleService from '../services/NewSaleService';
 import { cancelBtn, cancelBtnText, inputArea, inputField, inputFieldDisabled, inputHeading, rnPicker, rnPickerContainer, submitBtn, submitBtnText } from '../Styles/FormFields';
@@ -274,22 +275,10 @@ export default class AddCreditNotes extends Component {
             onChangeText={this.handleCretedBy}
           />
           <Text style={inputHeading}>Payment Type</Text>
-          <View style={rnPickerContainer}>
-            <RNPickerSelect
-              placeholder={{
-                label: 'Payment Type',
-                value: "",
-              }}
-              Icon={() => {
-                return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-              }}
-              items={this.state.trasanctionTypes}
-              onValueChange={this.handletransactionType}
-              style={rnPicker}
-              value={this.state.transanctionMode}
-              useNativeAndroidPickerStyle={false}
-            />
-          </View>
+          <RnPicker
+            items={this.state.trasanctionTypes}
+            setValue={this.handletransactionType}
+          />
           <Text style={inputHeading}>Comments</Text>
           <TextInput
             style={inputArea}

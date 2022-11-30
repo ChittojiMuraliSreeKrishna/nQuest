@@ -36,7 +36,7 @@ export default class GenerateReturnSlip extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      invoiceNumber: "EAS20223071720",
+      invoiceNumber: "",
       mobileNumber: "",
       customerTagging: false,
       modelVisible: true,
@@ -819,25 +819,6 @@ export default class GenerateReturnSlip extends Component {
                   <Text style={[highText]}> ₹ {this.state.returnSlipTotal} </Text>
                 </View>
                 <Text style={[textStyleMediumColor]}>{I18n.t("Return For Reason")} </Text>
-                {/* <View style={Device.isTablet ? styles.rnSelectContainer_tablet : styles.rnSelectContainer_mobile}>
-                  <RNPickerSelect
-                    placeholder={{ label: 'REASON', value: '' }}
-                    Icon={() => {
-                      return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-                    }}
-                    items={[
-                      { label: 'Not Fitting', value: 'Not Fitting' },
-                      { label: 'Damaged Piece', value: 'Damaged Piece' },
-                      { label: 'Quality is Not Good', value: 'Quality is Not Good' },
-                      { label: 'Others', value: 'Others' },
-                    ]}
-                    onValueChange={this.handleReason}
-                    style={Device.isTablet ? pickerSelectStyles_tablet : pickerSelectStyles_mobile}
-                    value={this.state.reason}
-                    useNativeAndroidPickerStyle={false}
-                  />
-                </View> */}
-
                 <RnPicker
                   items={pickerData}
                   setValue={this.handleReason}

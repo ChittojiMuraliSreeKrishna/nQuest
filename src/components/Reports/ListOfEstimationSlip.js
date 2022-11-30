@@ -14,13 +14,18 @@ import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import { formatDate } from '../../commonUtils/DateFormate';
 import DateSelector from '../../commonUtils/DateSelector';
+import RnPicker from '../../commonUtils/RnPicker';
 import { RF, RH, RW } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
 import { rnPicker, rnPickerContainer } from '../Styles/FormFields';
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
 
-
+const pickerData = [
+  { label: 'Completed', value: 'Completed' },
+  { label: 'Pending', value: 'Pending' },
+  { label: 'Cancelled', value: 'Cancelled' },
+]
 export class ListOfEstimationSlip extends Component {
 
   constructor(props) {
@@ -78,7 +83,7 @@ export class ListOfEstimationSlip extends Component {
 
 
   handledeleteEstimationSlip(item, index) {
-    this.setState({ deleteEstimationSlip: true, modalVisible: true, flagViewDetail: false });
+    this.setState({ deleteEstimationSlip: true, modalVisible: true, flagViewDetail: false, dsNumber1: item.dsNumber });
   }
 
   handleviewEstimationSlip(item, index) {
@@ -89,8 +94,15 @@ export class ListOfEstimationSlip extends Component {
 
 
 
-  deleteEstimationSlip = (item, index) => {
-    alert("you have deleted", index);
+  deleteEstimationSlip = () => {
+    ReportsService.deleteEstimationSlip(this.state.dsNumber1).then((res) => {
+      if (res.data.result) {
+        alert(res.data.result);
+        this.applyEstimationSlipFilter(0);
+      } else {
+        alert(res.data.message);
+      }
+    });
   };
 
   estimationModelCancel() {
@@ -360,47 +372,21 @@ export class ListOfEstimationSlip extends Component {
             <Modal isVisible={this.state.modalVisible} style={{ margin: 0 }}
               onBackButtonPress={() => this.estimationModelCancel()}
               onBackdropPress={() => this.estimationModelCancel()} >
-              <View style={[styles.deleteMainContainer, { backgroundColor: "#ED1C24" }]}>
-                <View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: RH(5), height: Device.isTablet ? RH(60) : RH(50) }}>
-                    <View>
-                      <Text style={{ marginTop: RH(15), fontSize: Device.isTablet ? RF(22) : RF(17), marginLeft: Device.isTablet ? RW(10) : 5, color: '#ffffff' }} > {I18n.t("Delete Estimation Slip")} </Text>
-                    </View>
-                    <View>
-                      <TouchableOpacity style={{ width: Device.isTablet ? RW(60) : RW(50), height: Device.isTablet ? RH(60) : RH(50), marginTop: Device.isTablet ? RH(20) : RH(15), }} onPress={() => this.estimationModelCancel()}>
-                        <Image style={{ margin: RH(5), height: Device.isTablet ? RH(20) : RH(15), width: Device.isTablet ? RW(20) : RW(15), }} source={require('../assets/images/modalCloseWhite.png')} />
-                      </TouchableOpacity>
-                    </View>
+              <View style={forms.filterModelContainer} >
+                <Text style={forms.popUp_decorator}>-</Text>
+                <View style={forms.filterModelSub}>
+                  <Text style={[scss.textStyleMedium, { fontSize: 16 }]}> {I18n.t("Are you sure want to delete Estimation Slip")} ?  </Text>
+                  <View style={forms.action_buttons_container}>
+                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                      onPress={() => this.deleteEstimationSlip()}>
+                      <Text style={forms.submit_btn_text} >{I18n.t("DELETE")}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                      onPress={() => this.estimationModelCancel()}>
+                      <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                    </TouchableOpacity>
                   </View>
-                  <Text style={{
-                    height: Device.isTablet ? 2 : 1,
-                    width: deviceWidth,
-                    backgroundColor: 'lightgray',
-                  }}></Text>
                 </View>
-                <View style={{ backgroundColor: "#ffffff", height: Device.isTablet ? RH(300) : RH(250) }}>
-                  <Text style={{
-                    textAlign: 'center',
-                    fontFamily: 'regular',
-                    marginTop: 15,
-                    fontSize: Device.isTablet ? RF(23) : RF(18),
-                    color: '#353C40'
-                  }}> {I18n.t("Are you sure want to delete Estimation Slip")} ?  </Text>
-                  <TouchableOpacity
-                    style={[Device.isTablet ? styles.filterApplyButton_tablet : styles.filterApplyButton_mobile, { marginTop: Device.isTablet ? RH(40) : RH(30) }]}
-                  >
-                    <Text style={Device.isTablet ? styles.filterButtonText_tablet : styles.filterButtonText_mobile}  > {I18n.t("DELETE")} </Text>
-
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[Device.isTablet ? styles.filterCancelButton_tablet : styles.filterCancelButton_mobile, { borderColor: '#ED1C24', }]} onPress={() => this.estimationModelCancel()}
-                  >
-                    <Text style={[Device.isTablet ? styles.filterButtonCancelText_tablet : styles.filterButtonCancelText_mobile, { color: '#ED1C24' }]}  > {I18n.t("CANCEL")} </Text>
-
-                  </TouchableOpacity>
-                </View>
-
               </View>
             </Modal>
           </View>
@@ -462,25 +448,10 @@ export class ListOfEstimationSlip extends Component {
                         />
                       </View>
                     )}
-                    <View style={[rnPickerContainer, { width: '92%' }]}>
-                      <RNPickerSelect
-                        placeholder={{
-                          label: 'DS STATUS'
-                        }}
-                        Icon={() => {
-                          return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-                        }}
-                        items={[
-                          { label: 'Completed', value: 'Completed' },
-                          { label: 'Pending', value: 'Pending' },
-                          { label: 'Cancelled', value: 'Cancelled' },
-                        ]}
-                        onValueChange={this.handleDsStatus}
-                        style={rnPicker}
-                        value={this.state.dsStatus}
-                        useNativeAndroidPickerStyle={false}
-                      />
-                    </View>
+                    <RnPicker
+                      items={pickerData}
+                      setValue={this.handleDsStatus}
+                    />
                     <TextInput
                       underlineColor='#efefef'
                       mode='flat'

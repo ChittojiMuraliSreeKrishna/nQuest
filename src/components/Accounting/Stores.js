@@ -21,6 +21,7 @@ import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from "../../commonUtils/assets/styles/style.scss";
 import { formatDate } from "../../commonUtils/DateFormate";
 import Loader from "../../commonUtils/loader";
+import RnPicker from "../../commonUtils/RnPicker";
 import UrmService from "../services/UrmService";
 import {
   rnPicker,
@@ -388,48 +389,14 @@ export default class Stores extends Component {
                 <Text style={forms.popUp_decorator}>-</Text>
                 <View style={forms.filterModelSub}>
                   <KeyboardAwareScrollView>
-                    <View style={rnPickerContainer}>
-                      <RNPickerSelect
-                        placeholder={{
-                          label: "STATE",
-                        }}
-                        Icon={() => {
-                          return (
-                            <Chevron
-                              style={styles.imagealign}
-                              size={1.5}
-                              color="gray"
-                            />
-                          );
-                        }}
-                        items={this.state.states}
-                        onValueChange={(value) => this.handleStoreState(value)}
-                        style={rnPicker}
-                        value={this.state.storeState}
-                        useNativeAndroidPickerStyle={false}
-                      />
-                    </View>
-                    <View style={rnPickerContainer}>
-                      <RNPickerSelect
-                        placeholder={{
-                          label: "DISTRICT",
-                        }}
-                        Icon={() => {
-                          return (
-                            <Chevron
-                              style={styles.imagealign}
-                              size={1.5}
-                              color="gray"
-                            />
-                          );
-                        }}
-                        items={this.state.dictricts}
-                        onValueChange={(value) => this.handleDistrict(value)}
-                        style={rnPicker}
-                        value={this.state.storeDistrict}
-                        useNativeAndroidPickerStyle={false}
-                      />
-                    </View>
+                    <RnPicker
+                      items={this.state.states}
+                      setValue={this.handleStoreState}
+                    />
+                    <RnPicker
+                      items={this.state.dictricts}
+                      setValue={this.handleDistrict}
+                    />
                     <TextInput
                       mode="flat"
                       outlineColor="#dfdfdf"

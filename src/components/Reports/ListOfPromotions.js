@@ -13,6 +13,7 @@ import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import Loader from '../../commonUtils/loader';
+import RnPicker from '../../commonUtils/RnPicker';
 import { RF, RH, RW } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
 import { emptyTextStyle } from '../Styles/FormFields';
@@ -21,6 +22,23 @@ import { emptyTextStyle } from '../Styles/FormFields';
 var deviceWidth = Dimensions.get("window").width;
 var deviceheight = Dimensions.get("window").height;
 
+const pickerData1 = [{
+  label: "On Barcode",
+  value: "promotionForEachBarcode",
+},
+{
+  label: "On WholeBill",
+  value: "promotionForWholeBill",
+}]
+
+const pickerData2 = [{
+  label: "Active",
+  value: "true",
+},
+{
+  label: "In Active",
+  value: "false",
+}]
 export class ListOfPromotions extends Component {
 
   constructor(props) {
@@ -43,7 +61,7 @@ export class ListOfPromotions extends Component {
     };
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     this.setState({ clientId: clientId });
   }
@@ -52,7 +70,7 @@ export class ListOfPromotions extends Component {
     this.setState({ promoId: value });
   };
 
-  applyListPromotions () {
+  applyListPromotions() {
     const obj = {
       isActive: this.state.promoStatus,
       applicability: this.state.promoType,
@@ -93,7 +111,7 @@ export class ListOfPromotions extends Component {
     }
   };
 
-  continuePagination () {
+  continuePagination() {
     if (this.state.totalPages > 1) {
       this.setState({ loadMoreActive: true });
     }
@@ -102,11 +120,11 @@ export class ListOfPromotions extends Component {
     }
   }
 
-  filterAction () {
+  filterAction() {
     this.setState({ flagFilterListPromotions: true, modalVisible: true });
   }
 
-  modelCancel () {
+  modelCancel() {
     this.setState({ flagFilterListPromotions: false, modalVisible: false });
   }
 
@@ -118,7 +136,7 @@ export class ListOfPromotions extends Component {
     this.setState({ promoStatus: value });
   };
 
-  clearFilterAction () {
+  clearFilterAction() {
     this.setState({
       loadMoreActive: false, loadNextActive: false,
       filterActive: false, flagFilterListPromotions: false, modalVisible: false, promoType: '', promoStatus: '', listPromotions: []
@@ -126,7 +144,7 @@ export class ListOfPromotions extends Component {
   }
 
 
-  render () {
+  render() {
     return (
       <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
         <Appbar>
@@ -158,18 +176,18 @@ export class ListOfPromotions extends Component {
           // onEndReached={this.loadMoreList}
           // onEndReachedThreshold={200}
           renderItem={({ item, index }) => (
-            <View style={[ scss.flatListContainer, { backgroundColor: "#FFF" } ]} >
+            <View style={[scss.flatListContainer, { backgroundColor: "#FFF" }]} >
               <View style={scss.flatListSubContainer}>
                 <View style={scss.textContainer}>
-                  <Text style={[ scss.highText, { textAlign: 'left' } ]} >PROMO ID: {item.promoId}</Text>
+                  <Text style={[scss.highText, { textAlign: 'left' }]} >PROMO ID: {item.promoId}</Text>
                 </View>
                 <View style={scss.textContainer}>
-                  <Text style={[ scss.textStyleMedium, { textAlign: 'left' } ]}>PROMO NAME: {"\n"} {item.promotionName}</Text>
-                  <Text style={[ scss.textStyleMedium, { textAlign: 'right' } ]} >DESCRIPTION: {"\n"}{item.description} </Text>
+                  <Text style={[scss.textStyleMedium, { textAlign: 'left' }]}>PROMO NAME: {"\n"} {item.promotionName}</Text>
+                  <Text style={[scss.textStyleMedium, { textAlign: 'right' }]} >DESCRIPTION: {"\n"}{item.description} </Text>
                 </View>
                 <View style={scss.textContainer}>
-                  <Text style={[ scss.textStyleMedium, { textAlign: 'left' } ]}>PROMO APPLY TYPE: {"\n"} {item.promoApplyType}</Text>
-                  <Text style={[ scss.textStyleMedium, { textAlign: 'right' } ]}>APPLICABILITY: {"\n"} {item.applicability}</Text>
+                  <Text style={[scss.textStyleMedium, { textAlign: 'left' }]}>PROMO APPLY TYPE: {"\n"} {item.promoApplyType}</Text>
+                  <Text style={[scss.textStyleMedium, { textAlign: 'right' }]}>APPLICABILITY: {"\n"} {item.applicability}</Text>
                 </View>
               </View>
             </View>
@@ -184,14 +202,14 @@ export class ListOfPromotions extends Component {
                   {this.state.loadPrevActive && (
                     <View style={scss.page_navigation_subcontainer}>
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(0)}
                         name="chevron-double-left"
                         size={25}
                       />
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(this.state.pageNo - 1)}
                         name="chevron-left"
@@ -203,13 +221,13 @@ export class ListOfPromotions extends Component {
                   {this.state.loadNextActive && (
                     <View style={scss.page_navigation_subcontainer}>
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         onPress={() => this.loadMoreList(this.state.pageNo + 1)}
                         name="chevron-right"
                         size={25}
                       />
                       <IconMA
-                        style={[ scss.pag_nav_btn ]}
+                        style={[scss.pag_nav_btn]}
                         onPress={() => this.loadMoreList(this.state.totalPages - 1)}
                         name="chevron-double-right"
                         size={25}
@@ -231,60 +249,23 @@ export class ListOfPromotions extends Component {
                 <Text style={forms.popUp_decorator}>-</Text>
                 <View style={forms.filterModelSub}>
                   <KeyboardAwareScrollView >
-                    <Text style={styles.headings}>{I18n.t("Promo Type")}</Text>
-                    <View style={[ styles.rnSelectContainer, { width: '92%' } ]}>
-                      <RNPickerSelect
-                        placeholder={{
-                          label: 'Promo Type', value: ''
-                        }}
-                        Icon={() => {
-                          return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-                        }}
-                        items={[ {
-                          label: "On Barcode",
-                          value: "promotionForEachBarcode",
-                        },
-                        {
-                          label: "On WholeBill",
-                          value: "promotionForWholeBill",
-                        } ]}
-                        onValueChange={this.handlePromoType}
-                        style={pickerSelectStyles}
-                        value={this.state.promoType}
-                        useNativeAndroidPickerStyle={false}
-                      />
-                    </View>
-
-                    <Text style={styles.headings}>{I18n.t("Promo Status")}</Text>
-                    <View style={[ styles.rnSelectContainer, { width: '92%' } ]}>
-                      <RNPickerSelect
-                        placeholder={{
-                          label: 'Promo Status ', value: ''
-                        }}
-                        Icon={() => {
-                          return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-                        }}
-                        items={[ {
-                          label: "Active",
-                          value: "true",
-                        },
-                        {
-                          label: "In Active",
-                          value: "false",
-                        } ]}
-                        onValueChange={this.handlePromoStatus}
-                        style={pickerSelectStyles}
-                        value={this.state.promoStatus}
-                        useNativeAndroidPickerStyle={false}
-                      />
-                    </View>
+                    <Text style={scss.textStyleLight}>{I18n.t("Promo Type")}</Text>
+                    <RnPicker
+                      items={pickerData1}
+                      setValue={this.handlePromoType}
+                    />
+                    <Text style={scss.textStyleLight}>{I18n.t("Promo Status")}</Text>
+                    <RnPicker
+                      items={pickerData2}
+                      setValue={this.handlePromoStatus}
+                    />
 
                     <View style={forms.action_buttons_container}>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.submit_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
                         onPress={() => this.applyListPromotions(this.state.pageNo)}>
                         <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={[ forms.action_buttons, forms.cancel_btn ]}
+                      <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
                         onPress={() => this.modelCancel()}>
                         <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
                       </TouchableOpacity>
@@ -299,73 +280,3 @@ export class ListOfPromotions extends Component {
     );
   }
 }
-
-
-const pickerSelectStyles = StyleSheet.create({
-  placeholder: {
-    color: "#6F6F6F",
-    fontSize: Device.isTablet ? RF(20) : RF(15),
-  },
-  inputIOS: {
-    justifyContent: 'center',
-    height: RH(42),
-    borderRadius: 3,
-    borderWidth: 1,
-    //paddingLeft: -20,
-    fontSize: Device.isTablet ? RF(20) : RF(15),
-    borderColor: '#FBFBFB',
-    backgroundColor: '#FBFBFB',
-  },
-
-  inputAndroid: {
-    justifyContent: 'center',
-    height: Device.isTablet ? RH(52) : RH(42),
-    borderRadius: 3,
-    borderWidth: 1,
-    //paddingLeft: -20,
-    fontSize: Device.isTablet ? RF(20) : RF(15),
-    borderColor: '#FBFBFB',
-    backgroundColor: '#FBFBFB',
-    color: '#001B4A'
-  },
-});
-
-const styles = StyleSheet.create({
-  headings: {
-    fontSize: Device.isTablet ? 20 : 15,
-    marginLeft: 20,
-    color: '#B4B7B8',
-    marginTop: Device.isTablet ? 10 : 5,
-    marginBottom: Device.isTablet ? 10 : 5,
-  },
-  imagealign: {
-    marginTop: Device.isTablet ? RH(25) : RH(20),
-    marginRight: Device.isTablet ? RW(30) : RW(20),
-  },
-  modelCloseImage: {
-    fontFamily: 'regular',
-    fontSize: RF(12),
-    position: 'absolute',
-    top: RH(10),
-    right: Device.isTablet ? RW(15) : RW(30),
-  },
-  filterMainContainer: {
-    backgroundColor: '#ffffff',
-    marginTop: Device.isTablet ? deviceheight - RH(500) : deviceheight - RH(400),
-    height: Device.isTablet ? RH(500) : RH(400),
-  },
-  rnSelectContainer: {
-    justifyContent: 'center',
-    margin: RH(20),
-    height: Device.isTablet ? RH(54) : RH(44),
-    marginTop: 5,
-    marginBottom: RH(10),
-    borderColor: '#8F9EB717',
-    borderRadius: 3,
-    backgroundColor: '#FBFBFB',
-    borderWidth: 1,
-    fontFamily: 'regular',
-    paddingLeft: RW(15),
-    fontSize: Device.isTablet ? RF(20) : RF(14),
-  }
-});

@@ -8,6 +8,7 @@ import { Appbar, TextInput } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
 import RazorpayCheckout from 'react-native-razorpay';
 import { Chevron } from 'react-native-shapes';
+import RnPicker from '../../commonUtils/RnPicker';
 import AccountingService from '../services/AccountingService';
 import { cancelBtn, cancelBtnText, inputArea, inputField, inputFieldDisabled, inputHeading, rnPicker, rnPickerContainer, submitBtn, submitBtnText } from '../Styles/FormFields';
 
@@ -222,22 +223,10 @@ export default class AddDebitNotes extends Component {
             onChangeText={this.handleApprovedBy}
           />
           <Text style={inputHeading}>{I18n.t("Payment Type")}</Text>
-          <View style={rnPickerContainer}>
-            <RNPickerSelect
-              placeholder={{
-                label: 'Payment Type',
-                value: "",
-              }}
-              Icon={() => {
-                return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-              }}
-              items={this.state.trasanctionTypes}
-              onValueChange={this.handletransactionType}
-              style={rnPicker}
-              value={this.state.transanctionMode}
-              useNativeAndroidPickerStyle={false}
-            />
-          </View>
+          <RnPicker
+            items={this.state.trasanctionTypes}
+            setValue={this.handletransactionType}
+          />
           {this.state.transanctionMode === "Cash" &&
             (<View>
               <Text style={inputHeading}>{I18n.t("Payable Cash")}</Text>

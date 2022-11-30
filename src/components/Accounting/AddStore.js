@@ -15,6 +15,7 @@ import RNPickerSelect from "react-native-picker-select";
 import { Chevron } from "react-native-shapes";
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import Loader from "../../commonUtils/loader";
+import RnPicker from "../../commonUtils/RnPicker";
 import { RF } from "../../Responsive";
 import {
   accountingErrorMessages,
@@ -425,33 +426,11 @@ export default class AddStore extends Component {
           <Text style={inputHeading}>
             {I18n.t("State")} <Text style={{ color: "#aa0000" }}>*</Text>
           </Text>
-          <View
-            style={[
-              rnPickerContainer,
-              { borderColor: stateValid ? "#8F9EB717" : "#dd0000" },
-            ]}
-          >
-            <RNPickerSelect
-              placeholder={{
-                label: "STATE",
-              }}
-              Icon={() => {
-                return (
-                  <Chevron
-                    style={styles.imagealign}
-                    size={1.5}
-                    color={stateValid ? "gray" : "#dd0000"}
-                  />
-                );
-              }}
-              items={this.state.states}
-              disabled={this.state.isEdit ? true : false}
-              onValueChange={(value) => this.handleStoreState(value)}
-              style={stateValid ? isEdit ? rnPickerDisabled : rnPicker : rnPickerError}
-              value={this.state.storeState}
-              useNativeAndroidPickerStyle={false}
-            />
-          </View>
+          <RnPicker
+            items={this.state.states}
+            disabled={this.state.isEdit ? true : false}
+            setValue={this.handleStoreState}
+          />
           {!stateValid && (
             <Message imp={true} message={this.state.errors["state"]} />
           )}
