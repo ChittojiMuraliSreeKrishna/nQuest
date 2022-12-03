@@ -19,7 +19,6 @@ export class RnPicker extends Component {
 
   componentDidMount() {
     let value = this.props
-    console.log({ value }, "CommonRN")
   }
 
   handleChangeData = (value) => {

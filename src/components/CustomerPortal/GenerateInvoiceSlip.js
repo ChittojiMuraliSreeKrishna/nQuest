@@ -4,7 +4,6 @@ import moment from 'moment';
 import React, { Component } from 'react';
 import { Dimensions, FlatList, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import RNBeep from 'react-native-a-beep';
-import { RNCamera } from 'react-native-camera';
 import I18n from 'react-native-i18n';
 import Modal from "react-native-modal";
 import { TextInput } from 'react-native-paper';
@@ -621,9 +620,9 @@ class GenerateInvoiceSlip extends Component {
       onGoBack: () => this.invoiceUpdate(),
     };
     // alert(String(this.state.mrpAmount))
-    this.props.navigation.navigate('TextilePayment', obj);
     this.invoiceUpdate();
-    console.log({ obj });
+    console.log({ obj }, obj.barCodeList, obj.dsNumberList);
+    // this.props.navigation.navigate('TextilePayment', obj);
   }
 
   invoiceUpdate() {

@@ -9,6 +9,7 @@ import IconIA from 'react-native-vector-icons/Ionicons';
 import scss from "../../commonUtils/assets/styles/style.scss";
 import Loader from "../../commonUtils/loader";
 import AccountingService from "../services/AccountingService";
+import { listEmptyMessage } from "../Styles/Styles";
 
 var deviceHeight = Dimensions.get("window").height;
 var deviceWidth = Dimensions.get("window").width;
@@ -25,18 +26,18 @@ export default class CreateTaxMaster extends Component {
     };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.getTaxMaster();
   }
 
   // Refreshing the taxMasters
-  refresh () {
+  refresh() {
     this.setState({ taxList: [] }, () => {
       this.getTaxMaster();
     });
   }
 
-  async getTaxMaster () {
+  async getTaxMaster() {
     this.setState({ loading: true });
     AccountingService.getAllMasterTax()
       .then((res) => {
@@ -52,15 +53,15 @@ export default class CreateTaxMaster extends Component {
       });
   }
 
-  modelCancel () {
+  modelCancel() {
     this.setState({ modalVisible: false });
   }
 
-  handledeleteTax (item, index) {
+  handledeleteTax(item, index) {
     this.setState({ taxMasterDelete: true, modalVisible: true });
   }
 
-  handleeditTax (item, index) {
+  handleeditTax(item, index) {
     this.props.navigation.navigate("AddTaxMaster", {
       item: item,
       isEdit: true,
@@ -69,7 +70,7 @@ export default class CreateTaxMaster extends Component {
     });
   }
 
-  navigateToAddTax () {
+  navigateToAddTax() {
     this.props.navigation.navigate("AddTaxMaster", {
       isEdit: false,
       onGoBack: () => this.refresh(),
@@ -77,11 +78,11 @@ export default class CreateTaxMaster extends Component {
     });
   }
 
-  refresh () {
+  refresh() {
     this.getTaxMaster();
   }
 
-  render () {
+  render() {
     return (
       <View>
         {this.state.loading && <Loader loading={this.state.loading} />}
@@ -91,7 +92,7 @@ export default class CreateTaxMaster extends Component {
               <Text style={scss.flat_heading}>List Of Taxes - <Text style={{ color: '#ed1c24' }}>{this.state.taxList.length}</Text></Text>
               <IconIA
                 name="add-circle-outline"
-                size={30}
+                size={20}
                 onPress={() => this.navigateToAddTax()}
               ></IconIA>
             </View>
@@ -99,7 +100,9 @@ export default class CreateTaxMaster extends Component {
           refreshing={this.state.isFetching}
           onRefresh={() => this.refresh()}
           data={this.state.taxList}
-          style={{ backgroundColor: '#FFF' }}
+          style={scss.flatListBody}
+          ListEmptyComponent={<Text style={listEmptyMessage}>&#9888; Records Not Found</Text>
+          }
           scrollEnabled={true}
           renderItem={({ item, index }) => (
             <ScrollView>

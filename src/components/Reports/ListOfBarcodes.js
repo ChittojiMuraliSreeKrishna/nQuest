@@ -257,7 +257,7 @@ export class ListOfBarcodes extends Component {
               {this.state.filterActive ?
                 <IconFA
                   name="sliders"
-                  size={25}
+                  size={20}
                   style={{ marginRight: 10 }}
                   color="#ed1c24"
                   onPress={() => this.clearFilterAction()}
@@ -266,7 +266,7 @@ export class ListOfBarcodes extends Component {
                   style={[scss.action_icons, { marginRight: 10 }]}
                   name="sliders"
                   color="#000"
-                  size={25}
+                  size={20}
                   onPress={() => this.filterAction()}
                 ></IconFA>
               }
@@ -274,6 +274,7 @@ export class ListOfBarcodes extends Component {
           }
           data={this.state.listBarcodes}
           scrollEnabled={true}
+          style={scss.flatListBody}
           keyExtractor={(item, i) => i.toString()}
           ListEmptyComponent={<Text style={{ fontSize: Device.isTablet ? RF(21) : RF(17), fontFamily: 'bold', color: '#000000', textAlign: 'center', marginTop: deviceheight / 3 }}>&#9888; {I18n.t("Results not loaded")}</Text>}
           renderItem={({ item, index }) => (
@@ -302,7 +303,7 @@ export class ListOfBarcodes extends Component {
                       <IconFA
                         style={scss.action_icons}
                         name='eye'
-                        size={25}
+                        size={20}
                         onPress={() => this.handleviewBarcode(item, index)}
                       ></IconFA>
                     </View>
@@ -326,14 +327,14 @@ export class ListOfBarcodes extends Component {
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(0)}
                         name="chevron-double-left"
-                        size={25}
+                        size={20}
                       />
                       <IconMA
                         style={[scss.pag_nav_btn]}
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(this.state.pageNo - 1)}
                         name="chevron-left"
-                        size={25}
+                        size={20}
                       />
                     </View>
                   )}
@@ -344,13 +345,13 @@ export class ListOfBarcodes extends Component {
                         style={[scss.pag_nav_btn]}
                         onPress={() => this.loadMoreList(this.state.pageNo + 1)}
                         name="chevron-right"
-                        size={25}
+                        size={20}
                       />
                       <IconMA
                         style={[scss.pag_nav_btn]}
                         onPress={() => this.loadMoreList(this.state.totalPages - 1)}
                         name="chevron-double-right"
-                        size={25}
+                        size={20}
                       />
                     </View>
                   )}

@@ -16,7 +16,7 @@ const Loader = props => {
       transparent={true}
       animationType={'none'}
       visible={true}
-      onRequestClose={() => { console.log('close modal') }}>
+    >
       <View style={styles.modalBackground}>
         <View style={Device.isTablet ? styles.activityIndicatorWrapper_tablet : styles.activityIndicatorWrapper_mobile}>
           <ActivityIndicator size="large" color="#1D7791" />

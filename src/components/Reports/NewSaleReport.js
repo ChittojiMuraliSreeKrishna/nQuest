@@ -279,7 +279,7 @@ export default class NewSaleReport extends Component {
                 <IconFA
                   name="sliders"
                   style={{ marginRight: 10 }}
-                  size={25}
+                  size={20}
                   color="#ed1c24"
                   onPress={() => this.clearFilterAction()}
                 ></IconFA> :
@@ -287,7 +287,7 @@ export default class NewSaleReport extends Component {
                   name="sliders"
                   color="#000"
                   style={[{ marginRight: 10 }, scss.action_icons]}
-                  size={25}
+                  size={20}
                   onPress={() => this.filterAction()}
                 ></IconFA>
               }
@@ -320,7 +320,7 @@ export default class NewSaleReport extends Component {
                     <View style={scss.buttonContainer}>
                       <IconFA
                         name='eye'
-                        size={25}
+                        size={20}
                         style={[{ marginRight: 10 }, scss.action_icons]}
                         onPress={() => this.handleviewNewSale(item, index)}
                       >
@@ -328,7 +328,7 @@ export default class NewSaleReport extends Component {
                       <IconMA
                         style={scss.action_icons}
                         name='trash-can-outline'
-                        size={25}
+                        size={20}
                         onPress={() => this.handledeleteNewSale(item, index)}
                       >
                       </IconMA>
@@ -352,14 +352,14 @@ export default class NewSaleReport extends Component {
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(0)}
                         name="chevron-double-left"
-                        size={25}
+                        size={20}
                       />
                       <IconMA
                         style={[scss.pag_nav_btn]}
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(this.state.pageNo - 1)}
                         name="chevron-left"
-                        size={25}
+                        size={20}
                       />
                     </View>
                   )}
@@ -370,13 +370,13 @@ export default class NewSaleReport extends Component {
                         style={[scss.pag_nav_btn]}
                         onPress={() => this.loadMoreList(this.state.pageNo + 1)}
                         name="chevron-right"
-                        size={25}
+                        size={20}
                       />
                       <IconMA
                         style={[scss.pag_nav_btn]}
                         onPress={() => this.loadMoreList(this.state.totalPages - 1)}
                         name="chevron-double-right"
-                        size={25}
+                        size={20}
                       />
                     </View>
                   )}

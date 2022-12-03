@@ -152,7 +152,7 @@ export class ListOfPromotions extends Component {
           {this.state.filterActive ?
             <FilterIcon
               name="sliders"
-              size={25}
+              size={20}
               style={{ marginRight: 10 }}
               color="#ed1c24"
               onPress={() => this.clearFilterAction()}
@@ -160,7 +160,7 @@ export class ListOfPromotions extends Component {
             <FilterIcon
               name="sliders"
               color="#000"
-              size={25}
+              size={20}
               style={{ marginRight: 10 }}
               onPress={() => this.filterAction()}
             />
@@ -206,14 +206,14 @@ export class ListOfPromotions extends Component {
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(0)}
                         name="chevron-double-left"
-                        size={25}
+                        size={20}
                       />
                       <IconMA
                         style={[scss.pag_nav_btn]}
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(this.state.pageNo - 1)}
                         name="chevron-left"
-                        size={25}
+                        size={20}
                       />
                     </View>
                   )}
@@ -224,13 +224,13 @@ export class ListOfPromotions extends Component {
                         style={[scss.pag_nav_btn]}
                         onPress={() => this.loadMoreList(this.state.pageNo + 1)}
                         name="chevron-right"
-                        size={25}
+                        size={20}
                       />
                       <IconMA
                         style={[scss.pag_nav_btn]}
                         onPress={() => this.loadMoreList(this.state.totalPages - 1)}
                         name="chevron-double-right"
-                        size={25}
+                        size={20}
                       />
                     </View>
                   )}

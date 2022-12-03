@@ -213,7 +213,7 @@ export default class LoyaltyPoints extends Component {
                   {!this.state.filterActive && (
                     <IconFA
                       name="sliders"
-                      size={25}
+                      size={20}
                       style={scss.action_icons}
                       onPress={() => this.filterAction()}
                     >
@@ -222,7 +222,7 @@ export default class LoyaltyPoints extends Component {
                   {this.state.filterActive && (
                     <IconFA
                       name="sliders"
-                      size={25}
+                      size={20}
                       color="#ED1C24"
                       onPress={() => { this.clearFilterAction() }}
                     >
@@ -296,14 +296,14 @@ export default class LoyaltyPoints extends Component {
                           color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                           onPress={() => this.loadMoreList(0)}
                           name="chevron-double-left"
-                          size={25}
+                          size={20}
                         />
                         <IconMA
                           style={[scss.pag_nav_btn]}
                           color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                           onPress={() => this.loadMoreList(this.state.pageNo - 1)}
                           name="chevron-left"
-                          size={25}
+                          size={20}
                         />
                       </View>
                     )}
@@ -314,13 +314,13 @@ export default class LoyaltyPoints extends Component {
                           style={[scss.pag_nav_btn]}
                           onPress={() => this.loadMoreList(this.state.pageNo + 1)}
                           name="chevron-right"
-                          size={25}
+                          size={20}
                         />
                         <IconMA
                           style={[scss.pag_nav_btn]}
                           onPress={() => this.loadMoreList(this.state.totalPages - 1)}
                           name="chevron-double-right"
-                          size={25}
+                          size={20}
                         />
                       </View>
                     )}

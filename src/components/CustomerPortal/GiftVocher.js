@@ -17,7 +17,7 @@ import Message from '../Errors/Message';
 import CustomerService from '../services/CustomerService';
 import { color } from '../Styles/colorStyles';
 
-import { dateSelector, dateText, inputField, submitBtn, submitBtnText } from '../Styles/FormFields';
+import { dateSelector, dateText } from '../Styles/FormFields';
 import { filterBtn, flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleLight, textStyleMedium, textStyleMediumColor } from '../Styles/Styles';
 
 
@@ -334,7 +334,7 @@ class GiftVocher extends Component {
   render() {
     const { gvNumberValid, startDateValid, endDateValid, giftValueValid, searchQueryValid } = this.state;
     return (
-      <View style={{ backgroundColor: "#FFFFFF", flex: 1 }}>
+      <View style={{ backgroundColor: "#FFFFFF", flex: 1, paddingTop: 10 }}>
         <ScrollView>
           {this.state.flagFilterOpen &&
             <Modal style={{ margin: 0 }} isVisible={this.state.flagFilterOpen}
@@ -424,7 +424,7 @@ class GiftVocher extends Component {
                   onPress={() => this.state.filterActive ? this.clearFilter() : this.filterAction()} >
                   <FilterIcon
                     name="sliders"
-                    size={25}
+                    size={20}
                     color={this.state.filterActive ? '#ED1C24' : '#000'}
                   />
                 </TouchableOpacity>
@@ -480,7 +480,7 @@ class GiftVocher extends Component {
                   <Text style={dateText}>{this.state.startDate === "" ? 'DD/MM/YYYY' : this.state.startDate}</Text>
                   <IconFA
                     name="calendar"
-                    size={25}
+                    size={20}
                     style={forms.calender_image}
                   />
                 </TouchableOpacity>
@@ -506,7 +506,7 @@ class GiftVocher extends Component {
                   >{this.state.endDate === '' ? 'DD/MM/YYYY' : this.state.endDate}</Text>
                   <IconFA
                     name="calendar"
-                    size={25}
+                    size={20}
                     style={forms.calender_image}
                   />
                 </TouchableOpacity>

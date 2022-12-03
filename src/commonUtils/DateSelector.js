@@ -9,7 +9,7 @@ export class DateSelector extends Component {
     super(props);
     this.state = {
       date: new Date(),
-      startDate: "",
+      newDate: "",
     };
   }
 
@@ -23,54 +23,13 @@ export class DateSelector extends Component {
 
   async saveDate() {
     const { date } = this.state;
-    await this.setState({ startDate: this.state.date.getFullYear() + formatMonth(this.state.date.getMonth() + 1) + dateFormat(this.state.date.getDate()) });
-    // if (parseInt(this.state.date.getDate()) < 10 &&
-    //   parseInt(this.state.date.getMonth()) + 1 < 10) {
-    //   await this.setState({
-    //     startDate:
-    //       this.state.date.getFullYear() +
-    //       "-0" +
-    //       (this.state.date.getMonth() + 1) +
-    //       "-" +
-    //       "0" +
-    //       this.state.date.getDate(),
-    //   });
-    // } else if (parseInt(this.state.date.getDate()) < 10) {
-    //   await this.setState({
-    //     startDate:
-    //       this.state.date.getFullYear() +
-    //       "-" +
-    //       (this.state.date.getMonth() + 1) +
-    //       "-" +
-    //       "0" +
-    //       this.state.date.getDate(),
-    //   });
-    // } else if (parseInt(this.state.date.getMonth()) + 1 < 10) {
-    //   await this.setState({
-    //     startDate:
-    //       this.state.date.getFullYear() +
-    //       "-0" +
-    //       (this.state.date.getMonth() + 1) +
-    //       "-" +
-    //       this.state.date.getDate(),
-    //   });
-    // } else {
-    //   await this.setState({
-    //     startDate:
-    //       this.state.date.getFullYear() +
-    //       "-" +
-    //       (this.state.date.getMonth() + 1) +
-    //       "-" +
-    //       this.state.date.getDate(),
-    //   });
-    // }
+    await this.setState({ newDate: this.state.date.getFullYear() + formatMonth(this.state.date.getMonth() + 1) + dateFormat(this.state.date.getDate()) });
     this.handleSave();
     this.props.dateCancel();
   }
 
   handleSave() {
-    this.props.setDate(this.state.startDate);
-    // alert(this.state.startDate);
+    this.props.setDate(this.state.newDate);
   }
 
   render() {

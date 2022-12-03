@@ -25,7 +25,7 @@ import Loader from "../../commonUtils/loader";
 import { RH, RW } from "../../Responsive";
 import AccountingService from "../services/AccountingService";
 import {
-  flatListHeaderContainer
+  flatListHeaderContainer, listEmptyMessage
 } from "../Styles/Styles";
 
 var deviceWidth = Dimensions.get("window").width;
@@ -282,14 +282,14 @@ export default class CreditNotes extends Component {
                 </TouchableOpacity>
                 {!this.state.filterActive && (
                   <IconFA
-                    size={25}
+                    size={20}
                     name="sliders"
                     onPress={() => this.filterAction()}
                   ></IconFA>
                 )}
                 {this.state.filterActive && (
                   <IconFA
-                    size={25}
+                    size={20}
                     name="sliders"
                     color="#ED1C24"
                     onPress={() => this.clearFilterAction()}
@@ -303,11 +303,13 @@ export default class CreditNotes extends Component {
               ? this.state.filterCreditData
               : this.state.creditNotes
           }
-          style={scss.flatListBody}
+          style={[scss.flatListBody, { paddingTop: 5 }]}
           scrollEnabled={true}
           // ListEmptyComponent={<Text style={listEmptyMessage}>&#9888; Records Not Found</Text>}
           refreshing={this.state.isFetching}
           onRefresh={() => this.refresh()}
+          ListEmptyComponent={<Text style={listEmptyMessage}>&#9888; Records Not Found</Text>
+          }
           renderItem={({ item, index }) => (
             <ScrollView>
               <View style={scss.flatListContainer}>
@@ -342,12 +344,12 @@ export default class CreditNotes extends Component {
                       <IconFA
                         name="eye"
                         style={[scss.action_icons, { paddingRight: 10 }]}
-                        size={25}
+                        size={20}
                         onPress={() => this.handleViewCredit(item, index)}
                       ></IconFA>
                       <IconIA
                         name="add-circle-outline"
-                        size={25}
+                        size={20}
                         style={scss.action_icons}
                         onPress={() => this.handleAddCredit(item, index)}
                       ></IconIA>

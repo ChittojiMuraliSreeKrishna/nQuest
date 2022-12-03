@@ -6,20 +6,20 @@ import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
 import { Appbar, Text as TEXT, TextInput } from 'react-native-paper';
-import RNPickerSelect from 'react-native-picker-select';
-import { Chevron } from 'react-native-shapes';
 import IconFA, { default as FilterIcon, default as Icon } from 'react-native-vector-icons/FontAwesome';
 import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from "../../commonUtils/assets/styles/style.scss";
+import Clipbrd from "../../commonUtils/Clipboard";
 import { formatDate } from '../../commonUtils/DateFormate';
 import DateSelector from '../../commonUtils/DateSelector';
 import Loader from '../../commonUtils/loader';
+import RnPicker from '../../commonUtils/RnPicker';
 import { RH } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
 import { emptyTextStyle } from '../Styles/FormFields';
 import { flatListMainContainer, flatlistSubContainer, highText, textContainer, textStyleSmall } from '../Styles/Styles';
-import RnPicker from '../../commonUtils/RnPicker'
+
 
 
 var deviceWidth = Dimensions.get("window").width;
@@ -298,14 +298,14 @@ export class GoodsReturn extends Component {
           {this.state.filterActive ?
             <FilterIcon
               name="sliders"
-              size={25}
+              size={20}
               style={{ marginRight: 10 }}
               color="#ed1c24"
               onPress={() => this.clearFilterAction()}
             /> :
             <FilterIcon
               name="sliders"
-              size={25}
+              size={20}
               color="#000"
               style={{ marginRight: 10 }}
               onPress={() => this.filterAction()}
@@ -324,11 +324,11 @@ export class GoodsReturn extends Component {
               <View style={flatlistSubContainer}>
                 <View style={textContainer}>
                   <Text style={highText} >S NO: {index + 1} </Text>
-                  <Text selectable={true} style={textStyleSmall}>{I18n.t("RTS NUMBER")}: {"\n"}{item.rtNumber}</Text>
+                  <Text style={textStyleSmall}>{I18n.t("RTS NUMBER")}:{"  "}<Clipbrd data={item.rtNumber} /> {"\n"}{item.rtNumber}</Text>
                   <Text style={textStyleSmall}>{I18n.t("BARCODE")}: {"\n"}{item && item.barcodes.length !== 0 ? item.barcodes[0].barCode : '-'}</Text>
                 </View>
                 <View style={textContainer}>
-                  <Text style={textStyleSmall} >{I18n.t("EMP ID")}: {item.createdBy} </Text>
+                  <Text style={textStyleSmall} >{I18n.t("EMP ID")}:{"\n"}{item.createdBy} </Text>
                   <Text style={textStyleSmall}>{I18n.t("RTS DATE & TIME")}: {"\n"} {formatDate(item.createdInfo)}</Text>
                   <Text style={textStyleSmall}>{I18n.t("AMOUNT")}: {"\n"} ₹{parseFloat(item.amount).toFixed(2)}</Text>
                 </View>
@@ -338,14 +338,14 @@ export class GoodsReturn extends Component {
                       <IconMA
                         style={{ marginLeft: 5 }}
                         name='trash-can-outline'
-                        size={25}
+                        size={20}
                       />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => this.handleViewGoods(item, index)}>
                       <Icon
                         name='eye'
                         style={{ marginLeft: 5 }}
-                        size={25}
+                        size={20}
                       />
                     </TouchableOpacity>
                   </View>
@@ -367,14 +367,14 @@ export class GoodsReturn extends Component {
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(0)}
                         name="chevron-double-left"
-                        size={25}
+                        size={20}
                       />
                       <IconMA
                         style={[scss.pag_nav_btn]}
                         color={this.state.loadPrevActive === true ? "#353c40" : "#b9b9b9"}
                         onPress={() => this.loadMoreList(this.state.pageNo - 1)}
                         name="chevron-left"
-                        size={25}
+                        size={20}
                       />
                     </View>
                   )}
@@ -385,13 +385,13 @@ export class GoodsReturn extends Component {
                         style={[scss.pag_nav_btn]}
                         onPress={() => this.loadMoreList(this.state.pageNo + 1)}
                         name="chevron-right"
-                        size={25}
+                        size={20}
                       />
                       <IconMA
                         style={[scss.pag_nav_btn]}
                         onPress={() => this.loadMoreList(this.state.totalPages - 1)}
                         name="chevron-double-right"
-                        size={25}
+                        size={20}
                       />
                     </View>
                   )}
@@ -410,7 +410,7 @@ export class GoodsReturn extends Component {
                     {this.state.viewItems.map((data) => {
                       return (
                         <View style={scss.model_text_container}>
-                          <TEXT selectable={true} variant='titleMedium' style={{ color: '#bbb' }}>Return Memo No:{"\n"}<TEXT style={{ color: '#ed1c24' }}>{data.rtNumber}</TEXT></TEXT>
+                          <TEXT variant='titleMedium' style={{ color: '#bbb' }}>Return Memo No:{"\n"}<TEXT style={{ color: '#ed1c24' }}>{data.rtNumber}{"  "} <Clipbrd data={data.rtNumber} /> </TEXT></TEXT>
                           <TEXT variant='titleMedium' style={{ color: '#bbb' }}>DATE:{"\n"}<TEXT style={{ color: '#000' }}>{formatDate(data.createdInfo)}</TEXT></TEXT>
                         </View>
                       );

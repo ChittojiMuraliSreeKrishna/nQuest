@@ -9,7 +9,7 @@ import scss from "../../commonUtils/assets/styles/style.scss";
 import { formatDate } from "../../commonUtils/DateFormate";
 import Loader from "../../commonUtils/loader";
 import AccountingService from "../services/AccountingService";
-import { textStyleLight } from "../Styles/Styles";
+import { listEmptyMessage, textStyleLight } from "../Styles/Styles";
 var deviceWidth = Dimensions.get("window").width;
 
 export default class CreateHSNCode extends Component {
@@ -24,25 +24,25 @@ export default class CreateHSNCode extends Component {
     };
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     this.getAllHsnCode();
   }
 
   // Refreshing the Hsns
-  refresh () {
+  refresh() {
     this.setState({ hsnList: [] }, () => {
       this.getAllHsnCode();
     });
   }
 
   // Getting All HsnCodes
-  async getAllHsnCode () {
+  async getAllHsnCode() {
     this.setState({ loading: true });
     AccountingService.getAllHsnCodes()
       .then((res) => {
         if (res) {
           console.log(res.data);
-          console.log(res.data.result[ 0 ].slabs);
+          console.log(res.data.result[0].slabs);
           this.setState({ hsnList: res.data.result });
         }
         this.setState({ loading: false });
@@ -54,12 +54,12 @@ export default class CreateHSNCode extends Component {
   }
 
   // Filter Model Actions
-  modelCancel () {
+  modelCancel() {
     this.setState({ modalVisible: false });
   }
 
   // Edit Hsn
-  handleeditHsn (item, index) {
+  handleeditHsn(item, index) {
     this.props.navigation.navigate("AddHsnCode", {
       item: item,
       isEdit: true,
@@ -69,7 +69,7 @@ export default class CreateHSNCode extends Component {
   }
 
   // Add Hsn
-  navigateToAddHsnCode () {
+  navigateToAddHsnCode() {
     this.props.navigation.navigate("AddHsnCode", {
       isEdit: false,
       onGoBack: () => this.refresh(),
@@ -77,11 +77,11 @@ export default class CreateHSNCode extends Component {
     });
   }
 
-  refresh () {
+  refresh() {
     this.getAllHsnCode();
   }
 
-  render () {
+  render() {
     return (
       <View>
         {this.state.loading && <Loader loading={this.state.loading} />}
@@ -92,12 +92,14 @@ export default class CreateHSNCode extends Component {
               <IconMA
                 name="add-circle-outline"
                 style={{ marginRight: 10 }}
-                size={30}
+                size={20}
                 onPress={() => this.navigateToAddHsnCode()}
               ></IconMA>
             </View>
           }
           data={this.state.hsnList}
+          ListEmptyComponent={<Text style={listEmptyMessage}>&#9888; Records Not Found</Text>
+          }
           style={scss.flatListBody}
           scrollEnabled={true}
           refreshing={this.state.isFetching}
@@ -131,7 +133,7 @@ export default class CreateHSNCode extends Component {
                     </Text>
                     <IconFA
                       name="edit"
-                      size={25}
+                      size={20}
                       style={scss.action_icons}
                       onPress={() => this.handleeditHsn(item, index)}
                     ></IconFA>

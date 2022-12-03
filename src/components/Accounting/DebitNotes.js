@@ -15,6 +15,7 @@ import DateSelector from '../../commonUtils/DateSelector';
 import Loader from '../../commonUtils/loader';
 import { RH, RW } from '../../Responsive';
 import AccountingService from '../services/AccountingService';
+import { listEmptyMessage } from '../Styles/Styles';
 
 var deviceWidth = Dimensions.get("window").width;
 
@@ -202,7 +203,7 @@ export default class DebitNotes extends Component {
         }
         <FlatList
           data={this.state.filterActive ? this.state.filterDebitData : this.state.debitNotes}
-          style={{ marginTop: 10 }}
+          style={[scss.flatListBody, { marginTop: 5 }]}
           scrollEnabled={true}
           refreshing={this.state.isFetching}
           onRefresh={() => this.refresh()}
@@ -211,7 +212,7 @@ export default class DebitNotes extends Component {
             <View style={scss.headerContainer}>
               {!this.state.filterActive &&
                 <IconFA
-                  size={25}
+                  size={20}
                   name="sliders"
                   onPress={() => this.filterAction()}
                 ></IconFA>
@@ -219,13 +220,15 @@ export default class DebitNotes extends Component {
               }
               {this.state.filterActive &&
                 <IconFA
-                  size={25}
+                  size={20}
                   name="sliders"
                   color='#ED1C24'
                   onPress={() => this.clearFilterAction()}
                 ></IconFA>}
             </View>
           </View>}
+          ListEmptyComponent={<Text style={listEmptyMessage}>&#9888; Records Not Found</Text>
+          }
           renderItem={({ item, index }) => (
             <ScrollView>
               <View style={scss.flatListContainer} >
@@ -255,13 +258,13 @@ export default class DebitNotes extends Component {
                       <IconFA
                         name='eye'
                         onPress={() => this.handleViewDebit(item, index)}
-                        size={25}
+                        size={20}
                         style={scss.action_icons}
                       >
                       </IconFA>
                       <IconIA
                         name='add-circle-outline'
-                        size={25}
+                        size={20}
                         style={[scss.action_icons, { marginLeft: 10 }]}
                         onPress={() => this.handleAddDebit(item, index)}
                       ></IconIA>

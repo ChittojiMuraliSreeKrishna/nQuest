@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -12,6 +12,7 @@ import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import Loader from '../../commonUtils/loader';
 import PrintService from '../../commonUtils/Printer/printService';
+import RnPicker from '../../commonUtils/RnPicker';
 import { customerErrorMessages } from '../Errors/errors';
 import Message from '../Errors/Message';
 import CustomerService from '../services/CustomerService';
@@ -19,7 +20,6 @@ import LoginService from '../services/LoginService';
 import NewSaleService from '../services/NewSaleService';
 import PromotionsService from '../services/PromotionsService';
 import { color } from '../Styles/colorStyles';
-import RnPicker from '../../commonUtils/RnPicker';
 
 
 var deviceWidth = Dimensions.get('window').width;
@@ -1455,6 +1455,7 @@ class TextilePayment extends Component {
     let discAppliedTotal = 0;
     const { storeId, domainId, barCodeList } = this.state;
     const requestObj = barCodeList.map((item) => {
+      console.log({ item })
       let obj = {};
       obj.actualValue = item.actualValue;
       obj.barCode = item.barCode;
@@ -1474,7 +1475,7 @@ class TextilePayment extends Component {
       obj.subSection = item.subSection;
       obj.taxValue = item.taxValue;
       obj.userId = item.userId;
-      obj.costPrice = item.costPrice;
+      obj.costPrice = item.itemPrice;
       obj.uom = item.uom;
       obj.originalBarcodeCreatedAt = item.createdDate;
       obj.batchNo = item.batchNo;
@@ -1483,6 +1484,7 @@ class TextilePayment extends Component {
       obj.distributedPromoDiscount = 0.0
       return obj;
     });
+    console.log({ requestObj })
     if (this.state.isEstimationEnable === "true") {
       CustomerService.getinvoiceLevelCheckPro(1, storeId, requestObj,).then((res) => {
         if (res.status === 200) {
@@ -1756,7 +1758,7 @@ class TextilePayment extends Component {
                   {"Bill Level Discount"}
                 </Text>
               </TouchableOpacity>
-              {this.state.isEstimationEnable === "true" && (
+              {this.state.isEstimationEnable && (
                 <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isBillLevel || this.state.isCheckPromo ? color.disableBackGround : color.accent }]}
                   onPress={() => {
                     this.checkPromo();

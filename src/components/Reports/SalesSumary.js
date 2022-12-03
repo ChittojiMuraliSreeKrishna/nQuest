@@ -192,7 +192,7 @@ export class SalesSumary extends Component {
           {this.state.filterActive ?
             <FilterIcon
               name="sliders"
-              size={25}
+              size={20}
               style={{ marginRight: 10 }}
               color="#ed1c24"
               onPress={() => this.clearFilterAction()}
@@ -200,7 +200,7 @@ export class SalesSumary extends Component {
             <FilterIcon
               color='#000'
               name="sliders"
-              size={25}
+              size={20}
               style={{ marginRight: 10 }}
               onPress={() => this.filterAction()}
             />
