@@ -1,24 +1,19 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+import moment from 'moment';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Device from 'react-native-device-detection';
+import { Dimensions, FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
+import I18n from 'react-native-i18n';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import Modal from "react-native-modal";
+import { TextInput } from 'react-native-paper';
+import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import { formatDate } from '../../commonUtils/DateFormate';
 import Loader from '../../commonUtils/loader';
-import { RF, RH, RW } from '../../Responsive';
-import CustomerService from '../services/CustomerService';
-import { flatListTitle, listEmptyMessage, textContainer, textStyleMedium } from '../Styles/Styles';
-import Modal from "react-native-modal";
-import { Chevron } from 'react-native-shapes';
-import RNPickerSelect from 'react-native-picker-select';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import forms from '../../commonUtils/assets/styles/formFields.scss';
-import I18n from 'react-native-i18n';
-import moment from 'moment';
-import { TextInput } from 'react-native-paper';
-import { color } from '../Styles/colorStyles';
 import RnPicker from '../../commonUtils/RnPicker';
+import CustomerService from '../services/CustomerService';
+import { color } from '../Styles/colorStyles';
+import { flatListTitle, listEmptyMessage, textContainer, textStyleMedium } from '../Styles/Styles';
 
 
 var deviceheight = Dimensions.get('window').height;
@@ -194,6 +189,7 @@ export default class DayClosure extends Component {
       saleAmount: this.state.toadayValue,
       penality: this.state.penlitydeskValue,
     }
+    console.log({ obj })
     if (this.state.daycheckCloseDates.length > 1) {
       CustomerService.saveDayCloser(obj).then(res => {
         if (res) {

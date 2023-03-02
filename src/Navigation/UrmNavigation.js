@@ -15,16 +15,16 @@ import Users from "../components/URM/users";
 const Stack = createStackNavigator();
 export default class UrmNavigation extends Component {
 
-  componentDidMount () {
+  componentDidMount() {
     const backHandler = BackHandler.addEventListener("hardwareBackPress", this.backAction());
     return () => backHandler.remove();
   }
 
-  backAction () {
+  backAction() {
     return true;
   }
 
-  render () {
+  render() {
     return (
       <>
         <Stack.Navigator initialRouteName="Blank">
@@ -47,36 +47,6 @@ export default class UrmNavigation extends Component {
             name="Roles"
             options={{ headerShown: false }}
             component={Roles}
-          />
-          <Stack.Screen
-            name="AddUser"
-            options={{ headerShown: false }}
-            component={AddUser}
-          />
-          <Stack.Screen
-            name="AddStore"
-            options={{ headerShown: false }}
-            component={AddStore}
-          />
-          <Stack.Screen
-            name="CreateRole"
-            options={{ headerShown: false }}
-            component={CreateRole}
-          />
-          <Stack.Screen
-            name="EditUser"
-            options={{ headerShown: false }}
-            component={EditUser}
-          />
-          <Stack.Screen
-            name="EditRole"
-            options={{ headerShown: false }}
-            component={EditRole}
-          />
-          <Stack.Screen
-            name="Privilages"
-            options={{ headerShown: false }}
-            component={Privilages}
           />
         </Stack.Navigator>
       </>

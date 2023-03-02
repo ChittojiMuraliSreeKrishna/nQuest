@@ -3,8 +3,8 @@ import { BackHandler, View } from 'react-native';
 import Loader from '../../commonUtils/loader';
 
 const Blank = () => {
-  const [ loading, setLoading ] = useState(true);
-  const [ message, setMessage ] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
   useEffect(() => {
     setTimeout(() => {
       setLoading(false);
@@ -19,7 +19,7 @@ const Blank = () => {
 
   return (
     <View>
-      {loading && <Loader loading={loading} />}
+      {/* {loading && <Loader loading={loading} />} */}
     </View>
   );
 };

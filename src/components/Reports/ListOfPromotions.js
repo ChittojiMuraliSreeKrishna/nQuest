@@ -1,22 +1,20 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Device from 'react-native-device-detection';
+import { Dimensions, FlatList, Text, TouchableOpacity, View } from 'react-native';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
 import { Appbar } from 'react-native-paper';
-import RNPickerSelect from 'react-native-picker-select';
-import { Chevron } from 'react-native-shapes';
 import FilterIcon from 'react-native-vector-icons/FontAwesome';
 import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
+import Clipbrd from "../../commonUtils/Clipboard";
 import Loader from '../../commonUtils/loader';
 import RnPicker from '../../commonUtils/RnPicker';
-import { RF, RH, RW } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
 import { emptyTextStyle } from '../Styles/FormFields';
+
 
 
 var deviceWidth = Dimensions.get("window").width;
@@ -78,7 +76,6 @@ export class ListOfPromotions extends Component {
     };
     this.setState({ loadMoreActive: false });
     ReportsService.promotionsList(obj, this.state.pageNo).then((res, err) => {
-      console.log(res.data, err);
       if (res.data) {
         this.setState({
           listPromotions: res.data.result.content, totalPages: res.data.result.totalPages,
@@ -182,7 +179,7 @@ export class ListOfPromotions extends Component {
                   <Text style={[scss.highText, { textAlign: 'left' }]} >PROMO ID: {item.promoId}</Text>
                 </View>
                 <View style={scss.textContainer}>
-                  <Text style={[scss.textStyleMedium, { textAlign: 'left' }]}>PROMO NAME: {"\n"} {item.promotionName}</Text>
+                  <Text style={[scss.textStyleMedium, { textAlign: 'left' }]}>PROMO NAME: {"\n"} {item.promotionName} <Clipbrd data={item.promotionName} /> </Text>
                   <Text style={[scss.textStyleMedium, { textAlign: 'right' }]} >DESCRIPTION: {"\n"}{item.description} </Text>
                 </View>
                 <View style={scss.textContainer}>

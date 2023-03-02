@@ -16,7 +16,7 @@ import Message from '../Errors/Message';
 import UrmService from '../services/UrmService';
 import { color } from '../Styles/colorStyles';
 import { cancelBtn, cancelBtnText, datePickerContainer, dateSelector, dateText, inputHeading, rnPicker, rnPickerContainer, rnPickerError, submitBtn, submitBtnText } from '../Styles/FormFields';
-
+import RnPicker from '../../commonUtils/RnPicker';
 var deviceWidth = Dimensions.get('window').width;
 
 export default class AddUser extends Component {
@@ -162,10 +162,10 @@ export default class AddUser extends Component {
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     this.setState({ loading: true });
     UrmService.getRolesByDomainId(clientId).then(res => {
-      console.log({ res }, "resRole");
+      // console.log({ res }, "resRole");
       if (res) {
         let roleResponse = res.data;
-        console.log({ roleResponse });
+        // console.log({ roleResponse });
         if (roleResponse.length > 0) {
           for (let i = 0; i < roleResponse.length; i++) {
             this.state.rolesArray.push({ name: roleResponse[ i ].roleName, id: roleResponse[ i ].id });
@@ -374,7 +374,7 @@ export default class AddUser extends Component {
         this.setState({ loading: true });
         UrmService.saveUser(saveObj).then((res) => {
           if (res) {
-            console.log({ res });
+            // console.log({ res });
             alert("User Created Successfully");
           }
           this.props.navigation.goBack();
@@ -465,24 +465,15 @@ export default class AddUser extends Component {
           />
           {!nameValid && <Message imp={true} message={this.state.errors[ "name" ]} />}
           <Text style={inputHeading}>{I18n.t("Gender")}</Text>
-          <View style={rnPickerContainer}>
-            <RNPickerSelect
-              placeholder={{
-                label: 'Gender'
-              }}
-              Icon={() => {
-                return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-              }}
-              items={[
-                { label: 'Male', value: 'Male' },
-                { label: 'Female', value: 'Female' },
-              ]}
-              onValueChange={this.handleGender}
-              style={rnPicker}
-              value={this.state.gender}
-              useNativeAndroidPickerStyle={false}
-            />
-          </View>
+          <RnPicker
+          items={[
+            {label: 'Male', value: 'Male'},
+            {label: 'Female', value: 'Female'}
+          ]}
+          setValue={this.handleGender}
+          editValue={this.state.gender}
+          isEdit={this.state.isEdit}
+          />
           <Text style={inputHeading}>Status <Text style={{ color: color.accent }}>*</Text></Text>
           <View style={[ rnPickerContainer, { borderColor: statusValid ? color.border : color.accent } ]}>
             <RNPickerSelect
@@ -597,21 +588,12 @@ export default class AddUser extends Component {
           {this.state.isSuperAdmin === false && (
             <View>
               <Text style={inputHeading}>{I18n.t("Role")}</Text>
-              <View style={rnPickerContainer}>
-                <RNPickerSelect
-                  placeholder={{
-                    label: 'Role'
-                  }}
-                  Icon={() => {
-                    return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-                  }}
-                  items={this.state.roles}
-                  onValueChange={this.handleRole}
-                  style={rnPicker}
-                  value={this.state.role}
-                  useNativeAndroidPickerStyle={false}
-                />
-              </View>
+              <RnPicker
+                items={this.state.roles}
+                setValue={this.handleRole}
+                editValue={this.state.role}
+                isEdit={this.state.isEdit}
+              />
             </View>
           )}
 

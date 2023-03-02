@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Constants from 'expo-constants';
 import moment from 'moment';
 import React, { Component } from 'react';
 import { Dimensions, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -14,7 +13,8 @@ import { Chevron } from 'react-native-shapes';
 import { openDatabase } from 'react-native-sqlite-storage';
 import { default as MinusIcon, default as PlusIcon, default as ScanIcon } from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
-import scss from '../../commonUtils/assets/styles/style.scss'
+import scss from '../../commonUtils/assets/styles/style.scss';
+import Clipbrd from "../../commonUtils/Clipboard";
 import Loader from '../../commonUtils/loader';
 import PrintService from '../../commonUtils/Printer/printService';
 import { RF } from '../../Responsive';
@@ -25,6 +25,7 @@ import { color } from '../Styles/colorStyles';
 import { textStyle } from '../Styles/FormFields';
 import { sucessBtn, sucessBtnText, sucessText } from '../Styles/PopupStyles';
 import { flatListMainContainer, flatlistSubContainer, flatListTextStyle, textContainer, textStyleMedium, textStyleMediumColor } from '../Styles/Styles';
+
 
 
 var deviceWidth = Dimensions.get('window').width;
@@ -785,7 +786,7 @@ class GenerateEstimationSlip extends Component {
                   <View style={{ alignItems: 'center', marginTop: 20 }}>
                     <Text>Es Number:</Text>
                     <Text></Text>
-                    <Text selectable={true} style={sucessText}>{this.state.resultDsNumber}</Text>
+                    <Text style={sucessText}>{this.state.resultDsNumber} <Clipbrd data={this.state.resultDsNumber} /> </Text>
                   </View>
                   <TouchableOpacity
                     style={sucessBtn} onPress={() => this.modelCancel()}

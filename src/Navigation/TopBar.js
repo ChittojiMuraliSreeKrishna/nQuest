@@ -11,10 +11,17 @@ import Modal from "react-native-modal";
 import { Text as TEXT } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconMA from 'react-native-vector-icons/MaterialIcons';
+import IconMAA from 'react-native-vector-icons/MaterialCommunityIcons';
 import scss from "../commonUtils/assets/styles/Bars.scss";
 import headers from '../commonUtils/assets/styles/HeaderStyles.scss';
+import MenuCategory from "../components/CustomerPortal/MenuCategory";
 import UrmService from "../components/services/UrmService";
-
+import forms from "../commonUtils/assets/styles/formFields.scss";
+import styles from "../commonUtils/assets/styles/style.scss";
+import RnPicker from "../commonUtils/RnPicker";
+import CustomerService from "../components/services/CustomerService";
+import Device from "react-native-device-detection";
+import { RW } from "../Responsive";
 
 var data = [];
 var subData = [];
@@ -22,6 +29,8 @@ var currentSelection = "";
 var dataCleared = true;
 var firstDisplayRoute = "";
 var displayName = "";
+
+// Screen Maping for main navigation
 export const screenMapping = {
   "Dashboard": "Home",
   "Billing Portal": "CustomerNavigation",
@@ -30,9 +39,12 @@ export const screenMapping = {
   "Accounting Portal": "AccountingNaviagtion",
   "Reports": "ReportsNavigation",
   "URM Portal": "UrmNavigation",
-  "Ticketing Portal": "TicketingNavigation"
+  "Ticketing Portal": "TicketingNavigation",
+  "Kitchen Management": "KitchenNavigation",
+  "Menu Category": "MenuNavigation"
 };
 
+// Getting Images based on privilege name
 const GetImageBasedOnPrevilageName = (name) => {
   return name === "Dashboard" ? (
     require("../commonUtils/assets/Images/home.png")
@@ -67,11 +79,27 @@ export class TopBar extends Component {
       privilages: [],
       headerNames: [],
       isClient: false,
-      storeName: ""
+      storeName: "",
+      toggleTableBtn: false,
+      toggleTableModel: false,
+      availTable: [],
+      storeId: 0,
+      clientId: 0,
+      userId: 0,
+      fromTableList: [],
+      toTableList: [],
+      selectedTable: [],
+      selectedTableName: "",
+      showBookDisabled: true,
+      subHeaderName: "",
+      fromTable: "",
+      toTable: "",
     };
   }
 
-  _renderItem(previlage) {
+
+  // Main Privileges
+  _renderItem (previlage) {
     return (
       <TouchableOpacity
         style={scss.dropdown_items}
@@ -97,43 +125,21 @@ export class TopBar extends Component {
   }
 
   //Before screen render
-  async componentWillMount() {
+  async componentWillMount () {
     currentSelection = "";
     var storeStringId = "";
     displayName = "";
     this.setState({ firstDisplayName: "", privilages: [] });
     var domainStringId = "";
+    this.getPrivileges();
+    this.getAllValues();
   }
-  async componentDidMount() {
-    AsyncStorage.getItem("storeName").then((value) => {
-      console.log({ value }, "storeNme")
-      this.setState({ storeName: storeName })
-    })
-    AsyncStorage.getItem("storeId")
-      .then((value) => {
-        storeStringId = value;
-        this.setState({ storeId: parseInt(storeStringId) });
-      })
-      .catch(() => {
-        console.error("There is error getting storeId");
-      });
+  async componentDidMount () {
+    this.getPrivileges();
+    this.getAllValues();
+  }
 
-    await AsyncStorage.getItem("rolename")
-      .then((value) => {
-        global.userrole = value;
-      })
-      .catch(() => {
-        console.error("There is error getting userrole");
-      });
-
-    await AsyncStorage.getItem("username").then((value) => {
-      global.username = value;
-    });
-
-    await AsyncStorage.getItem("storeName").then((value) => {
-      global.storeName = value;
-    });
-
+  async getAllValues () {
     global.previlage1 = "";
     global.previlage2 = "";
     global.previlage3 = "";
@@ -142,10 +148,22 @@ export class TopBar extends Component {
     global.previlage6 = "";
     global.previlage7 = "";
     global.previlage8 = "";
-    this.getPrivileges();
+    global.privilege9 = "";
+
+    const username = await AsyncStorage.getItem("username");
+    const rolename = await AsyncStorage.getItem("rolename");
+    const storename = await AsyncStorage.getItem("storename");
+    const storeId = await AsyncStorage.getItem("storeId");
+    const userId = await AsyncStorage.getItem("userId");
+    const clientId = await AsyncStorage.getItem("custom:clientId1");
+    this.setState({ storeId: storeId, clientId: clientId, userId: userId, storename: storename });
+    global.username = username;
+    global.rolename = rolename;
+    // alert(userId)
   }
 
-  async getPrivileges() {
+  // Getting All Privileges
+  async getPrivileges () {
     await AsyncStorage.getItem("roleType").then((value) => {
       if (value === "super_admin") {
         let privilegesSet = new Set();
@@ -161,24 +179,24 @@ export class TopBar extends Component {
           .then((value) => {
             global.userrole = value;
             UrmService.getPrivillagesByRoleName(value).then((res) => {
-              console.log({ value }, global.userrole);
-              console.log({ res });
+              // console.log({ value }, global.userrole);
+              // console.log({ res });
               if (res.data) {
                 if (value === "client_support") {
                   this.setState({ isClient: true });
                 }
                 const { isClient } = this.state;
                 let finalResult = this.groupByPrivileges(res.data.parentPrivileges);
-                console.log({ finalResult });
+                // console.log({ finalResult });
                 var mobilePriv = isClient ? finalResult.web : finalResult.mobile;
-                console.log({ mobilePriv });
+                // console.log({ mobilePriv });
                 let len = mobilePriv.length;
                 if (len > 0) {
                   this.setState({
                     firstDisplayName: mobilePriv[0].name,
                   });
                   const firstDisplayName = this.state.firstDisplayName;
-                  console.log({ firstDisplayName });
+                  // console.log({ firstDisplayName });
                   firstDisplayRoute = mobilePriv[0].name;
                   var privilegesSet = new Set();
                   for (let i = 0; i < len; i++) {
@@ -207,10 +225,16 @@ export class TopBar extends Component {
                     if (previlage.name === "Ticketing Portal") {
                       global.previlage7 = "Ticketing Portal";
                     }
+                    if (previlage.name === "Kitchen Management") {
+                      global.privilege8 = "Kitchen Management";
+                    }
+                    if (previlage.name === "Menu Category") {
+                      global.privilege9 = "Menu Category";
+                    }
                     privilegesSet.add(previlage.name);
                   }
                   data = Array.from(privilegesSet);
-                  console.log({ data }, "Privfinl");
+                  // console.log({ data }, "Privfinl");
                   this.getData();
                 } else {
                   alert("Mobile Privileges Not Found");
@@ -226,8 +250,9 @@ export class TopBar extends Component {
     });
   }
 
+  // Grouping the privileges
   groupByPrivileges = (array) => {
-    console.log({ array });
+    // console.log({ array });
     let initialValue = {
       mobile: [],
       web: []
@@ -238,9 +263,10 @@ export class TopBar extends Component {
     }, initialValue);
   };
 
-  async getData() {
+  // mapping the firstdisplay name & navigating
+  async getData () {
     const { firstDisplayName, firstDisplayNameScreen } = this.state;
-    console.log("data in get data", firstDisplayName, currentSelection);
+    // console.log("data in get data", firstDisplayName, currentSelection);
     this.setState({ privilages: [] }, () => {
       if (currentSelection === "") {
         currentSelection = firstDisplayName;
@@ -261,30 +287,34 @@ export class TopBar extends Component {
     });
   }
 
-  async renderSubHeadings(privilegeName) {
-    console.log({ privilegeName });
+  // For SubPrivileges
+  async renderSubHeadings (privilegeName) {
+    // console.log({ privilegeName });
     this.setState({ headerNames: [], privilages: [] }, async () => {
       await AsyncStorage.getItem("rolename").then(value => {
         UrmService.getPrivillagesByRoleName(value).then(async (res) => {
-          console.log(res.data, "TopPrev");
+          // console.log(res.data, "TopPrev");
           if (res) {
             if (res.data) {
               let finalSubResult = this.groupBySubPrivileges(res.data.parentPrivileges);
+              // console.log({ finalSubResult })
               const { isClient } = this.state;
               var mobileSubPriv = isClient ? finalSubResult.web : finalSubResult.mobile;
               let len = mobileSubPriv.length;
+              // console.log({ mobileSubPriv, len })
               for (let i = 0; i < len; i++) {
                 let privilege = mobileSubPriv[i];
+                // console.log({ privilege })
                 if (privilege.name === String(privilegeName)) {
                   let privilegeId = privilege.id;
                   let sublen = privilege.subPrivileges.length;
                   let subPrivileges = privilege.subPrivileges;
-                  console.log(subPrivileges, "TopSubPrev");
+                  // console.log(subPrivileges, "TopSubPrev");
                   for (let i = 0; i < sublen; i++) {
                     if (privilegeId === subPrivileges[i].parentPrivilegeId) {
                       let routes = subPrivileges[i].name;
                       this.state.headerNames.push({ name: routes });
-                      console.log("Header Names", this.state.headerNames);
+                      // console.log("Header Names", this.state.headerNames);
                     }
                   }
                   await this.setState({ headerNames: this.state.headerNames }, () => {
@@ -304,27 +334,35 @@ export class TopBar extends Component {
                   });
                   await this.setState({ privilages: this.state.privilages }, () => {
                     this.props.navigation.navigate(String(this.state.privilages[0].name));
-                    console.log(this.state.privilages, "TopPtiv");
-                    if (this.state.privilages.length > 0) {
-                      console.log(this.state.privilages, "buyPtiv")
-                      this.changeNavigation()
+                    if (this.state.privilages[0].name === "Menu" || this.state.privilages[0].name === "Invoice" || this.state.privilages[0].name === "Order status") {
+                      this.getAllTables();
+                      this.setState({ toggleTableBtn: true, subHeaderName: String(this.state.privilages[0].name) });
+                    } else {
+                      this.setState({ toggleTableBtn: false, subHeaderName: String(this.state.privilages[0].name) });
                     }
-                  })
+                    // console.log(this.state.privilages, "TopPtiv");
+                    if (this.state.privilages.length > 0) {
+                      // console.log(this.state.privilages, "buyPtiv")
+                      // this.changeNavigation()
+                    }
+                  });
                 }
               }
             }
           }
         });
-      })
-    })
+      });
+    });
   }
 
-  changeNavigation() {
+  // for the flatlist to scroll back to index
+  changeNavigation () {
     let randomIndex = Math.floor(Math.random(Date.now()) * this.state.privilages.length);
     this.flatListRef.scrollToIndex({ animated: true, index: randomIndex });
   }
 
-  groupBySubPrivileges(array) {
+  // Grouping subprivileges
+  groupBySubPrivileges (array) {
     let initialValue = {
       mobile: [],
       web: []
@@ -335,56 +373,61 @@ export class TopBar extends Component {
     }, initialValue);
   }
 
-  async componentWillUnmount() {
+  async componentWillUnmount () {
     await this.setState({ privilages: [] });
   }
 
-  modalHandle() {
+  // Handling the popupModels
+  modalHandle () {
     this.setState({ modalVisibleData: !this.state.modalVisibleData });
   }
 
-  refresh() {
+  // For Refreshing the main privileges
+  refresh () {
     console.log("inside refresh");
     this.setState({ refresh: !this.state.refresh });
   }
 
-  modalHandle() {
-    this.setState({ modalVisibleData: !this.state.modalVisibleData });
-  }
-
-  popupHandle() {
+  // Handling model popup
+  popupHandle () {
     this.setState({ popupModel: !this.state.popupModel });
   }
 
-
-  openProfilePopup() {
+  // Profile Model Popup
+  openProfilePopup () {
     this.setState({ popupModel: true });
   }
 
-  settingsNavigate() {
+  // Navigate to settings
+  settingsNavigate () {
     this.props.navigation.push("Settings");
     this.setState({ popupModel: false });
   }
 
-  selectStoreNavigate() {
+  // Navigate to select store
+  selectStoreNavigate () {
     this.props.navigation.navigate("SelectStore");
     this.setState({ popupModel: false });
   }
 
-  selectClientNavigate() {
+  // Navigate to select client
+  selectClientNavigate () {
     this.props.navigation.navigate("SelectClient");
     this.setState({ popupModel: false });
   }
 
-  logoutNavigation() {
+  // Navigate to login page
+  logoutNavigation () {
     this.props.navigation.push("Login");
     this.setState({ popupModel: false });
   }
-  getItemLayout = (data, index) => (
-    { length: this.state.privilages.length, offset: this.state.privilages.length * index, index }
-  )
 
-  handleSubHeaderNavigation(value, index) {
+  // getItemLayout = (data, index) => (
+  //   { length: this.state.privilages.length, offset: this.state.privilages.length * index, index }
+  // )
+
+  // For sub privileges navigation
+  handleSubHeaderNavigation (value, index) {
     if (this.state.privilages[index].bool === true) {
       this.state.privilages[index].bool = false;
     } else {
@@ -396,22 +439,127 @@ export class TopBar extends Component {
       }
       this.setState({ privilages: this.state.privilages }, () => {
         const { privilages } = this.state;
-        console.log({ privilages });
-        this.props.navigation.replace(String(value));
+        console.log({ value });
+        if (value === "Menu" || value === "Invoice" || value === "Order Status") {
+          this.getAllTables();
+          this.setState({ toggleTableBtn: true, subHeaderName: value });
+        }
+        else {
+          this.setState({ toggleTableBtn: false });
+        }
+        this.props.navigation.replace(String(value), { table: this.state.selectedTable }, () => {
+        });
       });
     }
   }
 
+  // Tables Category
+  getAllTables () {
+    CustomerService.getTablesList(this.state.storeId, this.state.clientId).then((res) => {
+      if (res?.data) {
+        let tabels = res.data;
+        // alert(tabels.length)
+        tabels.concat({ clicked: false });
+        // alert("sucrss")
+        console.log({ tabels });
+        this.setState({ availTable: tabels }, () => {
+          let fromTable = [];
+          let toTable = [];
+          for (let i = 0; i < res.data.length; i++) {
+            if (res.data[i].status === true) {
+              fromTable.push({ label: res.data[i].name, value: res.data[i].id });
+            } else {
+              toTable.push({ label: res.data[i].name, value: res.data[i].id });
+            }
+          }
+          console.log({ fromTable, toTable });
+          this.setState({ fromTableList: fromTable, toTableList: toTable });
+        });
+      }
+    }).catch(err => {
+      console.error({ err });
+    });
+  }
 
-  render() {
+  // Show All Tables
+  showAllTables () {
+    this.getAllTables();
+    this.setState({ toggleTableModel: true });
+  }
+
+  modelCancel () {
+    this.setState({ toggleTableModel: false });
+  }
+
+  handleSelectTable (item, index) {
+    console.log({ item });
+    this.setState({ selectedTable: item }, () => {
+      if (this.state.showBookDisabled) {
+        this.props.navigation.replace(this.state.subHeaderName, { table: this.state.selectedTable });
+        this.setState({ toggleTableModel: false });
+      }
+    });
+    if (item.status === false) {
+      this.setState({ showBookDisabled: false });
+    } else {
+      this.setState({ showBookDisabled: true });
+    }
+  }
+
+  handleBookTable () {
+    let obj = {
+      status: true,
+      id: this.state.selectedTable.id,
+      storeId: this.state.storeId
+    };
+    console.log({ obj });
+    CustomerService.bookTable(obj).then((res) => {
+      if (res?.data) {
+        let bookres = res?.data;
+        console.log({ bookres });
+        this.getAllTables();
+        this.modelCancel();
+        this.props.navigation.replace(this.state.subHeaderName, { table: this.state.selectedTable });
+        this.setState({ toggleTableModel: false });
+      }
+    }).catch((err) => {
+      console.log({ err });
+      // alert("Something Went Wrong");
+      this.setState({ toggleTableModel: false });
+    });
+  }
+
+  handleFromTable = (value) => {
+    console.log({ value });
+    this.setState({ fromTable: value });
+  };
+
+  handleToTable = (value) => {
+    console.log({ value });
+    this.setState({ toTable: value });
+  };
+
+  handleShiftTable () {
+    const { fromTable, toTable } = this.state;
+    CustomerService.shiftTable(fromTable, toTable).then((res) => {
+      let response = res?.data;
+      console.log({ response }, res);
+      if (response) {
+        this.getAllTables();
+        this.modelCancel();
+        this.props.navigation.replace(this.state.subHeaderName);
+      }
+    }).catch((err) => {
+      console.log({ err });
+      this.getAllTables();
+      this.modelCancel();
+    });
+  }
+
+
+  render () {
     displayName =
       currentSelection === "" ? this.state.firstDisplayName : currentSelection;
-    console.log(
-      "placeholder data: " +
-      this.state.firstDisplayName +
-      ",current selection " +
-      currentSelection,
-    );
     return (
       <>
         <View style={scss.topBarContainer}>
@@ -434,8 +582,16 @@ export class TopBar extends Component {
                   size={25}
                 ></Icon>
               </TouchableOpacity>
-              <Text style={scss.heading_subtitle}>{global.storeName}</Text>
+              <Text style={scss.heading_subtitle}>{global.userrole === "client_support" ? global.userrole : global.storeName ? global.storeName : "undefined"}</Text>
             </View>
+          </View>
+          <View>
+            {this.state.toggleTableBtn && (<TouchableOpacity onPress={() => this.showAllTables()}>
+              <Text>
+                <Icon name="table-chair" />{" "}
+                Table
+              </Text>
+            </TouchableOpacity>)}
           </View>
           {this.state.popupModel &&
             <Modal isVisible={this.state.popupModel}
@@ -506,7 +662,7 @@ export class TopBar extends Component {
                       : currentSelection,
                   )}
                 />
-                <Text style={scss.textItem}>{I18n.t(displayName)}</Text>
+                <Text style={scss.textItem}>{displayName ? I18n.t(displayName) : "Loading..."}</Text>
                 <Image
                   style={{ margin: 10 }}
                   source={require("../components/assets/images/list_trangle.png")}
@@ -530,8 +686,7 @@ export class TopBar extends Component {
                     <FlatList
                       data={data}
                       renderItem={(item) => this._renderItem(item)}
-                      keyExtractor={(item) => item}
-                      contentContainerStyle={{
+                      keyExtractor={(item, index) => String(index)} contentContainerStyle={{
                         flexDirection: "column",
                         justifyContent: "center",
                       }}
@@ -545,14 +700,11 @@ export class TopBar extends Component {
         <View style={{ backgroundColor: '#d6d6d6', height: 40, width: '100%' }}>
           <FlatList
             horizontal
-            data={this.state.privilages}
+            data={this.state.privilages ? this.state.privilages : [{ name: 'Loading' }]}
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
             ref={(ref) => this.flatListRef = ref}
-            getItemLayout={this.getItemLayout}
-            initialScrollIndex={0}
-            initialNumToRender={4}
-            keyExtractor={(item, index) => item}
+            keyExtractor={(item, index) => String(index)}
             style={headers.pageNavigationContainer}
             renderItem={({ item, index }) => (
               <View>
@@ -566,6 +718,65 @@ export class TopBar extends Component {
             )}
           />
         </View>
+        {this.state.toggleTableModel && (
+          <Modal style={{ margin: 0 }}
+            isVisible={this.state.toggleTableModel}
+            onBackButtonPress={() => this.modelCancel()}
+            onBackdropPress={() => this.modelCancel()}
+          >
+            <View style={forms.filterModelContainer}>
+              <Text style={[{ fontSize: 18, fontWeight: 'bold' }]}>Table Management</Text>
+              <View style={forms.filterModelSub}>
+                <Text style={{ fontSize: 16, marginLeft: 20, marginTop: 10, marginBottom: 10 }}>Select Table</Text>
+                <>
+                  <View style={styles.tableBody}>
+                    <FlatList
+                      // keyExtractor={(item, index) => String(index)}
+                      numColumns={3}
+                      data={this.state.availTable}
+                      renderItem={({ item, index }) => (
+                        <View style={styles.tableContainer}>
+                          <TouchableOpacity onPress={() => this.handleSelectTable(item, index)} style={[styles.tableBtn, { backgroundColor: item.status ? "#ddd" : "#fff" }]}>
+                            <IconMAA name='table-furniture' size={20}></IconMAA>
+                            <Text style={{ fontSize: 14 }}>{item.name}</Text>
+                          </TouchableOpacity>
+                        </View>
+                      )}
+                    />
+                  </View>
+                  <TouchableOpacity style={[forms.action_buttons, { backgroundColor: this.state.showBookDisabled ? '#d9d9d9' : '#ed1c24' }]} disabled={this.state.showBookDisabled} onPress={() => this.handleBookTable()}>
+                    <Text style={forms.submit_btn_text}>Book</Text>
+                  </TouchableOpacity>
+                  <Text style={{ fontSize: 16, marginLeft: 20, marginTop: 10, marginBottom: 10 }}>Switch Table to</Text>
+                  <View style={{ display: 'flex', flexDirection: 'row' }}>
+                    <View style={{ width: Device.isTablet ? RW(280) : RW(180) }}>
+                      <RnPicker
+                        items={this.state.fromTableList}
+                        setValue={this.handleFromTable}
+                        placeHolder={"From Table"}
+                      />
+                    </View>
+                    <View style={{ width: Device.isTablet ? RW(280) : RW(180) }}>
+                      <RnPicker
+                        items={this.state.toTableList}
+                        setValue={this.handleToTable}
+                        placeHolder={"To Table"}
+                      />
+                    </View>
+                  </View>
+                  <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: "center" }}>
+                    <TouchableOpacity style={[forms.action_buttons, { backgroundColor: '#ed1c24' }]} onPress={() => this.handleShiftTable()} >
+                      <Text style={forms.submit_btn_text}>Save</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[forms.action_buttons, { borderColor: '#dcdcdc', borderWidth: 1 }]}>
+                      <Text style={forms.cancel_btn_text}>Cancel</Text>
+                    </TouchableOpacity>
+                  </View>
+                </>
+              </View>
+            </View>
+          </Modal>
+        )}
       </>
     );
   }

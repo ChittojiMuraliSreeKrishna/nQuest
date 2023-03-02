@@ -136,25 +136,34 @@ class TextilePayment extends Component {
       enablePayment: false,
       isBillingDiscount: false,
       isCreditDone: false,
-      isKathaDone: false
+      isKathaDone: false,
+      isPrinterConnected: false,
+      domainType: "",
+      tableId: 0,
+      userId: 0,
     };
   }
 
-  async componentDidMount() {
+  async componentDidMount () {
     var domainStringId = "";
     var storeStringId = "";
     const userId = await AsyncStorage.getItem("userId");
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     const isEsSlipEnabled = await AsyncStorage.getItem('custom:isEsSlipEnabled');
     this.setState({ createdBy: userId, clientId: clientId, isEstimationEnable: isEsSlipEnabled });
+    // alert(await AsyncStorage.getItem("printerIp"))
+    let print = await AsyncStorage.getItem("printerIp");
+    if (print !== null) {
+      this.setState({ isPrinterConnected: true });
+    }
     AsyncStorage.getItem("domainDataId").then((value) => {
       domainStringId = value;
       this.setState({ domainId: parseInt(domainStringId) });
-      console.log("domain data id" + this.state.domainId);
+      // console.log("domain data id" + this.state.domainId);
 
     }).catch(() => {
       this.setState({ loading: false });
-      console.log('There is error getting domainDataId');
+      // console.log('There is error getting domainDataId');
       // alert('There is error getting domainDataId');
     });
 
@@ -162,48 +171,52 @@ class TextilePayment extends Component {
       global.domainName = value;
     }).catch(() => {
       this.setState({ loading: false });
-      console.log('There is error getting domainName');
+      // console.log('There is error getting domainName');
       //alert('There is error getting domainName');
     });
 
     AsyncStorage.getItem("storeId").then((value) => {
       storeStringId = value;
       this.setState({ storeId: parseInt(storeStringId) });
-      console.log(this.state.storeId);
+      // console.log(this.state.storeId);
     }).catch(() => {
       this.setState({ loading: false });
-      console.log('There is error getting storeId');
+      // console.log('There is error getting storeId');
       // alert('There is error getting storeId');
     });
-    console.log('total amount is,', this.props.route.params);
+    // console.log('total amount is,', this.props.route.params);
+    const parentObj = this.props.route.params;
+    console.log({ parentObj });
     this.setState({
-      totalAmount: this.props.route.params.totalAmount,
-      netPayableAmount: this.props.route.params.netPayableAmount,
-      grossAmount: this.props.route.params.grossAmount,
-      totalPromoDisc: this.props.route.params.totalPromoDisc,
-      taxAmount: this.props.route.params.taxAmount,
-      userId: this.props.route.params.userId,
-      retailBarCodeList: this.props.route.params.retailBarCodeList,
-      dsNumberList: this.props.route.params.dsNumberList,
-      customerFullName: this.props.route.params.customerFullName,
-      customerPhoneNumber: this.props.route.params.customerPhoneNumber,
-      customerGSTNumber: this.props.route.params.customerGSTNumber,
-      customerAddress: String(this.props.route.params.customerAddress),
-      customerGender: this.props.route.params.customerGender,
-      lineItemIdAdd: this.props.route.params.lineItemIdAdd,
-      totalQty: this.props.route.params.totalQty,
-      CGST: this.props.route.params.CGST,
-      SGST: this.props.route.params.SGST,
-      discountAmount: this.props.route.params.discountAmount,
-      creditAmount: this.props.route.params.creditAmount,
-      isTaxIncluded: this.props.route.params.isTaxIncluded,
-      barCodeList: this.props.route.params.barCodeList,
-      isCreditFlag: this.props.route.params.isCredit,
-      grandNetAmount: this.props.route.params.grandNetAmount,
-      billLevelDisc: this.props.route.params.discountAmount,
-      enablePayment: this.props.route.params.enablePayment
+      totalAmount: parentObj.totalAmount ? parentObj.totalAmount : "",
+      netPayableAmount: parentObj.netPayableAmount ? parentObj.netPayableAmount : "",
+      grossAmount: parentObj.grossAmount ? parentObj.grossAmount : "",
+      totalPromoDisc: parentObj.totalPromoDisc ? parentObj.totalPromoDisc : "",
+      taxAmount: parentObj.taxAmount ? parentObj.taxAmount : "",
+      retailBarCodeList: parentObj.retailBarCodeList ? parentObj.retailBarCodeList : [],
+      dsNumberList: parentObj.dsNumberList ? parentObj.dsNumberList : [],
+      customerFullName: parentObj.customerFullName ? parentObj.customerFullName : "",
+      customerPhoneNumber: parentObj.customerPhoneNumber ? parentObj.customerPhoneNumber : "",
+      customerGSTNumber: parentObj.customerGSTNumber ? parentObj.customerGSTNumber : "",
+      customerAddress: String(parentObj.customerAddress) ? String(parentObj.customerAddress) : "",
+      customerGender: parentObj.customerGender ? parentObj.customerGender : "",
+      lineItemIdAdd: parentObj.lineItemIdAdd ? parentObj.lineItemIdAdd : "",
+      totalQty: parentObj.totalQty,
+      CGST: parentObj.CGST,
+      SGST: parentObj.SGST,
+      discountAmount: parentObj.discountAmount,
+      creditAmount: parentObj.creditAmount,
+      isTaxIncluded: parentObj.isTaxIncluded ? parentObj.isTaxIncluded : "",
+      barCodeList: parentObj.barCodeList ? parentObj.barCodeList : [],
+      isCreditFlag: parentObj.isCredit ? parentObj.isCredit : "",
+      grandNetAmount: parentObj.grandNetAmount ? parentObj.grandNetAmount : "",
+      billLevelDisc: parentObj.discountAmount ? parentObj.discountAmount : "",
+      enablePayment: parentObj.enablePayment ? parentObj.enablePayment : "",
+      domainType: parentObj.domainType ? parentObj.domainType : "",
+      tableId: parentObj.tableId ? parentObj.tableId : 0,
+      userId: userId,
     });
-    this.setState({ isTagCustomer: this.props.route.params.customerPhoneNumber.length >= 10 ? true : false });
+    this.setState({ isTagCustomer: parentObj.customerPhoneNumber.length >= 10 ? true : false });
     // var qtyarr = [...this.state.barCodeList]
     // let cgst = 0
     // let sgst = 0
@@ -222,10 +235,12 @@ class TextilePayment extends Component {
     //   this.setState({ CGST: 0, SGST: 0, totalAmount: totalAmount, netPayableAmount: totalAmount })
     // }
     this.getDiscountReasons();
+    let params = this.props.route.params;
+    console.log({ params });
   }
 
 
-  addCustomer() {
+  addCustomer () {
     if (this.state.customerPhoneNumber.length != 10) {
       alert('Please Enter a valid 10 digit mobile number');
       return;
@@ -347,16 +362,16 @@ class TextilePayment extends Component {
     });
   };
 
-  modelCancel() {
+  modelCancel () {
     this.setState({ flagCustomerOpen: false, modalVisible: false });
   }
 
-  removeDuplicates(array, key) {
+  removeDuplicates (array, key) {
     const lookup = new Set();
     return array.filter(obj => !lookup.has(obj[key]) && lookup.add(obj[key]));
   }
 
-  confirmKathaModel() {
+  confirmKathaModel () {
     const obj = {
       "paymentType": "PKTPENDING",
       "paymentAmount": this.state.khataAmount
@@ -386,10 +401,10 @@ class TextilePayment extends Component {
           kathaColleted: parseFloat(this.state.khataAmount)
         }, () => {
           this.cancelKathaModel();
-        })
+        });
       } else {
         let netPayableAmt = parseFloat(this.state.grandNetAmount) - parseFloat(this.state.khataAmount);
-        let grandNetAmount = parseFloat(netPayableAmt)
+        let grandNetAmount = parseFloat(netPayableAmt);
         this.setState({
           grandNetAmount: (grandNetAmount.toFixed(2)),
           isKathaDone: true,
@@ -398,34 +413,34 @@ class TextilePayment extends Component {
         }, () => {
           this.cancelKathaModel();
           if (this.state.grandNetAmount === 0) {
-            this.setState({ enablePayment: true })
+            this.setState({ enablePayment: true });
           }
-        })
+        });
       }
     } else {
-      alert("cannot proceed")
+      alert("cannot proceed");
     }
   }
 
-  cancelKathaModel() {
+  cancelKathaModel () {
     this.setState({ kathaModelVisible: false });
   }
 
-  getUPILink() {
+  getUPILink () {
     this.savePayment();
   }
 
-  cancelUpiModel() {
+  cancelUpiModel () {
     this.setState({ upiModelVisible: false });
   }
 
-  confirmCreditModel() {
+  confirmCreditModel () {
     const obj = {
       "paymentType": "PKTADVANCE",
       "paymentAmount": this.state.payCreditAmount
-    }
+    };
     this.state.paymentType.push(obj);
-    var grandNetAmount = parseFloat(this.state.grandNetAmount)
+    var grandNetAmount = parseFloat(this.state.grandNetAmount);
     // if (this.state.payCreditAmount > grandNetAmount) {
     //   alert("please check the value")
     if (parseFloat(this.state.payCreditAmount) < grandNetAmount) {
@@ -435,9 +450,9 @@ class TextilePayment extends Component {
         // if (this.state.isRTApplied) {
         //   this.setState({ payingAmount: this.state.payCreditAmount + this.state.rtAmount, payButtonEnable: true })
         // }
-      })
+      });
     } else if (parseFloat(this.state.payCreditAmount) === grandNetAmount) {
-      this.setState({ isPayment: true, payButtonEnable: true, isCheckPromo: true, isCreditDone: true, enablePayment: false, isBillLevel: true, isTagCustomer: true })
+      this.setState({ isPayment: true, payButtonEnable: true, isCheckPromo: true, isCreditDone: true, enablePayment: false, isBillLevel: true, isTagCustomer: true });
       // const obj = {
       //   "paymentType": "PKTADVANCE",
       //   "paymentAmount": this.state.payCreditAmount
@@ -450,45 +465,45 @@ class TextilePayment extends Component {
     // if (this.state.isRTApplied) {
     //   this.setState({ payingAmount: grandNetAmount + this.state.rtAmount, payButtonEnable: true })
     // }
-    this.setState({ payingAmount: this.state.payCreditAmount })
+    this.setState({ payingAmount: this.state.payCreditAmount });
     this.setState({ isCreditAmount: true, creditAmount: this.state.creditAmount });
-    const grandAmount = this.state.grandNetAmount > this.state.payCreditAmount ? this.state.grandNetAmount - this.state.payCreditAmount : 0
+    const grandAmount = this.state.grandNetAmount > this.state.payCreditAmount ? this.state.grandNetAmount - this.state.payCreditAmount : 0;
     if (this.state.totalAmount === 0) {
       this.setState({
         enableCoupon: false, payButtonEnable: true,
         isProccedtoCheck: true, enablePayment: false, isCheckPromo: true, isBillLevel: true, isTagCustomer: true
-      })
+      });
     }
     this.cancelCreditModel();
     // this.pay()
   }
 
-  cancelCreditModel() {
+  cancelCreditModel () {
     this.setState({ creditModelVisible: false });
   }
 
-  saveCard() {
-    this.setState({})
-    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString()
+  saveCard () {
+    this.setState({});
+    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString();
     if (this.state.cardPaymentType === "Automatic") {
-      this.getCardModel()
-      this.cancelCardModel()
+      this.getCardModel();
+      this.cancelCardModel();
     } else {
-      this.setState({ cashAmount: parseFloat(grandNetAmount) })
-      this.setState({ enablePayment: false, isBillLevel: true, isTagCustomer: true, isCheckPromo: true, enableCoupon: false })
-      this.manualCardPayment()
+      this.setState({ cashAmount: parseFloat(grandNetAmount) });
+      this.setState({ enablePayment: false, isBillLevel: true, isTagCustomer: true, isCheckPromo: true, enableCoupon: false });
+      this.manualCardPayment();
     }
   }
 
   getCardModel = () => {
-    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10) - parseFloat(this.state.verifiedCash)).toString()
-    this.setState({ payingAmount: grandNetAmount })
+    var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10) - parseFloat(this.state.verifiedCash)).toString();
+    this.setState({ payingAmount: grandNetAmount });
     this.setState({
       isCard: true,
     },
       () => {
         if (this.state.isreturnCreditCash) {
-          this.setState({ grandNetAmount: this.state.balanceCreditAmount })
+          this.setState({ grandNetAmount: this.state.balanceCreditAmount });
         }
       });
     if (this.state.isRTApplied) {
@@ -501,26 +516,26 @@ class TextilePayment extends Component {
   };
 
   manualCardPayment = () => {
-    this.setState({ isCard: false, cardManual: true })
+    this.setState({ isCard: false, cardManual: true });
     const obj = {
       "paymentType": "Card",
       "paymentAmount": parseFloat(this.state.grandNetAmount)
-    }
+    };
     this.state.paymentType.push(obj);
     this.cancelCardModel();
-  }
+  };
 
-  cancelCardModel() {
+  cancelCardModel () {
     this.setState({ cardModelVisible: false, cardAutoModel: false });
   }
 
-  handleBackButtonClick() {
+  handleBackButtonClick () {
     this.props.navigation.goBack(null);
     return true;
   }
 
 
-  cashAction() {
+  cashAction () {
     this.setState({
       isCash: true,
       isCard: false,
@@ -536,7 +551,7 @@ class TextilePayment extends Component {
     });
   }
 
-  cardAction() {
+  cardAction () {
     this.setState({
       isCash: false,
       isCard: true,
@@ -556,7 +571,7 @@ class TextilePayment extends Component {
     this.setState({ enterredeempoint: text });
   };
 
-  clearRedemption() {
+  clearRedemption () {
     this.setState({ redeemedPints: "" });
   }
   handleCustomerPhoneNumber = (text) => {
@@ -584,18 +599,18 @@ class TextilePayment extends Component {
     this.setState({ customerGender: text });
   };
 
-  cancel() {
+  cancel () {
     this.setState({ flagCustomerOpen: false, flagqtyModelOpen: false, modalVisible: false });
     //this.setState({ modalVisible: true });
   }
 
-  endEditing() {
+  endEditing () {
     if (this.state.customerPhoneNumber.length > 0) {
       this.getUserDetails();
     }
   }
 
-  qrAction() {
+  qrAction () {
     this.setState({
       isCash: false,
       isCard: false,
@@ -611,7 +626,7 @@ class TextilePayment extends Component {
     });
   }
 
-  upiAction() {
+  upiAction () {
     this.setState({
       upiToCustomerModel: true,
       upiModelVisible: true,
@@ -628,7 +643,7 @@ class TextilePayment extends Component {
     });
   }
 
-  gvAction() {
+  gvAction () {
     this.setState({
       isCash: false,
       isCard: false,
@@ -641,7 +656,7 @@ class TextilePayment extends Component {
     });
   }
 
-  khataAction() {
+  khataAction () {
     this.setState({
       khataToCustomerModel: true,
       kathaModelVisible: true,
@@ -658,7 +673,7 @@ class TextilePayment extends Component {
     });
   }
 
-  creditAction() {
+  creditAction () {
     this.setState({
       creditModel: true,
       // payCreditAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString(),
@@ -679,7 +694,7 @@ class TextilePayment extends Component {
     this.setState({ upiMobileNumber: text });
   };
 
-  modelCancel() {
+  modelCancel () {
     this.setState({ modelVisible: false });
   }
 
@@ -694,8 +709,8 @@ class TextilePayment extends Component {
   handlerecievedAmount = (text) => {
     this.setState({ recievedAmount: text });
     if (this.state.isCardOrCash === true) {
-      let grandNetAmount = (parseFloat(this.state.grandNetAmount))
-      this.setState({ ccCardCash: grandNetAmount - text })
+      let grandNetAmount = (parseFloat(this.state.grandNetAmount));
+      this.setState({ ccCardCash: grandNetAmount - text });
     }
   };
 
@@ -703,7 +718,7 @@ class TextilePayment extends Component {
     this.setState({ gvNumber: text, giftvoucher: text });
   };
 
-  verifycash() {
+  verifycash () {
     // const cash = parseInt(this.state.payCreditAmount) + parseInt(this.state.balanceCreditAmount)
     // this.setState({
     //   balanceCreditAmount: 0,
@@ -715,7 +730,7 @@ class TextilePayment extends Component {
     if (this.state.isCash === true && this.state.isCardOrCash === false) {
       if (parseFloat(this.state.recievedAmount) > parseFloat(this.state.grandNetAmount)) {
         this.setState({ returnAmount: parseFloat(this.state.recievedAmount) - parseFloat(this.state.grandNetAmount) });
-        this.state.returnAmount = ((this.state.returnAmount).toFixed(2))
+        this.state.returnAmount = ((this.state.returnAmount).toFixed(2));
         this.setState({
           verifiedCash: parseFloat(this.state.totalAmount),
           payingAmount: this.state.grandNetAmount,
@@ -729,7 +744,7 @@ class TextilePayment extends Component {
         });
       } else if (parseFloat(this.state.recievedAmount) < parseFloat(this.state.grandNetAmount) || parseFloat(this.state.recievedAmount) !== "") {
         alert('Please collect sufficient amount');
-        this.setState({ showVerified: false })
+        this.setState({ showVerified: false });
       } else {
         this.state.verifiedCash = 0;
         this.state.returnAmount = 0;
@@ -746,7 +761,7 @@ class TextilePayment extends Component {
       };
       this.state.paymentType.push(obj);
       if (this.state.grandNetAmount !== 0 || this.state.totalAmount === 0) {
-        this.setState({ isProccedtoCheck: true, enablePayment: false, isCheckPromo: true, isBillLevel: true })
+        this.setState({ isProccedtoCheck: true, enablePayment: false, isCheckPromo: true, isBillLevel: true });
       }
     }
     else if (this.state.isCardOrCash === true) {
@@ -758,9 +773,9 @@ class TextilePayment extends Component {
           verifiedCash: this.state.recievedAmount,
           grandNetAmount: 0, showVerified: true
         });
-        this.pay()
+        this.pay();
       } else {
-        alert(" Collected Cash Should be less than payable amount when it comes to Cash & Card Payment")
+        alert(" Collected Cash Should be less than payable amount when it comes to Cash & Card Payment");
       }
 
     }
@@ -769,18 +784,18 @@ class TextilePayment extends Component {
     // }
   }
 
-  async applyPromocode() {
+  async applyPromocode () {
     const gvNumbers = [];
     const obj = {
       gvNumber: this.state.promocode
     };
     gvNumbers.push(obj);
-    let count = 0
+    let count = 0;
     this.state.giftCouponsList.length > 0 && this.state.giftCouponsList.map((item) => {
       if (item.gvNumber === this.state.promocode) {
-        return count = 1
+        return count = 1;
       }
-    })
+    });
     if (this.state.promocode !== "") {
       if (count != 1) {
         NewSaleService.getCoupons(this.state.clientId, gvNumbers).then(res => {
@@ -796,7 +811,7 @@ class TextilePayment extends Component {
                   this.setState({
                     enablePayment: false,
                     isCheckPromo: true, isBillLevel: true, isTagCustomer: true
-                  })
+                  });
                 });
               } else {
                 alert("Please purchase greater than coupon amount");
@@ -810,7 +825,7 @@ class TextilePayment extends Component {
               obj.gvNumber = item.gvNumber;
               obj.value = item.value;
               return obj;
-            })
+            });
             this.setState({
               giftCouponsList: [...this.state.giftCouponsList, couponsListList[0]],
               promocode: ''
@@ -818,27 +833,27 @@ class TextilePayment extends Component {
               this.setState({
                 isCheckPromo: true,
                 giftCouponsList: [...new Map(this.state.giftCouponsList.map((m) => [m.gvNumber, m])).values()]
-              })
-            })
+              });
+            });
           }
           else {
             alert(res.data.message);
             this.setState({
               promocode: ''
-            })
+            });
           }
           // }
         });
       } else {
-        this.setState({ promocode: '' })
+        this.setState({ promocode: '' });
       }
     } else {
       alert("Please Enter GV Number");
-      this.setState({ promocode: '' })
+      this.setState({ promocode: '' });
     }
   }
 
-  applyRedem() {
+  applyRedem () {
     this.setState({ redeemedPints: this.state.enterredeempoint });
     if (parseInt(this.state.loyaltyPoints) < parseInt(this.state.redeemedPints)) {
       alert('please enter greater than the available points');
@@ -850,19 +865,19 @@ class TextilePayment extends Component {
   }
 
 
-  tagCustomer() {
+  tagCustomer () {
     this.setState({ customerEmail: "", customerPhoneNumber: "", customerName: "", customerGender: "", customerAddress: "", flagCustomerOpen: true, modalVisible: true });
   }
 
-  clearTaggedCustomer() {
+  clearTaggedCustomer () {
     this.setState({ mobileNumber: "", loyaltyPoints: "", notfound: "" });
   }
 
-  clearPromocode() {
+  clearPromocode () {
     this.setState({ promoDiscount: 0, giftvoucher: "", promocode: "" });
   }
 
-  clearCashSammary() {
+  clearCashSammary () {
     this.setState({ verifiedCash: 0, recievedAmount: 0, returnAmount: 0 });
   }
 
@@ -902,67 +917,11 @@ class TextilePayment extends Component {
       objInvoice: [],
       dsNumber: ''
     });
-  }
+  };
 
   pay = () => {
     var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString();
     var obj;
-    // if (this.state.isRTApplied) {
-    //   this.setState({ payingAmount: grandNetAmount + this.state.rtAmount });
-    //   const obj = {
-    //     "paymentType": "RTSlip",
-    //     "paymentAmount": this.state.rtAmount
-    //   };
-    //   this.state.paymentType.push(obj);
-
-    //   if (this.state.rtAmount < grandNetAmount) {
-    //     if (this.state.isCash) {
-    //       const obj = {
-    //         "paymentAmountType": [
-    //           {
-    //             "paymentType": "RTSlip",
-    //             "paymentAmount": this.state.rtAmount
-    //           },
-    //           {
-    //             "paymentType": "Cash",
-    //             "paymentAmount": this.state.cashAmount
-    //           }
-    //         ]
-    //       };
-    //       this.state.paymentType.push(obj);
-    //     }
-    //     if (this.state.isKhata) {
-    //       const obj = {
-    //         "paymentAmountType": [
-    //           {
-    //             "paymentType": "RTSlip",
-    //             "paymentAmount": this.state.rtAmount
-    //           },
-    //           {
-    //             "paymentType": "PKTPENDING",
-    //             "paymentAmount": grandNetAmount
-    //           }
-    //         ]
-    //       };
-    //       this.state.paymentType.push(obj);
-    //     }
-    //     if (this.state.isCredit) {
-    //       const obj = {
-    //         "paymentAmountType": [
-    //           {
-    //             "paymentType": "RTSlip",
-    //             "paymentAmount": this.state.rtAmount
-    //           },
-    //           {
-    //             "paymentType": "PKTADVANCE",
-    //             "paymentAmount": grandNetAmount
-    //           }
-    //         ]
-    //       };
-    //       this.state.paymentType.push(obj);
-    //     }
-    //   }
-    // }
     if (this.state.isCash === true && this.state.isCardOrCash === false && this.state.recievedAmount === "") {
       alert('Please collect sufficient amount and then only pay');
     }
@@ -990,62 +949,19 @@ class TextilePayment extends Component {
           'Authorization': 'Bearer' + ' ' + token,
         }
       }).then(response => {
-        // console.log("UPI response", response);
         if (response.data) {
           this.setState({ upiToCustomerModel: false });
         }
       });
-      // axios.post(NewSaleService.upiPayment(), obj).then((res) => {
-      //     console.log("responseresponse", JSON.stringify(res.data));
-      //     alert("Order created " + res.data["message"]);
-      //     if (res.data) {
-      //         this.setState({ upiToCustomerModel: false });
-      //     }
-      // })
     }
-    // else if (global.domainName === "Textile") {
-    // if (this.state.isCard === true) {
-    //     const obj = {
-    //         "paymentType": "Card",
-    //         "paymentAmount": grandNetAmount
-    //     }
-    //     this.state.paymentType.push(obj);
-    // }
-    // else if (this.state.isCash === true) {
-    //   const obj = {
-    //     "paymentType": "Cash",
-    //     "paymentAmount": parseFloat(this.state.grandNetAmount)
-    //   };
-    //   this.state.paymentType.push(obj);
-    // }
-    // else if (this.state.isCardOrCash === true) {
-    //   const obj = {
-
-    //   };
-    //   this.state.paymentType.push(obj);
-    // }
-    // else if (this.state.isKhata === true) {
-    //   const obj = {
-    //     "paymentType": "PKTPENDING",
-    //     "paymentAmount": grandNetAmount
-    //   };
-    //   this.state.paymentType.push(obj);
-    // }
-    // else if(this.state.isCredit === true){
-    //   const obj = {
-    //     "paymentType": "PKTADVANCE",
-    //     "paymentAmount": this.state.creditAmount
-    //   }
-    //   this.state.paymentType.push(obj);
-    // }
     if (this.state.giftCouponsList.length >= 1) {
       const obj = {
         "paymentType": "GIFTVOUCHER",
         "paymentAmount": this.state.couponAmount
-      }
+      };
       this.state.paymentType.push(obj);
     }
-    let cCData
+    let cCData;
     if (this.state.isCardOrCash === true) {
       let paymentType = [{
         "paymentType": "Cash",
@@ -1054,63 +970,108 @@ class TextilePayment extends Component {
       {
         "paymentType": "Card",
         "paymentAmount": this.state.ccCardCash
-      }]
-      cCData = this.state.paymentType.concat(paymentType)
+      }];
+      cCData = this.state.paymentType.concat(paymentType);
     }
     let couponCode = this.state.giftCouponsList.map((item) => {
-      return item.gvNumber
-    })
-    obj = {
-      "natureOfSale": "InStore",
-      "domainId": 1,
-      "storeId": this.state.storeId,
-      "grossAmount": this.state.grossAmount,
-      "createdBy": parseInt(this.state.createdBy),
-      "totalPromoDisc": this.state.totalPromoDisc,
-      "taxAmount": this.state.taxAmount,
-      "totalManualDisc": parseInt(this.state.manualDisc),
-      "discApprovedBy": this.state.approvedBy,
-      "discType": this.state.reasonDiscount,
-      "approvedBy": null,
-      "netPayableAmount": this.state.payingAmount,
-      "offlineNumber": null,
-      "mobileNumber": this.state.customerPhoneNumber,
-      "customerFullName": this.state.customerFullName,
-      "customerName": this.state.customerName,
-      "userId": this.state.userId,
-      "sgst": this.state.SGST,
-      "cgst": this.state.CGST,
-      "dlSlip": this.state.dsNumberList,
-      "lineItemsReVo": this.state.barCodeList,
-      "createdBy": this.state.createdBy,
-      "recievedAmount": this.state.recievedAmount,
-      "returnAmount": this.state.returnAmount,
-      "paymentAmountType":
-        this.state.isCardOrCash === true ?
-          cCData :
-          this.state.paymentType,
-      "returnSlipNumbers": this.state.numRtList,
-      "returnSlipAmount": (this.state.rtAmount === null ? 0 : this.state.rtAmount),
-      "gvAppliedAmount": (this.state.couponAmount === null ? 0 : this.state.couponAmount),
-      "gvNumber": couponCode,
-      "totalAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString(),
-      "withoutTaxTotal": this.state.netPayableAmount,
-      "TotalAmTax": this.state.totalAmount,
-      "TaxIncExc": this.state.isTaxIncluded
-    };
-    console.log(" payment cash method data", obj);
-    let invoiceTax = []
-    invoiceTax.push(obj)
-    if (this.state.isCard === true) {
-      delete obj.paymentAmountType
+      return item.gvNumber;
+    });
+    // alert(this.state.domainType);
+    if (this.state.domainType === "Restaurants") {
+      obj = {
+        natureOfSale: "InStore",
+        storeId: this.state.storeId,
+        domainType: this.state.domainType,
+        createdBy: parseInt(this.state.createdBy),
+        totalPromoDisc: this.state.totalPromoDisc,
+        lineItemsReVo: this.state.barCodeList,
+        netPayableAmount: this.state.payingAmount,
+        paymentAmountType:
+          this.state.isCardOrCash === true ?
+            cCData :
+            this.state.paymentType,
+        recievedAmount: this.state.recievedAmount,
+        returnAmount: this.state.returnAmount,
+        sgst: this.state.SGST,
+        cgst: this.state.CGST,
+        tableId: this.state.tableId,
+        TotalAmTax: this.state.totalAmount,
+        totalManualDisc: parseInt(this.state.manualDisc),
+      };
+      // grossAmount: this.state.grossAmount,
+      // taxAmount: this.state.taxAmount,
+      // discApprovedBy: this.state.approvedBy,
+      // discType: this.state.reasonDiscount,
+      // approvedBy: null,
+      // offlineNumber: null,
+      // mobileNumber: this.state.customerPhoneNumber,
+      // customerFullName: this.state.customerFullName,
+      // customerName: this.state.customerName,
+      // // userId: this.state.userId,
+      // createdBy: this.state.createdBy,
+      // returnSlipNumbers: this.state.numRtList,
+      // returnSlipAmount: (this.state.rtAmount === null ? 0 : this.state.rtAmount),
+      // gvAppliedAmount: (this.state.couponAmount === null ? 0 : this.state.couponAmount),
+      // gvNumber: couponCode,
+      // totalAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString(),
+      // withoutTaxTotal: this.state.netPayableAmount,
+      // TaxIncExc: this.state.isTaxIncluded,
+      // enablePayment: true
+    } else {
+      obj = {
+        "natureOfSale": "InStore",
+        "domainId": 1,
+        "storeId": this.state.storeId,
+        "grossAmount": this.state.grossAmount,
+        "createdBy": parseInt(this.state.createdBy),
+        "totalPromoDisc": this.state.totalPromoDisc,
+        "taxAmount": this.state.taxAmount,
+        "totalManualDisc": parseInt(this.state.manualDisc),
+        "discApprovedBy": this.state.approvedBy,
+        "discType": this.state.reasonDiscount,
+        "approvedBy": null,
+        "netPayableAmount": this.state.payingAmount,
+        "offlineNumber": null,
+        "mobileNumber": this.state.customerPhoneNumber,
+        "customerFullName": this.state.customerFullName,
+        "customerName": this.state.customerName,
+        "userId": this.state.userId,
+        "sgst": this.state.SGST,
+        "cgst": this.state.CGST,
+        "dlSlip": this.state.dsNumberList,
+        "lineItemsReVo": this.state.barCodeList,
+        "createdBy": this.state.createdBy,
+        "recievedAmount": this.state.recievedAmount,
+        "returnAmount": this.state.returnAmount,
+        "paymentAmountType":
+          this.state.isCardOrCash === true ?
+            cCData :
+            this.state.paymentType,
+        "returnSlipNumbers": this.state.numRtList,
+        "returnSlipAmount": (this.state.rtAmount === null ? 0 : this.state.rtAmount),
+        "gvAppliedAmount": (this.state.couponAmount === null ? 0 : this.state.couponAmount),
+        "gvNumber": couponCode,
+        "totalAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString(),
+        "withoutTaxTotal": this.state.netPayableAmount,
+        "TotalAmTax": this.state.totalAmount,
+        "TaxIncExc": this.state.isTaxIncluded
+      };
+
     }
-    axios.post(NewSaleService.createOrder(), obj).then((res) => {
+    console.log(" payment cash method data", obj);
+    let invoiceTax = [];
+    invoiceTax.push(obj);
+    if (this.state.isCard === true) {
+      delete obj.paymentAmountType;
+    }
+    console.log({ obj });
+    axios.post(NewSaleService.createOrder(), obj).then(async (res) => {
       console.log("Invoice data", JSON.stringify(res.data));
       if (res.data && res.data["isSuccess"] === "true") {
+        if (this.state.isPrinterConnected === true) {
+          PrintService('INVOICE', res.data.result, this.state.barCodeList, invoiceTax);
+        }
 
-        PrintService('INVOICE', res.data.result, this.state.barCodeList, invoiceTax)
-
-        // const cardAmount = this.state.isCard || this.state.isCardOrCash ? JSON.stringify(Math.round(this.state.ccCardCash)) : JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString());
         alert("Order created " + res.data["result"]);
         if (this.state.isRTApplied === true || this.state.isKhata === true || this.state.cardManual === true || this.state.isCredit === true || this.state.isCash === true && this.state.isCardOrCash === false) {
           this.props.route.params.onGoBack();
@@ -1161,7 +1122,7 @@ class TextilePayment extends Component {
             //this.props.navigation.navigate('Orders', { total: this.state.totalAmount, payment: 'RazorPay' })
           }).catch((error) => {
             this.setState({ loading: false });
-            console.log(error);
+            // console.log(error);
             // handle failure
             alert(`Error: ${JSON.stringify(error.code)} || ${JSON.stringify(error.description)}`);
           });
@@ -1173,136 +1134,15 @@ class TextilePayment extends Component {
       }
     });
 
-    // else if (global.domainName === "Retail") {
-    //     let lineItems = [];
-    //     this.state.retailBarCodeList.forEach((barCode, index) => {
-    //         const obj = {
-    //             "barCode": barCode.barcodeId,
-    //             "domainId": 2,
-    //             "itemPrice": barCode.listPrice,
-    //             "netValue": barCode.listPrice,
-    //             "quantity": 1
-    //         };
-    //         lineItems.push(obj);
-    //     });
-
-    //     axios.post(NewSaleService.saveLineItems(), lineItems).then((res) => {
-    //         if (res.data && res.data["isSuccess"] === "true") {
-    //             let lineItemsList = [];
-    //             let dataResult = JSON.parse(res.data.result);
-    //             dataResult.forEach(element => {
-    //                 const obj = {
-    //                     "lineItemId": element
-    //                 };
-    //                 lineItemsList.push(obj);
-    //             });
-
-    //             this.setState({ lineItemsList: lineItemsList }, () => {
-    //                 const params = {
-    //                     "natureOfSale": "InStore",
-    //                     "domainId": 2,
-    //                     "storeId": this.state.storeId,
-    //                     "grossAmount": this.state.grossAmount,
-    //                     "totalPromoDisc": this.state.totalPromoDisc,
-    //                     "taxAmount": this.state.taxAmount,
-    //                     "totalManualDisc": parseInt(this.state.manualDisc),
-    //                     "discApprovedBy": this.state.approvedBy,
-    //                     "discType": this.state.reasonDiscount,
-    //                     "approvedBy": null,
-    //                     "netPayableAmount": (parseFloat(this.state.totalAmount ) -  parseFloat(this.state.redeemedPints / 10)).toString(),
-    //                     "offlineNumber": null,
-    //                     "userId": this.state.userId,
-    //                     "sgst": this.state.CGST,
-    //                     "cgst": this.state.CGST,
-    //                     "dlSlip": this.state.dsNumberList,
-    //                     "lineItemsReVo": this.state.lineItemsList,
-    //                     "paymentAmountType": [{
-    //                         "paymentType": "Cash",
-    //                         "paymentAmount": parseFloat(this.state.verifiedCash)
-    //                     }]
-
-    //                 };
-
-    //                 console.log(params);
-
-    //                 axios.post(NewSaleService.createOrder(), params).then((res) => {
-    //                     if (res.data && res.data["isSuccess"] === "true") {
-    //                         //  alert("Order created " + res.data["result"]);
-    //                         this.setState({ loading: false });
-    //                         this.props.route.params.onGoBack();
-    //                         this.props.navigation.goBack();
-    //                     }
-    //                     else {
-    //                         this.setState({ loading: false });
-    //                         alert("duplicate record already exists");
-    //                     }
-    //                 }
-    //                 );
-    //                 console.log(params);
-    //                 axios.post(NewSaleService.createOrder(), params).then((res) => {
-    //                     if (res.data && res.data["isSuccess"] === "true") {
-    //                         alert("Order created " + res.data["result"]);
-    //                         const params = {
-    //                             "amount": JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()),
-    //                             "info": "order creations",
-    //                             "newsaleId": res.data["result"],
-    //                         };
-
-    //                         axios.post(NewSaleService.payment(), params).then((res) => {
-    //                             // this.setState({isPayment: false});
-    //                             const data = JSON.parse(res.data["result"]);
-    //                             //console.log()
-    //                             var options = {
-    //                                 description: 'Transaction',
-    //                                 image: 'https://i.imgur.com/3g7nmJC.png',
-    //                                 currency: data.currency,
-    //                                 order_id: data.id,
-    //                                 key: 'rzp_test_z8jVsg0bBgLQer', // Your api key
-    //                                 amount: data.amount,
-    //                                 name: 'OTSI',
-    //                                 prefill: {
-    //                                     name: "Kadali",
-    //                                     email: "kadali@gmail.com",
-    //                                     contact: "9999999999",
-    //                                 },
-    //                                 theme: { color: '#F37254' }
-    //                             };
-    //                             console.log(options);
-    //                             RazorpayCheckout.open(options).then((data) => {
-    //                                 // handle success
-    //                                 this.setState({ tableData: [] });
-    //                                 alert(`Success: ${data.razorpay_payment_id}`);
-    //                                 this.props.route.params.onGoBack();
-    //                                 this.props.navigation.goBack();
-    //                                 //this.props.navigation.navigate('Orders', { total: this.state.totalAmount, payment: 'RazorPay' })
-    //                             }).catch((error) => {
-    //                                 this.setState({ loading: false });
-    //                                 console.log(error);
-    //                                 // handle failure
-    //                                 alert(`Error: ${JSON.stringify(error.code)} | ${JSON.stringify(error.description)}`);
-    //                             });
-    //                         });
-    //                         this.setState({ loading: false });
-    //                     }
-    //                     else {
-    //                         this.setState({ loading: false });
-    //                         alert("duplicate record already exists");
-    //                     }
-    //                 }
-    //                 );
-    //             });
-    //         }
-    //     });
-    // }
   };
 
 
-  redeemPoints() {
+  redeemPoints () {
     this.setState({ flagredeem: true, modalVisible: true });
   }
 
 
-  verifyCustomer() {
+  verifyCustomer () {
     this.setState({ loyaltyPoints: '' });
     if (this.state.mobileNumber.length !== 10) {
       alert('please Enter a customer valid mobile number');
@@ -1336,7 +1176,7 @@ class TextilePayment extends Component {
     }
   }
 
-  applyGVNumber() {
+  applyGVNumber () {
     const gvObj = [this.state.gvNumber];
     const param = '?flag=' + false;
     axios.put(NewSaleService.saveCoupons() + param, gvObj).then(res => {
@@ -1348,13 +1188,13 @@ class TextilePayment extends Component {
     });
   }
 
-  async applyRt() {
-    const obj = this.state.rtNumber
+  async applyRt () {
+    const obj = this.state.rtNumber;
     if (this.state.compareRTList.length === 0) {
       // console.log("in if", this.state.compareRTList, this.state.listOfRtnum);
       this.setState({
         compareRTList: [...this.state.listOfRtnum, obj],
-      })
+      });
     } else {
       // console.log("in else", this.state.rtListList);
       const isFound = this.state.rtListList.find(element => {
@@ -1367,7 +1207,7 @@ class TextilePayment extends Component {
       if (!isFound) {
         this.setState({
           compareRTList: [...this.state.compareRTList, obj]
-        })
+        });
       }
 
     }
@@ -1375,9 +1215,9 @@ class TextilePayment extends Component {
     if (this.state.rtNumber.length > 0) {
       const storeId = await AsyncStorage.getItem("storeId");
       NewSaleService.getRTDetails([this.state.rtNumber], storeId).then(res => {
-        console.log("___________res______________" + JSON.stringify(res.data));
+        // console.log("___________res______________" + JSON.stringify(res.data));
         if (res.data.result.length > 0) {
-          console.log("---------ress", res.data.result[0]);
+          // console.log("---------ress", res.data.result[0]);
           this.setState({
             rtListList: [...this.state.rtListList, res.data.result[0]]
           }, () => {
@@ -1391,7 +1231,7 @@ class TextilePayment extends Component {
               listOfRtnum: [],
               numRtList: listofRTNum
             });
-          })
+          });
           let sumreturnedAmout = res.data.result[0].barcodes.reduce((accumulator, curValue) => {
             if (curValue.returnQty) {
               accumulator = accumulator + curValue.returnAmount;
@@ -1408,11 +1248,11 @@ class TextilePayment extends Component {
               isRTApplied: true,
               isCheckPromo: true,
               grandNetAmount: parseFloat(this.state.grandNetAmount - sumreturnedAmout).toFixed(2)
-            })
+            });
             const obj = {
               "paymentType": "RTSlip",
               "paymentAmount": this.state.rtAmount
-            }
+            };
             this.state.paymentType.push(obj);
           } else if (grandNetAmount === sumreturnedAmout) {
             this.setState({
@@ -1425,37 +1265,37 @@ class TextilePayment extends Component {
               isRTApplied: true,
               grandNetAmount: parseFloat(this.state.grandNetAmount - sumreturnedAmout).toFixed(2),
               isCheckPromo: true, isBillLevel: true, isTagCustomer: true
-            })
+            });
             const obj = {
               "paymentType": "RTSlip",
               "paymentAmount": this.state.rtAmount
-            }
+            };
             this.state.paymentType.push(obj);
           }
           else {
-            alert("Please purchase greater than return amount")
+            alert("Please purchase greater than return amount");
           }
-          this.setState({ rtNumber: '' })
+          this.setState({ rtNumber: '' });
         } else {
           alert("Invalid RT Slip Number ");
-          this.setState({ rtNumber: '' })
+          this.setState({ rtNumber: '' });
         }
       }
       );
     } else {
       alert("Please Enter RT Slip Number");
-      this.setState({ rtNumber: '' })
+      this.setState({ rtNumber: '' });
     }
   }
 
-  checkPromo() {
+  checkPromo () {
     let costPrice = 0;
     let discount = 0;
     let total = 0;
     let discAppliedTotal = 0;
     const { storeId, domainId, barCodeList } = this.state;
     const requestObj = barCodeList.map((item) => {
-      console.log({ item })
+      console.log({ item });
       let obj = {};
       obj.actualValue = item.actualValue;
       obj.barCode = item.barCode;
@@ -1481,10 +1321,10 @@ class TextilePayment extends Component {
       obj.batchNo = item.batchNo;
       obj.promoDiscount = 0;
       obj.totalPromoDiscount = 0.0;
-      obj.distributedPromoDiscount = 0.0
+      obj.distributedPromoDiscount = 0.0;
       return obj;
     });
-    console.log({ requestObj })
+    console.log({ requestObj });
     if (this.state.isEstimationEnable === "true") {
       CustomerService.getinvoiceLevelCheckPro(1, storeId, requestObj,).then((res) => {
         if (res.status === 200) {
@@ -1497,11 +1337,11 @@ class TextilePayment extends Component {
               // item.distributedPromoDiscount= ele.distributedPromoDiscount;
               // item.totalPromoDiscount = ele.totalPromoDiscount
               if (item.barCode === ele.barCode) {
-                item.distributedPromoDiscount = ele.distributedPromoDiscount;
-                item.totalPromoDiscount = ele.totalPromoDiscount
+                item.distributedPromoDiscount = (ele.distributedPromoDiscount);
+                item.totalPromoDiscount = ele.totalPromoDiscount;
               }
-            })
-          })
+            });
+          });
           this.state.barCodeList.forEach((barCode, index) => {
             costPrice = costPrice + barCode.itemPrice;
             discount = discount + barCode.totalPromoDiscount;
@@ -1527,6 +1367,43 @@ class TextilePayment extends Component {
         }
       });
     } else {
+      const requestObj = barCodeList.map((item) => {
+        let obj = {};
+        obj.actualValue = item.actualValue;
+        obj.barcode = item.barCode;
+        obj.cgst = item.cgst;
+        obj.discount = item.promoDiscount;
+        obj.division = item.division;
+        obj.domainId = item.domainId;
+        obj.grossValue = item.grossValue;
+        obj.hsnCode = item.hsnCode;
+        obj.itemMrp = item.itemPrice;
+        obj.lineItemId = item.lineItemId;
+        obj.netValue = item.netValue;
+        obj.quantity = item.qty;
+        obj.section = item.section;
+        obj.sgst = item.sgst;
+        obj.storeId = item.storeId;
+        obj.subSection = item.subSection;
+        obj.taxValue = item.taxValue;
+        obj.userId = item.userId;
+        obj.costPrice = item.costPrice;
+        obj.uom = item.uom;
+        obj.originalBarcodeCreatedAt = item.createdDate;
+        obj.batchNo = item.batchNo;
+        obj.promoDiscount = 0;
+        obj.totalPromoDiscount = 0.0;
+        obj.calculatedDiscountsVo = {};
+        obj.category = item.category;
+        obj.colour = item.colour;
+        obj.empId = item.empId;
+        obj.name = item.name;
+        obj.parentBarcode = item.parentBarcode;
+        obj.productTextileId = item.productTextileId;
+        obj.status = item.status;
+        obj.value = item.value;
+        return obj;
+      });
       CustomerService.getCheckPromoAmount(storeId, 1, requestObj).then(res => {
         let calculatedDisc = res.data.result.calculatedDiscountVo;
         if (res.status === 200) {
@@ -1535,39 +1412,75 @@ class TextilePayment extends Component {
           });
         }
         if (res?.data && res?.data?.result[0].calculatedDiscountVo) {
-          this.setState({ promoDisc: res?.data?.result });
-          this.state.barCodeList.forEach(barcodeData => {
-            this.state.promoDisc.forEach(promo => {
-              if (barcodeData.barcode === promo.barcode) {
-                if (promo.calculatedDiscountVo) {
-                  if (promo.calculatedDiscountVo.discountAvailable) {
-                    if (promo.calculatedDiscountsVo.thisFixedAmountDiscount) {
-                      barcodeData.itemDiscount = parseInt(promo.calculatedDiscountVo.calculatedDiscount);
-                      barcodeData.totalMrp = barcodeData.totalMrp - barcodeData.itemDiscount;
+          this.setState({ promoDiscount: response.data.result }, () => {
+            // console.log('response.data', response.data)
+          });
+          // this.state.barCodeList.forEach(barcodeData => {
+          //   this.state.promoDisc.forEach(promo => {
+          //     if (barcodeData.barcode === promo.barcode) {
+          //       if (promo.calculatedDiscountVo) {
+          //         if (promo.calculatedDiscountVo.discountAvailable) {
+          //           if (promo.calculatedDiscountsVo.thisFixedAmountDiscount) {
+          //             barcodeData.itemDiscount = parseInt(promo.calculatedDiscountVo.calculatedDiscount);
+          //             barcodeData.totalMrp = barcodeData.totalMrp - barcodeData.itemDiscount;
+          //           }
+          //           else {
+          //             barcodeData.itemDiscount = parseInt(promo.calculatedDiscountsVo.calculatedDiscount);
+          //             barcodeData.totalMrp = barcodeData.totalMrp - barcodeData.itemDiscount;
+          //           }
+          //         }
+          //       } else {
+          //         barcodeData.itemDiscount = "No discount";
+          //       }
+          //     }
+          //   });
+          // });
+          // this.setState({ barList: this.state.barList }, () => {
+          // this.calculateTotal();
+          // });
+          response.data.result.forEach((ele, index) => {
+            barCodeList.forEach((item, idx) => {
+              if (item.barCode === ele.barcode) {
+                if (ele.calculatedDiscountsVo) {
+                  if (ele.calculatedDiscountsVo.discountAvailable) {
+                    if (ele.calculatedDiscountsVo.thisFixedAmountDiscount) {
+                      item.itemDiscount = parseFloat(ele.calculatedDiscountsVo.calculatedDiscount > 0 ? ele.calculatedDiscountsVo.calculatedDiscount : 0);
+                      item.totalMrp = (ele.itemDiscount > 0 ? ele.itemDiscount : 0);
                     }
                     else {
-                      barcodeData.itemDiscount = parseInt(promo.calculatedDiscountsVo.calculatedDiscount);
-                      barcodeData.totalMrp = barcodeData.totalMrp - barcodeData.itemDiscount;
+                      item.itemDiscount = parseFloat(ele.calculatedDiscountsVo.calculatedDiscount > 0 ? ele.calculatedDiscountsVo.calculatedDiscount : 0);
+                      item.totalMrp = item.totalMrp - item.itemDiscount;
                     }
                   }
                 } else {
-                  barcodeData.itemDiscount = "No discount";
+                  item.itemDiscount = "No discount";
                 }
               }
             });
           });
-          // this.setState({ barList: this.state.barList }, () => {
-          // this.calculateTotal();
-          // });
+          this.state.barCodeList.forEach((barCode, index) => {
+            costPrice = costPrice + barCode.itemPrice;
+            discount = discount + (barCode.itemDiscount ? barCode.itemDiscount : 0);
+            total = total + barCode.grossValue;
+          });
+
+          discount = discount + this.state.manualDisc;
+          discAppliedTotal = parseFloat(this.state.grandNetAmount - discount).toFixed(2);
+          this.setState({
+            netPayableAmount: parseFloat(total).toFixed(2),
+            totalPromoDisc: (parseFloat(this.state.totalPromoDisc) + parseFloat(discount)).toFixed(2),
+            grossAmount: costPrice,
+            grandNetAmount: discAppliedTotal
+          });
         } else {
           alert("No Promo Available");
         }
       });
     }
-    this.setState({ handleBillDiscount: false })
+    this.setState({ handleBillDiscount: false });
   }
 
-  getDiscountReasons() {
+  getDiscountReasons () {
     axios.get(CustomerService.getDiscountReasons()).then((res) => {
       if (res.status === 200) {
         //this.setState({discReasons: res.data});
@@ -1588,18 +1501,18 @@ class TextilePayment extends Component {
     });
   }
 
-  billDiscountModelCancel() {
+  billDiscountModelCancel () {
     this.setState({
       reasonDiscount: '', discApprovedBy: '', manualDisc: '',
       discountAmountValid: true, modalVisible: false, billmodelPop: false
     });
   }
 
-  handleDiscountAmount(value) {
+  handleDiscountAmount (value) {
     this.setState({ manualDisc: value });
   }
 
-  handleApprovedBy(text) {
+  handleApprovedBy (text) {
     this.setState({ approvedBy: text });
   }
 
@@ -1607,7 +1520,7 @@ class TextilePayment extends Component {
     this.setState({ reasonDiscount: value });
   };
 
-  billValidation() {
+  billValidation () {
     let isFormValid = true;
     let errors = {};
     if (parseFloat(this.state.manualDisc) > parseFloat(this.state.netPayableAmount)) {
@@ -1619,13 +1532,13 @@ class TextilePayment extends Component {
     return isFormValid;
   }
 
-  billDiscount() {
+  billDiscount () {
     const isFormValid = this.billValidation();
-    console.log("manualDiscmanualDisc", this.state.manualDisc, this.state.totalAmount);
+    // console.log("manualDiscmanualDisc", this.state.manualDisc, this.state.totalAmount);
     if (isFormValid) {
       if (this.state.manualDisc === 0 || this.state.approvedBy === "" || this.state.reasonDiscount === "") {
         alert("Please enter all fields");
-        this.setState({ isBillLevel: false })
+        this.setState({ isBillLevel: false });
       } else {
         // this.state.netPayableAmount = 0;
         const totalDisc = parseFloat(this.state.manualDisc);
@@ -1642,12 +1555,11 @@ class TextilePayment extends Component {
         });
       }
     }
-    console.log("manualDiscmanualDisc after", this.state.manualDisc, this.state.totalAmount);
   }
 
 
 
-  render() {
+  render () {
     return (
       <View style={scss.container}>
         {this.state.loading && <Loader loading={this.state.loading} />}
@@ -1758,17 +1670,16 @@ class TextilePayment extends Component {
                   {"Bill Level Discount"}
                 </Text>
               </TouchableOpacity>
-              {this.state.isEstimationEnable && (
-                <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isBillLevel || this.state.isCheckPromo ? color.disableBackGround : color.accent }]}
-                  onPress={() => {
-                    this.checkPromo();
-                  }}
-                  disabled={this.state.isBillLevel || this.state.isCheckPromo}>
-                  <Text style={forms.button_text}>
-                    {"Check Promo Disc"}
-                  </Text>
-                </TouchableOpacity>
-              )}
+              <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isBillLevel || this.state.isCheckPromo ? color.disableBackGround : color.accent }]}
+                onPress={() => {
+                  this.checkPromo();
+                }}
+                disabled={this.state.isBillLevel || this.state.isCheckPromo}>
+                <Text style={forms.button_text}>
+                  {"Check Promo Disc"}
+                </Text>
+              </TouchableOpacity>
+
             </View>
 
             {this.state.billmodelPop && (
@@ -2371,7 +2282,7 @@ class TextilePayment extends Component {
                         </View>
                         <View style={forms.action_buttons_container}>
                           <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
-                            onPress={() => { this.saveCard() }}>
+                            onPress={() => { this.saveCard(); }}>
                             <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
                           </TouchableOpacity>
                           <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
@@ -2396,18 +2307,18 @@ class TextilePayment extends Component {
               {this.state.isTaxIncluded !== 'null' &&
                 <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
                   <Text style={scss.textStyleMedium}>  CGST </Text>
-                  <Text style={scss.textStyleMedium}>₹ {this.state.CGST} </Text>
+                  <Text style={scss.textStyleMedium}>₹ {parseFloat(this.state.CGST).toFixed(2)} </Text>
                 </View>}
               {this.state.isTaxIncluded !== 'null' &&
                 <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
                   <Text style={scss.textStyleMedium}>  SGST </Text>
-                  <Text style={scss.textStyleMedium}>₹  {this.state.SGST} </Text>
+                  <Text style={scss.textStyleMedium}>₹  {parseFloat(this.state.SGST).toFixed(2)} </Text>
                 </View>}
 
-              <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
+              {this.state.isTaxIncluded !== 'null' && <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
                 <Text style={scss.textStyleMedium}> Total Amount </Text>
                 <Text style={scss.textStyleMedium}> ₹  {this.state.totalAmount} </Text>
-              </View>
+              </View>}
 
               <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
                 <Text style={[scss.textStyleMedium, { color: "#2ADC09" }]}>Promo Discount </Text>

@@ -104,7 +104,7 @@ class AddBarcode extends Component {
     };
   }
 
-  async componentDidMount() {
+  async componentDidMount () {
     var domainStringId = "";
     var storeStringId = "";
     this.setState({ isEdit: this.props.route.params.isEdit });
@@ -121,7 +121,7 @@ class AddBarcode extends Component {
   }
 
   // Go Back Actions
-  handleBackButtonClick() {
+  handleBackButtonClick () {
     this.props.navigation.goBack(null);
     return true;
   }
@@ -173,7 +173,7 @@ class AddBarcode extends Component {
   };
 
   // Division Actions
-  getAllDivisions(data) {
+  getAllDivisions (data) {
     let divisions = [];
     InventoryService.getAllDivisions(data).then((res) => {
       if (res?.data) {
@@ -199,28 +199,28 @@ class AddBarcode extends Component {
   };
 
   // Colors
-  getAllColors() {
+  getAllColors () {
     InventoryService.getColors().then(res => {
-      let Colors = []
-      console.log({ Colors }, "Colors")
+      let Colors = [];
+      console.log({ Colors }, "Colors");
       res.data.forEach((res) => {
         Colors.push({
           value: res.name,
           label: res.name
-        })
-      })
-      this.setState({ colorsRes: Colors })
+        });
+      });
+      this.setState({ colorsRes: Colors });
     }).catch(err => {
-      console.log({ err }, 'Colors')
-    })
+      console.log({ err }, 'Colors');
+    });
   }
 
   handleColor = (value) => {
-    this.setState({ selectedColor: value })
-  }
+    this.setState({ selectedColor: value });
+  };
 
   // Section Actions
-  getAllSections(id, data) {
+  getAllSections (id, data) {
     this.setState({ sectionsList: [] });
     let section = [];
     InventoryService.getAllSections(id, data).then((res) => {
@@ -246,7 +246,7 @@ class AddBarcode extends Component {
   };
 
   // SubSection Actions
-  getAllSubsections(id, data) {
+  getAllSubsections (id, data) {
     this.setState({ subSectionsList: [] });
     let subSection = [];
     InventoryService.getAllSections(id, data).then((res) => {
@@ -271,7 +271,7 @@ class AddBarcode extends Component {
   };
 
   // Category Actions
-  getAllCatogiries(data) {
+  getAllCatogiries (data) {
     this.setState({ categoriesList: [] });
     let categories = [];
     InventoryService.getAllCategories(data).then((res) => {
@@ -296,7 +296,7 @@ class AddBarcode extends Component {
   };
 
   // UOM Actions
-  getAllUOM() {
+  getAllUOM () {
     this.setState({ uomList: [] });
     let uomList = [];
     InventoryService.getUOM().then((res) => {
@@ -321,19 +321,19 @@ class AddBarcode extends Component {
   };
 
   handleSize = (value, data) => {
-    this.state.alist[0].selectedValue = value
+    this.state.alist[0].selectedValue = value;
     this.setState({ alist: this.state.alist, selectedValue: value });
     console.log({ value }, this.state.alist);
   };
 
   handleSelectChange = (value, data) => {
-    this.state.alist[1].selectedValue = value
-    this.setState({ alist: this.state.alist, selectedDValue: value })
-    console.log({ value }, this.state.alist)
-  }
+    this.state.alist[1].selectedValue = value;
+    this.setState({ alist: this.state.alist, selectedDValue: value });
+    console.log({ value }, this.state.alist);
+  };
 
   // HSNCodes Actions
-  getAllHSNCodes() {
+  getAllHSNCodes () {
     this.setState({ hsnCodesList: [] });
     let hsnList = [];
     InventoryService.getAllHsnList().then((res) => {
@@ -358,11 +358,11 @@ class AddBarcode extends Component {
   };
 
   // Store Actions
-  async getAllstores() {
+  async getAllstores () {
     this.setState({ storesList: [] });
     let storesList = [];
     const { clientId } = this.state;
-    console.log({ clientId })
+    console.log({ clientId });
     InventoryService.getAllStores(clientId).then((res) => {
       console.log("Stores", res.data);
       if (res?.data) {
@@ -482,12 +482,12 @@ class AddBarcode extends Component {
     this.setState({ barcode: value });
   };
 
-  handleBarcodeValid() {
+  handleBarcodeValid () {
 
   }
 
   // Date Actions
-  datepickerClicked() {
+  datepickerClicked () {
     this.setState({ datepickerOpen: true });
   }
 
@@ -512,7 +512,7 @@ class AddBarcode extends Component {
   };
 
   // Validations For Barcode Fields
-  validationForm() {
+  validationForm () {
     let isFormValid = true;
     let errors = {};
     if (this.state.name.length < errorLength.name) {
@@ -571,7 +571,7 @@ class AddBarcode extends Component {
   };
 
   // Saving Barcode
-  saveBarcode() {
+  saveBarcode () {
     // console.log(this.state.store);
     // this.setState({ loading: true });
     this.state.alist.forEach((item, ind) => {
@@ -582,11 +582,11 @@ class AddBarcode extends Component {
       delete item.placeholder;
       delete item.domainType;
       delete item.id;
-    })
+    });
     const { selectedDomain, isEdit } = this.state;
     const isFormValid = this.validationForm();
     if (isFormValid) {
-      console.log(this.state.alist)
+      console.log(this.state.alist);
       // Checking for validations
       const params = {
         // status: selectedDomain === "Retail" ? this.state.status : null,
@@ -639,20 +639,20 @@ class AddBarcode extends Component {
   }
 
   // Cancel Add Barcode
-  cancel() {
+  cancel () {
     this.props.navigation.goBack(null);
   }
 
-  render() {
+  render () {
     return (
       <View>
         {this.state.loading && <Loader loading={this.state.loading} />}
-        < Appbar mode="center-aligned" style={styles.mainContainer} >
+        <Appbar mode="center-aligned" style={styles.mainContainer} >
           <Appbar.BackAction
             onPress={() => this.handleBackButtonClick()}
           />
           <Appbar.Content title="Add Barcode" />
-        </Appbar >
+        </Appbar>
         <KeyboardAwareScrollView>
           <Text style={inputHeading}>
             {I18n.t("Domian")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -769,7 +769,7 @@ class AddBarcode extends Component {
                       />
                     </View>
                   )}
-                </View>)
+                </View>);
               })}
             </View>
           )}
@@ -1036,8 +1036,8 @@ class AddBarcode extends Component {
             </TouchableOpacity>
           </View>
           <View style={styles.bottomContainer}></View>
-        </KeyboardAwareScrollView >
-      </View >
+        </KeyboardAwareScrollView>
+      </View>
     );
   }
 }

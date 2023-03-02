@@ -49,7 +49,7 @@ export class SalesSumary extends Component {
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     // if (global.domainName === "Textile") {
     //   this.setState({ domainId: 1 });
     // }
@@ -60,24 +60,10 @@ export class SalesSumary extends Component {
     //   this.setState({ domainId: 3 });
     // }
 
-    AsyncStorage.getItem("storeId").then((value) => {
-      storeStringId = value;
-      this.setState({ storeId: parseInt(storeStringId) });
-      console.log(this.state.storeId);
-    }).catch(() => {
-      this.setState({ loading: false });
-      console.log('There is error getting storeId');
-      // alert('There is error getting storeId');
-    });
-
-    AsyncStorage.getItem("storeName").then((value) => {
-      this.setState({ storeName: value });
-      console.log(this.state.storeName);
-    }).catch(() => {
-      this.setState({ loading: false });
-      console.log('There is error getting storeId');
-      // alert('There is error getting storeId');
-    });
+    const storeId = await AsyncStorage.getItem("storeId");
+    this.setState({ storeId: storeId });
+    const storeName = await AsyncStorage.getItem("storeName");
+    this.setState({ storeId: storeId });
   }
 
 
@@ -124,9 +110,8 @@ export class SalesSumary extends Component {
           ? parseInt(this.state.storeId)
           : undefined,
     };
-    console.log('params are', obj);
+    // console.log('params are', obj);
     ReportsService.saleReports(obj).then((res) => {
-      console.log(res);
       if (res.data && res.data["isSuccess"] === "true") {
         if (res.data.result.lenght !== 0) {
           let data = res.data.result;
@@ -136,7 +121,6 @@ export class SalesSumary extends Component {
 
           a.push(data.salesSummery);
           a.push(data.retunSummery);
-          console.log(">>>>>>>>aaaaaaa", a);
           this.setState({
             filterActive: true,
             dsList: a,

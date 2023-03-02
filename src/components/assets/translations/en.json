@@ -31,6 +31,7 @@
     "SHIRTS": "SHIRTS",
     "SAREES": "SAREES",
     "KIDS": "KIDS",
+    "Seating Capacity": "Seating Capacity",
     "JEANS": "JEANS",
     "T-SHIRTS": "T-SHIRTS",
     "Sales % by category": "Sales % by category",
@@ -243,5 +244,7 @@
     "Confirm Password": "Confirm Password",
     "status": "status",
     "Vendor Tax": "Vendor Tax",
-    "Fabrice Type": "Fabrice Type"
+    "Fabrice Type": "Fabrice Type",
+    "Item Name": "Item Name",
+    "Cuision": "Cuision"
 }

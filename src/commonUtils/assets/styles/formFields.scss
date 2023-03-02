@@ -16,6 +16,32 @@
   flex: 1;
 }
 
+.privilegesactionbtns {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.privilegeheader {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.privilegestopbtns {
+  width: 50%;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.privilegesbtnstext {
+  font-size: 20px;
+  font-weight: 400;
+}
+
 .active_fld {
   background-color: $white;
   color: $black;
@@ -63,7 +89,7 @@
   height: 55px;
   width: 45%;
   background-color: $blue;
-  border: 1px solid $border;
+  border: 1px solid $grey;
   border-radius: 5px;
   text-align: center;
   background-color: $white;
@@ -164,10 +190,6 @@
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
-}
-
-.submit_btn {
-  background-color: $primary-color;
 }
 
 .submit_btn_text {

@@ -15,7 +15,7 @@ class ReportsService {
 
   returnSlips (data, pageNumber = 0) {
     const param = '?page=' + pageNumber;
-    return axios.post(BASE_URL + REPORTS_URL.returnslipsList + param, data);
+    return axios.post(BASE_URL + REPORTS_URL.returnslipsList + param + '&size=10', data);
   }
 
 
@@ -41,8 +41,14 @@ class ReportsService {
 
   deleteEstimationSlip (dsNumber) {
     const param2 = '?dsNumber=' + dsNumber;
-    return axios.delete(BASE_URL + REPORTS_URL.deleteDsNumber + param2 );
+    return axios.delete(BASE_URL + REPORTS_URL.deleteDsNumber + param2);
   }
+
+  getOrderHistory (storeId) {
+    const domain = "?domainType=Restaurants";
+    return axios.get(BASE_URL + REPORTS_URL.orderHistory + domain + "&storeId=" + storeId);
+  }
+
 
 }
 

@@ -18,16 +18,16 @@ import Blank from "../components/Home/Blank";
 const Stack = createStackNavigator();
 export default class AccountingNaviagtion extends Component {
 
-  componentDidMount () {
+  componentDidMount() {
     const backHandler = BackHandler.addEventListener("hardwareBackPress", this.backAction());
     return () => backHandler.remove();
   }
 
-  backAction () {
+  backAction() {
     return true;
   }
 
-  render () {
+  render() {
     return (
       <>
         <Stack.Navigator initialRouteName="Blank">
@@ -52,6 +52,11 @@ export default class AccountingNaviagtion extends Component {
             component={DebitNotes}
           />
           <Stack.Screen
+            name="AddDomain"
+            options={{ headerShown: false }}
+            component={AddDomain}
+          />
+          <Stack.Screen
             name="Credit Notes"
             options={{ headerShown: false }}
             component={CreditNotes}
@@ -70,31 +75,6 @@ export default class AccountingNaviagtion extends Component {
             name="AddStore"
             options={{ headerShown: false }}
             component={AddStore}
-          />
-          <Stack.Screen
-            name="AddDomain"
-            options={{ headerShown: false }}
-            component={AddDomain}
-          />
-          <Stack.Screen
-            name="AddTaxMaster"
-            options={{ headerShown: false }}
-            component={AddTaxMaster}
-          />
-          <Stack.Screen
-            name="AddHsnCode"
-            options={{ headerShown: false }}
-            component={AddHsnCode}
-          />
-          <Stack.Screen
-            name="AddCreditNotes"
-            options={{ headerShown: false }}
-            component={AddCreditNotes}
-          />
-          <Stack.Screen
-            name="AddDebitNotes"
-            options={{ headerShown: false }}
-            component={AddDebitNotes}
           />
         </Stack.Navigator>
       </>

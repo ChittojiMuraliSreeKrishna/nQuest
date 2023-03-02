@@ -61,11 +61,12 @@ export class GoodsReturn extends Component {
       loadNextActive: true,
       viewGoods: [],
       flagViewGoods: false,
-      viewItems: []
+      viewItems: [],
+      pageNo: 0
     };
   }
 
-  componentDidMount() {
+ async componentDidMount() {
     if (global.domainName === "Textile") {
       this.setState({ domainId: 1 });
     }
@@ -76,18 +77,9 @@ export class GoodsReturn extends Component {
       this.setState({ domainId: 3 });
     }
 
+    const storeId = await AsyncStorage.getItem("storeId");
+    this.setState({ storeId: storeId });
 
-    AsyncStorage.getItem("storeId").then((value) => {
-      storeStringId = value;
-      this.setState({ storeId: parseInt(storeStringId) });
-      console.log(this.state.storeId);
-
-
-    }).catch(() => {
-      this.setState({ loading: false });
-      console.log('There is error getting storeId');
-      // alert('There is error getting storeId');
-    });
   }
 
 
@@ -131,10 +123,8 @@ export class GoodsReturn extends Component {
       // domainId: this.state.domainId ? parseInt(this.state.domainId) : undefined,
       storeId: this.state.storeId ? parseInt(this.state.storeId) : null,
     };
-    console.log('params are' + JSON.stringify(obj), pageNumber);
-    ReportsService.returnSlips(obj, pageNumber).then((res) => {
-      console.log("returnSlips response", res.data, res.data.result.content);
-      console.log(res.data.result.length);
+    // console.log('params are' + JSON.stringify(obj), this.state.pageNo);
+    ReportsService.returnSlips(obj, this.state.pageNo).then((res) => {
       if (res.data) {
         if (res.data.result.length !== 0) {
           res.data.result.content.map((prop, i) => {
@@ -149,16 +139,15 @@ export class GoodsReturn extends Component {
             prop.barcodeVal = barcodeData;
             prop.review = false;
           });
-          this.setState({ filterActive: true });
+          this.setState({ filterActive: true ,modalVisible:false});
           this.setState({
             loading: false,
             goodsReturn: res.data.result.content,
             // rsDetailsList: res.data.result.content,
             totalPages: res.data.result.totalPages
-            // totalPages: res.data.totalPages,
           });
           this.continuePagination();
-          this.modelCancel();
+          // this.modelCancel();
         } else {
           alert("Results Not Found");
           this.modelCancel();
@@ -169,11 +158,7 @@ export class GoodsReturn extends Component {
         this.setState({ loading: false });
         this.modelCancel();
       }
-    }).catch((err) => {
-      alert('No Records Found');
-      this.setState({ loading: false });
-      this.modelCancel();
-    });
+    })
   }
 
   loadMoreList = (value) => {
@@ -194,7 +179,7 @@ export class GoodsReturn extends Component {
     }
   };
 
-  continuePagination() {
+  continuePagination(value) {
     if (this.state.totalPages > 1) {
       this.setState({ loadMoreActive: true });
     } else {
@@ -251,11 +236,11 @@ export class GoodsReturn extends Component {
     const rtNumber = item.rtNumber;
     let items = [];
     items.push(item);
-    console.log({ item }, rtNumber);
+    // console.log({ item }, rtNumber);
     ReportsService.getReturnSlipDetails(rtNumber).then((res) => {
       if (res?.data?.result) {
         let data = res?.data?.result;
-        console.log({ data });
+        // console.log({ data });
         let obj = {
           rtNo: "",
           createdDate: "",
@@ -279,7 +264,7 @@ export class GoodsReturn extends Component {
           };
           detailsArr.push(obj);
         });
-        console.log({ detailsArr });
+        // console.log({ detailsArr });
         this.setState({ viewGoods: detailsArr, flagViewGoods: true, viewItems: items });
       }
     });

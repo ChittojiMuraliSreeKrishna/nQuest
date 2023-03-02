@@ -1,38 +1,41 @@
 import React, { Component } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Device from 'react-native-device-detection';
+import { RW } from "../Responsive";
 import RNPickerSelect from "react-native-picker-select";
 import { Chevron } from "react-native-shapes";
 import { rnPicker, rnPickerContainer } from '../components/Styles/FormFields';
-import { RW } from "../Responsive";
 
 
 export class RnPicker extends Component {
 
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       data: [],
       selectedValue: ""
-    }
+    };
   }
 
-  componentDidMount() {
-    let value = this.props
+  componentDidMount () {
+    let value = this.props;
+    let rnitems = this.props.items;
+    let editValue = this.props.editValue;
+    console.log({ rnitems, editValue });
   }
 
   handleChangeData = (value) => {
     this.setState({ selectedValue: value }, () => {
-      this.props.setValue(this.state.selectedValue)
-    })
-  }
+      this.props.setValue(this.state.selectedValue);
+    });
+  };
 
-  render() {
+  render () {
     return (
       <View style={rnPickerContainer}>
         <RNPickerSelect
           placeholder={{
-            label: "Select",
+            label: this.props.placeHolder ? this.props.placeHolder : "Select",
           }}
           Icon={() => {
             return (
@@ -48,20 +51,20 @@ export class RnPicker extends Component {
             this.handleChangeData(value);
           }}
           style={rnPicker}
-          value={this.state.selectedValue}
+          value={this.props.isEdit ? this.props.editValue : this.state.selectedValue}
           useNativeAndroidPickerStyle={false}
           disabled={this.props.disabled}
         />
       </View>
-    )
+    );
   }
 }
 
-export default RnPicker
+export default RnPicker;
 
 const styles = StyleSheet.create({
   imagealign: {
     marginTop: Device.isTablet ? 25 : RW(20),
     marginRight: Device.isTablet ? 30 : RW(20),
   },
-})
+});

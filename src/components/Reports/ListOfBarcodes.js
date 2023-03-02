@@ -10,6 +10,7 @@ import IconFA from 'react-native-vector-icons/FontAwesome';
 import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
+import Clipbrd from "../../commonUtils/Clipboard";
 import DateSelector from '../../commonUtils/DateSelector';
 import { RF, RH, RW } from '../../Responsive';
 import ReportsService from '../services/ReportsService';
@@ -60,21 +61,20 @@ export class ListOfBarcodes extends Component {
     AsyncStorage.getItem("storeId").then((value) => {
       storeStringId = value;
       this.setState({ storeId: parseInt(storeStringId) });
-      console.log(this.state.storeId);
 
 
     }).catch(() => {
       this.setState({ loading: false });
-      console.log('There is error getting storeId');
+      // console.log('There is error getting storeId');
       // alert('There is error getting storeId');
     });
 
     AsyncStorage.getItem("storeName").then((value) => {
       this.setState({ storeName: value });
-      console.log(this.state.storeName);
+      // console.log(this.state.storeName);
     }).catch(() => {
       this.setState({ loading: false });
-      console.log('There is error getting storeId');
+      // console.log('There is error getting storeId');
       // alert('There is error getting storeId');
     });
   }
@@ -168,10 +168,9 @@ export class ListOfBarcodes extends Component {
       itemMrpLessThan: this.state.fromPrice,
       itemMrpGreaterThan: this.state.toPrice,
     };
-    console.log('params are' + JSON.stringify(obj));
+    // console.log('params are' + JSON.stringify(obj));
     let pageNumber = 0;
     ReportsService.getListOfBarcodes(obj, this.state.pageNo).then((res) => {
-      console.log(res.data.result.totalPages);
       if (res.data && res.data["isSuccess"] === "true") {
         if (res.data.result.length !== 0) {
           this.setState({
@@ -237,7 +236,6 @@ export class ListOfBarcodes extends Component {
   }
 
   handleviewBarcode(item, index) {
-    console.log({ item });
     this.state.viewBarcodeList.push(item);
     this.setState({ viewBarcodeList: this.state.viewBarcodeList });
     this.setState({ flagViewDetail: true, modalVisible: true, flagdelete: false });
@@ -283,7 +281,7 @@ export class ListOfBarcodes extends Component {
                 <View style={scss.flatListSubContainer}>
                   <View style={scss.textContainer}>
                     <Text style={scss.highText} >SNO: {index + 1} </Text>
-                    <Text style={scss.textStyleMedium}>{item.barcode}</Text>
+                    <Text style={scss.textStyleMedium}>{item.barcode} <Clipbrd data={item.barcode} /> </Text>
                   </View>
                   <View style={scss.textContainer}>
                     <Text style={scss.textStyleLight}>{I18n.t("BARCODE STORE")}: {"\n"}{this.state.storeName} </Text>
@@ -522,8 +520,11 @@ export class ListOfBarcodes extends Component {
                         <ScrollView>
                           <View style={scss.model_subbody}>
                             <View style={scss.model_text_container}>
-                              <Txt variant='titleMedium' selectable={true} style={{ textAlign: 'left' }}>Barcode:{"\n"}{item.barcode}</Txt>
                               <Txt variant='bodyMedium' style={{ textAlign: 'right' }}>HsnCode:{"\n"}{item.hsnCode}</Txt>
+                              <Txt variant='titleLight' style={{ textAlign: 'center' }}>Barcode:{"\n"}
+                                <Clipbrd data={item.barcode} />
+                                {item.barcode}
+                              </Txt>
                             </View>
                             <View style={scss.model_text_container}>
                               <Txt variant='bodyMedium' style={{ textAlign: 'left' }}>BatchNo:{"\n"}{item.batchNo}</Txt>

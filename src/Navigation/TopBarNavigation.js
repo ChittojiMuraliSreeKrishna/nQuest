@@ -6,6 +6,8 @@ import Home from "../components/Home/Home";
 import AccountingNaviagtion from "./AccountingNavigation";
 import CustomerNavigation from "./CustomerNavigation";
 import InventoryNavigation from "./InventoryNavigation";
+import KitchenNavigation from "./KitchenNavigation";
+import MenuNavigation from "./MenuNavigation";
 import NewSaleNavigation from "./NewSaleNavigation";
 import PromoNavigation from "./PromoNavigation";
 import ReportsNavigation from "./ReportsNavigation";
@@ -16,13 +18,30 @@ import UrmNavigation from "./UrmNavigation";
 const Stack = createStackNavigator();
 
 export default class TopBarNavigation extends Component {
-  componentDidMount () {
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      showTable: false
+    }
+  }
+
+  componentDidMount() {
     AsyncStorage.setItem("Home", "isLogged");
   }
-  render () {
+
+
+  updateTable = () => {
+    this.setState({ showTable: true }, () => {
+    })
+  }
+
+  render() {
     return (
       <>
-        <TopBar {...this.props} />
+        <TopBar {...this.props}
+          updateTable={this.updateTable}
+        />
         <Stack.Navigator>
           <Stack.Screen
             name="Blank"
@@ -73,6 +92,18 @@ export default class TopBarNavigation extends Component {
             name="TicketingNavigation"
             options={{ headerShown: false }}
             component={TicketingNavigation}
+          />
+          <Stack.Screen
+            name="KitchenNavigation"
+            options={{ headerShown: false }}
+            component={KitchenNavigation}
+          />
+
+          <Stack.Screen
+            name="MenuNavigation"
+            options={{ headerShown: false }}
+            component={MenuNavigation}
+            showTable={this.state.showTable}
           />
         </Stack.Navigator>
       </>

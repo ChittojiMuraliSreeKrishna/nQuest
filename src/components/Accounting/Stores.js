@@ -62,7 +62,7 @@ export default class Stores extends Component {
   componentDidMount() {
     this.getStoresList();
     this.getMasterStatesList();
-    this.getMasterDistrictsList();
+    // this.getMasterDistrictsList();
     this.props.navigation.addListener('focus', () => {
       this.getStoresList();
     });
@@ -122,7 +122,6 @@ export default class Stores extends Component {
         this.setState({ loading: false });
         if (this.state.flagStore === true) {
           this.setState({ storeError: "Records Not Found" });
-          // alert("There is an Error while Getting Stores");
         }
       });
   }
@@ -134,6 +133,7 @@ export default class Stores extends Component {
     this.setState({ loading: false });
     var states = [];
     UrmService.getStates().then((res) => {
+      console.log({res}, "states")
       if (res.data["result"]) {
         for (var i = 0; i < res.data["result"].length; i++) {
           states.push({
@@ -145,7 +145,7 @@ export default class Stores extends Component {
             console.log("stateId is" + this.state.statesArray[i].name);
             this.setState({ storeState: this.state.statesArray[i].name });
             // this.getMasterDistrictsList();
-            this.getGSTNumber();
+            // this.getGSTNumber();
           }
         }
         this.setState({

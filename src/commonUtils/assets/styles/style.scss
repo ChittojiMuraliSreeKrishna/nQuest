@@ -9,6 +9,33 @@
   margin: 5px 0;
 }
 
+.tableBtn {
+  height: 70px;
+  width: 70px;
+  border: 1px solid $black;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
+  border-radius: 3px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+
+.tableContainer {
+  max-height: 100px;
+}
+
+.tableBody {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .clipboard {
   height: 30px;
   width: 30px;

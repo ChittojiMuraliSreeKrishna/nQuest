@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react';RNPickerSelect
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';

@@ -188,7 +188,6 @@ class GenerateInvoiceSlip extends Component {
       "dsNumber": this.state.dsNumber.trim(),
     };
     this.state.dsNumberList.push(obj);
-    console.log(this.state.dsNumberList)
     const isEsSlipEnabled = await AsyncStorage.getItem('custom:isEsSlipEnabled');
     const isTaxIncluded = await AsyncStorage.getItem('custom:isTaxIncluded');
     if (dayCloseDates.length !== 0) {
@@ -196,39 +195,12 @@ class GenerateInvoiceSlip extends Component {
         if (isEsSlipEnabled === "true") {
           isEstimationEnable = true;
           this.setState({ isEstimationEnable: true });
-          // if (this.state.dsCompareList.length === 0) {
-          //   this.state.dsNumberList2.push(obj);
-          //   this.setState({
-          //     dsCompareList: [...this.state.dsNumberList2],
-          //     dsNumber: this.state.dsNumberList2
-          //   });
-          // } else {
-          //   const isFound = this.state.dsCompareList.find(element => {
-          //     if (element.dsNumber === obj.dsNumber) {
-          //       alert("DS Number Already Exist");
-          //       this.setState({
-          //         dsNumber: '',
-          //       });
-          //       return true;
-          //     }
-          //     return false;
-          //   });
-          //   if (!isFound) {
-          //     this.state.dsNumberList2.push(obj);
-          //     this.state.dsCompareList.push(this.state.dsNumberList2);
-          //     const flattened = this.state.dsCompareList.flatMap(dsNumber => dsNumber);
-          //     this.setState({
-          //       dsCompareList: flattened,
-          //       dsNumber: this.state.dsNumberList2
-          //     });
-          //   }
-          // }
         } else {
           isEstimationEnable = false;
           this.setState({ isEstimationEnable: false });
         }
         CustomerService.getDsSlip(esNumber.trim(), isEstimationEnable, storeId).then((res) => {
-          console.log("data in getDeliverySlipDetails", esNumber, isEstimationEnable, storeId);
+          // console.log("data in getDeliverySlipDetails", esNumber, isEstimationEnable, storeId);
           if (res.data) {
             if (this.state.dsCompareList.length === 0) {
               if (this.state.dsNumber.trim() === res.data.dsNumber) {
@@ -237,7 +209,6 @@ class GenerateInvoiceSlip extends Component {
                   dsCompareList: [...this.state.dsNumberList2],
                   dsNumberList: this.state.dsNumberList2
                 })
-                console.log("dsNumberList1", this.state.dsNumberList)
               }
 
             } else {
@@ -264,7 +235,6 @@ class GenerateInvoiceSlip extends Component {
                     dsNumberList: flattened
                   })
                 }
-                console.log("dsNumberList22", this.state.dsNumberList)
               }
             }
 
@@ -283,7 +253,6 @@ class GenerateInvoiceSlip extends Component {
                 var combineList = {};
 
                 barList.forEach((itm) => {
-                  console.log({ itm })
                   var barCode = itm.barCode;
                   itm.quantity = parseInt(itm.quantity);
                   itm.netValue = parseInt(itm.netValue);
@@ -505,7 +474,7 @@ class GenerateInvoiceSlip extends Component {
     const { storeId } = this.state;
     CustomerService.getDates(storeId).then(res => {
       if (res) {
-        console.log({ res }, res.data)
+        // console.log({ res }, res.data)
         if (res.data.length > 0) {
           this.setState({ dayCloseDates: res.data });
         }
@@ -621,8 +590,8 @@ class GenerateInvoiceSlip extends Component {
     };
     // alert(String(this.state.mrpAmount))
     this.invoiceUpdate();
-    console.log({ obj }, obj.barCodeList, obj.dsNumberList);
-    // this.props.navigation.navigate('TextilePayment', obj);
+    // console.log({ obj });
+    this.props.navigation.navigate('TextilePayment', obj);
   }
 
   invoiceUpdate() {
@@ -661,7 +630,7 @@ class GenerateInvoiceSlip extends Component {
       axios.get(CustomerService.getCustomerMobile() + "/" + obj.phoneNo).then((res) => {
         if (res) {
           const mobileData = res.data.result;
-          console.log({ mobileData }, res.data.result, this.state.barCodeList, obj)
+          // console.log({ mobileData }, res.data.result, this.state.barCodeList, obj)
           this.setState({
             userId: res.data.result.userId, customerFullName: res.data.result.userName, customerTagAllow: true, customerTagging: false
           });
@@ -1082,12 +1051,12 @@ class GenerateInvoiceSlip extends Component {
     let totalAmount = 0;
     let totalqty = 0;
     const qtyarr = [...this.state.barCodeList]
-    console.log({ qtyarr })
+    // console.log({ qtyarr })
     this.state.barCodeList.forEach(barCode => {
       totalAmount = parseInt(barCode.itemMrp) * parseInt(barCode.qty);
       totalqty = parseInt(totalqty) + parseInt(barCode.qty);
     });
-    console.log({ totalAmount, totalqty })
+    // console.log({ totalAmount, totalqty })
     this.setState({ mrpAmount: totalAmount, totalQuantity: totalqty }
     );
   }
@@ -1273,8 +1242,10 @@ class GenerateInvoiceSlip extends Component {
                             {"\n"}
                             <Text style={scss.textStyleMedium}>₹ {parseFloat(item.itemPrice).toFixed(2)}</Text>
                           </Text>
-                          <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("Pro Disc")}{"\n"}<Text style={[scss.textStyleMedium, { color: '#2ADC09', }]}>₹{(item.totalPromoDiscount) ? parseFloat(item.totalPromoDiscount).toFixed(2) : 0.0}</Text></Text>
-                          <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("Dist Discount")}{"\n"}<Text style={[scss.textStyleMedium, { color: '#2ADC09', }]}>₹{(item.distributedPromoDiscount) ? parseFloat(item.distributedPromoDiscount).toFixed(2) : 0.0}</Text></Text>
+                          {!this.state.isEstimationEnable &&(<Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("Discount")}{"\n"}<Text style={[scss.textStyleMedium, { color: '#2ADC09', }]}>₹{(item.itemDiscount) ? parseFloat(item.itemDiscount).toFixed(2) : 0.0}</Text></Text>)}
+                          {this.state.isEstimationEnable &&(<Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("ES Discount")}{"\n"}<Text style={[scss.textStyleMedium, { color: '#2ADC09', }]}>₹{(item.promoDiscount) ? parseFloat(item.promoDiscount).toFixed(2) : 0.0}</Text></Text>)}
+                          {this.state.isEstimationEnable &&(<Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("Pro Disc")}{"\n"}<Text style={[scss.textStyleMedium, { color: '#2ADC09', }]}>₹{(item.totalPromoDiscount) ? parseFloat(item.totalPromoDiscount).toFixed(2) : 0.0}</Text></Text>)}
+                          {this.state.isEstimationEnable &&( <Text style={[scss.textStyleLight, { textAlign: 'right' }]}>{I18n.t("Dist Discount")}{"\n"}<Text style={[scss.textStyleMedium, { color: '#2ADC09', }]}>₹{(item.distributedPromoDiscount) ? parseFloat(item.distributedPromoDiscount).toFixed(2) : 0.0}</Text></Text>)}
                         </View>
                         <View style={scss.flatListFooter}>
                           <Text style={scss.footerText}>{I18n.t("GROSS")} :

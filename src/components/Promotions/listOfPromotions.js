@@ -18,6 +18,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import Modal from "react-native-modal";
 import RNPickerSelect from "react-native-picker-select";
 import { Chevron } from "react-native-shapes";
+import Clipbrd from "../../commonUtils/Clipboard";
 import Loader from "../../commonUtils/loader";
 import LoginService from "../services/LoginService";
 import PromotionsService from "../services/PromotionsService";
@@ -347,7 +348,7 @@ class ListOfPromo extends Component {
                     color: "#353C40",
                   }}
                 >
-                  {String(item.promotionName)}
+                  {String(item.promotionName)} <Clipbrd data={item.promotionName} />
                 </Text>
 
                 <Text

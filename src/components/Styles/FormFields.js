@@ -58,6 +58,22 @@ export const inputHeading = {
 
 export const rnPickerContainer = {
   justifyContent: "center",
+  margin: '5%',
+  height: RH(45),
+  // marginTop: RH(5),
+  // marginBottom: RH(5),
+  borderColor: "#d6d6d6",
+  borderRadius: 3,
+  backgroundColor: color.light,
+  // borderWidth: 1,
+  fontFamily: "regular",
+  // paddingLeft: RW(13),
+  fontSize: RF(14),
+  width: '92%',
+};
+
+export const rnPickerContainerHalf = {
+  justifyContent: "center",
   margin: '4%',
   height: RH(45),
   marginTop: RH(5),
@@ -69,8 +85,9 @@ export const rnPickerContainer = {
   fontFamily: "regular",
   // paddingLeft: RW(13),
   fontSize: RF(14),
-  width: '92%',
+  width: '42%',
 };
+
 
 export const rnPicker = {
   placeholder: {
@@ -92,7 +109,7 @@ export const rnPicker = {
     justifyContent: "center",
     height: Device.isTablet ? 52 : 42,
     borderRadius: 3,
-    // borderWidth: 1,
+    borderWidth: 1,
     fontFamily: "regular",
     fontSize: RF(14),
     borderColor: color.border,
@@ -203,8 +220,8 @@ export const cancelBtnText = {
 
 export const dateSelector = {
   width: deviceWidth - RW(40),
-  // marginLeft: RW(20),
-  // marginRight: RW(20),
+  marginLeft: RW(20),
+  marginRight: RW(20),
   // marginTop: RH(10),
   // marginBottom: RH(10),
   borderWidth: RW(1),

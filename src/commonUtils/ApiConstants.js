@@ -39,9 +39,11 @@ export const INVENTORY_PORTAL = {
   getTextileBarcodes: "/inventory/inventory-management/barcodes/filter",
   getAllProductBundleList: "/inventory/productBundle/all",
   getAllDivisions: "/inventory/catalog/divisions",
+  getAllItems: "/inventory/inventory-management/items",
   getAllUOMs: "/inventory/uom/list",
   getAllSections: "/inventory/catalog/category",
   getAllCategories: "/inventory/catalog/categories",
+  getAllCategory: "/inventory/catalog/category",
   getAllHsnList: "/hsn-details/hsn-details/getHsnDetails",
   getStoreNamesByIds: "/user-management/store/storeList",
   updatTextileBarcodes: "/inventory/inventory-management/product",
@@ -50,6 +52,7 @@ export const INVENTORY_PORTAL = {
   updateBarcodesQuntity: "/inventory/inventory-management/product-qty",
   getTextileBarcodeDetails: "/inventory/inventory-management/barcode",
   deleteTextileBarcode: "/inventory/inventory-management/product",
+  kitchenItemStatus: "/inventory/inventory-management/item-status",
 };
 
 export const BILLING_PORTAL = {
@@ -115,5 +118,23 @@ export const REPORTS_URL = {
   invoicesGenerated: "/new-sale/reports/InvoicesGenerated",
   topFiveSales: "/new-sale/reports/getTopfiveSalesByStore",
   activeIactivePromos: "/connection-pool/promo/activeVSinactivepromos",
-  saleSummary: "/new-sale/reports/getsaleSummery"
+  saleSummary: "/new-sale/reports/getsaleSummery",
+
+  // OrderHistory Resrtaurants
+  orderHistory: "/new-sale/newsale/order-details",
+};
+
+// Menu CAtegory
+export const menuCategoryService = {
+  getAllTables: "/new-sale/newsale/list",
+  saveTable: "/new-sale/newsale/create-table-room",
+  editTable: "/new-sale/newsale/edit-table-room",
+  bookTable: "/new-sale/newsale/table",
+  getTableList: "/new-sale/newsale/table",
+  billTable: "/new-sale/newsale/edit-table",
+  payTable: "/new-sale/newsale/sale",
+  shiftTable: "/new-sale/newsale/item-table",
+  menuOrders: "/new-sale/newsale/table-items",
+  updateOrders: "/new-sale/newsale/lineitem",
+  viewOrder: "/new-sale/newsale/order-view",
 };

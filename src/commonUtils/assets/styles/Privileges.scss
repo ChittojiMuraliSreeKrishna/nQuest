@@ -1,4 +1,5 @@
 @import "./Colors.scss";
+
 .handle_btns {
   height: 40px;
   width: 100%;
@@ -17,7 +18,7 @@
   text-align: justify;
 }
 
-.section_headers{
+.section_headers {
   // padding: 2px 10px;
   font-size: 16px;
   color: $primary-color;
@@ -32,10 +33,35 @@
   // background-color: $white;
   // color: $grey-darker;
 }
+
 .sub_item {
   padding: 15px;
   font-size: 14px;
   height: 40px;
   background-color: $grey-dark;
   color: $white;
+}
+
+.webPrivActBtn {
+  background-color: $primary-color;
+  border-color: $black;
+  border-right-width: 1px;
+  border-bottom: 1px solid $primary-color;
+}
+
+.webPrivInActBtn {
+  background-color: $grey;
+  border-color: $black;
+}
+
+.mobilePrivActBtn {
+  background-color: $primary-color;
+  border-color: $black;
+  border-left-width: 1px;
+  border-bottom: 1px solid $primary-color;
+}
+
+.mobilePrivInActBtn {
+  background-color: $grey;
+  border-color: $black;
 }

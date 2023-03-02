@@ -119,7 +119,8 @@ class EditBarcode extends Component {
       size: "",
       alist: [],
       selectedValue: "",
-      selectedDValue: ""
+      selectedDValue: "",
+      storeName: "",
     };
   }
 
@@ -169,6 +170,7 @@ class EditBarcode extends Component {
         empId: editBcode.item.empId,
         storeId: editBcode.item.storeId,
         store: editBcode.item.storeId,
+        storeName: editBcode.item.storeName,
         quantity: String(editBcode.item.qty),
         productTextileId: editBcode.item.productTextileId,
         barcodeTextileId: editBcode.item.barcodeTextileId,
@@ -183,6 +185,7 @@ class EditBarcode extends Component {
         alist: editBcode.item.metadata,
       },
       () => {
+        // alert(this.state.storeId)
         if (editBcode.item.metadata.length > 0) {
           this.setState({
             selectedValue: editBcode.item.metadata[0].selectedValue,
@@ -554,6 +557,7 @@ class EditBarcode extends Component {
               )}
             </View>
           )}
+
           {this.state.selectedDomain === "Retail" && ( // For Retail Domain only
             <View>
               <Text style={inputHeading}>
@@ -802,10 +806,15 @@ class EditBarcode extends Component {
           <Text style={inputHeading}>
             {I18n.t("Store")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
-          <RnPicker
-            items={this.state.storesList}
-            setValue={this.handleStore}
-          />
+          <TextInput
+                editable={false}
+                style={[
+                  forms.inactive_fld,
+                  forms.input_fld
+                ]}
+                placeholder="Store"
+                value={this.state.storeName}
+              />
           {!storeValid && (
             <Message imp={true} message={this.state.errors["store"]} />
           )}

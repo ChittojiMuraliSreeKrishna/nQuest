@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import Device from "react-native-device-detection";
 import I18n from "react-native-i18n";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Modal from "react-native-modal";
@@ -15,6 +14,7 @@ import { Text, TextInput } from "react-native-paper";
 import IconFA from 'react-native-vector-icons/FontAwesome';
 import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconMAA from 'react-native-vector-icons/MaterialIcons';
+import Device from "react-native-device-detection";
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from "../../commonUtils/assets/styles/style.scss";
 import Clipbrd from "../../commonUtils/Clipboard";

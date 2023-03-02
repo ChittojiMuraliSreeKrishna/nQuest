@@ -1,4 +1,3 @@
-import { createStackNavigator } from "@react-navigation/stack";
 import React, { Component } from "react";
 import { BackHandler } from "react-native";
 import AddCustomer from '../components/CustomerPortal/AddCustomer';
@@ -7,11 +6,13 @@ import GenerateEstimationSlip from "../components/CustomerPortal/GenerateEstimat
 import GenerateInvoiceSlip from "../components/CustomerPortal/GenerateInvoiceSlip";
 import GenerateReturnSlip from '../components/CustomerPortal/GenerateReturnSlip';
 import GiftVoucher from '../components/CustomerPortal/GiftVocher';
+import Invoice from "../components/CustomerPortal/Invoice";
 import LoyaltyPoints from "../components/CustomerPortal/LoyaltyPoints";
 import TextilePayment from "../components/CustomerPortal/TextilePayment";
 import Blank from "../components/Home/Blank";
 import ScanBarCode from "../components/Newsale/ScanBarCode";
 
+import { createStackNavigator } from "@react-navigation/stack";
 const Stack = createStackNavigator();
 export default class CustomerNavigation extends Component {
 
@@ -19,6 +20,7 @@ export default class CustomerNavigation extends Component {
   componentDidMount () {
     const backHandler = BackHandler.addEventListener("hardwareBackPress", this.backAction());
     return () => backHandler.remove();
+    alert("hey");
   }
 
   backAction () {
@@ -78,6 +80,11 @@ export default class CustomerNavigation extends Component {
             name="ScanBarCode"
             options={{ headerShown: false }}
             component={ScanBarCode}
+          />
+          <Stack.Screen
+            name="Invoice"
+            options={{ headerShown: false }}
+            component={Invoice}
           />
         </Stack.Navigator>
       </>

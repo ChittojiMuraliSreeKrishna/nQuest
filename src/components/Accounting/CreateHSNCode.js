@@ -6,10 +6,14 @@ import {
 import IconFA from 'react-native-vector-icons/FontAwesome';
 import IconMA from 'react-native-vector-icons/Ionicons';
 import scss from "../../commonUtils/assets/styles/style.scss";
+import forms from '../../commonUtils/assets/styles/formFields.scss'
 import { formatDate } from "../../commonUtils/DateFormate";
 import Loader from "../../commonUtils/loader";
 import AccountingService from "../services/AccountingService";
 import { listEmptyMessage, textStyleLight } from "../Styles/Styles";
+import Modal from 'react-native-modal';
+import { TouchableOpacity } from "react-native";
+import Clipbrd from "../../commonUtils/Clipboard";
 var deviceWidth = Dimensions.get("window").width;
 
 export default class CreateHSNCode extends Component {
@@ -21,6 +25,8 @@ export default class CreateHSNCode extends Component {
       hsnList: [],
       loading: false,
       isFetching: false,
+      viewData: {},
+      viewModal: false
     };
   }
 
@@ -81,6 +87,14 @@ export default class CreateHSNCode extends Component {
     this.getAllHsnCode();
   }
 
+  handleViewHSN(item) {
+    this.setState({ viewModal: true, viewData: item })
+  }
+
+  handleModelView() {
+    this.setState({ viewData: {}, viewModal: false });
+  }
+
   render() {
     return (
       <View>
@@ -132,10 +146,10 @@ export default class CreateHSNCode extends Component {
                       {formatDate(item.createdDate)}
                     </Text>
                     <IconFA
-                      name="edit"
+                      name="eye"
                       size={20}
                       style={scss.action_icons}
-                      onPress={() => this.handleeditHsn(item, index)}
+                      onPress={() => this.handleViewHSN(item)}
                     ></IconFA>
                   </View>
                 </View>
@@ -143,6 +157,46 @@ export default class CreateHSNCode extends Component {
             </ScrollView>
           )}
         />
+        {this.state.viewModal && (
+          <Modal style={{ margin: 0 }} isVisible={this.state.viewModal}
+            onBackButtonPress={() => this.handleModelView()}
+            onBackdropPress={() => this.handleModelView()}
+          >
+            <View style={forms.filterModelContainer}>
+              <Text style={forms.popUp_decorator}>-</Text>
+              <View style={forms.filterModelSub}>
+                <View style={scss.textContainer}>
+                  <Text style={scss.highText}>HSN Code : {this.state.viewData.hsnCode}{"  "}  <Clipbrd data={this.state.viewData.hsnCode} /> </Text>
+                </View>
+                <View style={scss.textContainer}>
+                  <Text style={scss.textStyleLight}> GOODS/SERVICES:
+                    <Text style={scss.textStyleMedium}>
+                      {"\n"}
+                      {this.state.viewData.description}
+                    </Text>
+                  </Text>
+                  <Text style={scss.textStyleLight}>
+                    Domain: {"\n"}
+                    {this.state.viewData.domainType}
+                  </Text>
+                </View>
+                <View style={scss.textContainer}>
+                  <Text style={scss.textStyleLight}> TAX APPLICABLE: {"\n"}
+                    {this.state.viewData.taxAppliesOn}
+                  </Text>
+                  <Text style={scss.textStyleLight}>
+                    TAX APPLICABLE TYPE: {"\n"}
+                    {this.state.viewData.taxAppliedType}
+                  </Text>
+                </View>
+              </View>
+              <TouchableOpacity style={forms.close_full_btn} onPress={() => this.handleModelView()}>
+                <Text style={forms.cancel_btn_text}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
+        )
+        }
       </View>
     );
   }

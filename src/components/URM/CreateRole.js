@@ -21,6 +21,9 @@ import {
   inputHeading
 } from "../Styles/FormFields";
 import IconAD from 'react-native-vector-icons/AntDesign'
+import RNPickerSelect from "react-native-picker-select";
+import { Chevron } from "react-native-shapes";
+
 
 var deviceWidth = Dimensions.get("window").width;
 
@@ -457,7 +460,7 @@ export default class CreateRole extends Component {
               />
             </ScrollView>
           )}
-          
+
           <View style={styles.messageContainer}>
             <Text style={styles.message}>
               {I18n.t(

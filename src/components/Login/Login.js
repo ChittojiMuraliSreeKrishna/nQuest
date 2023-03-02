@@ -53,6 +53,8 @@ export default class Login extends Component {
     };
   }
 
+
+
   handleEmail = (text) => {
     this.setState({ userName: text });
   };
@@ -77,12 +79,12 @@ export default class Login extends Component {
     this.setState({ store: value });
   };
 
-  registerClient() {
+  registerClient () {
     // console.log('adsadasdd');
     this.props.navigation.navigate("RegisterClient");
   }
 
-  validationForm() {
+  validationForm () {
     let isFormValid = true;
     let errors = {};
 
@@ -100,14 +102,14 @@ export default class Login extends Component {
     this.setState({ errors: errors });
     return isFormValid;
   }
-  clearAllData() {
+  clearAllData () {
     AsyncStorage.clear();
     AsyncStorage.getAllKeys()
       .then(keys => AsyncStorage.multiRemove(keys));
 
   }
 
-  async login() {
+  async login () {
     const isFormValid = this.validationForm();
     const { userName, password } = this.state;
     if (isFormValid) {
@@ -142,7 +144,7 @@ export default class Login extends Component {
                 .then(() => { })
                 .catch(() => {
                   this.setState({ loading: false });
-                  console.log("there is an error saving userId");
+                  console.error("there is an error saving userId");
                 });
               AsyncStorage.setItem(
                 "rolename",
@@ -151,7 +153,7 @@ export default class Login extends Component {
                 .then(() => { })
                 .catch(() => {
                   this.setState({ loading: false });
-                  console.log("There is error saving domainDataId");
+                  console.error("There is error saving domainDataId");
                 });
               AsyncStorage.setItem(
                 "phone_number",
@@ -160,7 +162,7 @@ export default class Login extends Component {
                 .then(() => { })
                 .catch((err) => {
                   this.setState({ loading: false });
-                  console.log({ err });
+                  console.error({ err });
                 });
               AsyncStorage.setItem(
                 "custom:clientId1",
@@ -187,7 +189,7 @@ export default class Login extends Component {
                 .then(() => { })
                 .catch(() => {
                   this.setState({ loading: false });
-                  console.log("There is error saving isEsSlipEnabled");
+                  console.error("There is error saving isEsSlipEnabled");
                 });
               AsyncStorage.setItem(
                 "custom:isTaxIncluded",
@@ -196,7 +198,7 @@ export default class Login extends Component {
                 .then(() => { })
                 .catch(() => {
                   this.setState({ loading: false });
-                  console.log("There is error saving isTaxIncluded");
+                  console.error("There is error saving isTaxIncluded");
                 });
               AsyncStorage.setItem(
                 "roleType",
@@ -205,7 +207,7 @@ export default class Login extends Component {
               let storesAssigned = jwt_decode(token)["custom:assignedStores"];
 
               AsyncStorage.getItem("roleType").then((value) => {
-                console.log("Roles", value);
+                // console.log("Roles", value);
                 if (value) {
                   if (value === "super_admin") {
                     this.getAdminStores();
@@ -225,7 +227,7 @@ export default class Login extends Component {
                         store.push(obj);
                       }
                     });
-                    console.log({ store });
+                    // console.log({ store });
                     this.setState({ loading: false });
                     this.setState({ assignedStores: store }, () => {
                       this.getStores();
@@ -247,8 +249,8 @@ export default class Login extends Component {
                   userName: this.state.userName,
                   password: this.state.password,
                 });
-                console.log(this.state.sessionData);
-                console.log(this.state.roleName);
+                // console.log(this.state.sessionData);
+                // console.log(this.state.roleName);
               }
             }
             this.setState({ userName: "", password: "" });
@@ -264,9 +266,9 @@ export default class Login extends Component {
     }
   }
 
-  getAdminStores() {
+  getAdminStores () {
     LoginService.getUserStores().then((res) => {
-      console.log("getting Stores", res);
+      // console.log("getting Stores", res);
       if (res.data.length > 1) {
         this.props.navigation.push("SelectStore");
       } else {
@@ -290,19 +292,19 @@ export default class Login extends Component {
     });
   }
 
-  async getStores() {
+  async getStores () {
     let userId = await AsyncStorage.getItem("userId");
     LoginService.getSelectStores(userId).then((res) => {
-      console.warn("storeStatus", res.status);
+      // console.warn("storeStatus", res.status);
       if (res?.data) {
         let storeData = res.data;
-        console.log({ storeData });
+        // console.log({ storeData });
         if (storeData.length > 1) {
           this.props.navigation.navigate("SelectStore");
           let userId = AsyncStorage.getItem("userId");
           LoginService.getAllClient(userId).then(res => {
-            console.log({ res })
-          })
+            // console.log({ res })
+          });
         } else {
           const storeId = String(storeData[0].id);
           const storeName = String(storeData[0].name);
@@ -322,13 +324,13 @@ export default class Login extends Component {
     });
   }
 
-  forgotPassword() {
+  forgotPassword () {
     this.props.navigation.navigate("ForgotPassword", {
       username: this.state.userName,
     });
   }
 
-  componentDidMount() {
+  componentDidMount () {
     // this.refresh()
     this.clearAllData();
   }
@@ -346,7 +348,7 @@ export default class Login extends Component {
   };
 
 
-  render() {
+  render () {
     const userValid = this.state.userValid;
     const passValid = this.state.passwordValid;
     return (

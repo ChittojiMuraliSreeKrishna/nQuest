@@ -64,17 +64,9 @@ export class ListOfEstimationSlip extends Component {
     };
   }
 
-  componentDidMount() {
-    AsyncStorage.getItem("storeId").then((value) => {
-      storeStringId = value;
-      this.setState({ storeId: parseInt(storeStringId) });
-      console.log(this.state.storeId);
-    }).catch(() => {
-      this.setState({ loading: false });
-      console.log('There is error getting storeId');
-      //  alert('There is error getting storeId');
-    });
-
+  async componentDidMount() {
+    const storeId = await AsyncStorage.getItem("storeId");
+    this.setState({ storeId: storeId });
   }
 
   filterAction() {
@@ -87,7 +79,6 @@ export class ListOfEstimationSlip extends Component {
   }
 
   handleviewEstimationSlip(item, index) {
-    console.log({ item });
     this.state.viewEstimationsSlipList.push(item);
     this.setState({ viewEstimationsSlipList: this.state.viewEstimationsSlipList, flagViewDetail: true });
   }
@@ -174,7 +165,7 @@ export class ListOfEstimationSlip extends Component {
       dsNumber: this.state.dsNumber,
       storeId: this.state.storeId,
     };
-    console.log('params are' + JSON.stringify(obj));
+    // console.log('params are' + JSON.stringify(obj));
     this.setState({ loading: true, loadMoreActive: false });
     let pageNumber = 0;
     ReportsService.estimationSlips(obj, this.state.pageNo).then((res) => {
@@ -187,7 +178,7 @@ export class ListOfEstimationSlip extends Component {
         } else {
           alert("records not found");
         }
-        console.log(this.props.estimationSlip);
+        // console.log(this.props.estimationSlip);
       }
       else {
         alert(res.data.message);

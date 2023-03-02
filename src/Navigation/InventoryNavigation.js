@@ -3,27 +3,30 @@ import React, { Component } from "react";
 import { BackHandler } from "react-native";
 import Blank from '../components/Home/Blank';
 import AddBarcode from "../components/Inventory/AddBarcode";
+import AddItemList from "../components/Inventory/AddItemList";
 import AddProductCombo from "../components/Inventory/AddProductCombo";
 import Barcode from "../components/Inventory/Barcode";
 import EditBarcode from "../components/Inventory/EditBarcode";
 import GoodsTransfer from "../components/Inventory/GoodsTransfer";
+import ItemList from "../components/Inventory/ItemList";
 import OrderShipment from "../components/Inventory/OrderShipment";
 import ProductCombo from "../components/Inventory/ProductCombo";
 import ReBarcode from "../components/Inventory/ReBarcode";
 import RecieveOrder from "../components/Inventory/RecieveOrder";
+import TableManageMent from "../components/Inventory/TableManageMent";
 const Stack = createStackNavigator();
 export default class InventoryNavigation extends Component {
 
-  componentDidMount () {
+  componentDidMount() {
     const backHandler = BackHandler.addEventListener("hardwareBackPress", this.backAction());
     return () => backHandler.remove();
   }
 
-  backAction () {
+  backAction() {
     return true;
   }
 
-  render () {
+  render() {
     return (
       <>
         <Stack.Navigator initialRouteName="Blank">
@@ -48,32 +51,29 @@ export default class InventoryNavigation extends Component {
             component={ProductCombo}
           />
           <Stack.Screen
-            name="AddBarcode"
-            options={{ headerShown: false }}
-            component={AddBarcode}
-          />
-          <Stack.Screen
             name="Receive Order"
             options={{ headerShown: false }}
             component={RecieveOrder}
-          /><Stack.Screen
+          />
+          <Stack.Screen
             name="Goods Transfer"
             options={{ headerShown: false }}
             component={GoodsTransfer}
-          /><Stack.Screen
+          />
+          <Stack.Screen
             name="Order Shipment"
             options={{ headerShown: false }}
             component={OrderShipment}
           />
           <Stack.Screen
-            name="EditBarcode"
+            name="Item List"
             options={{ headerShown: false }}
-            component={EditBarcode}
+            component={ItemList}
           />
           <Stack.Screen
-            name="AddProduct"
+            name="Table Management"
             options={{ headerShown: false }}
-            component={AddProductCombo}
+            component={TableManageMent}
           />
         </Stack.Navigator>
       </>

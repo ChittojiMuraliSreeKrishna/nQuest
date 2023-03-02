@@ -7,6 +7,7 @@ import { ListOfBarcodes } from "../components/Reports/ListOfBarcodes";
 import { ListOfEstimationSlip } from '../components/Reports/ListOfEstimationSlip';
 import { ListOfPromotions } from "../components/Reports/ListOfPromotions";
 import NewSaleReport from "../components/Reports/NewSaleReport";
+import OrderHistory from "../components/Reports/OrderHistory";
 import ReportsDashboard from "../components/Reports/ReportsDashboard";
 import { SalesSumary } from "../components/Reports/SalesSumary";
 import TaxReport from "../components/Reports/TaxReport";
@@ -14,16 +15,16 @@ import TaxReport from "../components/Reports/TaxReport";
 const Stack = createStackNavigator();
 export default class ReportsNavigation extends Component {
 
-  componentDidMount () {
+  componentDidMount() {
     const backHandler = BackHandler.addEventListener("hardwareBackPress", this.backAction());
     return () => backHandler.remove();
   }
 
-  backAction () {
+  backAction() {
     return true;
   }
 
-  render () {
+  render() {
     return (
       <>
         <Stack.Navigator initialRouteName="Blank">
@@ -71,6 +72,11 @@ export default class ReportsNavigation extends Component {
             name="List of Estimation Slips"
             options={{ headerShown: false }}
             component={ListOfEstimationSlip}
+          />
+          <Stack.Screen
+            name="Order History"
+            options={{ headerShown: false }}
+            component={OrderHistory}
           />
         </Stack.Navigator>
       </>

@@ -1,17 +1,16 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from 'react-native-modal';
 import { Appbar, Text as Txt, TextInput } from 'react-native-paper';
-import RNPickerSelect from 'react-native-picker-select';
-import { Chevron } from 'react-native-shapes';
 import IconFA from 'react-native-vector-icons/FontAwesome';
 import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
 import forms from '../../commonUtils/assets/styles/formFields.scss';
 import scss from '../../commonUtils/assets/styles/style.scss';
+import Clipbrd from '../../commonUtils/Clipboard';
 import { dateFormat, formatDate, formatMonth } from '../../commonUtils/DateFormate';
 import DateSelector from '../../commonUtils/DateSelector';
 import RnPicker from '../../commonUtils/RnPicker';
@@ -80,16 +79,8 @@ export default class NewSaleReport extends Component {
   }
 
   async componentDidMount() {
-    await AsyncStorage.getItem("storeId").then((value) => {
-      storeStringId = value;
-      this.setState({ storeId: value });
-      console.log({ storeStringId });
-
-    }).catch(() => {
-      this.setState({ loading: false });
-      console.log('There is error getting storeId');
-      //  alert('There is error getting storeId');
-    });
+    const storeId = await AsyncStorage.getItem("storeId");
+    this.setState({ storeId: storeId });
   }
 
   filterAction() {
@@ -126,16 +117,14 @@ export default class NewSaleReport extends Component {
         storeId: this.state.storeId,
         domainId: this.state.domainId
       };
-      console.log('params are' + JSON.stringify(obj));
+      // console.log('params are' + JSON.stringify(obj));
       let pageNumber = 0;
       ReportsService.newSaleReports(obj, this.state.pageNo).then((res) => {
-        console.log(res.data.result);
         if (res.data && res.data["isSuccess"] === "true") {
           if (res.data.result.length !== 0) {
-            this.setState({ newSale: res.data.result.newSale.content, filterActive: true });
-            this.modelCancel();
-            console.log(this.state.newSale);
+            this.setState({ newSale: res.data.result.newSale.content, totalPages: res.data.result.newSale.totalPages, filterActive: true });
             this.continuePagination();
+            this.modelCancel();
           } else {
             alert("records not found");
           }
@@ -158,7 +147,7 @@ export default class NewSaleReport extends Component {
   loadMoreList = (value) => {
     if (value >= 0 && value < this.state.totalPages) {
       this.setState({ pageNo: value }, () => {
-        this.applyListPromotions();
+        this.getSaleBills();
         if (this.state.pageNo === (this.state.totalPages - 1)) {
           this.setState({ loadNextActive: false });
         } else {
@@ -188,8 +177,6 @@ export default class NewSaleReport extends Component {
   }
 
   handleviewNewSale(item, index) {
-    console.log({ item });
-    console.log(item.lineItemsReVo);
     this.state.viewNewsSaleList.push(item);
     this.setState({ flagViewDetail: true, modalVisible: true, flagDeleteNewSale: false, viewNewsSaleList: this.state.viewNewsSaleList });
   }
@@ -302,7 +289,7 @@ export default class NewSaleReport extends Component {
                 <View style={scss.flatListSubContainer}>
                   <View style={scss.textContainer}>
                     <Text style={scss.highText} >S.NO: {index + 1} </Text>
-                    <Text style={scss.textStyleMedium}>INVOICE NUMBER:{"\n"} {item.invoiceNumber}</Text>
+                    <Text style={scss.textStyleMedium}>INVOICE NUMBER:{"\n"} {item.invoiceNumber} <Clipbrd data={item.invoiceNumber} /> </Text>
                   </View>
                   <View style={scss.textContainer}>
                     <Text style={scss.textStyleLight}>{I18n.t("EMP ID")}: {item.empId} </Text>
@@ -543,7 +530,7 @@ export default class NewSaleReport extends Component {
                     renderItem={({ item, index }) => (
                       <View style={{ backgroundColor: '#FFF' }}>
                         <View style={scss.model_text_container}>
-                          <Txt style={{ textAlign: 'left' }} variant='titleMedium' selectable={true} key={Math.random()}>Memo.no:{"\n"}{item.invoiceNumber}</Txt>
+                          <Txt style={{ textAlign: 'left' }} variant='titleMedium' key={Math.random()}>Memo.no:{"\n"}{item.invoiceNumber} <Clipbrd data={item.invoiceNumber} /> </Txt>
                           <Txt style={{ textAlign: 'right' }} variant='bodyLarge'>Customer:{"\n"}{item.customerName}</Txt>
                         </View>
                         <View style={scss.model_text_container}>

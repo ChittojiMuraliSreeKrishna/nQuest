@@ -53,11 +53,9 @@ export default class AddStore extends Component {
       domain: "",
       clientId: 0,
       userId: 0,
-      statesArray: [],
       states: [],
       stateId: 0,
       statecode: "",
-      dictrictArray: [],
       dictricts: [],
       districtId: 0,
       domainsArray: [],
@@ -84,13 +82,14 @@ export default class AddStore extends Component {
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     const userId = await AsyncStorage.getItem("userId");
     console.log(userId);
-    this.setState({ clientId: clientId, userId: userId });
+    this.setState({ clientId: clientId, userId: userId, loading: true });
     this.setState({ isEdit: this.props.route.params.isEdit });
     if (this.state.isEdit === true) {
       const storeItem = this.props.route.params.item;
       console.log({ storeItem });
       console.log(storeItem.stateCode, "codeState");
       this.setState({
+        loading: true,
         stateId: storeItem.stateId,
         statecode: storeItem.stateCode,
         storeState: storeItem.stateCode,
@@ -115,6 +114,10 @@ export default class AddStore extends Component {
       this.getMasterStatesList();
     }
     console.log("storeStaet", this.state.storeState, this.state.districtId);
+    setTimeout(() => {
+      this.setState({loading: false})
+    }, 5000);
+
     // this.getDomainsList();
   }
 
@@ -136,8 +139,7 @@ export default class AddStore extends Component {
   }
 
   getMasterStatesList() {
-    this.setState({ states: [] });
-    this.setState({ loading: false });
+    this.setState({ states: [], loading: true });
     var states = [];
     UrmService.getStates().then((res) => {
       console.log(res.data);
@@ -149,15 +151,19 @@ export default class AddStore extends Component {
           });
           this.setState({
             states: states,
+            loading: false
           });
         }
-        this.setState({ statesArray: this.state.statesArray });
+      }
+      if(this.state.isEdit) {
+        this.state.states.push({"selectedValue": this.state.stateId})
+        this.setState({states: this.state.states})
       }
       console.log(this.state.states, "states");
     });
   }
   handleStoreState = (value) => {
-    if (!this.state.isEdit) {
+    if(value){
       this.setState({ storeState: value, statecode: value }, () => {
         console.log({ value });
         console.log(this.state.statecode, "yktld", this.state.storeState);
@@ -169,10 +175,9 @@ export default class AddStore extends Component {
 
   // Store Districts
   getMasterDistrictsList(id) {
-    this.setState({ loading: false, dictricts: [], dictrictArray: [] });
+    this.setState({dictricts: [], loading: true });
     UrmService.getDistricts(id).then((res) => {
       if (res.data["result"]) {
-        this.setState({ loading: false });
         let dictricts = [];
         for (var i = 0; i < res.data["result"].length; i++) {
           dictricts.push({
@@ -182,8 +187,12 @@ export default class AddStore extends Component {
           console.log({ dictricts });
           this.setState({
             dictricts: dictricts,
+            loading: false
           });
-          this.setState({ dictrictArray: this.state.dictrictArray });
+          if(this.state.isEdit){
+            this.state.dictricts.push({"selectedValue": this.state.districtId})
+            this.setState({dictricts: this.state.dictricts})
+          }
         }
       }
     });
@@ -195,12 +204,15 @@ export default class AddStore extends Component {
   };
 
   handleBackButtonClick() {
+    this.setState({loading: true})
     this.props.navigation.goBack(null);
+    this.props.route.params.onGoBack(null);
     return true;
   }
 
   cancel() {
     this.props.navigation.goBack(null);
+    this.props.route.params.onGoBack(null);
     return true;
   }
 
@@ -349,11 +361,10 @@ export default class AddStore extends Component {
               this.setState({ loading: true })
             } else {
               this.setState({ loading: false });
-              alert(res.data.message);
+              // alert(res.data.message);
             }
           })
           .catch(() => {
-            this.setState({ loading: false });
             this.setState({ loading: false });
             alert("There is an Error while Saving The Store");
           });
@@ -386,7 +397,6 @@ export default class AddStore extends Component {
             }
           })
           .catch(() => {
-            this.setState({ loading: false });
             this.setState({ loading: false });
             alert("There is an Error while Saving the Store");
           });
@@ -428,8 +438,10 @@ export default class AddStore extends Component {
           </Text>
           <RnPicker
             items={this.state.states}
-            disabled={this.state.isEdit ? true : false}
             setValue={this.handleStoreState}
+            editValue={this.state.storeState}
+            isEdit={this.state.isEdit}
+            disabled={this.state.isEdit ? true : false}
           />
           {!stateValid && (
             <Message imp={true} message={this.state.errors["state"]} />
@@ -437,34 +449,13 @@ export default class AddStore extends Component {
           <Text style={inputHeading}>
             {I18n.t("District")} <Text style={{ color: "#aa0000" }}>*</Text>
           </Text>
-          <View
-            style={[
-              rnPickerContainer,
-              { borderColor: districtValid ? "#8F9EB717" : "#dd0000" },
-            ]}
-          >
-            <RNPickerSelect
-              // style={Device.isTablet ? styles.rnSelect_tablet : styles.rnSelect_mobile}
-              placeholder={{
-                label: "DISTRICT",
-              }}
-              Icon={() => {
-                return (
-                  <Chevron
-                    style={styles.imagealign}
-                    size={1.5}
-                    color={districtValid ? "gray" : "#dd0000"}
-                  />
-                );
-              }}
-              items={this.state.dictricts}
-              onValueChange={(value) => this.handleDistrict(value)}
-              disabled={this.state.isEdit ? true : false}
-              style={districtValid ? isEdit ? rnPickerDisabled : rnPicker : rnPickerError}
-              value={this.state.storeDistrict}
-              useNativeAndroidPickerStyle={false}
-            />
-          </View>
+          <RnPicker
+            items={this.state.dictricts}
+            setValue={this.handleDistrict}
+            editValue={this.state.storeDistrict}
+            isEdit={this.state.isEdit}
+            disabled={this.state.isEdit ? true : false}
+          />
           {!districtValid && (
             <Message imp={true} message={this.state.errors["district"]} />
           )}
