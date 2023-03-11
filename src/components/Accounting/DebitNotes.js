@@ -111,13 +111,20 @@ export default class DebitNotes extends Component {
     AccountingService.getDebitNotes(reqOb).then(res => {
       if (res) {
         console.log(res.data);
-        this.setState({ debitNotes: res.data.content });
+        this.setState({ debitNotes: res.data.content }, () => {
+          this.changeNavigation();
+        });
       }
       this.setState({ loading: false });
     }).catch(err => {
       this.setState({ loading: false });
       console.log(err);
     });
+  }
+
+  // for the flatlist to scroll back to index
+  changeNavigation() {
+    this.flatListRef.scrollToIndex({ animated: true, index: 0 });
   }
 
   handleViewDebit(item, index) {
@@ -204,6 +211,7 @@ export default class DebitNotes extends Component {
         <FlatList
           data={this.state.filterActive ? this.state.filterDebitData : this.state.debitNotes}
           style={[scss.flatListBody, { marginTop: 5 }]}
+          ref={(ref) => this.flatListRef = ref}
           scrollEnabled={true}
           refreshing={this.state.isFetching}
           onRefresh={() => this.refresh()}

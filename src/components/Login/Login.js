@@ -79,12 +79,12 @@ export default class Login extends Component {
     this.setState({ store: value });
   };
 
-  registerClient () {
+  registerClient() {
     // console.log('adsadasdd');
     this.props.navigation.navigate("RegisterClient");
   }
 
-  validationForm () {
+  validationForm() {
     let isFormValid = true;
     let errors = {};
 
@@ -102,14 +102,14 @@ export default class Login extends Component {
     this.setState({ errors: errors });
     return isFormValid;
   }
-  clearAllData () {
+  clearAllData() {
     AsyncStorage.clear();
     AsyncStorage.getAllKeys()
       .then(keys => AsyncStorage.multiRemove(keys));
 
   }
 
-  async login () {
+  async login() {
     const isFormValid = this.validationForm();
     const { userName, password } = this.state;
     if (isFormValid) {
@@ -266,7 +266,7 @@ export default class Login extends Component {
     }
   }
 
-  getAdminStores () {
+  getAdminStores() {
     LoginService.getUserStores().then((res) => {
       // console.log("getting Stores", res);
       if (res.data.length > 1) {
@@ -292,7 +292,7 @@ export default class Login extends Component {
     });
   }
 
-  async getStores () {
+  async getStores() {
     let userId = await AsyncStorage.getItem("userId");
     LoginService.getSelectStores(userId).then((res) => {
       // console.warn("storeStatus", res.status);
@@ -309,6 +309,7 @@ export default class Login extends Component {
           const storeId = String(storeData[0].id);
           const storeName = String(storeData[0].name);
           AsyncStorage.setItem("storeId", storeId);
+          // AsyncStorage.setItem("storename", storeName);
           global.storeName = storeName;
           AsyncStorage.getItem("rolename").then((name) => {
             UrmService.getPrivillagesByRoleName(name).then((res) => {
@@ -324,13 +325,13 @@ export default class Login extends Component {
     });
   }
 
-  forgotPassword () {
+  forgotPassword() {
     this.props.navigation.navigate("ForgotPassword", {
       username: this.state.userName,
     });
   }
 
-  componentDidMount () {
+  componentDidMount() {
     // this.refresh()
     this.clearAllData();
   }
@@ -348,7 +349,7 @@ export default class Login extends Component {
   };
 
 
-  render () {
+  render() {
     const userValid = this.state.userValid;
     const passValid = this.state.passwordValid;
     return (

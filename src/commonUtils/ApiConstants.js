@@ -129,12 +129,14 @@ export const menuCategoryService = {
   getAllTables: "/new-sale/newsale/list",
   saveTable: "/new-sale/newsale/create-table-room",
   editTable: "/new-sale/newsale/edit-table-room",
-  bookTable: "/new-sale/newsale/table",
-  getTableList: "/new-sale/newsale/table",
+  bookTable: "/new-sale/newsale/booking",
+  getTableList: "/new-sale/newsale/table-room",
   billTable: "/new-sale/newsale/edit-table",
   payTable: "/new-sale/newsale/sale",
   shiftTable: "/new-sale/newsale/item-table",
-  menuOrders: "/new-sale/newsale/table-items",
+  menuOrders: "/new-sale/newsale/booking-items",
   updateOrders: "/new-sale/newsale/lineitem",
   viewOrder: "/new-sale/newsale/order-view",
+  roomOrder: "/new-sale/newsale/orders",
+  roomInvoice: "new-sale/newsale/room-payment"
 };

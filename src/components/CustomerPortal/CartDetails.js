@@ -23,12 +23,12 @@ export class CartDetails extends Component {
     }
 
     // Back Button Action
-    handleBackButtonClick () {
+    handleBackButtonClick() {
         this.props.navigation.goBack(null);
         return true;
     }
 
-    async componentDidMount () {
+    async componentDidMount() {
         const clientId = await AsyncStorage.getItem("custom:clientId1");
         const storeId = await AsyncStorage.getItem("storeId");
         let tableId = this.props?.route?.params?.tableId;
@@ -39,8 +39,8 @@ export class CartDetails extends Component {
         this.setState({ tableId: tableId, clientId: clientId, storeId: storeId, tableName: tableName });
     }
 
-    getData (menu) {
-        console.log({ menu });
+    getData(menu) {
+        // console.log({ menu });
         let newItems = [];
         for (let i = 0; i < menu.length; i++) {
             if (menu[i].cart) {
@@ -52,12 +52,12 @@ export class CartDetails extends Component {
     }
 
     // Get all previously ordered items
-    getAllPreviousItems (tableId) {
+    getAllPreviousItems(tableId) {
         CustomerService.getTableItems(tableId).then((res) => {
-            let response = res?.data;
-            console.log({ response }, "getting all table items");
-            if (response) {
-                this.setState({ previousItems: response });
+            let oldItems = res?.data[0]?.itemResponses;
+            console.log({ oldItems }, "getting all table items");
+            if (oldItems) {
+                this.setState({ previousItems: oldItems });
             }
         }).catch(err => {
             console.log({ err });
@@ -65,7 +65,7 @@ export class CartDetails extends Component {
     }
 
     // Modifying the items qty
-    incrementForTable (item, index) {
+    incrementForTable(item, index) {
         const items = [...this.state.menuItems];
         var addItem = parseInt(items[index].qty) + 1;
         items[index].qty = addItem.toString();
@@ -74,7 +74,7 @@ export class CartDetails extends Component {
         });
     }
 
-    decreamentForTable (item, index) {
+    decreamentForTable(item, index) {
         const items = [...this.state.menuItems];
         if (items[index].qty > 1) {
             var minItem = parseInt(items[index].qty) - 1;
@@ -87,7 +87,7 @@ export class CartDetails extends Component {
         }
     }
 
-    updateQuanty (text, index, item) {
+    updateQuanty(text, index, item) {
         const items = [...this.state.menuItems];
         if (parseInt(text) > 0 && item.qty !== NaN) {
             items[index].qty = parseInt(text);
@@ -98,7 +98,7 @@ export class CartDetails extends Component {
     }
 
     // Place New Order
-    placeNewOrder () {
+    placeNewOrder() {
         let lineItems = [];
         this.state.menuItems.forEach((element, index) => {
             console.log({ element });
@@ -134,7 +134,7 @@ export class CartDetails extends Component {
         });
     }
 
-    render () {
+    render() {
         return (
             <View style={{ flex: 1 }}>
                 <Appbar mode="center-aligned" style={styles.mainContainer} >
@@ -160,11 +160,11 @@ export class CartDetails extends Component {
                                                 {item.name}
                                                 {"\n"}
                                             </Text>
-                                            {item.itemPrice.toFixed(2)}
+                                            {parseFloat(item.itemMrp).toFixed(2)}
                                         </Text>
                                         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                                             <TouchableOpacity disabled={true}>
-                                                <PlusIcon name="plus-circle-outline" size={20} color={"red"} />
+                                                <MinusIcon name="minus-circle-outline" size={20} color={"red"} />
                                             </TouchableOpacity>
                                             <TextInput
                                                 style={{
@@ -181,7 +181,7 @@ export class CartDetails extends Component {
                                                 textAlign={'center'}
                                             />
                                             <TouchableOpacity disabled={true}>
-                                                <MinusIcon name="minus-circle-outline" size={20} color={"red"} />
+                                                <PlusIcon name="plus-circle-outline" size={20} color={"red"} />
                                             </TouchableOpacity>
                                         </View>
                                     </View>
@@ -207,12 +207,12 @@ export class CartDetails extends Component {
                                                 {item.name}
                                                 {"\n"}
                                             </Text>
-                                            {item.itemMrp.toFixed(2)}
+                                            {parseFloat(item.itemMrp).toFixed(2)}
                                         </Text>
                                         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                                             <TouchableOpacity
-                                                onPress={() => this.incrementForTable(item, index)}>
-                                                <PlusIcon name="plus-circle-outline" size={20} color={"red"} />
+                                                onPress={() => this.decreamentForTable(item, index)}>
+                                                <MinusIcon name="minus-circle-outline" size={20} color={"red"} />
                                             </TouchableOpacity>
                                             <TextInput
                                                 style={{
@@ -229,8 +229,8 @@ export class CartDetails extends Component {
                                                 onChangeText={(text) => this.updateQuanty(text, index, item)}
                                             />
                                             <TouchableOpacity
-                                                onPress={() => this.decreamentForTable(item, index)}>
-                                                <MinusIcon name="minus-circle-outline" size={20} color={"red"} />
+                                                onPress={() => this.incrementForTable(item, index)}>
+                                                <PlusIcon name="plus-circle-outline" size={20} color={"red"} />
                                             </TouchableOpacity>
                                         </View>
                                     </View>

@@ -33,10 +33,11 @@ class UrmService {
   }
 
   // Get all Privileges
-  getAllPrivillages() {
+  getAllPrivillages(type) {
     const getPrivileges = BASE_URL + USER_MANAGEMENT_URL.getAllPrivileges;
-    console.log({ getPrivileges });
-    return axios.get(getPrivileges);
+    const params = "?type=" + type;
+    console.log({ getPrivileges, params });
+    return axios.get(getPrivileges + params);
   }
 
   // Getting User Details

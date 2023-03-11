@@ -19,7 +19,7 @@ export class OrderStatus extends Component {
         };
     }
 
-    async componentDidMount () {
+    async componentDidMount() {
         const tableId = this.props?.route?.params?.table?.id;
         const tableName = this.props?.route?.params?.table?.name;
         const storeId = await AsyncStorage.getItem("storeId");
@@ -27,28 +27,33 @@ export class OrderStatus extends Component {
         this.getOrderItems();
     }
 
-    getOrderItems () {
+    getOrderItems() {
         if (this.state.tableId && this.state.tableId !== 0) {
             CustomerService.getTableItems(this.state.tableId).then((res) => {
-                let response = res?.data;
+                let response = res?.data[0]?.itemResponses;
                 if (response) {
                     console.log({ response });
                     this.setState({ orderItems: response }, () => {
                         this.calculateValues();
+                        this.changeNavigation();
                     });
                 }
             });
-            console.log({ obj });
         }
     }
 
+    // for the flatlist to scroll back to index
+    changeNavigation() {
+        this.flatListRef.scrollToIndex({ animated: true, index: 0 });
+    }
+
     // Calculating Values
-    calculateValues () {
+    calculateValues() {
         let totalAmount = 0;
         let totalCgst = 0;
         let totalSgst = 0;
         this.state.orderItems.forEach((item, index) => {
-            totalAmount = totalAmount + item.grossValue;
+            totalAmount = totalAmount + item.value;
             totalCgst = totalCgst + item.cgst;
             totalSgst = totalSgst + item.sgst;
         });
@@ -56,36 +61,37 @@ export class OrderStatus extends Component {
     }
 
     // Add More Items
-    addMore () {
+    addMore() {
         this.props.navigation.replace("Menu");
     }
 
     // Navigate to Billing Portal
-    navigateToPay () {
+    navigateToPay() {
         // this.props.navigation.push("CustomerNavigation");
     }
 
-    render () {
+    render() {
         return (
             <View style={{ flex: 1 }}>
                 <View style={{ height: '55%' }}>
                     <FlatList
                         data={this.state.orderItems}
+                        ref={(ref) => this.flatListRef = ref}
                         keyExtractor={(item, index) => String(index)}
                         renderItem={({ item, index }) => (
                             <View>
                                 <View style={scss.flatListContainer}>
                                     <View style={scss.flatListSubContainer}>
                                         <View style={scss.textContainer}>
-                                            {/* <Text style={scss.textStyleLight}>{index + 1}.</Text> */}
-                                            <View>
+                                            <View style={{ width: '30%', alignItems: 'baseline', maxWidth: '30%' }}>
                                                 <Image
                                                     source={{ uri: item.image }}
                                                 />
                                                 <Text style={scss.textStyleMedium}>{item.name}</Text>
-                                                <Text style={scss.textStyleMedium}>{item.grossValue}</Text>
+                                                <Text style={scss.textStyleMedium}>{item.value}</Text>
                                             </View>
-                                            <Text style={[scss.textStyleMedium, { color: item.status === "BeingPrepared" ? "#dd0" : "#0d0" }]}>{item.status}</Text>
+                                            <Text style={[scss.textStyleMedium, { color: item.status === "BeingPrepared" ? "#dd0" : "#0d0", textAlign: "center" }]}>{item.status}</Text>
+                                            <Text style={[scss.textStyleMedium, { textAlign: 'center' }]}>QTY:{"\n"} {item.quantity}</Text>
                                         </View>
                                     </View>
                                 </View>

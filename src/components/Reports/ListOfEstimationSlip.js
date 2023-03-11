@@ -25,7 +25,7 @@ const pickerData = [
   { label: 'Completed', value: 'Completed' },
   { label: 'Pending', value: 'Pending' },
   { label: 'Cancelled', value: 'Cancelled' },
-]
+];
 export class ListOfEstimationSlip extends Component {
 
   constructor(props) {
@@ -172,7 +172,9 @@ export class ListOfEstimationSlip extends Component {
       if (res.data && res.data["isSuccess"] === "true") {
         if (res.data.result.length !== 0) {
           this.setState({ filterActive: true });
-          this.setState({ estimationSlips: res.data.result.deliverySlip.content, totalPages: res.data.result.deliverySlip.totalPages });
+          this.setState({ estimationSlips: res.data.result.deliverySlip.content, totalPages: res.data.result.deliverySlip.totalPages }, () => {
+            this.changeNavigation();
+          });
           this.setState({ modalVisible: false, flagFilterOpen: false });
           this.continuePagination();
         } else {
@@ -192,6 +194,11 @@ export class ListOfEstimationSlip extends Component {
       this.setState({ modalVisible: false, flagFilterOpen: false });
       this.setState({ startDate: "", endDate: "", dsStatus: "", barcode: "", dsNumber: "" });
     });
+  }
+
+  // for the flatlist to scroll back to index
+  changeNavigation() {
+    this.flatListRef.scrollToIndex({ animated: true, index: 0 });
   }
 
   loadMoreList = (value) => {
@@ -240,6 +247,7 @@ export class ListOfEstimationSlip extends Component {
     return (
       <View>
         <FlatList
+          ref={(ref) => this.flatListRef = ref}
           data={this.state.estimationSlips}
           ListHeaderComponent={
             <Appbar>

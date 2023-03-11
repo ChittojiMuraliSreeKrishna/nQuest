@@ -13,21 +13,22 @@ import Blank from "../components/Home/Blank";
 import ScanBarCode from "../components/Newsale/ScanBarCode";
 
 import { createStackNavigator } from "@react-navigation/stack";
+import Payment from "../components/Newsale/Payment";
 const Stack = createStackNavigator();
 export default class CustomerNavigation extends Component {
 
 
-  componentDidMount () {
+  componentDidMount() {
     const backHandler = BackHandler.addEventListener("hardwareBackPress", this.backAction());
     return () => backHandler.remove();
     alert("hey");
   }
 
-  backAction () {
+  backAction() {
     return true;
   }
 
-  render () {
+  render() {
     return (
       <>
         <Stack.Navigator initialRouteName="Blank">
@@ -75,6 +76,11 @@ export default class CustomerNavigation extends Component {
             name="TextilePayment"
             options={{ headerShown: false }}
             component={TextilePayment}
+          />
+          <Stack.Screen
+            name="Payment"
+            options={{ headerShown: false }}
+            component={Payment}
           />
           <Stack.Screen
             name="ScanBarCode"

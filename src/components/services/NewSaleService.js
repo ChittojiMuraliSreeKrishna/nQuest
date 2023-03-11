@@ -3,44 +3,48 @@ import { NEW_SALE_URL } from '../../commonUtils/ApiConstants';
 import { BASE_URL } from '../../commonUtils/Base';
 
 class NewSaleService {
-  payment () {
+  payment() {
     return BASE_URL + '/paymentgateway/paymentgateway/create_order';
   }
 
-  upiPayment () {
+  upiPayment() {
     return BASE_URL + '/paymentgateway/razorpay/create-payment-link';
   }
 
-  getAllBarcodes () {
+  getAllBarcodes() {
     return BASE_URL + '/new-sale/newsale/getAllBarcodes';
   }
 
-  saveLineItems () {
+  saveLineItems() {
     return BASE_URL + '/new-sale/newsale/savelineitems/2';
   }
 
-  createOrder () {
+  createOrder() {
     return BASE_URL + '/new-sale/newsale/sale';
   }
 
-  getImageScanning () {
+  RoomPay() {
+    return BASE_URL + '/new-sale/newsale/room-payment';
+  }
+
+  getImageScanning() {
     return BASE_URL + '/user-management/auth/imageScanning';
   }
 
-  getCoupons (clientId, couponCode) {
+  getCoupons(clientId, couponCode) {
     const param = '/' + clientId;
     return axios.post(BASE_URL + "/new-sale/newsale/getGv" + param, couponCode);
   }
 
-  saveCoupons () {
+  saveCoupons() {
     return BASE_URL + "/new-sale/newsale/changeflaggv";
   }
 
-  getMobileData (mobileNumber) {
+  getMobileData(mobileNumber) {
     return axios.get(BASE_URL + NEW_SALE_URL.getMobileData + '/' + mobileNumber);
   }
 
-  getRTDetails (rtnumber, storeId) {
+  getRTDetails(rtnumber, storeId) {
     const param = "?storeId=" + storeId;
     console.log({ param }, rtnumber);
     return axios.post(BASE_URL + "/new-sale//return_slip/getReturnSlip" + param, rtnumber);

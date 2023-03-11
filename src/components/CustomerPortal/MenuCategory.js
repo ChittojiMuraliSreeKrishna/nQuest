@@ -37,7 +37,7 @@ class MenuCategory extends Component {
         };
     }
 
-    async componentDidMount () {
+    async componentDidMount() {
         const storeId = await AsyncStorage.getItem("storeId");
         const userId = await AsyncStorage.getItem("userId");
         const clientId = await AsyncStorage.getItem("custom:clientId1");
@@ -54,7 +54,7 @@ class MenuCategory extends Component {
     }
 
     // Divisions section
-    getAllDivisions () {
+    getAllDivisions() {
         let domain = "Restaurants";
         InventoryService.getAllDivisions(domain).then((res) => {
             console.log({ res });
@@ -97,7 +97,7 @@ class MenuCategory extends Component {
     };
 
     // Categories section
-    getAllCatogiries (data, domain) {
+    getAllCatogiries(data, domain) {
         this.setState({ categoriesList: [] });
         let categories = [];
         InventoryService.getAllCategory(data, domain).then((res) => {
@@ -139,25 +139,30 @@ class MenuCategory extends Component {
     };
 
     // Searching
-    searchItems () {
+    searchItems() {
         InventoryService.getAllSearchItems(this.state.selectedCategory, this.state.storeId).then((res) => {
             if (res?.data) {
                 let items = res.data.content;
+                this.state.menuItems.push(items);
                 this.setState({ menuItems: items });
             }
         });
     }
 
     // Add To Cart
-    addToCart (item, index) {
-        const items = [...this.state.menuItems];
-        items[index].cart = true;
-        items[index].qty = 1;
-        this.setState({ menuItems: items });
+    addToCart(item, index) {
+        if (this.state.tableId && this.state.tableId !== 0) {
+            const items = [...this.state.menuItems];
+            items[index].cart = true;
+            items[index].qty = 1;
+            this.setState({ menuItems: items });
+        } else {
+            alert("Please Select the table");
+        }
     }
 
     // Modifying the items qty
-    incrementForTable (item, index) {
+    incrementForTable(item, index) {
         const items = [...this.state.menuItems];
         var addItem = parseInt(items[index].qty) + 1;
         items[index].qty = addItem.toString();
@@ -166,7 +171,7 @@ class MenuCategory extends Component {
         });
     }
 
-    decreamentForTable (item, index) {
+    decreamentForTable(item, index) {
         const items = [...this.state.menuItems];
         if (items[index].qty > 1) {
             var minItem = parseInt(items[index].qty) - 1;
@@ -179,7 +184,7 @@ class MenuCategory extends Component {
         }
     }
 
-    updateQuanty (text, index, item) {
+    updateQuanty(text, index, item) {
         const items = [...this.state.menuItems];
         if (parseInt(text) > 0 && item.qty !== NaN) {
             items[index].qty = parseInt(text);
@@ -190,7 +195,7 @@ class MenuCategory extends Component {
     }
 
     // Cart Functionality
-    showCart () {
+    showCart() {
         if (this.state.tableId && this.state.tableId !== 0) {
             this.props.navigation.navigate("CartDetails", {
                 tableId: this.state.tableId,
@@ -205,12 +210,12 @@ class MenuCategory extends Component {
     }
 
     // Unmounting component
-    componentWillUnmount () {
+    componentWillUnmount() {
         this._isMounted = false;
     }
 
 
-    render () {
+    render() {
         let tableId = this.props?.route?.params?.table?.id; // TableId
         let tableName = this.props?.route?.params?.table?.name; // TableName
         console.log({ tableId, tableName });
@@ -291,8 +296,8 @@ class MenuCategory extends Component {
                                     <Text style={{ textAlign: "center" }}>₹{parseFloat(item.itemMrp).toFixed(2)}</Text>
                                     {item.cart ? <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                         <TouchableOpacity
-                                            onPress={() => this.incrementForTable(item, index)}>
-                                            <PlusIcon name="plus-circle-outline" size={20} color={"red"} />
+                                            onPress={() => this.decreamentForTable(item, index)}>
+                                            <MinusIcon name="minus-circle-outline" size={20} color={"red"} />
                                         </TouchableOpacity>
                                         <TextInput
                                             style={{
@@ -309,8 +314,8 @@ class MenuCategory extends Component {
                                             onChangeText={(text) => this.updateQuanty(text, index, item)}
                                         />
                                         <TouchableOpacity
-                                            onPress={() => this.decreamentForTable(item, index)}>
-                                            <MinusIcon name="minus-circle-outline" size={20} color={"red"} />
+                                            onPress={() => this.incrementForTable(item, index)}>
+                                            <PlusIcon name="plus-circle-outline" size={20} color={"red"} />
                                         </TouchableOpacity>
                                     </View> : <View>
                                         <TouchableOpacity onPress={() => this.addToCart(item, index)}>

@@ -93,7 +93,7 @@ export class SalesSumary extends Component {
 
   handleEndDate = (value) => {
     this.setState({ endDate: value });
-  }
+  };
   applySalesSummary() {
     const obj = {
       dateFrom: this.state.startDate ? this.state.startDate : undefined,
@@ -131,41 +131,48 @@ export class SalesSumary extends Component {
             totalCgst: data.totalCgst,
             totalIgst: data.totalIgst,
             totalCess: data.totalCess
-          })
-          this.setState({ startDate: "", endDate: "" })
-          this.modelCancel()
+          }, () => {
+            this.changeNavigation();
+          });
+          this.setState({ startDate: "", endDate: "" });
+          this.modelCancel();
         } else {
           alert("records not found");
-          this.setState({ startDate: "", endDate: "" })
+          this.setState({ startDate: "", endDate: "" });
         }
       }
       else {
-        this.setState({ startDate: "", endDate: "" })
+        this.setState({ startDate: "", endDate: "" });
         alert(res.data.message);
-        this.modelCancel()
+        this.modelCancel();
         // this.props.modelCancelCallback();
       }
     }
     ).catch(() => {
       alert('No Records Found');
-      this.modelCancel()
+      this.modelCancel();
       // this.props.modelCancelCallback();
     });
   }
 
+  // for the flatlist to scroll back to index
+  changeNavigation() {
+    this.flatListRef.scrollToIndex({ animated: true, index: 0 });
+  }
+
 
   filterAction() {
-    this.setState({ flagFilterSalesSumary: true, modalVisible: true })
+    this.setState({ flagFilterSalesSumary: true, modalVisible: true });
   }
 
   modelCancel() {
-    this.setState({ flagFilterSalesSumary: false, modalVisible: false })
+    this.setState({ flagFilterSalesSumary: false, modalVisible: false });
   }
 
   clearFilterAction() {
     this.setState({
       filterActive: false, flagFilterSalesSumary: false, modalVisible: false, startDate: "", endDate: "", dsList: [], totMrp: null
-    })
+    });
   }
 
   render() {
@@ -192,6 +199,7 @@ export class SalesSumary extends Component {
         </Appbar>
 
         <FlatList
+          ref={(ref) => this.flatListRef = ref}
           data={this.state.dsList}
           scrollEnabled={true}
           ListEmptyComponent={<Text style={emptyTextStyle}>&#9888; {I18n.t("Results not loaded")}</Text>}

@@ -90,13 +90,11 @@ class Products extends Component {
                             let qty = String(item["qty"]);
                             let totalAmount = String(item["netAmount"]);
                             let image = item['itemImage'];
-
                             this.state.arrayData.push({ sno: sno, barcode: barcode, itemdesc: itemDesc, netamount: netAmount, qty: qty, netamount: netAmount, image: image });
                             if (this.state.arrayData.length === 1) {
                                 this.setState({ arrayData: this.state.arrayData });
                             }
                             this.state.temp.push({ sno: sno, barcode: barcode, itemdesc: itemDesc, netamount: netAmount, qty: qty, netamount: netAmount, image: image });
-
                         }
                         console.log(this.state.arrayData);
                     }
@@ -178,8 +176,6 @@ class Products extends Component {
                 console.log(e);
                 Alert.alert(e.message ? e.message : e);
             });
-
-
     }
 
 
@@ -215,7 +211,6 @@ class Products extends Component {
                 console.log(error);
                 alert(error);
             });
-
     }
 
     cancel() {
@@ -254,7 +249,6 @@ class Products extends Component {
 
 
     barcodeDBStore = () => {
-        console.log('---------------------------------------------------');
         db.transaction(txn => {
             txn.executeSql(
                 'SELECT * FROM tbl_item where barcode = ?',

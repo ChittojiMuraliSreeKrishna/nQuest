@@ -32,7 +32,7 @@ export class TableManageMent extends Component {
         };
     }
 
-    async componentDidMount () {
+    async componentDidMount() {
         const storeId = await AsyncStorage.getItem("storeId");
         const userId = await AsyncStorage.getItem("userId");
         const clientId = await AsyncStorage.getItem("custom:clientId1");
@@ -41,8 +41,9 @@ export class TableManageMent extends Component {
         });
     }
 
-    getAllTables () {
-        CustomerService.getTablesList(this.state.storeId, this.state.clientId).then((res) => {
+    getAllTables() {
+        var bookingType = "Table";
+        CustomerService.getTablesList(this.state.storeId, this.state.clientId, bookingType).then((res) => {
             if (res) {
                 let tables = res?.data;
                 console.log({ tables });
@@ -51,11 +52,11 @@ export class TableManageMent extends Component {
         });
     }
 
-    addTables () {
+    addTables() {
         this.setState({ showAddTable: true });
     }
 
-    validationForm () {
+    validationForm() {
         let isFormValid = true;
         if (this.state.tableName === "") {
             isFormValid: false;
@@ -66,7 +67,7 @@ export class TableManageMent extends Component {
         return isFormValid;
     }
 
-    saveTable () {
+    saveTable() {
         if (!this.state.isEdit) {
             const list = {
                 clientId: this.state.clientId,
@@ -110,18 +111,18 @@ export class TableManageMent extends Component {
         }
     }
 
-    editTable (item) {
+    editTable(item) {
         console.log({ item }, item.numberOfSeats);
         this.setState({ tableEditId: item.id, tableName: item.name, availableTableSeats: item.numberOfSeats, isEdit: true, }, () => {
             this.setState({ showAddTable: true, });
         });
     }
 
-    deleteTable () {
+    deleteTable() {
         alert("under development");
     }
 
-    modelCancel () {
+    modelCancel() {
         this.setState({ showAddTable: false });
     }
 
@@ -133,7 +134,7 @@ export class TableManageMent extends Component {
         this.setState({ availableTableSeats: value });
     };
 
-    render () {
+    render() {
         return (
             <View>
                 <FlatList

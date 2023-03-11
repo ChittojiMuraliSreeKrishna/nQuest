@@ -109,10 +109,17 @@ export default class CreditNotes extends Component {
     AccountingService.getCreditNotes(reqOb).then((res) => {
       if (res) {
         console.log({ res }, res.data.content);
-        this.setState({ creditNotes: res.data.content });
+        this.setState({ creditNotes: res.data.content }, () => {
+          this.changeNavigation();
+        });
       }
       this.setState({ loading: false });
     });
+  }
+
+  // for the flatlist to scroll back to index
+  changeNavigation() {
+    this.flatListRef.scrollToIndex({ animated: true, index: 0 });
   }
 
   applyCreditNotesFilter() {
@@ -135,6 +142,8 @@ export default class CreditNotes extends Component {
           this.setState({
             filterCreditData: res.data.content,
             filterActive: true,
+          }, () => {
+            this.changeNavigation();
           });
         }
         this.setState({
@@ -258,6 +267,7 @@ export default class CreditNotes extends Component {
       <View>
         {this.state.loading && <Loader loading={this.state.loading} />}
         <FlatList
+          ref={(ref) => this.flatListRef = ref}
           ListHeaderComponent={
             <View style={flatListHeaderContainer}>
               <View>

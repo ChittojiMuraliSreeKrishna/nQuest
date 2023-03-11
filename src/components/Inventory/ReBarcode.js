@@ -85,6 +85,10 @@ export default class ReBarcode extends Component {
             loading: false,
             reBarcodesData: res.data.content,
             totalPages: res.data.totalPages
+          }, () => {
+            if (this.state.reBarcodesData.length > 0) {
+              this.changeNavigation();
+            }
           });
           if (res.data.length === 0) {
             this.setState({ error: "Records Not Found" });
@@ -96,6 +100,12 @@ export default class ReBarcode extends Component {
         this.setState({ loading: false, error: "Records Not Found" });
       });
   }
+
+  // for the flatlist to scroll back to index
+  changeNavigation() {
+    this.flatListRef.scrollToIndex({ animated: true, index: 0 });
+  }
+
 
   // Filter Actions
   filterAction() {
@@ -198,7 +208,7 @@ export default class ReBarcode extends Component {
       storeId: this.state.storeId,
     };
     console.log({ params }, this.state.viewBarcodeData);
-    let viewBarcodeData = []
+    let viewBarcodeData = [];
     let domainDetails = {};
     InventoryService.getBarcodesDetails(this.state.storeId, domainDetails, item.currentBarcodeId).then(res => {
       if (res?.data) {
@@ -208,14 +218,14 @@ export default class ReBarcode extends Component {
           viewBarcodeData.push(res.data);
           const uniqueData = viewBarcodeData.filter((val, id, array) => {
             return array.indexOf(val) == id;
-          })
+          });
           this.setState({ viewBarcodeData: uniqueData, viewBarcode: true });
         }
         console.log({ viewData }, this.state.viewBarcodeData.barcode);
       }
-      this.setState({ loading: false })
+      this.setState({ loading: false });
     }).catch((err) => {
-      this.setState({ loading: false })
+      this.setState({ loading: false });
       console.log({ err });
     });
   };
@@ -284,6 +294,7 @@ export default class ReBarcode extends Component {
         <FlatList
           removeClippedSubviews={false}
           style={scss.flatListBody}
+          ref={(ref) => this.flatListRef = ref}
           ListHeaderComponent={
             <View style={scss.headerContainer}>
               <Text style={scss.flat_heading}>List of Re-Barcodings - <Text style={{ color: "#ED1C24" }}>{this.state.filterActive ? this.state.filterRebarcodesData.length : this.state.reBarcodesData.length}</Text></Text>

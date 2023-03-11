@@ -86,6 +86,8 @@ export default class ProductCombo extends Component {
           productComboList: res?.data.result.content,
           loading: false,
           totalPages: res.data.result.totalPages
+        }, () => {
+          this.changeNavigation();
         });
         this.continuePagination();
       })
@@ -94,6 +96,12 @@ export default class ProductCombo extends Component {
         this.setState({ loading: false });
       });
   }
+
+  // for the flatlist to scroll back to index
+  changeNavigation() {
+    this.flatListRef.scrollToIndex({ animated: true, index: 0 });
+  }
+
 
   filterAction() {
     this.setState({ flagFilterOpen: true, modalVisible: true });
@@ -169,12 +177,12 @@ export default class ProductCombo extends Component {
   }
 
   viewProductActon(data, index) {
-    let viewProduct = []
+    let viewProduct = [];
     viewProduct.push({ data });
     const uniqueData = viewProduct.filter((val, id, array) => {
       return array.indexOf(val) == id;
-    })
-    console.log({ uniqueData }, uniqueData.data)
+    });
+    console.log({ uniqueData }, uniqueData.data);
     this.setState({
       viewProductData: uniqueData,
       modalVisibleView: true,
@@ -242,6 +250,7 @@ export default class ProductCombo extends Component {
         {this.state.loading && <Loader loading={this.state.loading} />}
         <FlatList
           style={scss.flatListBody}
+          ref={(ref) => this.flatListRef = ref}
           ListHeaderComponent={
             <View style={scss.headerContainer}>
               <Text style={scss.flat_heading}>

@@ -6,7 +6,7 @@ import {
 import IconFA from 'react-native-vector-icons/FontAwesome';
 import IconMA from 'react-native-vector-icons/Ionicons';
 import scss from "../../commonUtils/assets/styles/style.scss";
-import forms from '../../commonUtils/assets/styles/formFields.scss'
+import forms from '../../commonUtils/assets/styles/formFields.scss';
 import { formatDate } from "../../commonUtils/DateFormate";
 import Loader from "../../commonUtils/loader";
 import AccountingService from "../services/AccountingService";
@@ -49,7 +49,9 @@ export default class CreateHSNCode extends Component {
         if (res) {
           console.log(res.data);
           console.log(res.data.result[0].slabs);
-          this.setState({ hsnList: res.data.result });
+          this.setState({ hsnList: res.data.result }, () => {
+            this.changeNavigation();
+          });
         }
         this.setState({ loading: false });
       })
@@ -57,6 +59,11 @@ export default class CreateHSNCode extends Component {
         this.setState({ loading: false });
         console.log(err);
       });
+  }
+
+  // for the flatlist to scroll back to index
+  changeNavigation() {
+    this.flatListRef.scrollToIndex({ animated: true, index: 0 });
   }
 
   // Filter Model Actions
@@ -88,7 +95,7 @@ export default class CreateHSNCode extends Component {
   }
 
   handleViewHSN(item) {
-    this.setState({ viewModal: true, viewData: item })
+    this.setState({ viewModal: true, viewData: item });
   }
 
   handleModelView() {
@@ -100,6 +107,7 @@ export default class CreateHSNCode extends Component {
       <View>
         {this.state.loading && <Loader loading={this.state.loading} />}
         <FlatList
+          ref={(ref) => this.flatListRef = ref}
           ListHeaderComponent={
             <View style={scss.headerContainer}>
               <Text style={scss.flat_heading}>List Of HSN Codes - <Text style={{ color: '#ed1c24' }}>{this.state.hsnList.length}</Text> </Text>

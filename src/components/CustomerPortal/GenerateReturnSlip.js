@@ -26,7 +26,7 @@ const pickerData = [
   { label: 'Damaged Piece', value: 'Damaged Piece' },
   { label: 'Quality is Not Good', value: 'Quality is Not Good' },
   { label: 'Others', value: 'Others' },
-]
+];
 
 export default class GenerateReturnSlip extends Component {
 
@@ -156,8 +156,8 @@ export default class GenerateReturnSlip extends Component {
         // })
         CustomerService.getReturnSlipDetails(obj).then((res) => {
           if (res) {
-            let allreturnslipsList = res.data.result.returnSlips
-            console.log({ allreturnslipsList })
+            let allreturnslipsList = res.data.result.returnSlips;
+            console.log({ allreturnslipsList });
             this.setState(
               {
                 // returnslipsList: res.data.result,
@@ -166,34 +166,34 @@ export default class GenerateReturnSlip extends Component {
                 let costprice = 0;
                 let quantity = 0;
                 let netValue = 0;
-                let totalDiscount = 0
+                let totalDiscount = 0;
                 var combineList = {};
                 allreturnslipsList.forEach((itm) => {
                   var barcode = itm.barcode;
-                  itm.quantity = itm.quantity
-                  itm.netValue = itm.netValue
-                  itm.manualDiscount = itm.manualDiscount
-                  itm.promoDiscount = itm.promoDiscount
-                  itm.gvAppiled = itm.gvAppiled
+                  itm.quantity = itm.quantity;
+                  itm.netValue = itm.netValue;
+                  itm.manualDiscount = itm.manualDiscount;
+                  itm.promoDiscount = itm.promoDiscount;
+                  itm.gvAppiled = itm.gvAppiled;
 
                   if (!combineList[barcode]) {
-                    return combineList[barcode] = itm
+                    return combineList[barcode] = itm;
                   }
                   return combineList[barcode].quantity = combineList[barcode].quantity + itm.quantity,
                     combineList[barcode].netValue = combineList[barcode].netValue + itm.netValue,
                     combineList[barcode].grossValue = combineList[barcode].grossValue + itm.grossValue,
                     combineList[barcode].manualDiscount = combineList[barcode].manualDiscount + itm.manualDiscount,
                     combineList[barcode].promoDiscount = combineList[barcode].manualDiscount + itm.promoDiscount,
-                    combineList[barcode].gvAppiled = combineList[barcode].gvAppiled + itm.gvAppiled
+                    combineList[barcode].gvAppiled = combineList[barcode].gvAppiled + itm.gvAppiled;
 
 
-                })
-                var combineList2 = []
+                });
+                var combineList2 = [];
                 Object.keys(combineList).forEach((key) => {
-                  combineList2.push(combineList[key])
-                })
-                const clearList = [...combineList2]
-                this.state.returnInvoice = clearList
+                  combineList2.push(combineList[key]);
+                });
+                const clearList = [...combineList2];
+                this.state.returnInvoice = clearList;
                 this.state.returnInvoice.forEach((element) => {
                   netValue = netValue + element.netValue;
                   costprice = costprice + element.mrp;
@@ -201,7 +201,7 @@ export default class GenerateReturnSlip extends Component {
                   totalDiscount = totalDiscount + element.totalDiscount;
                   if (element.quantity >= 1) {
                     element.returnQty = parseInt("0");
-                    element.returnedAmout = parseInt("0")
+                    element.returnedAmout = parseInt("0");
                   }
                   element.isSelected = false;
                 });
@@ -231,13 +231,13 @@ export default class GenerateReturnSlip extends Component {
     if (selectedElement.isSelected === true) {
       selectedElement.isSelected = false;
       selectedElement.returnQty = 0;
-      selectedElement.returnedAmout = 0
+      selectedElement.returnedAmout = 0;
     }
     else {
       selectedElement.isSelected = true;
       if (selectedElement.quantity === 1) {
         selectedElement.returnQty = selectedElement.quantity;
-        selectedElement.returnedAmout = (selectedElement.netValue) / selectedElement.returnQty
+        selectedElement.returnedAmout = (selectedElement.netValue) / selectedElement.returnQty;
       }
       const obj = {
         netValue: selectedElement.netValue,
@@ -250,11 +250,11 @@ export default class GenerateReturnSlip extends Component {
     }
     this.state.returnInvoice.forEach((element, ind) => {
       if (element.returnQty && element.returnQty !== 0 && ind == index) {
-        element.returnedAmout = (parseFloat(element.returnQty) * element.netValue) / element.quantity
+        element.returnedAmout = (parseFloat(element.returnQty) * element.netValue) / element.quantity;
       } else {
-        element.returnedAmout = parseFloat(element.returnQty) * element.netValue
+        element.returnedAmout = parseFloat(element.returnQty) * element.netValue;
       }
-      element.returnedAmout = (parseFloat(element.returnQty) * element.netValue) / element.quantity
+      element.returnedAmout = (parseFloat(element.returnQty) * element.netValue) / element.quantity;
     });
     let sumreturnedAmout = this.state.returnInvoice.reduce((accumulator, curValue) => {
       if (curValue.returnQty && curValue.returnQty !== '0') {
@@ -306,7 +306,7 @@ export default class GenerateReturnSlip extends Component {
           returnAmount: element.netValue ? (element.netValue) : 0
         };
         barList.push(obj);
-        this.setState({ retBarList: barList })
+        this.setState({ retBarList: barList });
       });
     }
     const saveObj = {
@@ -319,12 +319,13 @@ export default class GenerateReturnSlip extends Component {
       totalAmount: parseInt(this.state.returnSlipTotal),
       createdBy: parseInt(this.state.userId),
       comments: this.state.reasonDesc,
-      returnQty: this.state.returnQty,
+      returnQty: barList.length,
     };
     // console.log(saveObj, "params");
     axios.post(CustomerService.saveRetunSlip(), saveObj).then((res) => {
       // console.log("return slip data,res", JSON.stringify(res.data));
       if (res) {
+        console.log(res);
         alert(res.data.message);
         this.setState({
           resultData: res.data.message,
@@ -410,16 +411,16 @@ export default class GenerateReturnSlip extends Component {
         qtyarr[index].returnQty = addItem.toString();
       }
     }
-    this.setState({ returnInvoice: qtyarr })
+    this.setState({ returnInvoice: qtyarr });
     this.state.returnInvoice.forEach((element, ind) => {
       if (element.returnQty && element.returnQty !== 0 && ind == index) {
-        const perQty = (element.netValue / element.quantity)
+        const perQty = (element.netValue / element.quantity);
         element.returnedAmout = (parseInt(element.returnQty)) * perQty;
       } else if (element.returnQty === '' && element.returnQty === 0 && ind == index) {
-        element.returnedAmout = 0
+        element.returnedAmout = 0;
         element.isSelected = false;
       }
-      element.returnedAmout = parseInt(element.returnQty) * element.netValue / element.quantity
+      element.returnedAmout = parseInt(element.returnQty) * element.netValue / element.quantity;
     });
     let sumreturnedAmout = this.state.returnInvoice.reduce((accumulator, curValue) => {
       if (curValue.returnQty && curValue.returnQty !== '0') {
@@ -449,13 +450,13 @@ export default class GenerateReturnSlip extends Component {
 
     this.state.returnInvoice.forEach((element, ind) => {
       if (element.returnQty && element.returnQty !== 0 && ind == index) {
-        const perQty = (element.netValue / element.quantity)
+        const perQty = (element.netValue / element.quantity);
         element.returnedAmout = (parseInt(element.returnQty)) * perQty;
       } else if (element.returnQty === '' && element.returnQty === 0 && ind == index) {
-        element.returnedAmout = 0
+        element.returnedAmout = 0;
         element.isSelected = false;
       }
-      element.returnedAmout = parseInt(element.returnQty) * element.netValue / element.quantity
+      element.returnedAmout = parseInt(element.returnQty) * element.netValue / element.quantity;
     });
     let sumreturnedAmout = this.state.returnInvoice.reduce((accumulator, curValue) => {
       if (curValue.returnQty && curValue.returnQty !== '0') {
@@ -475,13 +476,13 @@ export default class GenerateReturnSlip extends Component {
       qtyarr[index].returnQty = additem.toString();
       this.state.returnInvoice.forEach((element, ind) => {
         if (element.returnQty && element.returnQty !== 0 && ind == index) {
-          const perQty = (element.netValue / element.quantity)
+          const perQty = (element.netValue / element.quantity);
           element.returnedAmout = (parseInt(element.returnQty)) * perQty;
         } else if (element.returnQty === '' && element.returnQty === 0 && ind == index) {
-          element.returnedAmout = 0
+          element.returnedAmout = 0;
           element.isSelected = false;
         }
-        element.returnedAmout = parseInt(element.returnQty) * element.netValue / element.quantity
+        element.returnedAmout = parseInt(element.returnQty) * element.netValue / element.quantity;
       });
       let sumreturnedAmout = this.state.returnInvoice.reduce((accumulator, curValue) => {
         if (curValue.returnQty && curValue.returnQty !== '0') {
@@ -699,10 +700,9 @@ export default class GenerateReturnSlip extends Component {
                                 {this.state.returnInvoice.length >= 1 && this.state.quantity >= 1 && (
                                   <>
                                     <TouchableOpacity
-                                      onPress={() => this.incrementForTable(item, index)}>
-                                      <IconMA name="plus-circle-outline" size={20} color={"red"} />
+                                      onPress={() => this.decreamentForTable(item, index)}>
+                                      <IconMA name="minus-circle-outline" size={20} color={"red"} />
                                     </TouchableOpacity>
-
                                     <TextInput
                                       style={{
                                         justifyContent: 'center',
@@ -716,8 +716,8 @@ export default class GenerateReturnSlip extends Component {
                                       onChangeText={(text) => this.updateQty(text, index, item)}
                                     />
                                     <TouchableOpacity
-                                      onPress={() => this.decreamentForTable(item, index)}>
-                                      <IconMA name="minus-circle-outline" size={20} color={"red"} />
+                                      onPress={() => this.incrementForTable(item, index)}>
+                                      <IconMA name="plus-circle-outline" size={20} color={"red"} />
                                     </TouchableOpacity>
                                   </>
                                 )}

@@ -1,4 +1,4 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+//import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { Component } from "react";
 import {
   Dimensions,
@@ -26,6 +26,7 @@ import InventoryService from "../services/InventoryService";
 import {
   listEmptyMessage
 } from "../Styles/Styles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 var deviceWidth = Dimensions.get("window").width;
@@ -66,6 +67,7 @@ export default class Barcode extends Component {
 
   async componentDidMount() {
     const storeId = await AsyncStorage.getItem("storeId");
+    // alert(storeId);
     const newstoreId = await AsyncStorage.getItem("newstoreId");
     this.setState({ storeId: storeId });
     this.setState({ pageNo: 0 });
@@ -115,6 +117,10 @@ export default class Barcode extends Component {
             error: "",
             totalPages: res.data.totalPages,
             loading: false,
+          }, () => {
+            if (this.state.barcodesList.length > 0) {
+              this.continuePagination();
+            }
           });
           console.warn("BarList", this.state.barcodesList);
           if (response) {
@@ -126,6 +132,12 @@ export default class Barcode extends Component {
         this.setState({ loading: false, error: "Records not found" });
       });
   }
+
+  // for the flatlist to scroll back to index
+  changeNavigation() {
+    this.flatListRef.scrollToIndex({ animated: true, index: 0 });
+  }
+
 
   // Edit Barcodes Function
   handleeditbarcode(item, index, value) {
@@ -146,7 +158,7 @@ export default class Barcode extends Component {
       reBar: value,
       onGoBack: () => this.refresh(),
       goBack: () => this.refresh(),
-    })
+    });
   }
 
   // Delete Barcode Function
@@ -307,6 +319,7 @@ export default class Barcode extends Component {
           <FlatList
             style={scss.flatListBody}
             refreshing={this.state.isFetching}
+            ref={(ref) => this.flatListRef = ref}
             onRefresh={() => this.refresh()}
             ListHeaderComponent={
               <View style={scss.headerContainer}>

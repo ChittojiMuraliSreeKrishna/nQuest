@@ -43,7 +43,9 @@ export default class CreateTaxMaster extends Component {
       .then((res) => {
         if (res) {
           console.log(res.data);
-          this.setState({ taxList: res.data.result });
+          this.setState({ taxList: res.data.result }, () => {
+            this.changeNavigation();
+          });
         }
         this.setState({ loading: false });
       })
@@ -51,6 +53,11 @@ export default class CreateTaxMaster extends Component {
         this.setState({ loading: false });
         console.log(err);
       });
+  }
+
+  // for the flatlist to scroll back to index
+  changeNavigation() {
+    this.flatListRef.scrollToIndex({ animated: true, index: 0 });
   }
 
   modelCancel() {
@@ -87,6 +94,7 @@ export default class CreateTaxMaster extends Component {
       <View>
         {this.state.loading && <Loader loading={this.state.loading} />}
         <FlatList
+          ref={(ref) => this.flatListRef = ref}
           ListHeaderComponent={
             <View style={scss.headerContainer}>
               <Text style={scss.flat_heading}>List Of Taxes - <Text style={{ color: '#ed1c24' }}>{this.state.taxList.length}</Text></Text>

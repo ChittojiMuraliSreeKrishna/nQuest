@@ -27,7 +27,7 @@ const pickerData1 = [{
 {
   label: "On WholeBill",
   value: "promotionForWholeBill",
-}]
+}];
 
 const pickerData2 = [{
   label: "Active",
@@ -36,7 +36,7 @@ const pickerData2 = [{
 {
   label: "In Active",
   value: "false",
-}]
+}];
 export class ListOfPromotions extends Component {
 
   constructor(props) {
@@ -80,6 +80,8 @@ export class ListOfPromotions extends Component {
         this.setState({
           listPromotions: res.data.result.content, totalPages: res.data.result.totalPages,
           filterActive: true, modalVisible: false
+        }, () => {
+          this.changeNavigation();
         });
         this.continuePagination();
       }
@@ -107,6 +109,11 @@ export class ListOfPromotions extends Component {
       });
     }
   };
+
+  // for the flatlist to scroll back to index
+  changeNavigation() {
+    this.flatListRef.scrollToIndex({ animated: true, index: 0 });
+  }
 
   continuePagination() {
     if (this.state.totalPages > 1) {
@@ -165,6 +172,7 @@ export class ListOfPromotions extends Component {
         </Appbar>
         {this.state.loading && <Loader loading={this.state.loading} />}
         <FlatList
+          ref={(ref) => this.flatListRef = ref}
           data={this.state.listPromotions}
           scrollEnabled={true}
           keyExtractor={(item, i) => i.toString()}

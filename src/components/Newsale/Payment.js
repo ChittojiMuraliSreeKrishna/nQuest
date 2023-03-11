@@ -1,46 +1,58 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { DrawerActions } from '@react-navigation/native';
 import axios from 'axios';
-import Constants from 'expo-constants';
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
+import I18n from 'react-native-i18n';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Modal from "react-native-modal";
-import RNPickerSelect from 'react-native-picker-select';
+import { Appbar, RadioButton, TextInput } from 'react-native-paper';
 import RazorpayCheckout from 'react-native-razorpay';
-import { Chevron } from 'react-native-shapes';
+import forms from '../../commonUtils/assets/styles/formFields.scss';
+import scss from '../../commonUtils/assets/styles/style.scss';
 import Loader from '../../commonUtils/loader';
+import PrintService from '../../commonUtils/Printer/printService';
+import RnPicker from '../../commonUtils/RnPicker';
+import { customerErrorMessages } from '../Errors/errors';
+import Message from '../Errors/Message';
+import CustomerService from '../services/CustomerService';
 import LoginService from '../services/LoginService';
 import NewSaleService from '../services/NewSaleService';
 import PromotionsService from '../services/PromotionsService';
+import { color } from '../Styles/colorStyles';
+
+
 var deviceWidth = Dimensions.get('window').width;
 var deviceWidth = Dimensions.get('window').width;
-const data = [{ key: 1 }, { key: 2 }, { key: 3 }, { key: 4 }, { key: 5 }];
+var deviceheight = Dimensions.get('window').height;
+const data = [{ key: 1 }, { key: 2 }, { key: 3 }, { key: 4 }, { key: 5 }, { key: 6 }];
 
 class Payment extends Component {
     constructor(props) {
         super(props);
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
         this.state = {
-            flagOne: true,
-            flagTwo: false,
-            flagThree: false,
-            flagFour: false,
-            flagFive: false,
+            isCash: false,
+            isCard: false,
+            isCardOrCash: false,
+            isUpi: false,
+            isGv: false,
+            isKhata: false,
             promocode: "",
             mobileNumber: "",
             loyaltyPoints: "",
             value: "",
             giftvoucher: "",
-            totalAmount: "",
-            totalDiscount: "",
-            recievedAmount: "",
-            verifiedCash: "",
-            domainId: 1,
-            storeId: 1,
+            totalAmount: 0,
+            totalDiscount: 0,
+            recievedAmount: 0,
+            verifiedCash: 0,
+            ccCardCash: 0,
+            domainId: 0,
+            storeId: 0,
             customerName: '',
             customerPhoneNumber: '',
+            customerFullName: '',
             customerGSTNumber: '',
             customerAddress: '',
             customerGender: '',
@@ -51,93 +63,177 @@ class Payment extends Component {
             customerEmail: '',
             flagCustomerOpen: false,
             flagredeem: false,
-            redeemedPints: "0",
+            redeemedPints: 0,
             enterredeempoint: '',
-            promoDiscount: "0",
+            couponDiscount: 0,
+            grossAmount: 0,
+            totalPromoDisc: 0,
+            CGST: 0,
+            SGST: 0,
+            taxAmount: 0,
+            approvedBy: '',
+            reasonDiscount: '',
+            userId: null,
+            dsNumberList: [],
+            returnAmount: 0,
+            retailBarCodeList: [],
+            modelVisible: true,
+            gvToCustomerModel: false,
+            gvNumber: "",
+            promoDiscount: 0,
+            manualDisc: 0,
+            loading: false,
+            clientId: 0,
+            isTagCustomer: false,
+            khataToCustomerModel: false,
+            kathaModelVisible: false,
+            upiToCustomerModel: false,
+            kathaColleted: 0,
+            upiModelVisible: false,
+            upiMobileNumber: '',
+            paymentType: [],
+            rtNumber: '',
+            rtAmount: 0,
+            rtValue: 0,
+            netCardPayment: 0,
+            createdBy: null,
+            giftCouponsList: [],
+            couponAmount: 0,
+            numRtList: [],
+            isRTApplied: false,
+            payButtonEnable: false,
+            compareRTList: [],
+            rtListList: [],
+            listOfRtnum: [],
+            creditModel: false,
+            creditModelVisible: false,
+            creditAmount: 0,
+            payCreditAmount: 0,
+            isCredit: false,
+            isCreditAmount: false,
+            balanceCreditAmount: "",
+            isreturnCreditCash: false,
+            isTaxIncluded: '',
+            barCodeList: [],
+            cardAutoModel: false,
+            cardModelVisible: false,
+            cardPaymentType: 'Manual',
+            cardManual: false,
+            khataAmount: 0,
+            payingAmount: 0,
+            grandNetAmount: 0,
+            showVerified: false,
+            billLevelDisc: 0,
+            isBillLevelDisc: false,
+            isCheckPromo: false,
+            totalManualDisc: 0,
+            discReasons: [],
+            discountAmountValid: true,
+            errors: {},
+            netPayableAmount: 0,
+            isBillLevel: false,
+            isCreditConfirm: false,
+            enablePayment: false,
+            isBillingDiscount: false,
+            isCreditDone: false,
+            isKathaDone: false,
+            isPrinterConnected: false,
+            domainType: "",
+            tableId: 0,
+            userId: 0,
+            domain: ""
         };
     }
 
     async componentDidMount() {
         var domainStringId = "";
         var storeStringId = "";
+        const userId = await AsyncStorage.getItem("userId");
+        const clientId = await AsyncStorage.getItem("custom:clientId1");
+        const isEsSlipEnabled = await AsyncStorage.getItem('custom:isEsSlipEnabled');
+        this.setState({ createdBy: userId, clientId: clientId, isEstimationEnable: isEsSlipEnabled });
+        // alert(await AsyncStorage.getItem("printerIp"))
+        let print = await AsyncStorage.getItem("printerIp");
+        if (print !== null) {
+            this.setState({ isPrinterConnected: true });
+        }
         AsyncStorage.getItem("domainDataId").then((value) => {
             domainStringId = value;
             this.setState({ domainId: parseInt(domainStringId) });
-            console.log("domain data id" + this.state.domainId);
+            // console.log("domain data id" + this.state.domainId);
 
         }).catch(() => {
             this.setState({ loading: false });
-            console.log('There is error getting domainDataId');
-          //  alert('There is error getting domainDataId');
+            // console.log('There is error getting domainDataId');
+            // alert('There is error getting domainDataId');
+        });
+
+        AsyncStorage.getItem("domainName").then((value) => {
+            global.domainName = value;
+        }).catch(() => {
+            this.setState({ loading: false });
+            // console.log('There is error getting domainName');
+            //alert('There is error getting domainName');
         });
 
         AsyncStorage.getItem("storeId").then((value) => {
             storeStringId = value;
             this.setState({ storeId: parseInt(storeStringId) });
-            console.log(this.state.storeId);
+            // console.log(this.state.storeId);
         }).catch(() => {
             this.setState({ loading: false });
-            console.log('There is error getting storeId');
-           // alert('There is error getting storeId');
+            // console.log('There is error getting storeId');
+            // alert('There is error getting storeId');
         });
-        console.log(this.props.route.params.totalAmount);
+        // console.log('total amount is,', this.props.route.params);
+        const parentObj = this.props.route.params;
+        console.log({ parentObj });
         this.setState({
-            totalAmount: this.props.route.params.totalAmount,
-            totalDiscount: this.props.route.params.totalDiscount,
-            customerName: this.props.route.params.customerName,
-            customerPhoneNumber: this.props.route.params.customerPhoneNumber,
-            customerGSTNumber: this.props.route.params.customerGSTNumber,
-            customerAddress: String(this.props.route.params.customerAddress),
-            customerGender: this.props.route.params.customerGender,
-            lineItemIdAdd: this.props.route.params.lineItemIdAdd,
-            totalQty: this.props.route.params.totalQty
+            totalAmount: parentObj.totalAmount ? parentObj.totalAmount : "",
+            netPayableAmount: parentObj.netPayableAmount ? parentObj.netPayableAmount : "",
+            grossAmount: parentObj.grossAmount ? parentObj.grossAmount : "",
+            totalPromoDisc: parentObj.totalPromoDisc ? parentObj.totalPromoDisc : "",
+            taxAmount: parentObj.taxAmount ? parentObj.taxAmount : "",
+            retailBarCodeList: parentObj.retailBarCodeList ? parentObj.retailBarCodeList : [],
+            dsNumberList: parentObj.dsNumberList ? parentObj.dsNumberList : [],
+            customerFullName: parentObj.customerFullName ? parentObj.customerFullName : "",
+            customerPhoneNumber: parentObj.customerPhoneNumber ? parentObj.customerPhoneNumber : "",
+            customerGSTNumber: parentObj.customerGSTNumber ? parentObj.customerGSTNumber : "",
+            customerAddress: String(parentObj.customerAddress) ? String(parentObj.customerAddress) : "",
+            customerGender: parentObj.customerGender ? parentObj.customerGender : "",
+            lineItemIdAdd: parentObj.lineItemIdAdd ? parentObj.lineItemIdAdd : "",
+            totalQty: parentObj.totalQty,
+            CGST: parentObj.CGST ? parentObj.CGST : 0,
+            SGST: parentObj.SGST ? parentObj.SGST : 0,
+            discountAmount: parentObj.discountAmount,
+            creditAmount: parentObj.creditAmount,
+            isTaxIncluded: parentObj.isTaxIncluded ? parentObj.isTaxIncluded : "",
+            barCodeList: parentObj.barCodeList ? parentObj.barCodeList : [],
+            isCreditFlag: parentObj.isCredit ? parentObj.isCredit : "",
+            grandNetAmount: parentObj.grandNetAmount ? parentObj.grandNetAmount : "",
+            billLevelDisc: parentObj.discountAmount ? parentObj.discountAmount : "",
+            enablePayment: parentObj.enablePayment ? parentObj.enablePayment : "",
+            domainType: parentObj.domainType ? parentObj.domainType : "",
+            tableId: parentObj.tableId ? parentObj.tableId : 0,
+            userId: userId,
         });
-
+        this.setState({ isTagCustomer: parentObj.customerPhoneNumber.length >= 10 ? true : false });
+        this.getDiscountReasons();
+        let params = this.props.route.params;
+        console.log({ params });
     }
 
 
     addCustomer() {
         if (this.state.customerPhoneNumber.length != 10) {
-            alert('Please Enter valid mobile number');
+            alert('Please Enter a valid 10 digit mobile number');
             return;
         }
         else if (this.state.customerName.length === 0) {
             alert('Please Enter customer name');
             return;
         }
-        // else if (this.state.customerGender.length === 0) {
-        //   alert('Please Enter customer gender');
-        //   return
-        // }
-        // else if (this.state.customerAddress.length === 0) {
-        //   alert('Please Enter customer address');
-        //   return
-        // }
-        // else if (this.state.customerGSTNumber.length === 0) {
-        //   alert('Please Enter customer GST Number');
-        //   return
-        // }
-        // {
-        //   "email":"manideep6067@gmail.com",	
-        //   "phoneNumber":"8466043603",
-        //   "birthDate":"07-03-1995",
-        //   "gender":"male",
-        //   "name":"vinod",
-        //   "username":"Mani_123451",
-        //   "parentId":"1",
-        //   "domianId":"0",
-        //   "address":"Katrenikona",
-        //   "isCustomer":true,
-        //   "isSuperAdmin":false,
-        //   "stores":[
 
-        //   ],
-        //   "role":{
-        //   },
-        //   "clientId":"",
-        //   "isConfigUser":false,
-        //   "clientDomain":[]
-        //   }
         const params = {
             "email": this.state.customerEmail,
             "phoneNumber": this.state.customerPhoneNumber,
@@ -214,7 +310,7 @@ class Payment extends Component {
         ).catch(() => {
             this.setState({ loading: false });
             this.setState({ flagCustomerOpen: false, modalVisible: false });
-            alert("Unable to Get User Details");
+            alert("There is an Error getting User Details");
         });
     };
 
@@ -222,7 +318,168 @@ class Payment extends Component {
         this.setState({ flagCustomerOpen: false, modalVisible: false });
     }
 
+    removeDuplicates(array, key) {
+        const lookup = new Set();
+        return array.filter(obj => !lookup.has(obj[key]) && lookup.add(obj[key]));
+    }
 
+    confirmKathaModel() {
+        const obj = {
+            "paymentType": "PKTPENDING",
+            "paymentAmount": this.state.khataAmount
+        };
+        this.state.paymentType.push(obj);
+        if (this.state.isRTApplied) {
+            this.setState({
+                payingAmount: this.state.grandNetAmount + this.state.rtAmount,
+                // totalAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString() + this.state.rtAmount
+            });
+        }
+        // if (this.state.totalAmount > 0) {
+        //   this.setState({
+        //     grandNetAmount: this.state.grandNetAmount - this.state.khataAmount,
+        //     payingAmount: parseFloat(this.state.totalAmount) - parseFloat(this.state.khataAmount)
+        //   }, () => {
+        //     this.cancelKathaModel();
+        //   });
+        // }
+        if (parseFloat(this.state.khataAmount) <= parseFloat(this.state.netPayableAmount)) {
+            if (parseFloat(this.state.khataAmount) === parseFloat(this.state.grandNetAmount)) {
+                this.setState({
+                    payButtonEnable: true,
+                    enableCoupon: false,
+                    isKathaDone: true,
+                    enablePayment: false, isCheckPromo: true, isBillLevel: true, grandNetAmount: 0.0,
+                    kathaColleted: parseFloat(this.state.khataAmount)
+                }, () => {
+                    this.cancelKathaModel();
+                });
+            } else {
+                let netPayableAmt = parseFloat(this.state.grandNetAmount) - parseFloat(this.state.khataAmount);
+                let grandNetAmount = parseFloat(netPayableAmt);
+                this.setState({
+                    grandNetAmount: (grandNetAmount.toFixed(2)),
+                    isKathaDone: true,
+                    payingAmount: parseFloat(this.state.netPayableAmount) - parseFloat(this.state.khataAmount),
+                    kathaColleted: parseFloat(this.state.khataAmount)
+                }, () => {
+                    this.cancelKathaModel();
+                    if (this.state.grandNetAmount === 0) {
+                        this.setState({ enablePayment: true });
+                    }
+                });
+            }
+        } else {
+            alert("cannot proceed");
+        }
+    }
+
+    cancelKathaModel() {
+        this.setState({ kathaModelVisible: false });
+    }
+
+    getUPILink() {
+        this.savePayment();
+    }
+
+    cancelUpiModel() {
+        this.setState({ upiModelVisible: false });
+    }
+
+    confirmCreditModel() {
+        const obj = {
+            "paymentType": "PKTADVANCE",
+            "paymentAmount": this.state.payCreditAmount
+        };
+        this.state.paymentType.push(obj);
+        var grandNetAmount = parseFloat(this.state.grandNetAmount);
+        // if (this.state.payCreditAmount > grandNetAmount) {
+        //   alert("please check the value")
+        if (parseFloat(this.state.payCreditAmount) < grandNetAmount) {
+            const amount = grandNetAmount - this.state.payCreditAmount;
+            this.state.grandNetAmount = parseFloat(amount);
+            this.setState({ isPayment: true, isreturnCreditCash: true, isCreditDone: true, balanceCreditAmount: amount, grandNetAmount: parseFloat(amount).toFixed(2) }, () => {
+                // if (this.state.isRTApplied) {
+                //   this.setState({ payingAmount: this.state.payCreditAmount + this.state.rtAmount, payButtonEnable: true })
+                // }
+            });
+        } else if (parseFloat(this.state.payCreditAmount) === grandNetAmount) {
+            this.setState({ isPayment: true, payButtonEnable: true, isCheckPromo: true, isCreditDone: true, enablePayment: false, isBillLevel: true, isTagCustomer: true });
+            // const obj = {
+            //   "paymentType": "PKTADVANCE",
+            //   "paymentAmount": this.state.payCreditAmount
+            // }
+            // this.state.paymentType.push(obj);
+        }
+        // this.setState({ recievedAmount: this.state.payCreditAmount, payingAmount: this.state.payCreditAmount })
+        // const grandAmount = grandNetAmount >= this.state.payCreditAmount ? grandNetAmount - this.state.payCreditAmount : 0
+        // this.setState({ isCreditAmount: true });
+        // if (this.state.isRTApplied) {
+        //   this.setState({ payingAmount: grandNetAmount + this.state.rtAmount, payButtonEnable: true })
+        // }
+        this.setState({ payingAmount: this.state.payCreditAmount });
+        this.setState({ isCreditAmount: true, creditAmount: this.state.creditAmount });
+        const grandAmount = this.state.grandNetAmount > this.state.payCreditAmount ? this.state.grandNetAmount - this.state.payCreditAmount : 0;
+        if (this.state.totalAmount === 0) {
+            this.setState({
+                enableCoupon: false, payButtonEnable: true,
+                isProccedtoCheck: true, enablePayment: false, isCheckPromo: true, isBillLevel: true, isTagCustomer: true
+            });
+        }
+        this.cancelCreditModel();
+        // this.pay()
+    }
+
+    cancelCreditModel() {
+        this.setState({ creditModelVisible: false });
+    }
+
+    saveCard() {
+        this.setState({});
+        var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString();
+        if (this.state.cardPaymentType === "Automatic") {
+            this.getCardModel();
+            this.cancelCardModel();
+        } else {
+            this.setState({ cashAmount: parseFloat(grandNetAmount) });
+            this.setState({ enablePayment: false, isBillLevel: true, isTagCustomer: true, isCheckPromo: true, enableCoupon: false });
+            this.manualCardPayment();
+        }
+    }
+
+    getCardModel = () => {
+        var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10) - parseFloat(this.state.verifiedCash)).toString();
+        this.setState({ payingAmount: grandNetAmount });
+        this.setState({
+            isCard: true,
+        },
+            () => {
+                if (this.state.isreturnCreditCash) {
+                    this.setState({ grandNetAmount: this.state.balanceCreditAmount });
+                }
+            });
+        if (this.state.isRTApplied) {
+            this.setState({ payingAmount: grandNetAmount + this.state.rtAmount });
+        }
+        this.pay();
+        // this.setState({
+        //   isCardSelected: true,
+        // });
+    };
+
+    manualCardPayment = () => {
+        this.setState({ isCard: false, cardManual: true });
+        const obj = {
+            "paymentType": "Card",
+            "paymentAmount": parseFloat(this.state.grandNetAmount)
+        };
+        this.state.paymentType.push(obj);
+        this.cancelCardModel();
+    };
+
+    cancelCardModel() {
+        this.setState({ cardModelVisible: false, cardAutoModel: false });
+    }
 
     handleBackButtonClick() {
         this.props.navigation.goBack(null);
@@ -230,28 +487,36 @@ class Payment extends Component {
     }
 
 
-
-    menuAction() {
-        this.props.navigation.dispatch(DrawerActions.openDrawer());
-    }
-
     cashAction() {
         this.setState({
-            flagOne: true,
-            flagTwo: false,
-            flagThree: false,
-            flagFour: false,
-            flagFive: false
+            isCash: true,
+            isCard: false,
+            isCardOrCash: false,
+            isUpi: false,
+            isGv: false,
+            isKhata: false,
+            payButtonEnable: true,
+            isCredit: false,
+            recievedAmount: 0,
+            returnAmount: 0,
+            verifiedCash: 0
         });
     }
 
     cardAction() {
         this.setState({
-            flagOne: false,
-            flagTwo: true,
-            flagThree: false,
-            flagFour: false,
-            flagFive: false
+            isCash: false,
+            isCard: true,
+            isCardOrCash: false,
+            isUpi: false,
+            isGv: false,
+            isKhata: false,
+            payButtonEnable: true,
+            isCredit: false,
+            recievedAmount: 0,
+            returnAmount: 0,
+            cardAutoModel: true,
+            cardModelVisible: true
         });
     }
     handleredeemPoints = (text) => {
@@ -259,7 +524,6 @@ class Payment extends Component {
     };
 
     clearRedemption() {
-        console.log('dasdsdasdafsf');
         this.setState({ redeemedPints: "" });
     }
     handleCustomerPhoneNumber = (text) => {
@@ -269,6 +533,7 @@ class Payment extends Component {
     handleCustomerName = (text) => {
         this.setState({ customerName: text });
     };
+
 
     handleCustomerEmail = (text) => {
         this.setState({ customerEmail: text });
@@ -287,13 +552,11 @@ class Payment extends Component {
     };
 
     cancel() {
-        console.log('clicked');
         this.setState({ flagCustomerOpen: false, flagqtyModelOpen: false, modalVisible: false });
         //this.setState({ modalVisible: true });
     }
 
     endEditing() {
-        console.log("end edited");
         if (this.state.customerPhoneNumber.length > 0) {
             this.getUserDetails();
         }
@@ -301,32 +564,90 @@ class Payment extends Component {
 
     qrAction() {
         this.setState({
-            flagOne: false,
-            flagTwo: false,
-            flagThree: true,
-            flagFour: false,
-            flagFive: false
+            isCash: false,
+            isCard: false,
+            isCardOrCash: true,
+            isUpi: false,
+            isGv: false,
+            isKhata: false,
+            payButtonEnable: true,
+            isCredit: false,
+            recievedAmount: 0,
+            returnAmount: 0,
+            verifiedCash: 0
         });
     }
 
     upiAction() {
         this.setState({
-            flagOne: false,
-            flagTwo: false,
-            flagThree: false,
-            flagFour: true,
-            flagFive: false
+            upiToCustomerModel: true,
+            upiModelVisible: true,
+            isCash: false,
+            isCard: false,
+            isCardOrCash: false,
+            isUpi: true,
+            isGv: false,
+            isKhata: false,
+            payButtonEnable: true,
+            isCredit: false,
+            recievedAmount: 0,
+            returnAmount: 0
         });
     }
 
-    khathaAction() {
+    gvAction() {
         this.setState({
-            flagOne: false,
-            flagTwo: false,
-            flagThree: false,
-            flagFour: false,
-            flagFive: true
+            isCash: false,
+            isCard: false,
+            isCardOrCash: false,
+            isUpi: false,
+            isGv: true,
+            isKhata: false,
+            payButtonEnable: true,
+            isCredit: false
         });
+    }
+
+    khataAction() {
+        this.setState({
+            khataToCustomerModel: true,
+            kathaModelVisible: true,
+            isCash: false,
+            isCard: false,
+            isCardOrCash: false,
+            isUpi: false,
+            isGv: false,
+            isKhata: true,
+            // payButtonEnable: this.state.grandNetAmount == 0 ? true : false,
+            isCredit: false,
+            recievedAmount: 0,
+            returnAmount: 0
+        });
+    }
+
+    creditAction() {
+        this.setState({
+            creditModel: true,
+            // payCreditAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString(),
+            creditModelVisible: true,
+            isCash: false,
+            isCard: false,
+            isCardOrCash: false,
+            isUpi: false,
+            isGv: false,
+            isKhata: false,
+            isCredit: true,
+            recievedAmount: 0,
+            returnAmount: 0
+        });
+    }
+
+    handleUpiMobileNumber = (text) => {
+        this.setState({ upiMobileNumber: text });
+    };
+
+    modelCancel() {
+        this.setState({ modelVisible: false });
     }
 
     handlePromocode = (text) => {
@@ -339,17 +660,149 @@ class Payment extends Component {
 
     handlerecievedAmount = (text) => {
         this.setState({ recievedAmount: text });
+        if (this.state.isCardOrCash === true) {
+            let grandNetAmount = (parseFloat(this.state.grandNetAmount));
+            this.setState({ ccCardCash: grandNetAmount - text });
+        }
+    };
+
+    handleGVNumber = (text) => {
+        this.setState({ gvNumber: text, giftvoucher: text });
     };
 
     verifycash() {
-        this.setState({ verifiedCash: this.state.recievedAmount });
+        // const cash = parseInt(this.state.payCreditAmount) + parseInt(this.state.balanceCreditAmount)
+        // this.setState({
+        //   balanceCreditAmount: 0,
+        //   // cashAmount:  parseInt(this.state.payCreditAmount) + parseInt(this.state.balanceCreditAmount),
+        //   recievedAmount: cash ? cash : this.state.recievedAmount,
+        //   payCreditAmount: parseInt(this.state.payCreditAmount) + parseInt(this.state.balanceCreditAmount)
+        // })
+        // console.log("Received amount", this.state.recievedAmount, this.state.grandNetAmount);
+        if (this.state.isCash === true && this.state.isCardOrCash === false) {
+            if (parseFloat(this.state.recievedAmount) > parseFloat(this.state.grandNetAmount)) {
+                this.setState({ returnAmount: parseFloat(this.state.recievedAmount) - parseFloat(this.state.grandNetAmount) });
+                this.state.returnAmount = ((this.state.returnAmount).toFixed(2));
+                this.setState({
+                    verifiedCash: parseFloat(this.state.totalAmount),
+                    payingAmount: this.state.grandNetAmount,
+                    grandNetAmount: 0.0,
+                    showVerified: true
+                });
+            } else if (parseFloat(this.state.recievedAmount) === parseFloat(this.state.grandNetAmount)) {
+                this.setState({
+                    isPayment: false, returnAmount: parseFloat(this.state.recievedAmount) - parseFloat(this.state.grandNetAmount), showVerified: true,
+                    payingAmount: this.state.grandNetAmount, grandNetAmount: 0.0,
+                });
+            } else if (parseFloat(this.state.recievedAmount) < parseFloat(this.state.grandNetAmount) || parseFloat(this.state.recievedAmount) !== "") {
+                alert('Please collect sufficient amount');
+                this.setState({ showVerified: false });
+            } else {
+                this.state.verifiedCash = 0;
+                this.state.returnAmount = 0;
+                this.state.grandNetAmount = 0;
+                this.state.receivedAmount = 0;
+                this.setState({ isCash: false });
+            }
+            // if (this.state.isreturnCreditCash) {
+            //   this.setState({ grandNetAmount: this.state.balanceCreditAmount })
+            // }
+            const obj = {
+                "paymentType": "Cash",
+                "paymentAmount": parseFloat(this.state.grandNetAmount)
+            };
+            this.state.paymentType.push(obj);
+            if (this.state.grandNetAmount !== 0 || this.state.totalAmount === 0) {
+                this.setState({ isProccedtoCheck: true, enablePayment: false, isCheckPromo: true, isBillLevel: true });
+            }
+        }
+        else if (this.state.isCardOrCash === true) {
+            if ((parseFloat(this.state.recievedAmount) < (parseFloat(this.state.grandNetAmount)))) {
+                this.setState({
+                    // cardModelVisible: true,
+                    payingAmount: this.state.grandNetAmount,
+                    // cardAutoModel: true, 
+                    verifiedCash: this.state.recievedAmount,
+                    grandNetAmount: 0, showVerified: true
+                });
+                this.pay();
+            } else {
+                alert(" Collected Cash Should be less than payable amount when it comes to Cash & Card Payment");
+            }
+
+        }
+        // if (this.state.isreturnCreditCash) {
+        //   this.setState({ grandNetAmount: this.state.balanceCreditAmount })
+        // }
     }
 
-    applyPromocode() {
-        // alert('promo code applied') 
-        this.setState({ giftvoucher: this.state.promocode });
-        this.setState({ promoDiscount: "100" });
-
+    async applyPromocode() {
+        const gvNumbers = [];
+        const obj = {
+            gvNumber: this.state.promocode
+        };
+        gvNumbers.push(obj);
+        let count = 0;
+        this.state.giftCouponsList.length > 0 && this.state.giftCouponsList.map((item) => {
+            if (item.gvNumber === this.state.promocode) {
+                return count = 1;
+            }
+        });
+        if (this.state.promocode !== "") {
+            if (count != 1) {
+                NewSaleService.getCoupons(this.state.clientId, gvNumbers).then(res => {
+                    if (Array.isArray(res.data.result)) {
+                        let grandAmount = this.state.grandNetAmount;
+                        const couponsListList = res.data.result.map((item) => {
+                            if (grandAmount > item.value) {
+                                grandAmount = grandAmount - item.value;
+                            } else if (grandAmount === item.value) {
+                                this.setState({
+                                    isCouponApplied: false,
+                                }, () => {
+                                    this.setState({
+                                        enablePayment: false,
+                                        isCheckPromo: true, isBillLevel: true, isTagCustomer: true
+                                    });
+                                });
+                            } else {
+                                alert("Please purchase greater than coupon amount");
+                                // this.setState({ promocode: "" });
+                            }
+                            this.setState({
+                                grandNetAmount: this.state.grandNetAmount - item.value,
+                                couponAmount: this.state.couponAmount + item.value
+                            });
+                            let obj = {};
+                            obj.gvNumber = item.gvNumber;
+                            obj.value = item.value;
+                            return obj;
+                        });
+                        this.setState({
+                            giftCouponsList: [...this.state.giftCouponsList, couponsListList[0]],
+                            promocode: ''
+                        }, () => {
+                            this.setState({
+                                isCheckPromo: true,
+                                giftCouponsList: [...new Map(this.state.giftCouponsList.map((m) => [m.gvNumber, m])).values()]
+                            });
+                        });
+                    }
+                    else {
+                        alert(res.data.message);
+                        this.setState({
+                            promocode: ''
+                        });
+                    }
+                    // }
+                });
+            } else {
+                this.setState({ promocode: '' });
+            }
+        } else {
+            alert("Please Enter GV Number");
+            this.setState({ promocode: '' });
+        }
     }
 
     applyRedem() {
@@ -373,99 +826,180 @@ class Payment extends Component {
     }
 
     clearPromocode() {
-        this.setState({ promoDiscount: "0", giftvoucher: "", promocode: "" });
+        this.setState({ promoDiscount: 0, giftvoucher: "", promocode: "" });
     }
 
     clearCashSammary() {
-        this.setState({ verifiedCash: "", recievedAmount: "" });
+        this.setState({ verifiedCash: 0, recievedAmount: 0, returnAmount: 0 });
     }
 
+
+    clearStateFields = () => {
+        this.setState({
+            customerName: " ",
+            gender: " ",
+            dob: " ",
+            customerGST: " ",
+            address: " ",
+            manualDisc: 0,
+            customerEmail: "",
+            netPayableAmount: 0.0,
+            barCodeList: [],
+            grossAmount: 0.0,
+            promoDiscount: 0.0,
+            cashAmount: 0,
+            taxAmount: 0.0,
+            grandNetAmount: 0,
+            payingAmount: 0,
+            returnCash: 0,
+            stateGST: 0,
+            centralGST: 0,
+            isPayment: true,
+            isCreditAmount: false,
+            creditAmount: 0,
+            payCreditAmount: 0,
+            totalAmount: 0,
+            couponAmount: 0,
+            isTagCustomer: false,
+            rtAmount: 0,
+            enablePayment: false,
+            totalPromoDisc: 0,
+            showTable: false,
+            numRtList: [],
+            objInvoice: [],
+            dsNumber: ''
+        });
+    };
+
     pay = () => {
-        if (this.state.flagOne === true) {
-            const params = {
-                "natureOfSale": "InStore",
-                "domainId": 2,
-                "storeId": this.state.storeId,
-                "grossAmount": this.state.totalAmount,
-                "totalPromoDisc": (parseFloat(this.state.totalDiscount) + parseFloat(this.state.promoDiscount) + parseFloat(this.state.redeemedPints / 10)).toString(),
-                "taxAmount": 0,
-                "totalManualDisc": 0,
-                "discApprovedBy": null,
-                "discType": null,
-                "approvedBy": 5218,
-                "netPayableAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString(),
-                "offlineNumber": null,
-                "paymentAmountType": [
-                    {
-                        "paymentAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString(),
-                        "paymentType": "Cash"
-                    }],
-                "customerDetails": {
-                    "name": this.state.customerName,
-                    "mobileNumber": this.state.customerPhoneNumber,
-                    "gstNumber": this.state.customerGSTNumber,
-                    "address": this.state.customerAddress,
-                    "gender": this.state.customerAddress,
-                    "altMobileNo": "",
-                    "dob": ""
-                },
-                "dlSlip": [],
-                "lineItemsReVo": this.state.lineItemIdAdd
-            };
-
-            console.log(params);
-
-            axios.post(NewSaleService.createOrder(), params).then((res) => {
-                if (res.data && res.data["isSuccess"] === "true") {
-                    //  alert("Order created " + res.data["result"]);
-                    this.setState({ loading: false });
-                    this.props.route.params.onGoBack();
-                    this.props.navigation.goBack();
-                }
-                else {
-                    this.setState({ loading: false });
-                    alert("duplicate record already exists");
-                }
-            }
-            );
+        var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString();
+        var obj;
+        if (this.state.isCash === true && this.state.isCardOrCash === false && this.state.recievedAmount === "") {
+            alert('Please collect sufficient amount and then only pay');
         }
-        else if (this.state.flagTwo === true) {
-            const params = {
-                "natureOfSale": "InStore",
-                "domainId": 2,
-                "storeId": this.state.storeId,
-                "grossAmount": this.state.totalAmount,
-                "totalPromoDisc": (parseFloat(this.state.totalDiscount) + parseFloat(this.state.promoDiscount) + parseFloat(this.state.redeemedPints / 10)).toString(),
-                "taxAmount": 0,
-                "totalManualDisc": 0,
-                "discApprovedBy": null,
-                "discType": null,
-                "approvedBy": 5218,
-                "netPayableAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString(),
-                "offlineNumber": null,
+        else if (this.state.isCash === true && this.state.isCardOrCash === false && parseFloat(this.state.recievedAmount) < (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10))) {
+            alert('Please collect sufficient amount and then only pay');
+        }
+        else if (this.state.isCardOrCash === true && this.state.verifiedCash === "") {
+            alert('Please collect some cash amount for ccpay');
+        }
+        else if (this.state.isUpi === true) {
+            // this.getPaymentResposne()
+            const obj = {
+                "amount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString(),
+                "description": "payment description",
                 "customerDetails": {
-                    "name": this.state.customerName,
-                    "mobileNumber": this.state.customerPhoneNumber,
-                    "gstNumber": this.state.customerGSTNumber,
-                    "address": this.state.customerAddress,
-                    "gender": this.state.customerGender,
-                    "altMobileNo": "",
-                    "dob": ""
-                },
-                "dlSlip": [],
-                "lineItemsReVo": this.state.lineItemIdAdd
+                    "name": "kadali",
+                    "contact": this.state.upiMobileNumber,
+                    "email": "kadali7799@gmail.com"
+                }
             };
-            console.log(params);
-            axios.post(NewSaleService.createOrder(), params).then((res) => {
-                if (res.data && res.data["isSuccess"] === "true") {
-                    alert("Order created " + res.data["result"]);
-                    const params = {
-                        "amount": JSON.stringify((parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()),
-                        "info": "order creations",
-                        "newsaleId": res.data["result"],
-                    };
+            const token = AsyncStorage.getItem("tokenkey");
+            const uninterceptedAxiosInstance = axios.create();
+            uninterceptedAxiosInstance.post('http://14.98.164.17:9097/paymentgateway/razorpay/create-payment-link', obj, {
+                headers: {
+                    'Authorization': 'Bearer' + ' ' + token,
+                }
+            }).then(response => {
+                if (response.data) {
+                    this.setState({ upiToCustomerModel: false });
+                }
+            });
+        }
+        if (this.state.giftCouponsList.length >= 1) {
+            const obj = {
+                "paymentType": "GIFTVOUCHER",
+                "paymentAmount": this.state.couponAmount
+            };
+            this.state.paymentType.push(obj);
+        }
+        let cCData;
+        if (this.state.isCardOrCash === true) {
+            let paymentType = [{
+                "paymentType": "Cash",
+                "paymentAmount": parseFloat(this.state.recievedAmount)
+            },
+            {
+                "paymentType": "Card",
+                "paymentAmount": this.state.ccCardCash
+            }];
+            cCData = this.state.paymentType.concat(paymentType);
+        }
+        let couponCode = this.state.giftCouponsList.map((item) => {
+            return item.gvNumber;
+        });
+        // alert(this.state.domainType);
+        if (this.state.domainType === "Table") {
+            obj = {
+                natureOfSale: "InStore",
+                storeId: this.state.storeId,
+                domainType: this.state.domainType,
+                createdBy: parseInt(this.state.createdBy),
+                totalPromoDisc: this.state.totalPromoDisc,
+                lineItemsReVo: this.state.barCodeList,
+                netPayableAmount: this.state.payingAmount,
+                paymentAmountType:
+                    this.state.isCardOrCash === true ?
+                        cCData :
+                        this.state.paymentType,
+                recievedAmount: this.state.recievedAmount,
+                returnAmount: this.state.returnAmount,
+                sgst: this.state.SGST,
+                cgst: this.state.CGST,
+                tableId: this.state.tableId,
+                TotalAmTax: this.state.totalAmount,
+                totalManualDisc: parseInt(this.state.manualDisc),
+            };
 
-                    axios.post(NewSaleService.payment(), params).then((res) => {
+        } else {
+            obj = {
+                bookingId: this.state.userId,
+                invoiceIds: this.state.barCodeList,
+                storeId: this.state.storeId,
+                paymentAmountType:
+                    this.state.isCardOrCash === true ?
+                        cCData :
+                        this.state.paymentType,
+            };
+
+        }
+        console.log(" payment cash method data", obj);
+        let invoiceTax = [];
+        invoiceTax.push(obj);
+        if (this.state.isCard === true) {
+            delete obj.paymentAmountType;
+        }
+        console.log({ obj });
+        if (this.state.domainType === "Table") {
+            axios.post(NewSaleService.createOrder(), obj).then(async (res) => {
+                console.log("Invoice data", JSON.stringify(res.data));
+                if (res.data && res.data["isSuccess"] === "true") {
+                    if (this.state.isPrinterConnected === true) {
+                        PrintService('INVOICE', res.data.result, this.state.barCodeList, invoiceTax);
+                    }
+
+                    alert("Order created " + res.data["result"]);
+                    if (this.state.isRTApplied === true || this.state.isKhata === true || this.state.cardManual === true || this.state.isCredit === true || this.state.isCash === true && this.state.isCardOrCash === false) {
+                        this.props.route.params.onGoBack();
+                        this.props.navigation.goBack();
+                    }
+                    let obj;
+                    if (this.state.isCard === true) {
+                        obj = {
+                            "amount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)),
+                            "info": "order creations",
+                            "newsaleId": res.data["result"],
+                        };
+                    } else if (this.state.isCardOrCash === true) {
+                        obj = {
+                            "amount": this.state.ccCardCash,
+                            "info": "order creations",
+                            "newsaleId": res.data["result"],
+                        };
+
+                    }
+                    // console.log('params aresdasd', obj);
+                    axios.post(NewSaleService.payment(), obj).then((res) => {
                         // this.setState({isPayment: false});
                         const data = JSON.parse(res.data["result"]);
                         //console.log()
@@ -484,7 +1018,7 @@ class Payment extends Component {
                             },
                             theme: { color: '#F37254' }
                         };
-                        console.log(options);
+                        // console.log("options data", options);
                         RazorpayCheckout.open(options).then((data) => {
                             // handle success
                             this.setState({ tableData: [] });
@@ -494,24 +1028,28 @@ class Payment extends Component {
                             //this.props.navigation.navigate('Orders', { total: this.state.totalAmount, payment: 'RazorPay' })
                         }).catch((error) => {
                             this.setState({ loading: false });
-                            console.log(error);
+                            // console.log(error);
                             // handle failure
-                            alert(`Error: ${JSON.stringify(error.code)} | ${JSON.stringify(error.description)}`);
+                            alert(`Error: ${JSON.stringify(error.code)} || ${JSON.stringify(error.description)}`);
                         });
                     });
-                    this.setState({ loading: false });
                 }
                 else {
-                    this.setState({ loading: false });
+                    // this.setState({ loading: false });
                     alert("duplicate record already exists");
                 }
-            }
-            );
-        }
-        else {
-            alert('Payment for this tab implementation inprogress');
+            });
+        } else {
+            axios.post(NewSaleService.RoomPay(), obj).then(async (res) => {
+                if (res.data) {
+                    alert(res.data);
+                    this.props.route.params.onGoBack();
+                    this.props.navigation.goBack();
+                }
+            });
         }
     };
+
 
     redeemPoints() {
         this.setState({ flagredeem: true, modalVisible: true });
@@ -528,20 +1066,19 @@ class Payment extends Component {
                 "invoiceNumber": null,
                 "mobileNumber": this.state.mobileNumber,
             };
-            console.log(params);
             this.setState({ loading: true });
             axios.post(PromotionsService.searchLoyaltyPoints(),
                 params).then((res) => {
                     if (res.data && res.data["isSuccess"] === "true") {
                         this.setState({ loading: false });
                         let len = res.data["result"].length;
-                        console.log(res.data["result"]);
+                        // console.log(res.data["result"]);
                         if (len > 0) {
                             for (let i = 0; i < len; i++) {
                                 let number = res.data["result"][i];
                                 this.setState({ loyaltyPoints: number.loyaltyPoints });
 
-                                console.log(this.state.loyaltyPoints);
+                                // console.log(this.state.loyaltyPoints);
                             }
                         }
                     }
@@ -553,1156 +1090,936 @@ class Payment extends Component {
         }
     }
 
+    applyGVNumber() {
+        const gvObj = [this.state.gvNumber];
+        const param = '?flag=' + false;
+        axios.put(NewSaleService.saveCoupons() + param, gvObj).then(res => {
+            if (res) {
+                // console.log(res.data);
+                alert(res.data.message);
+            }
+            this.setState({ modelVisible: false, gvNumber: "" });
+        });
+    }
+
+    async applyRt() {
+        const obj = this.state.rtNumber;
+        if (this.state.compareRTList.length === 0) {
+            // console.log("in if", this.state.compareRTList, this.state.listOfRtnum);
+            this.setState({
+                compareRTList: [...this.state.listOfRtnum, obj],
+            });
+        } else {
+            // console.log("in else", this.state.rtListList);
+            const isFound = this.state.rtListList.find(element => {
+                if (element.returnReference === obj) {
+                    alert("RT Number Alredy Exist ");
+                    return true;
+                }
+                return false;
+            });
+            if (!isFound) {
+                this.setState({
+                    compareRTList: [...this.state.compareRTList, obj]
+                });
+            }
+
+        }
+        var grandNetAmount = parseFloat(this.state.grandNetAmount);
+        if (this.state.rtNumber.length > 0) {
+            const storeId = await AsyncStorage.getItem("storeId");
+            NewSaleService.getRTDetails([this.state.rtNumber], storeId).then(res => {
+                // console.log("___________res______________" + JSON.stringify(res.data));
+                if (res.data.result.length > 0) {
+                    // console.log("---------ress", res.data.result[0]);
+                    this.setState({
+                        rtListList: [...this.state.rtListList, res.data.result[0]]
+                    }, () => {
+                        const flattened1 = this.state.rtListList.flatMap(returnReference => returnReference);
+                        const unique = [...new Map(flattened1.map((m) => [m.taggedItemId, m])).values()];
+                        let listofRTNum = unique.map((itm) => itm.returnReference);
+                        this.setState({
+                            rtSlipList: unique,
+                            rtListList: unique,
+                            rtNumber: '',
+                            listOfRtnum: [],
+                            numRtList: listofRTNum
+                        });
+                    });
+                    let sumreturnedAmout = res.data.result[0].barcodes.reduce((accumulator, curValue) => {
+                        if (curValue.returnQty) {
+                            accumulator = accumulator + curValue.returnAmount;
+                        }
+                        return accumulator;
+                    }, 0);
+                    if (grandNetAmount > sumreturnedAmout) {
+                        this.setState({
+                            isRTnumAplied: false,
+                            rtAmount: this.state.rtAmount + sumreturnedAmout,
+                            payingAmount: parseFloat(this.state.rtAmount - grandNetAmount).toFixed(2),
+                            // totalAmount: grandNetAmount - sumreturnedAmout,
+                            payButtonEnable: grandNetAmount - sumreturnedAmout === 0 ? true : false,
+                            isRTApplied: true,
+                            isCheckPromo: true,
+                            grandNetAmount: parseFloat(this.state.grandNetAmount - sumreturnedAmout).toFixed(2)
+                        });
+                        const obj = {
+                            "paymentType": "RTSlip",
+                            "paymentAmount": this.state.rtAmount
+                        };
+                        this.state.paymentType.push(obj);
+                    } else if (grandNetAmount === sumreturnedAmout) {
+                        this.setState({
+                            isRTnumAplied: false,
+                            rtAmount: this.state.rtAmount + sumreturnedAmout,
+                            enablePayment: false,
+                            payingAmount: parseFloat(this.state.rtAmount - grandNetAmount).toFixed(2),
+                            // totalAmount: grandNetAmount - sumreturnedAmout,
+                            payButtonEnable: grandNetAmount - sumreturnedAmout === 0 ? true : false,
+                            isRTApplied: true,
+                            grandNetAmount: parseFloat(this.state.grandNetAmount - sumreturnedAmout).toFixed(2),
+                            isCheckPromo: true, isBillLevel: true, isTagCustomer: true
+                        });
+                        const obj = {
+                            "paymentType": "RTSlip",
+                            "paymentAmount": this.state.rtAmount
+                        };
+                        this.state.paymentType.push(obj);
+                    }
+                    else {
+                        alert("Please purchase greater than return amount");
+                    }
+                    this.setState({ rtNumber: '' });
+                } else {
+                    alert("Invalid RT Slip Number ");
+                    this.setState({ rtNumber: '' });
+                }
+            }
+            );
+        } else {
+            alert("Please Enter RT Slip Number");
+            this.setState({ rtNumber: '' });
+        }
+    }
+
+    checkPromo() {
+        let costPrice = 0;
+        let discount = 0;
+        let total = 0;
+        let discAppliedTotal = 0;
+        const { storeId, domainId, barCodeList } = this.state;
+        const requestObj = barCodeList.map((item) => {
+            console.log({ item });
+            let obj = {};
+            obj.actualValue = item.actualValue;
+            obj.barCode = item.barCode;
+            obj.cgst = item.cgst;
+            obj.discount = item.promoDiscount;
+            obj.division = item.division;
+            obj.domainId = item.domainId;
+            obj.grossValue = item.grossValue;
+            obj.hsnCode = item.hsnCode;
+            obj.itemPrice = item.itemPrice;
+            obj.lineItemId = item.lineItemId;
+            obj.netValue = item.netValue;
+            obj.quantity = item.quantity;
+            obj.section = item.section;
+            obj.sgst = item.sgst;
+            obj.storeId = item.storeId;
+            obj.subSection = item.subSection;
+            obj.taxValue = item.taxValue;
+            obj.userId = item.userId;
+            obj.costPrice = item.itemPrice;
+            obj.uom = item.uom;
+            obj.originalBarcodeCreatedAt = item.createdDate;
+            obj.batchNo = item.batchNo;
+            obj.promoDiscount = 0;
+            obj.totalPromoDiscount = 0.0;
+            obj.distributedPromoDiscount = 0.0;
+            return obj;
+        });
+        console.log({ requestObj });
+        if (this.state.isEstimationEnable === "true") {
+            CustomerService.getinvoiceLevelCheckPro(1, storeId, requestObj,).then((res) => {
+                if (res.status === 200) {
+                    this.setState({
+                        barCodeList: res.data.result,
+                        isCheckPromo: true,
+                    });
+                    res.data.result.forEach((ele, index) => {
+                        this.state.barCodeList.forEach((item, idx) => {
+                            // item.distributedPromoDiscount= ele.distributedPromoDiscount;
+                            // item.totalPromoDiscount = ele.totalPromoDiscount
+                            if (item.barCode === ele.barCode) {
+                                item.distributedPromoDiscount = (ele.distributedPromoDiscount);
+                                item.totalPromoDiscount = ele.totalPromoDiscount;
+                            }
+                        });
+                    });
+                    this.state.barCodeList.forEach((barCode, index) => {
+                        costPrice = costPrice + barCode.itemPrice;
+                        discount = discount + barCode.totalPromoDiscount;
+                        total = total + barCode.netValue;
+                    });
+
+                    discount = discount + this.state.manualDisc;
+                    discAppliedTotal = parseFloat(this.state.grandNetAmount - discount).toFixed(2);
+                    this.setState({
+                        netPayableAmount: parseFloat(total).toFixed(2),
+                        totalPromoDisc: (parseFloat(this.state.totalPromoDisc) + parseFloat(discount)).toFixed(2),
+                        grossAmount: costPrice,
+                        grandNetAmount: discAppliedTotal
+                    });
+                    if (this.state.barCodeList.length > 0) {
+                        this.setState({ enablePayment: true });
+                    }
+
+                    // this.getTaxAmount();
+                } else {
+                    alert("no Promo Available");
+                    this.setState({ isCheckPromo: true });
+                }
+            });
+        } else {
+            const requestObj = barCodeList.map((item) => {
+                let obj = {};
+                obj.actualValue = item.actualValue;
+                obj.barcode = item.barCode;
+                obj.cgst = item.cgst;
+                obj.discount = item.promoDiscount;
+                obj.division = item.division;
+                obj.domainId = item.domainId;
+                obj.grossValue = item.grossValue;
+                obj.hsnCode = item.hsnCode;
+                obj.itemMrp = item.itemPrice;
+                obj.lineItemId = item.lineItemId;
+                obj.netValue = item.netValue;
+                obj.quantity = item.qty;
+                obj.section = item.section;
+                obj.sgst = item.sgst;
+                obj.storeId = item.storeId;
+                obj.subSection = item.subSection;
+                obj.taxValue = item.taxValue;
+                obj.userId = item.userId;
+                obj.costPrice = item.costPrice;
+                obj.uom = item.uom;
+                obj.originalBarcodeCreatedAt = item.createdDate;
+                obj.batchNo = item.batchNo;
+                obj.promoDiscount = 0;
+                obj.totalPromoDiscount = 0.0;
+                obj.calculatedDiscountsVo = {};
+                obj.category = item.category;
+                obj.colour = item.colour;
+                obj.empId = item.empId;
+                obj.name = item.name;
+                obj.parentBarcode = item.parentBarcode;
+                obj.productTextileId = item.productTextileId;
+                obj.status = item.status;
+                obj.value = item.value;
+                return obj;
+            });
+            CustomerService.getCheckPromoAmount(storeId, 1, requestObj).then(res => {
+                let calculatedDisc = res.data.result.calculatedDiscountVo;
+                if (res.status === 200) {
+                    this.setState({
+                        isCheckPromo: true
+                    });
+                }
+                if (res?.data && res?.data?.result[0].calculatedDiscountVo) {
+                    this.setState({ promoDiscount: response.data.result }, () => {
+                        // console.log('response.data', response.data)
+                    });
+                    response.data.result.forEach((ele, index) => {
+                        barCodeList.forEach((item, idx) => {
+                            if (item.barCode === ele.barcode) {
+                                if (ele.calculatedDiscountsVo) {
+                                    if (ele.calculatedDiscountsVo.discountAvailable) {
+                                        if (ele.calculatedDiscountsVo.thisFixedAmountDiscount) {
+                                            item.itemDiscount = parseFloat(ele.calculatedDiscountsVo.calculatedDiscount > 0 ? ele.calculatedDiscountsVo.calculatedDiscount : 0);
+                                            item.totalMrp = (ele.itemDiscount > 0 ? ele.itemDiscount : 0);
+                                        }
+                                        else {
+                                            item.itemDiscount = parseFloat(ele.calculatedDiscountsVo.calculatedDiscount > 0 ? ele.calculatedDiscountsVo.calculatedDiscount : 0);
+                                            item.totalMrp = item.totalMrp - item.itemDiscount;
+                                        }
+                                    }
+                                } else {
+                                    item.itemDiscount = "No discount";
+                                }
+                            }
+                        });
+                    });
+                    this.state.barCodeList.forEach((barCode, index) => {
+                        costPrice = costPrice + barCode.itemPrice;
+                        discount = discount + (barCode.itemDiscount ? barCode.itemDiscount : 0);
+                        total = total + barCode.grossValue;
+                    });
+
+                    discount = discount + this.state.manualDisc;
+                    discAppliedTotal = parseFloat(this.state.grandNetAmount - discount).toFixed(2);
+                    this.setState({
+                        netPayableAmount: parseFloat(total).toFixed(2),
+                        totalPromoDisc: (parseFloat(this.state.totalPromoDisc) + parseFloat(discount)).toFixed(2),
+                        grossAmount: costPrice,
+                        grandNetAmount: discAppliedTotal
+                    });
+                } else {
+                    alert("No Promo Available");
+                }
+            });
+        }
+        this.setState({ handleBillDiscount: false });
+    }
+
+    getDiscountReasons() {
+        axios.get(CustomerService.getDiscountReasons()).then((res) => {
+            if (res.status === 200) {
+                //this.setState({discReasons: res.data});
+                const discount = res.data.result;
+                discount.forEach((dis, index) => {
+                    const obj = {
+                        value: dis,
+                        label: dis,
+                    };
+                    this.state.discReasons.push(obj);
+                });
+            } else {
+                alert(res.data);
+            }
+        }).catch(() => {
+            this.setState({ loading: false });
+            // alert('Error with getting discount reasons');
+        });
+    }
+
+    billDiscountModelCancel() {
+        this.setState({
+            reasonDiscount: '', discApprovedBy: '', manualDisc: '',
+            discountAmountValid: true, modalVisible: false, billmodelPop: false
+        });
+    }
+
+    handleDiscountAmount(value) {
+        this.setState({ manualDisc: value });
+    }
+
+    handleApprovedBy(text) {
+        this.setState({ approvedBy: text });
+    }
+
+    handleDiscountReason = (value) => {
+        this.setState({ reasonDiscount: value });
+    };
+
+    billValidation() {
+        let isFormValid = true;
+        let errors = {};
+        if (parseFloat(this.state.manualDisc) > parseFloat(this.state.netPayableAmount)) {
+            isFormValid = false;
+            errors["discountAmount"] = customerErrorMessages.discountAmount;
+            this.setState({ discountAmountValid: false });
+        }
+        this.setState({ errors: errors });
+        return isFormValid;
+    }
+
+    billDiscount() {
+        const isFormValid = this.billValidation();
+        // console.log("manualDiscmanualDisc", this.state.manualDisc, this.state.totalAmount);
+        if (isFormValid) {
+            if (this.state.manualDisc === 0 || this.state.approvedBy === "" || this.state.reasonDiscount === "") {
+                alert("Please enter all fields");
+                this.setState({ isBillLevel: false });
+            } else {
+                // this.state.netPayableAmount = 0;
+                const totalDisc = parseFloat(this.state.manualDisc);
+                if (totalDisc < this.state.grandNetAmount) {
+                    const netPayableAmount = this.state.grandNetAmount - totalDisc;
+                    this.setState({ grandNetAmount: netPayableAmount });
+                    this.state.grandNetAmount = (netPayableAmount.toFixed(2));
+                    // this.getTaxAmount();
+                }
+                const promDisc = parseInt(this.state.manualDisc) + this.state.totalPromoDisc;
+                this.setState({
+                    showDiscReason: true, promoDiscount: promDisc, isCheckPromo: false,
+                    billmodelPop: false, modalVisible: false, isBillLevel: true, isBillingDiscount: true
+                });
+            }
+        }
+    }
+
+
 
     render() {
         return (
-            <View style={styles.container}>
-                {this.state.loading &&
-                    <Loader
-                        loading={this.state.loading} />
-                }
-
-                <View style={styles.viewswidth}>
-                    <TouchableOpacity style={{
-                        position: 'absolute',
-                        left: 10,
-                        top: 30,
-                        width: 40,
-                        height: 40,
-                    }} onPress={() => this.handleBackButtonClick()}>
-                        <Image source={require('../assets/images/backButton.png')} />
-                    </TouchableOpacity>
-                    <Text style={{
-                        position: 'absolute',
-                        left: 70,
-                        top: 47,
-                        width: 300,
-                        height: 20,
-                        fontFamily: 'bold',
-                        fontSize: 18,
-                        color: '#353C40'
-                    }}> Payment method </Text>
-                </View>
-
+            <View style={scss.container}>
+                {this.state.loading && <Loader loading={this.state.loading} />}
+                <Appbar style={{ backgroundColor: color.white }}>
+                    <Appbar.BackAction
+                        onPress={() => this.handleBackButtonClick()}
+                    />
+                    <Appbar.Content title="Payment method" />
+                </Appbar>
                 <ScrollView>
-                    <View style={styles.container}>
-
-                        <Text style={{ fontSize: 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 15 }}> {('SELECT A MODE TO PAY ₹ 1,450.00')} </Text>
-                        <FlatList
-                            style={styles.flatList}
-                            horizontal
-                            data={data}
-                            showsVerticalScrollIndicator={false}
-                            showsHorizontalScrollIndicator={false}
-                            renderItem={({ item, index }) => {
-                                if (item.key === 1) {
-                                    return <View style={{
-                                        height: 50,
-                                        width: 50,
-                                        backgroundColor: "#ffffff",
-                                        borderRadius: 25,
-                                        marginLeft: 10,
-                                        marginTop: 10,
-
-                                    }}>
-                                        <TouchableOpacity style={{
-                                            marginLeft: 0, marginTop: 0,
-                                        }} onPress={() => this.cashAction()}>
-                                            <Image source={this.state.flagOne ? require('../assets/images/cashselect.png') : require('../assets/images/cashunselect.png')} style={{
-                                                marginLeft: 0, marginTop: 0,
-                                            }} />
-                                        </TouchableOpacity>
-                                        <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: 14, color: this.state.flagOne ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
-                                            CASH
-                                        </Text>
-
-                                    </View>;
-                                }
-                                if (item.key === 2) {
-                                    return <View style={{
-                                        height: 50,
-                                        width: 50,
-                                        backgroundColor: "#ffffff",
-                                        borderRadius: 25,
-                                        marginLeft: 20,
-                                        marginTop: 10,
-
-                                    }}>
-                                        <TouchableOpacity style={{
-                                            marginLeft: 0, marginTop: 0,
-                                        }} onPress={() => this.cardAction()}>
-                                            <Image source={this.state.flagTwo ? require('../assets/images/cardselect.png') : require('../assets/images/cashunselect.png')} style={{
-                                                marginLeft: 0, marginTop: 0,
-                                            }} />
-                                        </TouchableOpacity>
-                                        <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: 14, color: this.state.flagTwo ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
-                                            CARD
-                                        </Text>
-
-                                    </View>;
-                                }
-                                if (item.key === 3) {
-                                    return <View style={{
-                                        height: 50,
-                                        width: 50,
-                                        backgroundColor: "#ffffff",
-                                        borderRadius: 25,
-                                        marginLeft: 20,
-                                        marginTop: 10,
-
-                                    }}>
-                                        <TouchableOpacity style={{
-                                            marginLeft: 0, marginTop: 0,
-                                        }} onPress={() => this.qrAction()}>
-                                            <Image source={this.state.flagThree ? require('../assets/images/qrselect.png') : require('../assets/images/qrunselect.png')} style={{
-                                                marginLeft: 0, marginTop: 0,
-                                            }} />
-                                        </TouchableOpacity>
-                                        <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, width: 50, fontSize: 14, color: this.state.flagThree ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
-                                            GET QR
-                                        </Text>
-
-                                    </View>;
-
-                                }
-                                if (item.key === 4) {
-                                    return <View style={{
-                                        height: 50,
-                                        width: 50,
-                                        backgroundColor: "#ffffff",
-                                        borderRadius: 25,
-                                        marginLeft: 20,
-                                        marginTop: 10,
-
-                                    }}>
-                                        <TouchableOpacity style={{
-                                            marginLeft: 0, marginTop: 0,
-                                        }} onPress={() => this.upiAction()}>
-                                            <Image source={this.state.flagFour ? require('../assets/images/upiselect.png') : require('../assets/images/upiunselect.png')} style={{
-                                                marginLeft: 0, marginTop: 0,
-                                            }} />
-                                        </TouchableOpacity>
-                                        <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: 14, color: this.state.flagFour ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
-                                            UPI
-                                        </Text>
-
-                                    </View>;
-                                }
-                                if (item.key === 5) {
-                                    return <View style={{
-                                        height: 50,
-                                        width: 50,
-
-                                        backgroundColor: "#ffffff",
-
-                                        borderRadius: 25,
-                                        marginLeft: 20,
-                                        marginTop: 10,
-
-                                    }}>
-                                        <TouchableOpacity style={{
-                                            marginLeft: 0, marginTop: 0,
-                                        }} onPress={() => this.khathaAction()}>
-                                            <Image source={this.state.flagFive ? require('../assets/images/kathaselect.png') : require('../assets/images/kathaunselect.png')} style={{
-                                                marginLeft: 0, marginTop: 0,
-                                            }} />
-                                        </TouchableOpacity>
-                                        <Text style={{ fontSize: 15, alignItems: 'center', alignSelf: 'center', marginTop: 0, fontSize: 14, color: this.state.flagFive ? "#ED1C24" : "#22222240", fontFamily: 'regular' }}>
-                                            KHATA
-                                        </Text>
-
-                                    </View>;
-                                }
-                            }}
-                            ListFooterComponent={<View style={{ width: 15 }}></View>}
-                        />
-
-
-
-                        <Text style={{ fontSize: 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 10 }}> {('ARE YOU A TAGGED CUSTOMER ?')} </Text>
-                        {this.state.loyaltyPoints !== "" && (
-                            <TouchableOpacity
-                                style={{ borderRadius: 5, width: 90, height: 20, alignSelf: 'flex-end', marginTop: -20 }}
-                                onPress={() => this.clearTaggedCustomer()} >
-                                <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('CLEAR')} </Text>
-                            </TouchableOpacity>
-                        )}
-
-                        {this.state.notfound === "not found" && (
-                            <TouchableOpacity
-                                style={{ borderRadius: 5, width: 90, height: 20, alignSelf: 'flex-end', marginTop: -20 }}
-                                onPress={() => this.clearTaggedCustomer()} >
-                                <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('CLEAR')} </Text>
-                            </TouchableOpacity>
-                        )}
-
-
-                        {/* loyalty points */}
-                        <TextInput style={styles.input}
-                            underlineColorAndroid="transparent"
-                            placeholder="+91 Enter mobile number"
-                            placeholderTextColor="#6F6F6F60"
-                            textAlignVertical="center"
-                            keyboardType={'default'}
-                            autoCapitalize="none"
-                            value={this.state.mobileNumber}
-                            //  onEndEditing
-                            onChangeText={(text) => this.handleMobileNumber(text)}
-                        // onEndEditing={() => this.endEditing()}
-                        />
-                        {this.state.loyaltyPoints === "" && this.state.notfound !== "not found" && (
-                            <TouchableOpacity
-                                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: 90, height: 32, borderColor: "#ED1C24", borderWidth: 1, alignSelf: 'flex-end', right: 10, marginTop: -37 }}
-                                onPress={() => this.verifyCustomer()} >
-                                <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>
-                            </TouchableOpacity>
-                        )}
-
-                        {this.state.notfound === "not found" && this.state.loyaltyPoints == "" && (
-                            <TouchableOpacity
-                                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: 90, height: 32, alignSelf: 'flex-end', right: 10, marginTop: -37 }}
-                            >
-                                <Image style={{ position: 'absolute', right: 80, top: 9 }} source={require('../assets/images/notapplied.png')} />
-
-                                <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('NO RECORDS')} </Text>
-                            </TouchableOpacity>
-                        )}
-                        {this.state.notfound === "not found" && this.state.loyaltyPoints == "" && (
-                            <View style={{ height: 50, backgroundColor: "#ffffff", }}>
-                                <View style={{ height: Device.isTablet ? 2 : 1, backgroundColor: "" }}>
-                                </View>
-                                <TouchableOpacity
-                                    style={{ backgroundColor: '#ED1C24', borderRadius: 5, width: 150, height: 32, alignSelf: 'center', marginTop: 5 }}
-                                    onPress={() => this.tagCustomer()} >
-                                    <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ffffff', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('ADD TO TAG CUSTOMER')} </Text>
-                                </TouchableOpacity>
-                            </View>
-                        )}
-
-                        {this.state.loyaltyPoints !== "" && this.state.giftvoucher === "" && (
-                            <TouchableOpacity
-                                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: 90, height: 32, alignSelf: 'flex-end', right: 10, marginTop: -37 }}
-                            >
-                                <Image style={{ position: 'absolute', right: 68, top: 9 }} source={require('../assets/images/applied.png')} />
-
-                                <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
-
-                            </TouchableOpacity>
-                        )}
-
-                        {/* {this.state.notfound === "not found" && this.state.giftvoucher !== "" && (
-                            <TouchableOpacity
-                                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: 90, height: 32, position: 'absolute', right: 10,alignSelf: 'flex-end',marginTop:-37 }}
-                            >
-                                <Image style={{ position: 'absolute', right: 80, top: 9 }} source={require('../assets/images/notapplied.png')} />
-
-                                <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('NO RECORDS')} </Text>
-
-                            </TouchableOpacity>
-                        )} */}
-
-                        {this.state.loyaltyPoints !== "" && this.state.giftvoucher !== "" && (
-                            <TouchableOpacity
-                                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: 90, height: 32, position: 'absolute', right: 10, alignSelf: 'flex-end', marginTop: -37 }}
-                            >
-                                <Image style={{ position: 'absolute', right: 68, top: 9 }} source={require('../assets/images/applied.png')} />
-
-                                <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
-
-                            </TouchableOpacity>
-                        )}
-
-                        {this.state.loyaltyPoints !== "" && this.state.redeemedPints === "0" && (
-                            <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
-                                <Text style={{ fontSize: 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10 }}> LOYALTY POINTS  {this.state.loyaltyPoints} </Text>
-                                <Text style={{ fontSize: 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10, marginBottom: 10 }}> VALUE  {(parseInt(this.state.loyaltyPoints) / 10).toString()} </Text>
-                            </View>
-                        )}
-
-                        {this.state.redeemedPints !== "0" && (
-                            <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
-                                <Text style={{ fontSize: 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10 }}> REDEEMED POINTS   {this.state.redeemedPints} </Text>
-                                <Text style={{ fontSize: 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10, marginBottom: 10 }}> REMAINING POINTS  {(parseInt(this.state.loyaltyPoints - this.state.redeemedPints)).toString()} </Text>
-                            </View>
-                        )}
-
-                        {this.state.loyaltyPoints !== "" && this.state.redeemedPints !== "0" && (
-                            <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
-                                <TouchableOpacity
-                                    style={{ borderRadius: 5, width: 90, height: 20, alignSelf: 'flex-end', marginTop: -40 }}
-                                    onPress={() => this.clearRedemption()} >
-                                    <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('CLEAR')} </Text>
-                                </TouchableOpacity>
-                            </View>
-                        )}
-
-                        {this.state.loyaltyPoints !== "" && this.state.redeemedPints === "0" && (
-                            <View style={{ height: 0, backgroundColor: "#ffffff", }}>
-                                {/* <View style={{ height: Device.isTablet ? 2 : 1, backgroundColor: "#22222240",marginTop:-20, }}> */}
-
-                                <TouchableOpacity
-                                    style={{ backgroundColor: '#ED1C24', borderRadius: 5, width: 150, height: 32, alignSelf: 'flex-end', marginTop: -45, right: 10 }}
-                                    onPress={() => this.redeemPoints()} >
-                                    <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ffffff', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('REDEEM POINTS')} </Text>
-                                </TouchableOpacity>
-                                {/* </View> */}
-                            </View>
-                        )}
-
-
-
-                        <Text style={{ fontSize: 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 10 }}> {('HAVE A PROMO CODE ?')} </Text>
-                        {this.state.giftvoucher !== "" && (
-                            <TouchableOpacity
-                                style={{ borderRadius: 5, width: 90, height: 20, alignSelf: 'flex-end', marginTop: -20 }}
-                                onPress={() => this.clearPromocode()} >
-                                <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('CLEAR')} </Text>
-                            </TouchableOpacity>
-                        )}
-                        {/* {this.state.loyaltyPoints !== "" && (
-                              <TouchableOpacity 
-                              onPress={() => this.applyPromocode()} >
-                              <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('CLEAR')} </Text>
-                          </TouchableOpacity>
-                    )} */}
-
-                        <TextInput style={styles.input}
-                            underlineColorAndroid="transparent"
-                            placeholder="Enter promo code"
-                            placeholderTextColor="#6F6F6F60"
-                            textAlignVertical="center"
-                            keyboardType={'default'}
-                            autoCapitalize="none"
-                            value={this.state.promocode}
-                            //  onEndEditing
-                            onChangeText={(text) => this.handlePromocode(text)}
-                        // onEndEditing={() => this.endEditing()}
-                        />
-                        {this.state.giftvoucher === "" && (
-                            <TouchableOpacity
-                                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: 90, height: 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: -37 }}
-                                onPress={() => this.applyPromocode()} >
-                                <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('APPLY')} </Text>
-                            </TouchableOpacity>
-                        )}
-
-                        {this.state.giftvoucher !== "" && (
-                            <TouchableOpacity
-                                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: 90, height: 32, right: 10, alignSelf: 'flex-end', marginTop: -37 }}
-                            >
-                                <Image style={{ position: 'absolute', right: 68, top: 9 }} source={require('../assets/images/applied.png')} />
-
-                                <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
-
-                            </TouchableOpacity>
-                        )}
-
-                        {this.state.giftvoucher !== "" && (
-                            <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
-                                <Text style={{ fontSize: 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10 }}> YOU GOT 100 RUPPES CASHBACK </Text>
-
-                            </View>
-                        )}
-
-                        {this.state.flagOne === true && (
-                            <Text style={{ fontSize: 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 10 }}> {('CASH SUMMARY')} </Text>
-
-                        )}
-                        {this.state.flagOne === true && this.state.verifiedCash !== "" && (
-                            <TouchableOpacity
-                                style={{ borderRadius: 5, width: 90, height: 20, alignSelf: 'flex-end', marginTop: -20 }}
-                                onPress={() => this.clearCashSammary()} >
-                                <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('CLEAR')} </Text>
-                            </TouchableOpacity>
-                        )}
-
-                        {this.state.flagOne === true && (
-                            <TextInput style={styles.input}
-                                underlineColorAndroid="transparent"
-                                placeholder="Recieved Amount"
-                                placeholderTextColor="#6F6F6F60"
-                                textAlignVertical="center"
-                                keyboardType={'default'}
-                                autoCapitalize="none"
-                                value={this.state.recievedAmount}
-                                //  onEndEditing
-                                onChangeText={(text) => this.handlerecievedAmount(text)} />
-                            // onEndEditing={() => this.endEditing()}
-                        )}
-
-
-                        {this.state.flagOne === true && this.state.giftvoucher === "" && this.state.loyaltyPoints === "" && this.state.verifiedCash === "" && (
-                            <TouchableOpacity
-                                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: 90, height: 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: -37 }}
-                                onPress={() => this.verifycash()} >
-                                <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>
-                            </TouchableOpacity>
-                        )}
-
-                        {this.state.flagOne === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash === "" && (
-                            <TouchableOpacity
-                                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: 90, height: 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: -37 }}
-                                onPress={() => this.verifycash()} >
-                                <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>
-                            </TouchableOpacity>
-                        )}
-
-                        {this.state.flagOne === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints === "" && this.state.verifiedCash === "" && (
-                            <TouchableOpacity
-                                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: 90, height: 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: -37 }}
-                                onPress={() => this.verifycash()} >
-                                <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>
-                            </TouchableOpacity>
-                        )}
-
-                        {this.state.flagOne === true && this.state.giftvoucher === "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash === "" && (
-                            <TouchableOpacity
-                                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: 90, height: 32, borderColor: "#ED1C24", borderWidth: 1, right: 10, alignSelf: 'flex-end', marginTop: -37 }}
-                                onPress={() => this.verifycash()} >
-                                <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#ED1C24', marginLeft: 10, marginTop: 8, alignSelf: 'center' }}> {('VERIFY')} </Text>
-                            </TouchableOpacity>
-                        )}
-
-
-                        {this.state.flagOne === true && this.state.giftvoucher === "" && this.state.loyaltyPoints === "" && this.state.verifiedCash !== "" && (
-                            <TouchableOpacity
-                                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: 90, height: 32, right: 10, alignSelf: 'flex-end', marginTop: -37 }}
-                            >
-                                <Image style={{ position: 'absolute', right: 68, top: 9 }} source={require('../assets/images/applied.png')} />
-
-                                <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
-
-                            </TouchableOpacity>
-                        )}
-
-                        {this.state.flagOne === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash !== "" && (
-                            <TouchableOpacity
-                                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: 90, height: 32, right: 10, alignSelf: 'flex-end', marginTop: -37 }}
-                            >
-                                <Image style={{ position: 'absolute', right: 68, top: 9 }} source={require('../assets/images/applied.png')} />
-
-                                <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
-
-                            </TouchableOpacity>
-                        )}
-
-                        {this.state.flagOne === true && this.state.giftvoucher !== "" && this.state.loyaltyPoints === "" && this.state.verifiedCash !== "" && (
-                            <TouchableOpacity
-                                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: 90, height: 32, right: 10, alignSelf: 'flex-end', marginTop: -37 }}
-                            >
-                                <Image style={{ position: 'absolute', right: 68, top: 9 }} source={require('../assets/images/applied.png')} />
-
-                                <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
-
-                            </TouchableOpacity>
-                        )}
-
-                        {this.state.flagOne === true && this.state.giftvoucher === "" && this.state.loyaltyPoints !== "" && this.state.verifiedCash !== "" && (
-                            <TouchableOpacity
-                                style={{ backgroundColor: '#FFffff', borderRadius: 5, width: 90, height: 32, right: 10, alignSelf: 'flex-end', marginTop: -37 }}
-                            >
-                                <Image style={{ position: 'absolute', right: 68, top: 9 }} source={require('../assets/images/applied.png')} />
-
-                                <Text style={{ fontSize: 12, fontFamily: 'regular', color: '#28D266', marginLeft: 10, marginTop: 10, alignSelf: 'center' }}> {('VERIFIED')} </Text>
-
-                            </TouchableOpacity>
-                        )}
-
-
-
-                        {this.state.flagOne === true && this.state.verifiedCash !== "" && (
-                            <View style={{ backgroundColor: '#ffffff', marginTop: 0 }}>
-                                <Text style={{ fontSize: 12, fontFamily: 'medium', color: '#ED1C24', marginLeft: 10, marginTop: 10 }}> RETURN AMOUNT  ₹100 </Text>
-
-                            </View>
-                        )}
-
-                        {this.state.flagredeem && (
+                    <View>
+                        {this.state.enablePayment === true && (
                             <View>
-                                <Modal isVisible={this.state.modalVisible}>
+                                <Text style={[scss.textStyleMedium, { margin: 5, color: '#828282' }]}> SELECT A MODE TO PAY ₹ {(parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString()} </Text>
+                                <FlatList
+                                    style={[scss.flatList, { height: Device.isTablet ? 130 : 100 }]}
+                                    horizontal
+                                    data={data}
+                                    keyExtractor={(item, index) => index.toString()}
+                                    showsVerticalScrollIndicator={false}
+                                    showsHorizontalScrollIndicator={false}
+                                    renderItem={({ item, index }) => {
+                                        if (item.key === 1) {
+                                            return <View style={scss.paymentIcon}>
+                                                <TouchableOpacity onPress={() => this.cashAction()}
+                                                    disabled={parseFloat(this.state.grandNetAmount) === 0}>
+                                                    <Image source={this.state.isCash ? require('../assets/images/cashselect.png') : require('../assets/images/cashunselect.png')} style={{
+                                                        marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
+                                                    }} />
+                                                </TouchableOpacity>
+                                                <Text style={[scss.textStyleLight, { color: this.state.isCard ? color.accent : color.lightDark, textAlign: 'center' }]}>CASH</Text>
+                                            </View>;
+                                        }
+                                        if (item.key === 2) {
+                                            return <View style={scss.paymentIcon}>
+                                                <TouchableOpacity onPress={() => this.cardAction()}
+                                                    disabled={parseFloat(this.state.grandNetAmount) === 0}>
+                                                    <Image source={this.state.isCard ? require('../assets/images/cardselect.png') : require('../assets/images/cardunselect.png')} style={{
+                                                        marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
+                                                    }} />
+                                                </TouchableOpacity>
+                                                <Text style={[scss.textStyleLight, { color: this.state.isCard ? color.accent : color.lightDark, textAlign: 'center' }]}>CARD</Text>
+                                            </View>;
+                                        }
+                                        if (item.key === 3) {
+                                            return <View style={scss.paymentIcon}>
+                                                <TouchableOpacity onPress={() => this.qrAction()}
+                                                    disabled={parseFloat(this.state.grandNetAmount) === 0}>
+                                                    <Image source={this.state.isCardOrCash ? require('../assets/images/qrselect.png') : require('../assets/images/qrunselect.png')} style={{
+                                                        marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
+                                                    }} />
+                                                </TouchableOpacity>
+                                                <Text style={[scss.textStyleLight, { color: this.state.isCardOrCash ? color.accent : color.lightDark, textAlign: 'center' }]}>CC</Text>
+                                            </View>;
 
-                                    <View style={{
-                                        width: deviceWidth,
-                                        alignItems: 'center',
-                                        marginLeft: -20,
-                                        backgroundColor: "#ffffff",
-                                        height: 300,
-                                        position: 'absolute',
-                                        bottom: -20,
-                                    }}>
+                                        }
+                                        if (item.key === 4) {
+                                            return <View style={scss.paymentIcon}>
+                                                <TouchableOpacity onPress={() => this.upiAction()}
+                                                    disabled={parseFloat(this.state.grandNetAmount) === 0}>
+                                                    <Image source={this.state.isUpi ? require('../assets/images/upiselect.png') : require('../assets/images/upiunselect.png')} style={{
+                                                        marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
+                                                    }} />
+                                                </TouchableOpacity>
+                                                <Text style={[scss.textStyleLight, { color: this.state.isUpi ? color.accent : color.lightDark, textAlign: 'center' }]}>UPI</Text>
+                                            </View>;
+                                        }
+                                        if (item.key === 5 && this.state.isTagCustomer) {
+                                            return <View style={scss.paymentIcon}>
+                                                <TouchableOpacity style={{
+                                                    // backgroundColor: this.state.isKathaDone ? color.disableBackGround : color.white
+                                                }} onPress={() => this.khataAction()}
+                                                    disabled={parseFloat(this.state.grandNetAmount) === 0 || this.state.isKathaDone}>
+                                                    <Image source={this.state.isKhata ? require('../assets/images/kathaselect.png') : require('../assets/images/kathaunselect.png')} style={{
+                                                        marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0
+                                                    }} />
+                                                </TouchableOpacity>
+                                                <Text style={[scss.textStyleLight, { color: this.state.isKhata ? color.accent : color.lightDark, textAlign: 'center' }]}>KHATA</Text>
+                                            </View>;
+                                        }
+                                        if (item.key === 6 && this.state.isCreditFlag) {
+                                            return <View style={scss.paymentIcon}>
+                                                <TouchableOpacity style={{
+                                                    // backgroundColor: this.state.isCreditDone ? color.disableBackGround : color.white
+                                                }} onPress={() => this.creditAction()}
+                                                    disabled={parseFloat(this.state.grandNetAmount) === 0 || this.state.isCreditDone}>
+                                                    <Image source={this.state.isCredit ? require('../assets/images/kathaselect.png') : require('../assets/images/kathaunselect.png')} style={{
+                                                        marginLeft: Device.isTablet ? 15 : 0, marginTop: Device.isTablet ? 10 : 0,
+                                                    }} />
+                                                </TouchableOpacity>
+                                                <Text style={[scss.textStyleLight, { color: this.state.isCredit ? color.accent : color.lightDark, textAlign: 'center' }]}>CREDIT</Text>
+                                            </View>;
+                                        }
+                                    }}
+                                    ListFooterComponent={<View style={{ width: 15 }}></View>}
+                                />
+                            </View>
+                        )}
 
-                                        <Text style={{
-                                            position: 'absolute',
-                                            left: 20,
-                                            top: 15,
-                                            width: 300,
-                                            height: 20,
-                                            fontFamily: 'medium',
-                                            fontSize: 16,
-                                            color: '#353C40'
-                                        }}> Redeem your points </Text>
+                        <View style={{ flexDirection: 'row' }}>
+                            <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isBillLevel ? color.disableBackGround : color.accent }]}
+                                onPress={() =>
+                                    this.setState({ billmodelPop: true, modalVisible: true })
+                                }
+                                disabled={this.state.isBillLevel}>
+                                <Text style={forms.button_text}>
+                                    {"Bill Level Discount"}
+                                </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[forms.button_active, { backgroundColor: this.state.isBillLevel || this.state.isCheckPromo ? color.disableBackGround : color.accent }]}
+                                onPress={() => {
+                                    this.checkPromo();
+                                }}
+                                disabled={this.state.isBillLevel || this.state.isCheckPromo}>
+                                <Text style={forms.button_text}>
+                                    {"Check Promo Disc"}
+                                </Text>
+                            </TouchableOpacity>
 
-                                        <TouchableOpacity style={{
-                                            position: 'absolute',
-                                            right: 20,
-                                            top: 7,
-                                            width: 50, height: 50,
-                                        }} onPress={() => this.modelCancel()}>
-                                            <Image style={{ color: '#ED1C24', fontFamily: 'regular', fontSize: 12, position: 'absolute', top: 10, right: 0, }} source={require('../assets/images/modelcancel.png')} />
-                                        </TouchableOpacity>
+                        </View>
 
-                                        <Text style={{ height: Device.isTablet ? 2 : 1, width: deviceWidth, backgroundColor: 'lightgray', marginTop: 50, }}>
-                                        </Text>
-                                        <Text style={{
-                                            position: 'absolute',
-                                            left: 20,
-                                            top: 60,
-                                            width: 300,
-                                            height: 20,
-                                            fontFamily: 'regular',
-                                            fontSize: 14,
-                                            color: '#353C40'
-                                        }}> Please enter how many points you want to redeem? </Text>
-
-                                        <View style={{ marginTop: 30, width: deviceWidth, }}>
-                                            <TextInput style={styles.modelinput}
-                                                underlineColorAndroid="transparent"
-                                                placeholder="ENTER POINTS"
-                                                placeholderTextColor="#6F6F6F"
-                                                textAlignVertical="center"
-                                                autoCapitalize="none"
-                                                value={this.state.enterredeempoint}
-                                                onChangeText={this.handleredeemPoints}
+                        {this.state.billmodelPop && (
+                            <View>
+                                <Modal style={{ margin: 0 }} isVisible={this.state.billmodelPop}
+                                    onBackButtonPress={() => this.billDiscountModelCancel()}
+                                    onBackdropPress={() => this.billDiscountModelCancel()}
+                                >
+                                    <View style={[forms.filterModelContainer, { width: '100%' }]}>
+                                        <Text style={forms.popUp_decorator}>-</Text>
+                                        <View style={forms.filterModelSub}>
+                                            <TextInput
+                                                style={forms.input_fld}
+                                                mode="flat"
+                                                activeUnderlineColor='#000'
+                                                underlineColor={'#6f6f6f'}
+                                                label={I18n.t("AMOUNT *")}
+                                                keyboardType={'numeric'}
+                                                value={this.state.manualDisc}
+                                                onChangeText={(text) =>
+                                                    this.handleDiscountAmount(text)
+                                                }
                                             />
+                                            {!this.state.discountAmountValid && (
+                                                <Message imp={true} message={this.state.errors["discountAmount"]} />
+                                            )}
+
+                                            <TextInput
+                                                style={forms.input_fld}
+                                                mode="flat"
+                                                activeUnderlineColor='#000'
+                                                underlineColor={'#6f6f6f'}
+                                                label={I18n.t("APPROVED BY *")}
+                                                value={this.state.approvedBy}
+                                                onChangeText={(text) => this.handleApprovedBy(text)}
+                                            />
+
+                                            <RnPicker
+                                                items={this.state.discReasons}
+                                                setValue={this.handleDiscountReason}
+                                            />
+                                            <View style={forms.action_buttons_container}>
+                                                <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                                                    onPress={() => this.billDiscount()}>
+                                                    <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
+                                                </TouchableOpacity>
+                                                <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                                                    onPress={() => this.billDiscountModelCancel()}>
+                                                    <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                                                </TouchableOpacity>
+                                            </View>
                                         </View>
+                                    </View>
+                                </Modal>
+                            </View >
+                        )}
 
+                        {this.state.isBillLevel === false &&
+                            <>
+                                <Text style={[scss.textStyleMedium, { color: '#828282', marginLeft: 10, marginTop: 10 }]}> {('HAVE A RT NUMBER?')} </Text>
+                                <View style={[scss.radio_group, { margin: 5 }]}>
+                                    <TextInput
+                                        style={[forms.input_fld, { width: "60%", minWidth: "60%", maxWidth: "70%" }]}
+                                        underlineColor="transparent"
+                                        label="ENTER RT NUMBER"
+                                        activeUnderlineColor='#000'
+                                        value={this.state.rtNumber}
+                                        onChangeText={(text) => this.setState({ rtNumber: text })}
+                                    // onEndEditing={() => this.endEditing()}
+                                    />
+                                    <View style={{ justifyContent: 'center' }}>
                                         <TouchableOpacity
-                                            style={{
-                                                width: deviceWidth - 40,
-                                                marginLeft: 20,
-                                                marginRight: 20,
-                                                marginTop: 20,
-                                                height: 50, backgroundColor: "#ED1C24", borderRadius: 5,
-                                            }} onPress={() => this.applyRedem()}
-                                        >
-                                            <Text style={{
-                                                textAlign: 'center', marginTop: 20, color: "#ffffff", fontSize: 15,
-                                                fontFamily: "regular"
-                                            }}  > APPLY </Text>
-
+                                            style={scss.verifyText}
+                                            onPress={() => this.applyRt()} >
+                                            <Text style={[scss.textStyleLight, { color: color.accent }]}> {('VERIFY')} </Text>
                                         </TouchableOpacity>
+                                    </View>
+                                </View>
 
-                                        <TouchableOpacity
-                                            style={{
-                                                width: deviceWidth - 40,
-                                                marginLeft: 20,
-                                                marginRight: 20,
-                                                marginTop: 20,
-                                                height: 50, backgroundColor: "#ffffff", borderRadius: 5, borderWidth: 1, borderColor: "#353C4050",
-                                            }} onPress={() => this.modelCancel()}
-                                        >
-                                            <Text style={{
-                                                textAlign: 'center', marginTop: 20, color: "#353C4050", fontSize: 15,
-                                                fontFamily: "regular"
-                                            }}  > CANCEL </Text>
+                            </>}
 
-                                        </TouchableOpacity>
+                        {this.state.isBillLevel === false && <View>
+                            <Text style={[scss.textStyleMedium, { color: '#828282', marginLeft: 10, marginTop: 10 }]}> {('HAVE A COUPON CODE ?')} </Text>
+
+                            <View style={[scss.radio_group, { margin: 5 }]}>
+                                <TextInput
+                                    style={[forms.input_fld, { width: "60%", minWidth: "60%", maxWidth: "70%" }]}
+                                    underlineColor="transparent"
+                                    label="Enter coupon code"
+                                    activeUnderlineColor='#000'
+                                    value={this.state.promocode}
+                                    maxLength={8}
+                                    onChangeText={(text) => this.handlePromocode(text)}
+                                />
+                                <View style={{ justifyContent: 'center' }}>
+                                    <TouchableOpacity
+                                        style={scss.verifyText}
+                                        onPress={() => this.applyPromocode()} >
+                                        <Text style={[scss.textStyleLight, { color: color.accent }]}> {('APPLY')} </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                        }
+                        {(this.state.isCash === true || this.state.isCardOrCash === true) && (
+                            <Text style={[scss.textStyleMedium, { color: '#828282', marginLeft: 10, marginTop: 10 }]}> {('CASH SUMMARY')} </Text>
+                        )}
+
+                        {(this.state.isCash === true || this.state.isCardOrCash === true) && (
+                            <View style={[scss.radio_group, { margin: 5 }]}>
+                                <TextInput
+                                    style={[forms.input_fld, { width: "60%", minWidth: "60%", maxWidth: "70%" }]}
+                                    underlineColor="transparent"
+                                    activeUnderlineColor='#000'
+                                    label="Recieved Amount"
+                                    keyboardType='numeric'
+                                    value={this.state.recievedAmount}
+                                    onChangeText={(text) => this.handlerecievedAmount(text)} />
+                                {/* // onEndEditing={() => this.endEditing()} */}
+                                <View style={{ justifyContent: 'center' }}>
+                                    <TouchableOpacity
+                                        style={[scss.verifyText, { borderColor: this.state.showVerified ? color.white : color.accent }]}
+                                        onPress={() => this.verifycash()} >
+                                        {this.state.showVerified ?
+                                            <>
+                                                <Image style={{ position: 'absolute', right: Device.isTablet ? 83 : 68, top: Device.isTablet ? 11 : 9 }} source={require('../assets/images/applied.png')} />
+                                                <Text style={[scss.textStyleLight, { color: color.success, marginLeft: 12 }]}> {('VERIFIED')} </Text>
+                                            </> :
+                                            <Text style={[scss.textStyleLight, { color: color.accent }]}> {('VERIFY')} </Text>}
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        )}
+
+                        {this.state.upiToCustomerModel && (
+                            <View>
+                                <Modal isVisible={this.state.upiModelVisible} style={{ margin: 0 }}
+                                    onBackButtonPress={() => this.cancelUpiModel()}
+                                    onBackdropPress={() => this.cancelUpiModel()} >
+                                    <View style={forms.filterModelContainer} >
+                                        <Text style={forms.popUp_decorator}>-</Text>
+                                        <View style={forms.filterModelSub}>
+                                            <KeyboardAwareScrollView >
+                                                <Text style={scss.textStyleLight}>Net Payable Amount:</Text>
+                                                <TextInput
+                                                    style={forms.input_fld}
+                                                    underlineColor="transparent"
+                                                    activeUnderlineColor='#000'
+                                                    disabled
+                                                    value={(parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString()}
+                                                />
+                                                <Text style={scss.textStyleLight}>Mobile Number:</Text>
+                                                <TextInput
+                                                    style={forms.input_fld}
+                                                    underlineColor="transparent"
+                                                    label={"MOBILE NUMBER"}
+                                                    activeUnderlineColor='#000'
+                                                    keyboardType='decimal-pad'
+                                                    maxLength={10}
+                                                    value={this.state.upiMobileNumber}
+                                                    onChangeText={(text) => this.handleUpiMobileNumber(text)}
+                                                />
+                                                <View style={forms.action_buttons_container}>
+                                                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                                                        onPress={() => this.getUPILink()}>
+                                                        <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
+                                                    </TouchableOpacity>
+                                                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                                                        onPress={() => this.cancelUpiModel()}>
+                                                        <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                                                    </TouchableOpacity>
+                                                </View>
+                                            </KeyboardAwareScrollView>
+                                        </View>
+                                    </View>
+                                </Modal>
+                            </View>
+                        )}
+
+
+                        {this.state.khataToCustomerModel && (
+                            <View>
+                                <Modal isVisible={this.state.kathaModelVisible} style={{ margin: 0 }}
+                                    onBackButtonPress={() => this.cancelKathaModel()}
+                                    onBackdropPress={() => this.cancelKathaModel()} >
+                                    <View style={forms.filterModelContainer} >
+                                        <Text style={forms.popUp_decorator}>-</Text>
+                                        <View style={forms.filterModelSub}>
+                                            <KeyboardAwareScrollView >
+                                                <Text style={scss.textStyleLight}>Adding Payment Details on Katha</Text>
+                                                <TextInput
+                                                    style={forms.input_fld}
+                                                    underlineColor="transparent"
+                                                    activeUnderlineColor='#000'
+                                                    value={this.state.khataAmount}
+                                                    onChangeText={(value) =>
+                                                        this.setState({ khataAmount: value }
+                                                        )
+                                                    }
+                                                />
+                                                <View style={forms.action_buttons_container}>
+                                                    <TouchableOpacity style={
+                                                        [forms.action_buttons, forms.submit_btn, { backgroundColor: (parseFloat(this.state.khataAmount) > this.state.grandNetAmount) && parseFloat(this.state.khataAmount) > 0 ? color.disableBackGround : color.accent }]}
+                                                        disabled={(!parseFloat(this.state.khataAmount) > this.state.netPayableAmount) && !parseFloat(this.state.khataAmount) > 0}
+                                                        onPress={() => this.confirmKathaModel()}>
+                                                        <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
+                                                    </TouchableOpacity>
+                                                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                                                        onPress={() => this.cancelKathaModel()}>
+                                                        <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                                                    </TouchableOpacity>
+                                                </View>
+                                            </KeyboardAwareScrollView>
+                                        </View>
                                     </View>
                                 </Modal>
                             </View>)}
 
-                        {this.state.flagCustomerOpen && (
+                        {this.state.creditModel && (
                             <View>
-                                <Modal isVisible={this.state.modalVisible}>
-                                    <KeyboardAwareScrollView KeyboardAwareScrollView
-                                        enableOnAndroid={true}>
-
-
-                                        <View style={{
-                                            flex: 1, justifyContent: 'center', //Centered horizontally
-                                            alignItems: 'center', color: '#ffffff',
-                                            borderRadius: 20, borderwidth: 10
-                                        }}>
-                                            <View style={{ flex: 1, marginLeft: 20, marginRight: 20, backgroundColor: "#ffffff", marginTop: deviceWidth / 2 - 80 }}>
-                                                <Text style={{
-                                                    color: "#353C40", fontSize: 18, fontFamily: "semibold", marginLeft: 20, marginTop: 20, height: 20,
-                                                    justifyContent: 'center',
-                                                }}> {'Personal Information'} </Text>
-
-                                                <View style={{ marginTop: 0, width: deviceWidth }}>
-                                                    <TextInput style={styles.createUserinput}
-                                                        underlineColorAndroid="transparent"
-                                                        placeholder="MOBILE NUMBER *"
-                                                        placeholderTextColor="#353C4050"
-                                                        keyboardType="name-phone-pad"
-                                                        textAlignVertical="center"
-                                                        autoCapitalize="none"
-                                                        value={this.state.customerPhoneNumber}
-                                                        onChangeText={(text) => this.handleCustomerPhoneNumber(text)}
-                                                        onEndEditing={() => this.endEditing()}
-                                                    />
-                                                </View>
-
-
-                                                <TextInput style={styles.createUserinput}
-                                                    underlineColorAndroid="transparent"
-                                                    placeholder="CUSTOMER NAME *"
-                                                    placeholderTextColor="#353C4050"
-                                                    textAlignVertical="center"
-                                                    autoCapitalize="none"
-                                                    value={this.state.customerName}
-                                                    onChangeText={this.handleCustomerName}
+                                <Modal isVisible={this.state.creditModelVisible} style={{ margin: 0 }}
+                                    onBackButtonPress={() => this.cancelCreditModel()}
+                                    onBackdropPress={() => this.cancelCreditModel()} >
+                                    <View style={forms.filterModelContainer} >
+                                        <Text style={forms.popUp_decorator}>-</Text>
+                                        <View style={forms.filterModelSub}>
+                                            <KeyboardAwareScrollView >
+                                                <Text style={scss.textStyleMedium}>Credit Amount:</Text>
+                                                <TextInput
+                                                    style={forms.input_fld}
+                                                    underlineColor="transparent"
+                                                    activeUnderlineColor='#000'
+                                                    editable={false} selectTextOnFocus={false}
+                                                    value={(parseFloat(this.state.creditAmount)).toString()}
                                                 />
-
-                                                <View>
-                                                    <TextInput style={styles.createUserinput}
-                                                        underlineColorAndroid="transparent"
-                                                        placeholder="EMAIL"
-                                                        placeholderTextColor="#353C4050"
-                                                        textAlignVertical="center"
-                                                        autoCapitalize="none"
-                                                        value={this.state.customerEmail}
-                                                        onChangeText={this.handleCustomerEmail}
-                                                    />
-                                                </View>
-
-                                                <View style={{
-                                                    justifyContent: 'center',
-                                                    margin: 40,
-                                                    height: 44,
-                                                    marginTop: 5,
-                                                    marginBottom: 10,
-                                                    borderColor: '#8F9EB717',
-                                                    borderRadius: 3,
-                                                    backgroundColor: '#FBFBFB',
-                                                    borderWidth: 1,
-                                                    fontFamily: 'regular',
-                                                    paddingLeft: 15,
-                                                    fontSize: 14,
-                                                }} >
-                                                    <RNPickerSelect
-                                                        placeholder={{
-                                                            label: 'GENDER',
-                                                            value: '',
-                                                        }}
-                                                        Icon={() => {
-                                                            return <Chevron style={styles.imagealign} size={1.5} color="gray" />;
-                                                        }}
-                                                        items={[
-                                                            { label: 'Male', value: 'male' },
-                                                            { label: 'Female', value: 'female' },
-                                                        ]}
-                                                        onValueChange={this.handlecustomerGender}
-                                                        style={pickerSelectStyles}
-                                                        value={this.state.customerGender}
-                                                        useNativeAndroidPickerStyle={false}
-
-                                                    />
-                                                </View>
-
-
-                                                <TextInput style={styles.createUserinput}
-                                                    underlineColorAndroid="transparent"
-                                                    placeholder="ADDRESS"
-                                                    placeholderTextColor="#353C4050"
-                                                    textAlignVertical="center"
-                                                    autoCapitalize="none"
-                                                    value={this.state.customerAddress}
-                                                    onChangeText={this.handleCustomerAddress}
+                                                <Text style={scss.textStyleMedium}>Cash :</Text>
+                                                <TextInput
+                                                    style={forms.input_fld}
+                                                    underlineColor="transparent"
+                                                    activeUnderlineColor='#000'
+                                                    selectTextOnFocus={false}
+                                                    value={this.state.payCreditAmount}
+                                                    onChangeText={(value) =>
+                                                        this.setState({ payCreditAmount: value }, () => {
+                                                        })
+                                                    }
                                                 />
-
-                                                <Text style={{
-                                                    color: "#353C40", fontSize: 18, fontFamily: "semibold", marginLeft: 20, marginTop: 20, height: 20,
-                                                    justifyContent: 'center',
-                                                }}> {'Business Information(optional)'} </Text>
-
-                                                <View>
-                                                    <TextInput style={styles.createUserinput}
-                                                        underlineColorAndroid="transparent"
-                                                        placeholder="GST NUMBER"
-                                                        placeholderTextColor="#353C4050"
-                                                        textAlignVertical="center"
-                                                        autoCapitalize="none"
-                                                        value={this.state.customerGSTNumber}
-                                                        onChangeText={this.handleCustomerGSTNumber}
-                                                    />
+                                                <View style={forms.action_buttons_container}>
+                                                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn, { backgroundColor: (parseFloat(this.state.payCreditAmount) > (this.state.creditAmount)) || (parseFloat(this.state.payCreditAmount) > (this.state.grandNetAmount)) ? color.disableBackGround : color.accent }]}
+                                                        disabled={(parseFloat(this.state.payCreditAmount) > (this.state.creditAmount)) || (parseFloat(this.state.payCreditAmount) > (this.state.grandNetAmount))}
+                                                        onPress={() => this.confirmCreditModel()}>
+                                                        <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
+                                                    </TouchableOpacity>
+                                                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                                                        onPress={() => this.cancelCreditModel()}>
+                                                        <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                                                    </TouchableOpacity>
                                                 </View>
-
-
-
-                                                <TouchableOpacity
-                                                    style={{
-                                                        margin: 20,
-                                                        height: 50, backgroundColor: "#ED1C24", borderRadius: 5, marginLeft: 40, marginRight: 40,
-                                                    }} onPress={() => this.addCustomer()}
-                                                >
-                                                    <Text style={{
-                                                        textAlign: 'center', margin: 20, color: "#ffffff", fontSize: 15,
-                                                        fontFamily: "regular", height: 50,
-                                                    }}  > TAG/ADD CUSTOMER </Text>
-
-                                                </TouchableOpacity>
-
-                                                <TouchableOpacity
-                                                    style={{
-                                                        margin: 20,
-                                                        height: 50, backgroundColor: "#ED1C24", borderRadius: 5, marginLeft: 40, marginRight: 40,
-                                                    }}
-                                                    onPress={() => this.cancel()} >
-                                                    <Text style={{
-                                                        textAlign: 'center', margin: 20, color: "#ffffff", fontSize: 15,
-                                                        fontFamily: "regular", height: 50,
-                                                    }}> {('Cancel')} </Text>
-                                                </TouchableOpacity>
-
-                                            </View>
-
+                                            </KeyboardAwareScrollView>
                                         </View>
-
-                                    </KeyboardAwareScrollView>
+                                    </View>
                                 </Modal>
                             </View>)}
 
 
+                        {this.state.gvToCustomerModel && (
+                            <View>
+                                <Modal isVisible={this.state.modelVisible} style={{ margin: 0 }}
+                                    onBackButtonPress={() => this.modelCancel()}
+                                    onBackdropPress={() => this.modelCancel()} >
+                                    <View style={forms.filterModelContainer} >
+                                        <Text style={forms.popUp_decorator}>-</Text>
+                                        <View style={forms.filterModelSub}>
+                                            <KeyboardAwareScrollView >
+                                                <Text style={scss.textStyleMedium}>GV Number:</Text>
+                                                <TextInput
+                                                    style={forms.input_fld}
+                                                    underlineColor="transparent"
+                                                    label="GV Number"
+                                                    activeUnderlineColor='#000'
+                                                    value={this.state.promocode}
+                                                    onChangeText={this.handlePromocode}
+                                                />
+                                                <View style={forms.action_buttons_container}>
+                                                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                                                        onPress={() => this.applyPromocode()}>
+                                                        <Text style={forms.submit_btn_text} >{I18n.t("APPLY")}</Text>
+                                                    </TouchableOpacity>
+                                                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                                                        onPress={() => this.modelCancel()}>
+                                                        <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                                                    </TouchableOpacity>
+                                                </View>
+                                            </KeyboardAwareScrollView>
+                                        </View>
+                                    </View>
+                                </Modal>
+                            </View>
+                        )}
+
+                        {this.state.cardAutoModel && (
+                            <View>
+                                <Modal isVisible={this.state.cardModelVisible} style={{ margin: 0 }}
+                                    onBackButtonPress={() => this.cancelCardModel()}
+                                    onBackdropPress={() => this.cancelCardModel()} >
+                                    <View style={forms.filterModelContainer} >
+                                        <Text style={forms.popUp_decorator}>-</Text>
+                                        <View style={forms.filterModelSub}>
+                                            <KeyboardAwareScrollView >
+                                                <View>
+                                                    <Text style={scss.textStyleMedium}>Card Payment:</Text>
+                                                    <Text>Amount:</Text>
+                                                    <TextInput
+                                                        style={forms.input_fld}
+                                                        underlineColor="transparent"
+                                                        activeUnderlineColor='#000'
+                                                        editable={this.state.isCardOrCash}
+                                                        selectTextOnFocus={false}
+                                                        value={parseFloat(this.state.grandNetAmount)}
+                                                    />
+
+                                                    <View style={scss.radio_group}>
+                                                        <View style={scss.radio_item}>
+                                                            <RadioButton
+                                                                value="Manual"
+                                                                status={this.state.cardPaymentType === 'Manual' ? 'checked' : 'unchecked'}
+                                                                onPress={() => this.setState({ cardPaymentType: 'Manual' })}
+                                                            />
+                                                            <Text>Manual</Text>
+                                                        </View>
+                                                    </View>
+                                                </View>
+                                                <View style={forms.action_buttons_container}>
+                                                    <TouchableOpacity style={[forms.action_buttons, forms.submit_btn]}
+                                                        onPress={() => { this.saveCard(); }}>
+                                                        <Text style={forms.submit_btn_text} >{I18n.t("CONFIRM")}</Text>
+                                                    </TouchableOpacity>
+                                                    <TouchableOpacity style={[forms.action_buttons, forms.cancel_btn]}
+                                                        onPress={() => this.cancelCardModel()}>
+                                                        <Text style={forms.cancel_btn_text}>{I18n.t("CANCEL")}</Text>
+                                                    </TouchableOpacity>
+                                                </View>
+                                            </KeyboardAwareScrollView>
+                                        </View>
+                                    </View>
+                                </Modal>
+                            </View>)}
+
+                        <Text style={[scss.textStyleMedium, { color: '#828282', marginLeft: 10, marginTop: 10 }]}> {('BILLING SUMMARY')} </Text>
 
 
-                        <Text style={{ fontSize: 12, fontFamily: 'medium', color: '#828282', marginLeft: 10, marginTop: 10 }}> {('PRICE SUMMARY')} </Text>
+                        <View style={{ margin: 5 }}>
+                            {/* <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
+                                <Text style={scss.textStyleMedium}>Total Amount </Text>
+                                <Text style={scss.textStyleMedium}>₹ {this.state.netPayableAmount} </Text>
+                            </View> */}
+                            {this.state.isTaxIncluded !== 'null' &&
+                                <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
+                                    <Text style={scss.textStyleMedium}>  CGST </Text>
+                                    <Text style={scss.textStyleMedium}>₹ {parseFloat(this.state.CGST).toFixed(2)} </Text>
+                                </View>}
+                            {this.state.isTaxIncluded !== 'null' &&
+                                <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
+                                    <Text style={scss.textStyleMedium}>  SGST </Text>
+                                    <Text style={scss.textStyleMedium}>₹  {parseFloat(this.state.SGST).toFixed(2)} </Text>
+                                </View>}
 
+                            {this.state.isTaxIncluded !== 'null' && <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
+                                <Text style={scss.textStyleMedium}> Total Amount </Text>
+                                <Text style={scss.textStyleMedium}> ₹  {this.state.totalAmount} </Text>
+                            </View>}
 
-                        <View style={{ width: deviceWidth, height: 290, backgroundColor: '#FFFFFF', marginTop: 10, }}>
-                            <Text style={{
-                                color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 30, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                                fontSize: 14, position: 'absolute',
-                            }}>
-                                Total Qty </Text>
-                            <Text style={{
-                                color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 30, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                                fontSize: 14, position: 'absolute',
-                            }}>
-                                {this.state.totalQty} </Text>
-                            <Text style={{
-                                color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 60, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                                fontSize: 14, position: 'absolute',
-                            }}>
-                                Total MRP </Text>
-                            <Text style={{
-                                color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 60, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                                fontSize: 14, position: 'absolute',
-                            }}>
-                                ₹ {this.state.totalAmount} </Text>
-                            <Text style={{
-                                color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 90, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                                fontSize: 14, position: 'absolute',
-                            }}>
-                                Product Discount </Text>
-                            <Text style={{
-                                color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 90, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                                fontSize: 14, position: 'absolute',
-                            }}>
-                                ₹  {this.state.totalDiscount} </Text>
-                            <Text style={{
-                                color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 120, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                                fontSize: 14, position: 'absolute',
-                            }}>
-                                Promo Discount </Text>
-                            <Text style={{
-                                color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 120, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                                fontSize: 14, position: 'absolute',
-                            }}>
-                                ₹  {this.state.promoDiscount} </Text>
+                            <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
+                                <Text style={[scss.textStyleMedium, { color: "#2ADC09" }]}>Promo Discount </Text>
+                                <Text style={[scss.textStyleMedium, { color: "#2ADC09" }]}> ₹  {this.state.totalPromoDisc} </Text>
+                            </View>
 
-                            <Text style={{
-                                color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 150, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                                fontSize: 14, position: 'absolute',
-                            }}>
-                                Points Redemption({this.state.redeemedPints}) </Text>
-                            <Text style={{
-                                color: "#353C40", fontFamily: "medium", alignItems: 'center', marginLeft: 16, top: 150, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                                fontSize: 14, position: 'absolute',
-                            }}>
-                                ₹  {(parseInt(this.state.redeemedPints) / 10).toString()} </Text>
+                            <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
+                                <Text style={scss.textStyleMedium}>Payable Amount </Text>
+                                <Text style={scss.textStyleMedium}>₹ {(parseFloat(this.state.grandNetAmount).toFixed(2))}
+                                </Text>
+                            </View>
+                            {this.state.isBillingDiscount &&
+                                <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
+                                    <Text style={scss.textStyleMedium}>Billing Discount </Text>
+                                    <Text style={scss.textStyleMedium}>₹  {this.state.manualDisc} </Text>
+                                </View>}
 
-                            <Text style={{
-                                color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 180, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                                fontSize: 20, position: 'absolute',
-                            }}>
-                                Payable Amount </Text>
-                            <Text style={{
-                                color: "#353C40", fontFamily: "bold", alignItems: 'center', marginLeft: 16, top: 180, fontSize: 20, position: 'absolute', right: 10, justifyContent: 'center', textAlign: 'center', marginTop: 10,
-                                fontSize: 20, position: 'absolute',
-                            }}>
-                                ₹ {(parseFloat(this.state.totalAmount) - parseFloat(this.state.totalDiscount) - parseFloat(this.state.promoDiscount) - parseFloat(this.state.redeemedPints / 10)).toString()} </Text>
+                            {
+                                this.state.isCreditAmount && (
+                                    <>
+                                        <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
+                                            <Text style={scss.textStyleMedium}>Credit Amount </Text>
+                                            <Text style={scss.textStyleMedium}> ₹ {(parseFloat(this.state.creditAmount).toFixed(2))}</Text>
+                                        </View>
+                                        <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
+                                            <Text style={scss.textStyleMedium}> Payed Amount </Text>
+                                            <Text style={scss.textStyleMedium}> ₹ {(parseFloat(this.state.payCreditAmount).toFixed(2))} </Text>
+                                        </View>
+                                    </>
+                                )
+                            }
+                            {this.state.khataAmount > 0 &&
+                                <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
+                                    <Text style={scss.textStyleMedium}>Katha Amount </Text>
+                                    <Text style={scss.textStyleMedium}> ₹ {(parseFloat(this.state.khataAmount).toFixed(2))} </Text>
+                                </View>}
 
-                            <View style={styles.TopcontainerforPay}>
+                            {this.state.returnAmount >= 0 && (
+                                <>
+                                    <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
+                                        <Text style={scss.textStyleMedium}>Collected Amount </Text>
+                                        <Text style={scss.textStyleMedium}> ₹ {parseFloat(this.state.recievedAmount).toFixed(2)} </Text>
+                                    </View>
+
+                                    <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
+                                        <Text style={[scss.textStyleMedium, { color: "#FFAF4C" }]}>Return Amount </Text>
+                                        <Text style={[scss.textStyleMedium, { color: "#FFAF4C" }]}> ₹ {(parseFloat(this.state.returnAmount).toFixed(2))} </Text>
+                                    </View>
+                                </>)}
+                            {
+                                this.state.couponAmount > 0 && (
+                                    <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
+                                        <Text style={[scss.textStyleMedium, { color: "#2ADC09" }]}>Coupon Applied </Text>
+                                        <Text style={[scss.textStyleMedium, { color: "#2ADC09" }]}> ₹ {(parseFloat(this.state.couponAmount).toFixed(2))} </Text>
+                                    </View>
+                                )
+                            }
+
+                            {this.state.isRTApplied === true && (
+                                <View style={[scss.radio_group, { marginLeft: 16, marginTop: 10 }]}>
+                                    <Text style={[scss.textStyleMedium, { color: "#2ADC09" }]}>  RT Amount </Text>
+                                    <Text style={[scss.textStyleMedium, { color: "#2ADC09" }]}>₹  {(parseFloat(this.state.rtAmount).toFixed(2))} </Text>
+                                </View>
+                            )}
+
+                            <View></View>
+                            <View style={forms.action_buttons_container}>
                                 <TouchableOpacity
-                                    style={styles.signInButton}
+                                    style={[forms.action_buttons, forms.submit_btn, { width: "95%" }]}
+                                    disabled={!this.state.payButtonEnable}
                                     onPress={() => this.pay()} >
-
-                                    <Text style={styles.signInButtonText}> Pay </Text>
+                                    <Text style={forms.submit_btn_text}> Pay </Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
                     </View>
                 </ScrollView >
-            </View>
+            </View >
         );
     }
 }
 export default Payment;
-
-const pickerSelectStyles = StyleSheet.create({
-    placeholder: {
-        color: "#353C4050",
-        fontFamily: "regular",
-        fontSize: Device.isTablet ? 20 : 15,
-    },
-    inputIOS: {
-        justifyContent: 'center',
-        height: Device.isTablet ? 52 : 42,
-        borderRadius: 3,
-        borderWidth: Device.isTablet ? 2 : 1,
-        fontFamily: 'regular',
-        //paddingLeft: -20,
-        fontSize: Device.isTablet ? 20 : 15,
-        borderColor: '#FBFBFB',
-        backgroundColor: '#FBFBFB',
-    },
-    inputAndroid: {
-        justifyContent: 'center',
-        height: Device.isTablet ? 52 : 42,
-        borderRadius: 3,
-        borderWidth: Device.isTablet ? 2 : 1,
-        fontFamily: 'regular',
-        //paddingLeft: -20,
-        fontSize: Device.isTablet ? 20 : 15,
-        borderColor: '#FBFBFB',
-        backgroundColor: '#FBFBFB',
-
-        // marginLeft: 20,
-        // marginRight: 20,
-        // marginTop: 10,
-        // height: 40,
-        // backgroundColor: '#ffffff',
-        // borderBottomColor: '#456CAF55',
-        color: '#001B4A',
-        // fontFamily: "bold",
-        // fontSize: 16,
-        // borderRadius: 3,
-    },
-});
-
-
-const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        justifyContent: 'center',
-        backgroundColor: '#FAFAFF'
-    },
-    TopcontainerforPay: {
-        flexDirection: 'row',
-        marginLeft: 0,
-        marginRight: 0,
-        // marginTop: 10,
-        width: '100%',
-        backgroundColor: '#ffffff',
-        borderColor: 'lightgray',
-        borderRadius: 0,
-        height: 50,
-        position: 'absolute',
-        bottom: 10,
-    },
-    image: {
-        marginTop: 40,
-        marginLeft: 10,
-        width: 80,
-        height: 80,
-        borderWidth: 0,
-        borderRadius: 40,
-    },
-    viewswidth: {
-        backgroundColor: '#FFFFFF',
-        width: deviceWidth,
-        textAlign: 'center',
-        fontSize: 24,
-        height: 84,
-    },
-    input: {
-        justifyContent: 'center',
-        marginLeft: 0,
-        marginRight: 0,
-        height: 44,
-        marginTop: 5,
-        borderColor: '#8F9EB717',
-        borderRadius: 3,
-        backgroundColor: '#ffffff',
-        fontFamily: 'regular',
-        paddingLeft: 15,
-        fontSize: 14,
-    },
-    signInButton: {
-        backgroundColor: '#ED1C24',
-        justifyContent: 'center',
-        width: '95%',
-        marginLeft: 10,
-        height: 40,
-        borderRadius: 10,
-        fontWeight: 'bold',
-        margin: 5,
-        // alignSelf:'center',
-        // marginBottom:100,
-    },
-    signInButtonText: {
-        color: 'white',
-        alignSelf: 'center',
-        fontSize: 14,
-        fontFamily: "regular",
-    },
-    signInFieldStyle: {
-        color: '#456CAF55',
-        marginLeft: 20,
-        marginTop: 5,
-        fontSize: 12,
-        fontFamily: "regular",
-    },
-    findIteminput: {
-        marginLeft: 30,
-        marginRight: 30,
-        marginTop: 20,
-        marginBottom: 1000,
-        height: 50,
-        backgroundColor: "#DEF1FF",
-        borderRadius: 10,
-        color: '#001B4A',
-        fontFamily: "regular",
-        fontSize: 12,
-    },
-    signUptext: {
-        marginTop: 40,
-        fontFamily: "regular",
-        alignSelf: 'center',
-        color: '#FFFFFF',
-        fontSize: 28,
-    },
-    saleBillsText: {
-        marginLeft: 0,
-        marginTop: -20,
-        marginBottom: 10,
-        fontFamily: "bold",
-        color: '#0F2851',
-        fontSize: 14,
-    },
-    tablecontainer: {
-        flex: 1,
-        // width:deviceWidth,
-        marginLeft: 20,
-        marginRight: 20,
-        padding: 20,
-        paddingTop: 30,
-        backgroundColor: '#FFFFFF',
-        borderRadius: 10,
-    },
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        // backgroundColor: '#FAFAFF'
-    },
-    flatList: {
-        marginTop: 20,
-        backgroundColor: '#ffffff',
-        height: 100
-    },
-    flatlistbox: {
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: 150,
-        width: 220,
-        borderWidth: 1,
-        backgroundColor: "#00C656",
-        borderColor: '#ffffff',
-        borderRadius: 10,
-        marginLeft: 10,
-        //  paddingHorizontal: 15,
-        // padding:15,
-        // marginRight: 15,
-    },
-
-    head: {
-        height: 45,
-        borderColor: '#FAFAFF',
-        borderWidth: 1,
-        borderRadius: 10,
-    },
-    text: {
-        margin: 6,
-        color: "#0196FD",
-        fontFamily: "semibold",
-        fontSize: 11,
-    },
-    textData: {
-        margin: 6,
-        color: "#48596B",
-        fontFamily: "regular",
-        fontSize: 10,
-    },
-
-    Topcontainer: {
-        flexDirection: 'row',
-        marginLeft: 0,
-        marginRight: 0,
-        width: '100%',
-        backgroundColor: 'grey',
-        height: 50
-    },
-
-    TopcontainerforModel: {
-        flexDirection: 'row',
-        marginLeft: 0,
-        marginRight: 0,
-        marginTop: 10,
-        width: '100%',
-        backgroundColor: 'grey',
-        borderRadius: 20,
-        height: 50,
-    },
-    redbox: {
-        backgroundColor: "#1CA2FF",
-        alignSelf: "flex-start",
-
-        //marginHorizontal: "1%",
-        marginBottom: 6,
-        width: "25%",
-        height: 45,
-        textAlign: "center",
-    },
-    bluebox: {
-        backgroundColor: "#0196FD",
-        alignSelf: "flex-start",
-        //marginHorizontal: "1%",
-        marginBottom: 6,
-        width: "25%",
-        height: 45,
-        textAlign: "center",
-    },
-    blackbox: {
-        backgroundColor: "#0196FD",
-        alignSelf: "flex-start",
-        //marginHorizontal: "1%",
-        marginBottom: 6,
-        width: "25%",
-        height: 45,
-        textAlign: "center",
-    },
-    greenbox: {
-        backgroundColor: "#0196FD",
-        alignSelf: "flex-start",
-        //marginHorizontal: "1%",
-        marginBottom: 6,
-        width: "25%",
-        height: 45,
-        textAlign: "center",
-    },
-    tabBar: {
-        flexDirection: 'row',
-        paddingTop: Constants.statusBarHeight,
-    },
-    tabItem: {
-        flex: 1,
-        alignItems: 'center',
-        padding: 16,
-    },
-    box: {
-        width: 50,
-        height: 50,
-    },
-    row: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-    },
-    button: {
-        paddingHorizontal: 8,
-        paddingVertical: 6,
-        //borderRadius: 4,
-        backgroundColor: "#0196FD",
-        alignSelf: "flex-start",
-        //marginHorizontal: "1%",
-        marginBottom: 6,
-        width: "25%",
-        height: 45,
-        textAlign: "center",
-    },
-    selected: {
-        backgroundColor: "#BBE3FF",
-        borderWidth: 0,
-        backgroundColor: "#0196FD",
-    },
-    buttonLabel: {
-        textAlign: "center",
-        color: "#BBE3FF",
-        fontFamily: "regular",
-        fontSize: 14,
-    },
-    imagealign: {
-        marginTop: Device.isTablet ? 25 : 20,
-        marginRight: Device.isTablet ? 30 : 20,
-    },
-    selectedLabel: {
-        color: "white",
-        textAlign: "center",
-        alignSelf: "center",
-        marginTop: 10,
-        fontFamily: "regular",
-        fontSize: 14,
-    },
-    modelinput: {
-        justifyContent: 'center',
-        marginLeft: 20,
-        marginRight: 20,
-        height: 44,
-        marginTop: 5,
-        marginBottom: 10,
-        borderColor: '#8F9EB717',
-        borderRadius: 3,
-        backgroundColor: '#FBFBFB',
-        borderWidth: 1,
-        fontFamily: 'regular',
-        paddingLeft: 15,
-        fontSize: 14,
-    },
-    label: {
-        textAlign: "center",
-        marginBottom: 10,
-        fontSize: 24,
-    },
-    createUserinput: {
-        justifyContent: 'center',
-        margin: 40,
-        height: 44,
-        marginTop: 5,
-        marginBottom: 10,
-        borderColor: '#8F9EB717',
-        borderRadius: 3,
-        backgroundColor: '#FBFBFB',
-        borderWidth: 1,
-        fontFamily: 'regular',
-        paddingLeft: 15,
-        fontSize: 14,
-    },
-
-    //model
-    modelcontainer: {
-        alignItems: 'center',
-        backgroundColor: '#ede3f2',
-        padding: 100
-    },
-    modal: {
-        flex: 1,
-        alignItems: 'center',
-        backgroundColor: '#f7021a',
-        padding: 100
-    },
-    modeltext: {
-        color: '#3f2949',
-        marginTop: 10
-    }
-});

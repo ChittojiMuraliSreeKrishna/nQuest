@@ -23,7 +23,7 @@ var deviceheight = Dimensions.get("window").height;
 const pickerData = [
   { label: 'Completed', value: 'Completed' },
   { label: 'Cancelled', value: 'Cancelled' },
-]
+];
 export default class NewSaleReport extends Component {
 
   constructor(props) {
@@ -122,7 +122,9 @@ export default class NewSaleReport extends Component {
       ReportsService.newSaleReports(obj, this.state.pageNo).then((res) => {
         if (res.data && res.data["isSuccess"] === "true") {
           if (res.data.result.length !== 0) {
-            this.setState({ newSale: res.data.result.newSale.content, totalPages: res.data.result.newSale.totalPages, filterActive: true });
+            this.setState({ newSale: res.data.result.newSale.content, totalPages: res.data.result.newSale.totalPages, filterActive: true }, () => {
+              this.changeNavigation();
+            });
             this.continuePagination();
             this.modelCancel();
           } else {
@@ -142,6 +144,11 @@ export default class NewSaleReport extends Component {
         this.props.modelCancelCallback();
       });
     }
+  }
+
+  // for the flatlist to scroll back to index
+  changeNavigation() {
+    this.flatListRef.scrollToIndex({ animated: true, index: 0 });
   }
 
   loadMoreList = (value) => {
@@ -235,12 +242,12 @@ export default class NewSaleReport extends Component {
   }
 
   handleDate = (value) => {
-    this.setState({ startDate: value })
-  }
+    this.setState({ startDate: value });
+  };
 
   handleEndDate = (value) => {
-    this.setState({ endDate: value })
-  }
+    this.setState({ endDate: value });
+  };
 
   clearFilterAction() {
     this.setState({
@@ -259,6 +266,7 @@ export default class NewSaleReport extends Component {
       <View>
         <FlatList
           data={this.state.newSale}
+          ref={(ref) => this.flatListRef = ref}
           ListHeaderComponent={
             <Appbar>
               <Appbar.Content title="New Sale Report" />

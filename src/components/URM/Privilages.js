@@ -17,7 +17,7 @@ import { TRUE } from 'node-sass';
 const data1 = [
   { value: "GOODS", label: "GOODS" },
   { value: "SERVICES", label: "SERVICES" }
-]
+];
 
 
 var deviceWidth = Dimensions.get('window').width;
@@ -76,17 +76,20 @@ export default class Privilages extends Component {
   getMobilePrivileges() {
     global.mobilePrivilages = [];
     this.setState({ loading: true });
-    UrmService.getAllPrivillages().then((res) => {
+    UrmService.getAllPrivillages(this.state.service).then((res) => {
       if (res) {
         if (res.data) {
           let existingPrivilages = this.state.editMobilePrivileges;
           let finalPrivileges = res.data.mobilePrivileges;
-          const privileges = finalPrivileges.reduce((allPrives, { type, id, name, subPrivileges }) => {
-            if (!allPrives[type]) allPrives[type] = [];
-            allPrives[type].push({ "id": id, "name": name, "subPrivileges": subPrivileges })
-            return allPrives
-          })
-          let totalPrivilages = this.state.service === "GOODS" ? privileges.GOODS : privileges.SERVICES
+          // console.log({ finalPrivileges });
+          // const privileges = finalPrivileges.reduce((allPrives, { type, id, name, subPrivileges }) => {
+          //   if (!allPrives[type]) allPrives[type] = [];
+          //   allPrives[type].push({ "id": id, "name": name, "subPrivileges": subPrivileges });
+          //   console.log(allPrives);
+          //   return allPrives;
+          // });
+          // console.log(privileges.GOODS, "Privileges");
+          let totalPrivilages = finalPrivileges;
           let stateParentPrivilages = [];
           let stateSubPrivilages = [];
           for (let i = 0; i < totalPrivilages.length; i++) {
@@ -275,7 +278,11 @@ export default class Privilages extends Component {
   };
 
   handleViewMobile() {
-    this.setState({ viewMobile: !this.state.viewMobile, viewWeb: false });
+    if (this.state.service) {
+      this.setState({ viewMobile: !this.state.viewMobile, viewWeb: false });
+    } else {
+      alert("please select the type first");
+    }
   }
 
 
@@ -283,24 +290,25 @@ export default class Privilages extends Component {
   getWebPrivileges() {
     global.webPrivilages = [];
     this.setState({ loading: true });
-    UrmService.getAllPrivillages().then((res) => {
+    UrmService.getAllPrivillages(this.state.service).then((res) => {
       if (res) {
         if (res.data) {
           this.setState({ loading: false });
           let existingPrivilages = this.state.editWebPrivileges;
           let finalPrivileges = res.data.webPrivileges;
-          const privileges = finalPrivileges.reduce((allPrives, { type, id, name, subPrivileges }) => {
-            if (!allPrives[type]) allPrives[type] = [];
-            allPrives[type].push({ "id": id, "name": name, "subPrivileges": subPrivileges })
-            return allPrives
-          })
-          let totalPrivilages = this.state.service === "GOODS" ? privileges.GOODS : privileges.SERVICES
+          // const privileges = finalPrivileges.reduce((allPrives, { type, id, name, subPrivileges }) => {
+          //   if (!allPrives[type]) allPrives= [];
+          //   allPrives[type].push({ "id": id, "name": name, "subPrivileges": subPrivileges });
+          //   // console.log({ allPrives });
+          //   return allPrives;
+          // });
+          let totalPrivilages = finalPrivileges;
           let stateParentPrivilages = [];
           let stateSubPrivilages = [];
           for (let i = 0; i < totalPrivilages.length; i++) {
             for (let j = 0; existingPrivilages !== null && existingPrivilages !== undefined && j < existingPrivilages.length; j++) {
               if (totalPrivilages[i].id === existingPrivilages[j].id) {
-                this.setState({ viewWeb: true })
+                this.setState({ viewWeb: true });
                 let obj = {
                   id: existingPrivilages[j].id
                 };
@@ -489,7 +497,11 @@ export default class Privilages extends Component {
   };
 
   handleViewWeb() {
-    this.setState({ viewWeb: !this.state.viewWeb, viewMobile: false });
+    if (this.state.service) {
+      this.setState({ viewWeb: !this.state.viewWeb, viewMobile: false });
+    } else {
+      alert("please select the type first");
+    }
   }
 
   // Select All Functions
@@ -586,12 +598,12 @@ export default class Privilages extends Component {
 
   handleChangeService(value) {
     this.setState({ service: value }, () => {
-      this.getMobilePrivileges()
-      this.getWebPrivileges()
+      this.getMobilePrivileges();
+      this.getWebPrivileges();
       if (this.state.viewMobile === false && this.state.viewWeb === false) {
-        this.setState({ viewWeb: true })
+        this.setState({ viewWeb: true });
       }
-    })
+    });
   }
 
   // Save Role
@@ -617,7 +629,7 @@ export default class Privilages extends Component {
           <View style={rnPickerContainerHalf}>
             <RNPickerSelect
               placeholder={{
-                label: "Select",
+                label: "Type",
               }}
               Icon={() => {
                 return (
@@ -626,7 +638,7 @@ export default class Privilages extends Component {
                     size={1.5}
                     color="grey"
                   />
-                )
+                );
               }}
               items={data1}
               onValueChange={(value) => {
@@ -746,7 +758,7 @@ export default class Privilages extends Component {
                 data={this.state.mobilePrivileges}
                 keyExtractor={(item, i) => i.toString()}
                 ListEmptyComponent={<Text style={{ fontSize: 20, color: '#000', textAlign: 'center', marginTop: 100 }}>Please Select the Service first</Text>}
-                s renderItem={({ item, index }) => (
+                renderItem={({ item, index }) => (
                   <View>
                     <View>
                       <TouchableOpacity onPress={() => this.selectedMobileParentPrivilage(item, index)}>

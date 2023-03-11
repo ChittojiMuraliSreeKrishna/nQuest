@@ -141,10 +141,11 @@ class TextilePayment extends Component {
       domainType: "",
       tableId: 0,
       userId: 0,
+      domain: ""
     };
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     var domainStringId = "";
     var storeStringId = "";
     const userId = await AsyncStorage.getItem("userId");
@@ -202,8 +203,8 @@ class TextilePayment extends Component {
       customerGender: parentObj.customerGender ? parentObj.customerGender : "",
       lineItemIdAdd: parentObj.lineItemIdAdd ? parentObj.lineItemIdAdd : "",
       totalQty: parentObj.totalQty,
-      CGST: parentObj.CGST,
-      SGST: parentObj.SGST,
+      CGST: parentObj.CGST ? parentObj.CGST : 0,
+      SGST: parentObj.SGST ? parentObj.SGST : 0,
       discountAmount: parentObj.discountAmount,
       creditAmount: parentObj.creditAmount,
       isTaxIncluded: parentObj.isTaxIncluded ? parentObj.isTaxIncluded : "",
@@ -240,7 +241,7 @@ class TextilePayment extends Component {
   }
 
 
-  addCustomer () {
+  addCustomer() {
     if (this.state.customerPhoneNumber.length != 10) {
       alert('Please Enter a valid 10 digit mobile number');
       return;
@@ -362,16 +363,16 @@ class TextilePayment extends Component {
     });
   };
 
-  modelCancel () {
+  modelCancel() {
     this.setState({ flagCustomerOpen: false, modalVisible: false });
   }
 
-  removeDuplicates (array, key) {
+  removeDuplicates(array, key) {
     const lookup = new Set();
     return array.filter(obj => !lookup.has(obj[key]) && lookup.add(obj[key]));
   }
 
-  confirmKathaModel () {
+  confirmKathaModel() {
     const obj = {
       "paymentType": "PKTPENDING",
       "paymentAmount": this.state.khataAmount
@@ -422,19 +423,19 @@ class TextilePayment extends Component {
     }
   }
 
-  cancelKathaModel () {
+  cancelKathaModel() {
     this.setState({ kathaModelVisible: false });
   }
 
-  getUPILink () {
+  getUPILink() {
     this.savePayment();
   }
 
-  cancelUpiModel () {
+  cancelUpiModel() {
     this.setState({ upiModelVisible: false });
   }
 
-  confirmCreditModel () {
+  confirmCreditModel() {
     const obj = {
       "paymentType": "PKTADVANCE",
       "paymentAmount": this.state.payCreditAmount
@@ -478,11 +479,11 @@ class TextilePayment extends Component {
     // this.pay()
   }
 
-  cancelCreditModel () {
+  cancelCreditModel() {
     this.setState({ creditModelVisible: false });
   }
 
-  saveCard () {
+  saveCard() {
     this.setState({});
     var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString();
     if (this.state.cardPaymentType === "Automatic") {
@@ -525,17 +526,17 @@ class TextilePayment extends Component {
     this.cancelCardModel();
   };
 
-  cancelCardModel () {
+  cancelCardModel() {
     this.setState({ cardModelVisible: false, cardAutoModel: false });
   }
 
-  handleBackButtonClick () {
+  handleBackButtonClick() {
     this.props.navigation.goBack(null);
     return true;
   }
 
 
-  cashAction () {
+  cashAction() {
     this.setState({
       isCash: true,
       isCard: false,
@@ -551,7 +552,7 @@ class TextilePayment extends Component {
     });
   }
 
-  cardAction () {
+  cardAction() {
     this.setState({
       isCash: false,
       isCard: true,
@@ -571,7 +572,7 @@ class TextilePayment extends Component {
     this.setState({ enterredeempoint: text });
   };
 
-  clearRedemption () {
+  clearRedemption() {
     this.setState({ redeemedPints: "" });
   }
   handleCustomerPhoneNumber = (text) => {
@@ -599,18 +600,18 @@ class TextilePayment extends Component {
     this.setState({ customerGender: text });
   };
 
-  cancel () {
+  cancel() {
     this.setState({ flagCustomerOpen: false, flagqtyModelOpen: false, modalVisible: false });
     //this.setState({ modalVisible: true });
   }
 
-  endEditing () {
+  endEditing() {
     if (this.state.customerPhoneNumber.length > 0) {
       this.getUserDetails();
     }
   }
 
-  qrAction () {
+  qrAction() {
     this.setState({
       isCash: false,
       isCard: false,
@@ -626,7 +627,7 @@ class TextilePayment extends Component {
     });
   }
 
-  upiAction () {
+  upiAction() {
     this.setState({
       upiToCustomerModel: true,
       upiModelVisible: true,
@@ -643,7 +644,7 @@ class TextilePayment extends Component {
     });
   }
 
-  gvAction () {
+  gvAction() {
     this.setState({
       isCash: false,
       isCard: false,
@@ -656,7 +657,7 @@ class TextilePayment extends Component {
     });
   }
 
-  khataAction () {
+  khataAction() {
     this.setState({
       khataToCustomerModel: true,
       kathaModelVisible: true,
@@ -673,7 +674,7 @@ class TextilePayment extends Component {
     });
   }
 
-  creditAction () {
+  creditAction() {
     this.setState({
       creditModel: true,
       // payCreditAmount: (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString(),
@@ -694,7 +695,7 @@ class TextilePayment extends Component {
     this.setState({ upiMobileNumber: text });
   };
 
-  modelCancel () {
+  modelCancel() {
     this.setState({ modelVisible: false });
   }
 
@@ -718,7 +719,7 @@ class TextilePayment extends Component {
     this.setState({ gvNumber: text, giftvoucher: text });
   };
 
-  verifycash () {
+  verifycash() {
     // const cash = parseInt(this.state.payCreditAmount) + parseInt(this.state.balanceCreditAmount)
     // this.setState({
     //   balanceCreditAmount: 0,
@@ -784,7 +785,7 @@ class TextilePayment extends Component {
     // }
   }
 
-  async applyPromocode () {
+  async applyPromocode() {
     const gvNumbers = [];
     const obj = {
       gvNumber: this.state.promocode
@@ -853,7 +854,7 @@ class TextilePayment extends Component {
     }
   }
 
-  applyRedem () {
+  applyRedem() {
     this.setState({ redeemedPints: this.state.enterredeempoint });
     if (parseInt(this.state.loyaltyPoints) < parseInt(this.state.redeemedPints)) {
       alert('please enter greater than the available points');
@@ -865,19 +866,19 @@ class TextilePayment extends Component {
   }
 
 
-  tagCustomer () {
+  tagCustomer() {
     this.setState({ customerEmail: "", customerPhoneNumber: "", customerName: "", customerGender: "", customerAddress: "", flagCustomerOpen: true, modalVisible: true });
   }
 
-  clearTaggedCustomer () {
+  clearTaggedCustomer() {
     this.setState({ mobileNumber: "", loyaltyPoints: "", notfound: "" });
   }
 
-  clearPromocode () {
+  clearPromocode() {
     this.setState({ promoDiscount: 0, giftvoucher: "", promocode: "" });
   }
 
-  clearCashSammary () {
+  clearCashSammary() {
     this.setState({ verifiedCash: 0, recievedAmount: 0, returnAmount: 0 });
   }
 
@@ -1137,12 +1138,12 @@ class TextilePayment extends Component {
   };
 
 
-  redeemPoints () {
+  redeemPoints() {
     this.setState({ flagredeem: true, modalVisible: true });
   }
 
 
-  verifyCustomer () {
+  verifyCustomer() {
     this.setState({ loyaltyPoints: '' });
     if (this.state.mobileNumber.length !== 10) {
       alert('please Enter a customer valid mobile number');
@@ -1176,7 +1177,7 @@ class TextilePayment extends Component {
     }
   }
 
-  applyGVNumber () {
+  applyGVNumber() {
     const gvObj = [this.state.gvNumber];
     const param = '?flag=' + false;
     axios.put(NewSaleService.saveCoupons() + param, gvObj).then(res => {
@@ -1188,7 +1189,7 @@ class TextilePayment extends Component {
     });
   }
 
-  async applyRt () {
+  async applyRt() {
     const obj = this.state.rtNumber;
     if (this.state.compareRTList.length === 0) {
       // console.log("in if", this.state.compareRTList, this.state.listOfRtnum);
@@ -1288,7 +1289,7 @@ class TextilePayment extends Component {
     }
   }
 
-  checkPromo () {
+  checkPromo() {
     let costPrice = 0;
     let discount = 0;
     let total = 0;
@@ -1480,7 +1481,7 @@ class TextilePayment extends Component {
     this.setState({ handleBillDiscount: false });
   }
 
-  getDiscountReasons () {
+  getDiscountReasons() {
     axios.get(CustomerService.getDiscountReasons()).then((res) => {
       if (res.status === 200) {
         //this.setState({discReasons: res.data});
@@ -1501,18 +1502,18 @@ class TextilePayment extends Component {
     });
   }
 
-  billDiscountModelCancel () {
+  billDiscountModelCancel() {
     this.setState({
       reasonDiscount: '', discApprovedBy: '', manualDisc: '',
       discountAmountValid: true, modalVisible: false, billmodelPop: false
     });
   }
 
-  handleDiscountAmount (value) {
+  handleDiscountAmount(value) {
     this.setState({ manualDisc: value });
   }
 
-  handleApprovedBy (text) {
+  handleApprovedBy(text) {
     this.setState({ approvedBy: text });
   }
 
@@ -1520,7 +1521,7 @@ class TextilePayment extends Component {
     this.setState({ reasonDiscount: value });
   };
 
-  billValidation () {
+  billValidation() {
     let isFormValid = true;
     let errors = {};
     if (parseFloat(this.state.manualDisc) > parseFloat(this.state.netPayableAmount)) {
@@ -1532,7 +1533,7 @@ class TextilePayment extends Component {
     return isFormValid;
   }
 
-  billDiscount () {
+  billDiscount() {
     const isFormValid = this.billValidation();
     // console.log("manualDiscmanualDisc", this.state.manualDisc, this.state.totalAmount);
     if (isFormValid) {
@@ -1559,7 +1560,7 @@ class TextilePayment extends Component {
 
 
 
-  render () {
+  render() {
     return (
       <View style={scss.container}>
         {this.state.loading && <Loader loading={this.state.loading} />}

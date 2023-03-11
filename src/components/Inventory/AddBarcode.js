@@ -104,7 +104,7 @@ class AddBarcode extends Component {
     };
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     var domainStringId = "";
     var storeStringId = "";
     this.setState({ isEdit: this.props.route.params.isEdit });
@@ -121,7 +121,7 @@ class AddBarcode extends Component {
   }
 
   // Go Back Actions
-  handleBackButtonClick () {
+  handleBackButtonClick() {
     this.props.navigation.goBack(null);
     return true;
   }
@@ -173,7 +173,7 @@ class AddBarcode extends Component {
   };
 
   // Division Actions
-  getAllDivisions (data) {
+  getAllDivisions(data) {
     let divisions = [];
     InventoryService.getAllDivisions(data).then((res) => {
       if (res?.data) {
@@ -199,7 +199,7 @@ class AddBarcode extends Component {
   };
 
   // Colors
-  getAllColors () {
+  getAllColors() {
     InventoryService.getColors().then(res => {
       let Colors = [];
       console.log({ Colors }, "Colors");
@@ -220,7 +220,7 @@ class AddBarcode extends Component {
   };
 
   // Section Actions
-  getAllSections (id, data) {
+  getAllSections(id, data) {
     this.setState({ sectionsList: [] });
     let section = [];
     InventoryService.getAllSections(id, data).then((res) => {
@@ -246,7 +246,7 @@ class AddBarcode extends Component {
   };
 
   // SubSection Actions
-  getAllSubsections (id, data) {
+  getAllSubsections(id, data) {
     this.setState({ subSectionsList: [] });
     let subSection = [];
     InventoryService.getAllSections(id, data).then((res) => {
@@ -271,7 +271,7 @@ class AddBarcode extends Component {
   };
 
   // Category Actions
-  getAllCatogiries (data) {
+  getAllCatogiries(data) {
     this.setState({ categoriesList: [] });
     let categories = [];
     InventoryService.getAllCategories(data).then((res) => {
@@ -296,7 +296,7 @@ class AddBarcode extends Component {
   };
 
   // UOM Actions
-  getAllUOM () {
+  getAllUOM() {
     this.setState({ uomList: [] });
     let uomList = [];
     InventoryService.getUOM().then((res) => {
@@ -327,13 +327,13 @@ class AddBarcode extends Component {
   };
 
   handleSelectChange = (value, data) => {
-    this.state.alist[1].selectedValue = value;
-    this.setState({ alist: this.state.alist, selectedDValue: value });
+    data.selectedValue = value;
+    this.setState({ alist: this.state.alist });
     console.log({ value }, this.state.alist);
   };
 
   // HSNCodes Actions
-  getAllHSNCodes () {
+  getAllHSNCodes() {
     this.setState({ hsnCodesList: [] });
     let hsnList = [];
     InventoryService.getAllHsnList().then((res) => {
@@ -358,7 +358,7 @@ class AddBarcode extends Component {
   };
 
   // Store Actions
-  async getAllstores () {
+  async getAllstores() {
     this.setState({ storesList: [] });
     let storesList = [];
     const { clientId } = this.state;
@@ -482,12 +482,12 @@ class AddBarcode extends Component {
     this.setState({ barcode: value });
   };
 
-  handleBarcodeValid () {
+  handleBarcodeValid() {
 
   }
 
   // Date Actions
-  datepickerClicked () {
+  datepickerClicked() {
     this.setState({ datepickerOpen: true });
   }
 
@@ -512,7 +512,7 @@ class AddBarcode extends Component {
   };
 
   // Validations For Barcode Fields
-  validationForm () {
+  validationForm() {
     let isFormValid = true;
     let errors = {};
     if (this.state.name.length < errorLength.name) {
@@ -571,7 +571,7 @@ class AddBarcode extends Component {
   };
 
   // Saving Barcode
-  saveBarcode () {
+  saveBarcode() {
     // console.log(this.state.store);
     // this.setState({ loading: true });
     this.state.alist.forEach((item, ind) => {
@@ -613,7 +613,7 @@ class AddBarcode extends Component {
         metadata: this.state.alist
 
       };
-      console.log({ params });
+      console.log({ params }, this.state.alist);
       this.setState({ loading: true });
       InventoryService.saveBarCode(params, selectedDomain, isEdit)
         .then((res) => {
@@ -639,11 +639,11 @@ class AddBarcode extends Component {
   }
 
   // Cancel Add Barcode
-  cancel () {
+  cancel() {
     this.props.navigation.goBack(null);
   }
 
-  render () {
+  render() {
     return (
       <View>
         {this.state.loading && <Loader loading={this.state.loading} />}
@@ -734,6 +734,7 @@ class AddBarcode extends Component {
             <View>
               {/* <Text>hrys</Text> */}
               {this.state.alist.map((items, index) => {
+                console.log({ items });
                 return (<View>
                   {items.type === "select" && (
                     <View>
@@ -764,7 +765,7 @@ class AddBarcode extends Component {
                         maxLength={12}
                         underlineColor={"#d6d6d6"}
                         autoCapitalize="none"
-                        value={this.state.selectedDValue}
+                        value={items.selectedValue}
                         onChangeText={(value) => this.handleSelectChange(value, items)}
                       />
                     </View>
@@ -773,7 +774,7 @@ class AddBarcode extends Component {
               })}
             </View>
           )}
-          {this.state.selectedDomain === "FruitsAndVegetables" && ( // For groceries only
+          {/* {this.state.selectedDomain === "FruitsAndVegetables" && ( // For groceries only
             <View>
               <Text style={inputHeading}> {I18n.t("Brand Name")} </Text>
               <TextInput
@@ -818,7 +819,7 @@ class AddBarcode extends Component {
                   />
                 </View>
               )}
-            </View>)}
+            </View>)} */}
           <Text style={inputHeading}>
             {I18n.t("Colour")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>

@@ -29,7 +29,7 @@ var deviceheight = Dimensions.get("window").height;
 const pickerData = [
   { value: 'PENDING', label: 'Pending', },
   { value: 'COMPLETED', label: 'Completed', },
-]
+];
 export class GoodsReturn extends Component {
 
   constructor(props) {
@@ -66,7 +66,7 @@ export class GoodsReturn extends Component {
     };
   }
 
- async componentDidMount() {
+  async componentDidMount() {
     if (global.domainName === "Textile") {
       this.setState({ domainId: 1 });
     }
@@ -139,12 +139,14 @@ export class GoodsReturn extends Component {
             prop.barcodeVal = barcodeData;
             prop.review = false;
           });
-          this.setState({ filterActive: true ,modalVisible:false});
+          this.setState({ filterActive: true, modalVisible: false });
           this.setState({
             loading: false,
             goodsReturn: res.data.result.content,
             // rsDetailsList: res.data.result.content,
             totalPages: res.data.result.totalPages
+          }, () => {
+            this.changeNavigation();
           });
           this.continuePagination();
           // this.modelCancel();
@@ -158,7 +160,12 @@ export class GoodsReturn extends Component {
         this.setState({ loading: false });
         this.modelCancel();
       }
-    })
+    });
+  }
+
+  // for the flatlist to scroll back to index
+  changeNavigation() {
+    this.flatListRef.scrollToIndex({ animated: true, index: 0 });
   }
 
   loadMoreList = (value) => {
@@ -299,6 +306,7 @@ export class GoodsReturn extends Component {
         </Appbar>
         {this.state.loading && <Loader loading={this.state.loading} />}
         <FlatList
+          ref={(ref) => this.flatListRef = ref}
           data={this.state.goodsReturn}
           scrollEnabled={true}
           removeClippedSubviews={false}

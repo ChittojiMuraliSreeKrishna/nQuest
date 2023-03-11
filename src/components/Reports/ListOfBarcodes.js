@@ -177,11 +177,13 @@ export class ListOfBarcodes extends Component {
             listBarcodes: res.data.result.content,
             totalPages: res.data.result.totalPages,
             filterActive: true, modalVisible: false, flagFilterOpen: false
+          }, () => {
+            this.changeNavigation();
           });
         } else {
           alert("records not found");
         }
-        this.continuePagination()
+        this.continuePagination();
       }
       else {
         alert(res.data.message);
@@ -193,6 +195,11 @@ export class ListOfBarcodes extends Component {
       alert('No Results Found');
       this.props.modelCancelCallback();
     });
+  }
+
+  // for the flatlist to scroll back to index
+  changeNavigation() {
+    this.flatListRef.scrollToIndex({ animated: true, index: 0 });
   }
 
   loadMoreList = (value) => {
@@ -249,6 +256,7 @@ export class ListOfBarcodes extends Component {
     return (
       <View>
         <FlatList
+          ref={(ref) => this.flatListRef = ref}
           ListHeaderComponent={
             <Appbar>
               <Appbar.Content title={`List Of Barcodes - ${this.state.listBarcodes.length}`} />
