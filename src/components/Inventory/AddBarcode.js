@@ -25,7 +25,7 @@ import {
   dateText,
   inputHeading
 } from "../Styles/FormFields";
-
+import { default as MinusIcon, default as PlusIcon, default as ScanIcon } from 'react-native-vector-icons/MaterialCommunityIcons';
 var deviceWidth = Dimensions.get("window").width;
 var deviceHeight = Dimensions.get("window").height;
 
@@ -111,9 +111,9 @@ class AddBarcode extends Component {
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     this.setState({ clientId: clientId });
     const storeId = AsyncStorage.getItem("storeId");
-    console.log({ storeId: storeId });
+    // console.log({ storeId: storeId });
     const isTaxIncluded = await AsyncStorage.getItem('custom:isTaxIncluded');
-    console.log({ isTaxIncluded });
+    // console.log({ isTaxIncluded });
     this.setState({ isTaxIncluded: isTaxIncluded });
     this.getAllstores();
     this.getAllHSNCodes();
@@ -126,17 +126,35 @@ class AddBarcode extends Component {
     return true;
   }
 
+  // Scan Barcode
+  navigateToScanCode() {
+    global.barcodeId = 'something';
+    this.props.navigation.navigate('ScanBarCode', {
+      isFromNewSale: false, isFromAddProduct: false, invoiceScan: true,
+      onGoBack: () => this.refresh(),
+    });
+  }
 
+  refresh() {
+    if (global.barcodeId != 'something') {
+      this.setState({ barcode: global.barcodeId },
+        () => {
+          this.getRetailBarcodeList();
+        });
+      global.barcodeId = 'something';
+    }
+  }
 
   // Domain Actions
   handleDomain = (value) => {
-    this.setState({ dynamicAttributesName: "", dynamicAttributes: [], loading: true });
+    this.setState({ dynamicAttributesName: "", dynamicAttributes: [], loading: true, alist: [] });
     InventoryService.getDomainAttributes(value).then((res) => {
-      console.log({ res });
+      console.log({ res }, "dynamicAttributes", res.data);
       if (res.data) {
         let size = [];
+        let name = res?.data[0]?.name ? res?.data[0]?.name : "";
         // for (let i = 0; i < res.data.length; i++) {
-        res.data.length > 0 ? res.data[0].values.map((item) =>
+        res.data.length > 0 ? res.data[0].values?.map((item) =>
           size.push({
             value: item,
             label: item,
@@ -144,16 +162,25 @@ class AddBarcode extends Component {
           })
         ) : nulll;
         // }
-        this.setState({ dynamicAttributes: size, dynamicAttributesName: res.data[0].name, loading: false, alist: res.data });
+        let response = res.data;
+        response.forEach((item, index) => {
+          if (item.type === "date") {
+            item.openPicker = false;
+          }
+        });
+        this.setState({ dynamicAttributes: size, dynamicAttributesName: name, loading: false, alist: response }, () => {
+          console.warn(this.state.alist);
+        });
       } else {
         this.setState({ loading: false });
       }
     }).catch((err) => {
+      console.log({ err });
       this.setState({ loading: false });
     });
 
     this.setState({ selectedDomain: value }, () => {
-      console.log({ value });
+      // console.log({ value });
       this.setState({ saveButtonDisabled: true });
       const { selectedDomain } = this.state;
       this.getAllDivisions(selectedDomain);
@@ -168,7 +195,7 @@ class AddBarcode extends Component {
 
   // Status Actions
   handleStatus = (value) => {
-    console.log({ value });
+    // console.log({ value });
     this.setState({ selectedStatus: value });
   };
 
@@ -183,13 +210,13 @@ class AddBarcode extends Component {
             label: res.data[i].name,
           });
         }
-        console.log({ divisions });
+        // console.log({ divisions });
         this.setState({ divisionsList: divisions });
       }
     });
   }
   handleDivision = (value) => {
-    console.log({ value });
+    // console.log({ value });
     this.setState({ divisionId: value, selectedDivision: value }, () => {
       this.getAllSections(this.state.divisionId, this.state.selectedDomain);
     });
@@ -202,7 +229,7 @@ class AddBarcode extends Component {
   getAllColors() {
     InventoryService.getColors().then(res => {
       let Colors = [];
-      console.log({ Colors }, "Colors");
+      // console.log({ Colors }, "Colors");
       res.data.forEach((res) => {
         Colors.push({
           value: res.name,
@@ -211,7 +238,7 @@ class AddBarcode extends Component {
       });
       this.setState({ colorsRes: Colors });
     }).catch(err => {
-      console.log({ err }, 'Colors');
+      // console.log({ err }, 'Colors');
     });
   }
 
@@ -231,7 +258,7 @@ class AddBarcode extends Component {
             label: res.data[i].name,
           });
         }
-        console.log({ section });
+        // console.log({ section });
         this.setState({ sectionsList: section });
       }
     });
@@ -258,7 +285,7 @@ class AddBarcode extends Component {
             id: res.data[i].id,
           });
         }
-        console.log({ subSection });
+        // console.log({ subSection });
         this.setState({ subSectionsList: subSection });
       }
     });
@@ -283,7 +310,7 @@ class AddBarcode extends Component {
             id: res.data[i].id,
           });
         }
-        console.log({ categories });
+        // console.log({ categories });
         this.setState({ categoriesList: categories });
       }
     });
@@ -301,14 +328,14 @@ class AddBarcode extends Component {
     let uomList = [];
     InventoryService.getUOM().then((res) => {
       if (res?.data) {
-        console.log("UOMS", res.data);
+        // console.log("UOMS", res.data);
         for (let i = 0; i < res.data.length; i++) {
           uomList.push({
             value: res.data[i].uomName,
             label: res.data[i].uomName,
           });
         }
-        console.log({ uomList });
+        // console.log({ uomList });
         this.setState({ uomList: uomList });
       }
     });
@@ -323,13 +350,13 @@ class AddBarcode extends Component {
   handleSize = (value, data) => {
     this.state.alist[0].selectedValue = value;
     this.setState({ alist: this.state.alist, selectedValue: value });
-    console.log({ value }, this.state.alist);
+    // console.log({ value }, this.state.alist);
   };
 
   handleSelectChange = (value, data) => {
     data.selectedValue = value;
     this.setState({ alist: this.state.alist });
-    console.log({ value }, this.state.alist);
+    // console.log({ value }, this.state.alist);
   };
 
   // HSNCodes Actions
@@ -338,14 +365,14 @@ class AddBarcode extends Component {
     let hsnList = [];
     InventoryService.getAllHsnList().then((res) => {
       if (res?.data) {
-        console.log("HSNS", res.data);
+        // console.log("HSNS", res.data);
         for (let i = 0; i < res.data.result.length; i++) {
           hsnList.push({
             value: res.data.result[i].hsnCode,
             label: res.data.result[i].hsnCode,
           });
         }
-        console.log({ hsnList });
+        // console.log({ hsnList });
         this.setState({ hsnCodesList: hsnList });
       }
     });
@@ -362,9 +389,9 @@ class AddBarcode extends Component {
     this.setState({ storesList: [] });
     let storesList = [];
     const { clientId } = this.state;
-    console.log({ clientId });
+    // console.log({ clientId });
     InventoryService.getAllStores(clientId).then((res) => {
-      console.log("Stores", res.data);
+      // console.log("Stores", res.data);
       if (res?.data) {
         for (let i = 0; i < res.data.length; i++) {
           storesList.push({
@@ -372,13 +399,13 @@ class AddBarcode extends Component {
             label: res.data[i].name,
           });
         }
-        console.log({ storesList });
+        // console.log({ storesList });
         this.setState({ storesList: storesList });
       }
     });
   }
   handleStore = (value) => {
-    console.warn({ value });
+    // console.warn({ value });
     this.setState({ storeId: value, store: value });
   };
 
@@ -478,7 +505,7 @@ class AddBarcode extends Component {
 
   // Barcode Actions
   handleBarcode = (value) => {
-    console.log({ value });
+    // console.log({ value });
     this.setState({ barcode: value });
   };
 
@@ -572,7 +599,7 @@ class AddBarcode extends Component {
 
   // Saving Barcode
   saveBarcode() {
-    // console.log(this.state.store);
+    // // console.log(this.state.store);
     // this.setState({ loading: true });
     this.state.alist.forEach((item, ind) => {
       delete item.createdBy;
@@ -586,7 +613,7 @@ class AddBarcode extends Component {
     const { selectedDomain, isEdit } = this.state;
     const isFormValid = this.validationForm();
     if (isFormValid) {
-      console.log(this.state.alist);
+      // console.log(this.state.alist);
       // Checking for validations
       const params = {
         // status: selectedDomain === "Retail" ? this.state.status : null,
@@ -613,20 +640,20 @@ class AddBarcode extends Component {
         metadata: this.state.alist
 
       };
-      console.log({ params }, this.state.alist);
+      // console.log({ params }, this.state.alist);
       this.setState({ loading: true });
       InventoryService.saveBarCode(params, selectedDomain, isEdit)
         .then((res) => {
           if (res && res.status === 200) {
             let response = res.data;
-            console.log({ response });
+            // console.log({ response });
             this.props.route.params.onGoBack();
             this.props.navigation.goBack();
             ToastAndroid.show(`Barcode Created Successfully`, ToastAndroid.LONG);
           } else {
             ToastAndroid.show(response.message, ToastAndroid.LONG);
           }
-          console.log({ res });
+          // console.log({ res });
           this.setState({ loading: false });
         })
         .catch((err) => {
@@ -660,6 +687,7 @@ class AddBarcode extends Component {
           <RnPicker
             items={data1}
             setValue={this.handleDomain}
+            placeHolder={"Select Domain"}
           />
           <View>
             <Text style={inputHeading}>
@@ -668,6 +696,7 @@ class AddBarcode extends Component {
             <RnPicker
               items={this.state.divisionsList}
               setValue={this.handleDivision}
+              placeHolder={"Select Division"}
             />
             <Text style={inputHeading}>
               {I18n.t("Section")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -675,6 +704,7 @@ class AddBarcode extends Component {
             <RnPicker
               items={this.state.sectionsList}
               setValue={this.handleSection}
+              placeHolder={"Select Section"}
             />
             <Text style={inputHeading}>
               {I18n.t("Sub Section")}{" "}
@@ -683,6 +713,7 @@ class AddBarcode extends Component {
             <RnPicker
               items={this.state.subSectionsList}
               setValue={this.handleSubSection}
+              placeHolder={"Select Sub Section"}
             />
             <Text style={inputHeading}>
               {I18n.t("Category")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -690,66 +721,31 @@ class AddBarcode extends Component {
             <RnPicker
               items={this.state.categoriesList}
               setValue={this.handleCateory}
+              placeHolder={"Select Category"}
             />
 
           </View>
-          {this.state.selectedDomain === "Retail" && ( // For Retail Domain only
-            <View>
-              <Text style={inputHeading}>
-                {I18n.t("Status Type")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
-              </Text>
-              <RnPicker
-                items={retailStatus}
-                setValue={this.handleStatus}
-              />
-              <Text style={inputHeading}>
-                Stock Validity <Text style={{ color: "#aa0000" }}>*</Text>{" "}
-              </Text>
-              <TouchableOpacity
-                style={dateSelector}
-                testID="openModal"
-                onPress={() => this.datepickerClicked()}
-              >
-                <Text style={dateText}>
-                  {this.state.productValidity === ""
-                    ? "YYYY-MM-DD"
-                    : this.state.productValidity}
-                </Text>
-                <Image
-                  style={filter.calenderpng}
-                  source={require("../assets/images/calender.png")}
-                />
-              </TouchableOpacity>
-              {this.state.datepickerOpen && (
-                <View style={filter.dateTopView}>
-                  <DateSelector
-                    dateCancel={this.datepickerCancelClicked}
-                    setDate={this.handleDate}
-                  />
-                </View>
-              )}
-            </View>
-          )}
           {this.state.alist !== null && this.state.alist.length > 0 && (
             <View>
               {/* <Text>hrys</Text> */}
-              {this.state.alist.map((items, index) => {
-                console.log({ items });
+              {this.state.alist.map((attrbs, index) => {
+                // console.log({ attrbs });
                 return (<View>
-                  {items.type === "select" && (
+                  {attrbs.type === "select" && (
                     <View>
-                      <Text style={inputHeading}>{items.name}</Text>
+                      <Text style={inputHeading}>{attrbs.name}</Text>
                       <RnPicker
-                        items={items.values.map((item) => (
+                        items={attrbs.values.map((item) => (
                           { label: item, value: item }
                         ))}
                         setValue={this.handleSize}
+                        placeHolder={attrbs.name}
                       />
                     </View>
                   )}
-                  {items.type === "input" && (
+                  {attrbs.type === "input" && (
                     <View>
-                      <Text style={inputHeading}>{items.name}</Text>
+                      <Text style={inputHeading}>{attrbs.name}</Text>
                       <TextInput
                         activeUnderlineColor="#d6d6d6"
                         mode="flat"
@@ -759,73 +755,54 @@ class AddBarcode extends Component {
                           {},
                         ]}
                         underlineColorAndroid="transparent"
-                        placeholder={items.name}
+                        placeholder={attrbs.name}
                         placeholderTextColor={"#6f6f6f"}
                         textAlignVertical="center"
                         maxLength={12}
                         underlineColor={"#d6d6d6"}
                         autoCapitalize="none"
-                        value={items.selectedValue}
+                        value={attrbs.selectedValue}
                         onChangeText={(value) => this.handleSelectChange(value, items)}
                       />
+                    </View>
+                  )}
+                  {attrbs.type === "date" && (
+                    <View>
+                      <Text style={inputHeading}>{attrbs.name}</Text>
+                      <TouchableOpacity
+                        style={dateSelector}
+                        testID="openModal"
+                        onPress={() => { attrbs.openPicker = true; this.setState({ alist: this.state.alist }); }}
+                      >
+                        <Text style={dateText}>
+                          {attrbs.selectedValue === null
+                            ? "YYYY-MM-DD"
+                            : attrbs.selectedValue}
+                        </Text>
+                        <Image
+                          style={filter.calenderpng}
+                          source={require("../assets/images/calender.png")}
+                        />
+                      </TouchableOpacity>
+                      {attrbs.openPicker === true &&
+                        <DateSelector
+                          dateCancel={() => { attrbs.openPicker = false; this.setState({ alist: this.state.alist }); }}
+                          setDate={(value) => { attrbs.selectedValue = value; this.setState({ alist: this.state.alist }); }}
+                        />}
                     </View>
                   )}
                 </View>);
               })}
             </View>
           )}
-          {/* {this.state.selectedDomain === "FruitsAndVegetables" && ( // For groceries only
-            <View>
-              <Text style={inputHeading}> {I18n.t("Brand Name")} </Text>
-              <TextInput
-                activeUnderlineColor="#d6d6d6"
-                mode="flat"
-                style={[
-                  forms.input_fld,
-                  forms.active_fld,
-                  {},
-                ]}
-                underlineColorAndroid="transparent"
-                placeholder={I18n.t("Brand Name")}
-                placeholderTextColor={"#6f6f6f"}
-                textAlignVertical="center"
-                maxLength={12}
-                underlineColor={"#d6d6d6"}
-                autoCapitalize="none"
-                value={this.state.brand}
-                onChangeText={this.handleBrand}
-              />
-              <Text style={inputHeading}> {I18n.t("Expiry Date")} </Text>
-              <TouchableOpacity
-                style={dateSelector}
-                testID="openModal"
-                onPress={() => this.datepickerClicked()}
-              >
-                <Text style={dateText}>
-                  {this.state.expiryDateFruitsDomain === ""
-                    ? "YYYY-MM-DD"
-                    : this.state.expiryDateFruitsDomain}
-                </Text>
-                <Image
-                  style={filter.calenderpng}
-                  source={require("../assets/images/calender.png")}
-                />
-              </TouchableOpacity>
-              {this.state.datepickerOpen && (
-                <View style={filter.dateTopView}>
-                  <DateSelector
-                    dateCancel={this.datepickerCancelClicked}
-                    setDate={this.handleExpiryFruitsDomainDate}
-                  />
-                </View>
-              )}
-            </View>)} */}
+
           <Text style={inputHeading}>
             {I18n.t("Colour")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <RnPicker
             items={this.state.colorsRes}
             setValue={this.handleColor}
+            placeHolder={"Select Colour"}
           />
           <Text style={inputHeading}>
             {I18n.t("Name")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -944,6 +921,7 @@ class AddBarcode extends Component {
           <RnPicker
             items={this.state.uomList}
             setValue={this.handleUOM}
+            placeHolder={"Select UOM"}
           />
           {(this.state.isTaxIncluded === "true" || this.state.isTaxIncluded === "false") && this.state.isTaxIncluded !== null && (<View >
             <Text style={inputHeading}>
@@ -952,6 +930,7 @@ class AddBarcode extends Component {
             <RnPicker
               items={this.state.hsnCodesList}
               setValue={this.handleHSNCode}
+              placeHolder={"Select HSNCode"}
             />
           </View>)}
           <Text style={inputHeading}>
@@ -982,6 +961,7 @@ class AddBarcode extends Component {
           <RnPicker
             items={this.state.storesList}
             setValue={this.handleStore}
+            placeHolder={"Select Store"}
           />
           <Text style={inputHeading}>
             QTY <Text style={{ color: "#aa0000" }}>*</Text>{" "}
@@ -1007,26 +987,35 @@ class AddBarcode extends Component {
           <Text style={inputHeading}>
             Barcode
           </Text>
-          <TextInput
-            activeUnderlineColor="#000"
-            mode="flat"
-            underlineColor={"#d6d6d6"}
-            style={[
-              forms.input_fld,
-              forms.active_fld,
-            ]}
-            underlineColorAndroid="transparent"
-            placeholder="BarCode"
-            placeholderTextColor={"#676767"}
-            textAlignVertical="center"
-            maxLength={12}
-            autoCapitalize="none"
-            value={this.state.barcode}
-            onBlur={() => this.handleBarcodeValid()}
-            onChangeText={(value) => this.handleBarcode(value)}
-          />
+          <View style={{ display: 'flex', flexDirection: 'row' }}>
+            <View style={{ width: "85%" }}>
+              <TextInput
+                activeUnderlineColor="#000"
+                mode="flat"
+                underlineColor={"#d6d6d6"}
+                style={[
+                  forms.input_fld,
+                  forms.active_fld,
+                ]}
+                underlineColorAndroid="transparent"
+                placeholder="BarCode"
+                placeholderTextColor={"#676767"}
+                textAlignVertical="center"
+                maxLength={12}
+                autoCapitalize="none"
+                value={this.state.barcode}
+                onBlur={() => this.handleBarcodeValid()}
+                onChangeText={(value) => this.handleBarcode(value)}
+              />
+            </View>
+            <View>
+              <TouchableOpacity style={{ padding: RF(10) }} onPress={() => this.navigateToScanCode()} >
+                <ScanIcon name='barcode-scan' size={30} color={color.black} />
+              </TouchableOpacity>
+            </View>
+          </View>
           <View style={forms.action_buttons_container}>
-            <TouchableOpacity style={[forms.action_buttons, { backgroundColor: this.state.saveButtonDisabled ? color.accent : color.disableBackGround }]}
+            <TouchableOpacity style={[forms.action_buttons, forms.submit_btn, { backgroundColor: this.state.saveButtonDisabled ? color.accent : color.disableBackGround }]}
               disabled={!this.state.saveButtonDisabled}
               onPress={() => this.saveBarcode()}>
               <Text style={forms.submit_btn_text} >{I18n.t("SAVE")}</Text>

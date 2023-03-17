@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
-import { Text, View, FlatList, TouchableOpacity, Image } from 'react-native';
+import { Text, View, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import IconFA from 'react-native-vector-icons/FontAwesome';
 import InventoryService from '../services/InventoryService';
@@ -8,6 +8,10 @@ import headers from '../../commonUtils/assets/styles/HeaderStyles.scss';
 import Device from 'react-native-device-detection';
 import { default as MinusIcon, default as PlusIcon } from 'react-native-vector-icons/MaterialCommunityIcons';
 import { TextInput } from 'react-native';
+import { openDatabase } from 'react-native-sqlite-storage';
+import { err } from 'react-native-svg/lib/typescript/xml';
+
+const dataBase = openDatabase({ name: 'menucategory.db', createFromLocation: 1 }, () => { }, err => { console.warn({ err }); });
 
 class MenuCategory extends Component {
 
@@ -18,6 +22,7 @@ class MenuCategory extends Component {
         this.state = {
             storeId: 0,
             menuItems: [],
+            cartItems: [],
             userId: 0,
             selectedTable: "",
             showTableModel: false,
@@ -51,7 +56,32 @@ class MenuCategory extends Component {
         let tableId = this.props?.route?.params?.table?.id;
         let tableName = this.props?.route?.params?.table?.name;
         this.setState({ tableId: tableId, tableName: tableName });
+        this.createDateBaase();
+        if (this.state.tableId !== 0) {
+            this.searchItems();
+        }
     }
+
+    createDateBaase() {
+        dataBase.transaction((txn) => {
+            txn.executeSql(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='menus'",
+                [],
+                (tx, res) => {
+                    console.log('item', res.rows.length);
+                    console.log({ res }, res.rows);
+                    if (res.rows.length === 0) {
+                        txn.executeSql('DROP TABLE IF EXISTS menus', []);
+                        txn.executeSql('CREATE TABLE IF NOT EXISTS menus(menuId INTEGER PRIMARY KEY AUTOINCREMENT, createdDate DATETIME, cuisine VARCHAR(30), divisionId VARCHAR(30), divisionId VARCHAR(30), id VARCHAR(30), image VARCHAR(200), itemMrp VARCHAR(30), itemName VARCHAR(30), itemStatus VARCHAR(30), qty VARCHAR(30), section VARCHAR(30), sectionId VARCHAR(30), taxValues JSONB)', []);
+                    }
+                }),
+                (err) => {
+                    console.error({ err });
+                };
+        });
+        // Alert.alert("DataBase", "created Table");
+    }
+
 
     // Divisions section
     getAllDivisions() {
@@ -103,15 +133,15 @@ class MenuCategory extends Component {
         InventoryService.getAllCategory(data, domain).then((res) => {
             if (res?.data) {
                 console.log(res.data);
-                for (let i = 0; i < res.data.length; i++) {
+                res.data.forEach((item) => {
                     categories.push({
-                        value: res.data[i].id,
-                        label: res.data[i].category,
-                        id: res.data[i].id,
-                        iamge: res.data[i].image,
+                        value: item.id,
+                        label: item.category,
+                        id: item.id,
+                        iamge: item.image,
                         bool: false
                     });
-                }
+                });
                 console.log({ categories });
                 this.setState({ categoriesList: categories });
             }
@@ -141,25 +171,61 @@ class MenuCategory extends Component {
     // Searching
     searchItems() {
         InventoryService.getAllSearchItems(this.state.selectedCategory, this.state.storeId).then((res) => {
+            const { menuItems } = this.state;
             if (res?.data) {
-                let items = res.data.content;
-                this.state.menuItems.push(items);
-                this.setState({ menuItems: items });
+                let items = new Set();
+                items = res.data.content;
+                console.log({ items });
+                this.handleDataBase(items);
+                this.setState({ menuItems: items }, () => {
+                });
             }
         });
     }
 
+    handleDataBase(items) {
+        dataBase.transaction((tx) => {
+            items.forEach((item) => {
+                tx.executeSql(
+                    "INSERT INTO menus (menuId, createdDate, cuisine, divisionId, id, image, itemMrp, itemName, itemStatus, qty, section, sectionId, taxValues) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    [item.createdDate, item.cuisine, item.divisionId, item.id, item.image, item.itemMrp, item.itemName, item.itemStatus, item.qty, item.section, item.sectionId, item.taxValues],
+                    (tx, results) => {
+                        alert("success");
+                        console.log("success");
+                    },
+                    (err) => {
+                        console.error({ err });
+                    }
+                );
+            });
+        });
+    }
+
     // Add To Cart
-    addToCart(item, index) {
+    addToCart = (item, index) => {
         if (this.state.tableId && this.state.tableId !== 0) {
             const items = [...this.state.menuItems];
             items[index].cart = true;
             items[index].qty = 1;
-            this.setState({ menuItems: items });
+            console.log({ item });
+            if (this.state.cartItems.length === 0) {
+                this.state.cartItems.push(item);
+            } else {
+                for (let i = 0; i < this.state.cartItems.length; i++) {
+                    if (parseInt(this.state.cartItems[i].id) === item.id) {
+                        this.state.cartItems[i].qty + 1;
+                    } else {
+                        this.state.cartItems.push(item);
+                    }
+                }
+            }
+            this.setState({ menuItems: items, cartItems: this.state.cartItems }, () => {
+                // console.log(this.state.cartItems);
+            });
         } else {
             alert("Please Select the table");
         }
-    }
+    };
 
     // Modifying the items qty
     incrementForTable(item, index) {
@@ -167,7 +233,13 @@ class MenuCategory extends Component {
         var addItem = parseInt(items[index].qty) + 1;
         items[index].qty = addItem.toString();
         this.setState({ menuItems: items }, () => {
-
+            this.state.cartItems.forEach((cart) => {
+                if (cart.itemName === item.itemName) {
+                    cart.qty + 1;
+                }
+            });
+            console.log(this.state.cartItems);
+            this.setState({ cartItems: this.state.cartItems });
         });
     }
 
@@ -176,19 +248,36 @@ class MenuCategory extends Component {
         if (items[index].qty > 1) {
             var minItem = parseInt(items[index].qty) - 1;
             items[index].qty = minItem.toString();
-            this.setState({ menuItems: items });
+            this.setState({ menuItems: items }, () => {
+            });
         } else {
             items[index].qty = 0;
             items[index].cart = false;
             this.setState({ menuItems: items });
         }
+        this.state.cartItems.forEach((cart) => {
+            if (cart.itemName === item.itemName) {
+                if (cart.qty > 1) {
+                    cart.qty - 1;
+                } else {
+                    cart.cart = false;
+                }
+            }
+        });
+        this.setState({ cartItems: this.state.cartItems });
     }
 
     updateQuanty(text, index, item) {
         const items = [...this.state.menuItems];
         if (parseInt(text) > 0 && item.qty !== NaN) {
             items[index].qty = parseInt(text);
-            this.setState({ menuItems: items });
+            this.setState({ menuItems: items }, () => {
+                this.state.cartItems.forEach((cart) => {
+                    if (cart.itemName === item.itemName) {
+                        cart.qty = parseInt(text);
+                    }
+                });
+            });
         } else {
             alert("Please Enter A Valid QTY");
         }
@@ -199,7 +288,7 @@ class MenuCategory extends Component {
         if (this.state.tableId && this.state.tableId !== 0) {
             this.props.navigation.navigate("CartDetails", {
                 tableId: this.state.tableId,
-                menu: this.state.menuItems,
+                menu: this.state.cartItems,
                 tableName: this.state.tableName,
                 goBack: () => this.searchItems(),
                 onGoBack: () => this.searchItems()
@@ -290,8 +379,6 @@ class MenuCategory extends Component {
                                         source={{ uri: item.image }}
                                         style={{ height: 90, width: 90, borderRadius: 10 }}
                                     />
-                                    {/* <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                                </ScrollView> */}
                                     <Text style={{ textAlign: "center", flexShrink: 1 }} numberOfLines={1} ellipsizeMode="tail">{item.itemName}</Text>
                                     <Text style={{ textAlign: "center" }}>₹{parseFloat(item.itemMrp).toFixed(2)}</Text>
                                     {item.cart ? <View style={{ flexDirection: 'row', alignItems: 'center' }}>

@@ -5,10 +5,11 @@ import {
   USER_MANAGEMENT_URL
 } from "../../commonUtils/ApiConstants";
 import { BASE_URL } from "../../commonUtils/Base";
+import { compileString } from "sass";
 
 class InventoryService {
   // Getting all barcode -> Barcode.js
-  getTextileBarcodes (list, pageNumber) {
+  getTextileBarcodes(list, pageNumber) {
     const barcodeParam = "?page=" + pageNumber + "&size=10";
     console.log({ barcodeParam });
     return axios.post(
@@ -18,22 +19,22 @@ class InventoryService {
   }
 
   // Get all Productcombo -> ProductCombo.js
-  getProductCombo (params) {
+  getProductCombo(params) {
     console.log({ params });
     return axios.post(BASE_URL + INVENTORY_PORTAL.getAllProductBundleList + params);
   }
 
   // Get all divisions for -> AddBarcodes.js, EditBarcodes.js
-  getUOM () {
+  getUOM() {
     return axios.get(BASE_URL + INVENTORY_PORTAL.getAllUOMs);
   }
 
-  getColors () {
+  getColors() {
     return axios.get(BASE_URL + INVENTORY_PORTAL.getAllColors);
   }
 
   // Get all divisions for -> AddBarcodes.js, EditBarcodes.js
-  getAllDivisions (domainType) {
+  getAllDivisions(domainType) {
     const divisionParam = "?domainType=" + domainType;
     console.log({ divisionParam });
     return axios.get(
@@ -42,14 +43,14 @@ class InventoryService {
   }
 
   // Get all sections, subSections for -> addbarcode, EditBarcodes.js
-  getAllSections (id, domainType) {
+  getAllSections(id, domainType) {
     const sectionParam = "?id=" + id + "&domainType=" + domainType;
     console.log({ sectionParam });
     return axios.get(BASE_URL + INVENTORY_PORTAL.getAllSections + sectionParam);
   }
 
   // Get all Categories for -> AddBarcode.js, EditBarcode.js
-  getAllCategories (domainType) {
+  getAllCategories(domainType) {
     const categoriesParam = "?domainType=" + domainType;
     console.log({ categoriesParam });
     return axios.get(
@@ -58,7 +59,7 @@ class InventoryService {
   }
 
   // For Restaurants -> MenuCategory.js
-  getAllCategory (id, domainType) {
+  getAllCategory(id, domainType) {
     const categoryParam = "?id=" + id + "&domainType=" + domainType;
     console.log({ categoryParam });
     return axios.get(
@@ -68,19 +69,19 @@ class InventoryService {
 
 
   // Get all stores for -> AddBarcodes.js, AddProductCombo.js, EditBarcodes.js
-  getAllStores (clientId) {
+  getAllStores(clientId) {
     const storesParam = "?clientId=" + clientId + "&isActive=true";
     console.log({ storesParam });
     return axios.get(BASE_URL + USER_MANAGEMENT_URL.getAllStores + storesParam);
   }
 
   // Get all hsns 
-  getAllHsnList () {
+  getAllHsnList() {
     return axios.get(BASE_URL + INVENTORY_PORTAL.getAllHsnList);
   }
 
   // Save Barocodes
-  saveBarCode (list, domain, isEdit, value) {
+  saveBarCode(list, domain, isEdit, value) {
     console.log({ list, domain, isEdit, value });
 
     if (isEdit) {
@@ -108,7 +109,7 @@ class InventoryService {
   }
 
   // Saving List Items Restaurants
-  saveListItem (isEdit, list) {
+  saveListItem(isEdit, list) {
     console.log({ list });
     if (isEdit) {
       const updateListItem = BASE_URL + INVENTORY_PORTAL.updatTextileBarcodes;
@@ -121,14 +122,14 @@ class InventoryService {
   }
 
   // Get All List Items
-  getListItems (storeId) {
+  getListItems(storeId) {
     const getAllItems = BASE_URL + INVENTORY_PORTAL.getAllItems + "?storeId=" + storeId;
     console.log({ getAllItems, storeId });
     return axios.get(getAllItems);
   }
 
   // Get All Items MenuCategory.js
-  getAllSearchItems (data, storeId) {
+  getAllSearchItems(data, storeId) {
     const searchParms = "?section=" + data + "&storeId=" + storeId;
     const url = BASE_URL + INVENTORY_PORTAL.getAllItems;
     console.log({ searchParms });
@@ -136,7 +137,7 @@ class InventoryService {
   }
 
   // Getting Barcode Details -> AddProductCombo.js
-  getBarcodesDetails (storesId, domain, barcodeId) {
+  getBarcodesDetails(storesId, domain, barcodeId) {
     if (domain && domain.label === "Retail") {
       const RetailDetails = "?barcode=" + barcodeId + "&storeId=" + storesId;
       console.log({ RetailDetails });
@@ -154,54 +155,55 @@ class InventoryService {
 
 
   // Saving Product Combo -> AddProductCombo.js
-  addProductCombo (obj) {
+  addProductCombo(obj) {
     return axios.post(BASE_URL + INVENTORY_PORTAL.addProductBundle, obj);
   }
 
   // Delete Barcodes
-  deleteBarcode (id) {
+  deleteBarcode(id) {
     const param = '?id=' + id;
     return axios.delete(BASE_URL + INVENTORY_PORTAL.deleteTextileBarcode + param);
   }
 
   /* --- UNUSED CALLS --- */
 
-  updatTextileBarcodes () {
+  updatTextileBarcodes() {
     return BASE_URL + "/inventory/inventoryTextile/updateBarcode_Textile";
   }
 
-  deleteTextileBarcode () {
+  deleteTextileBarcode() {
     return BASE_URL + "/inventory/inventoryTextile/deleteBarcode_Textile";
   }
 
-  getbarcodeTexttileAdjustments () {
+  getbarcodeTexttileAdjustments() {
     return BASE_URL + "/inventory/inventory-management/adjustments/filter";
   }
 
-  getStoreNameById () {
+  getStoreNameById() {
     return BASE_URL + "/user-management/store/storeList";
   }
 
-  createProduct () {
+  createProduct() {
     return BASE_URL + "/inventory/inventoryRetail/createBarcode";
   }
 
-  updateBarcode () {
+  updateBarcode() {
     return BASE_URL + "/inventory/inventoryRetail/updateBarcode";
   }
 
-  getAllBarcodes () {
+  getAllBarcodes() {
     return BASE_URL + "/inventory/inventoryRetail/getAllBarcodes";
   }
-  saveUOM () {
+  saveUOM() {
     return BASE_URL + "/uom/saveUom";
   }
-  getDomainAttributes (domain) {
+  getDomainAttributes(domain) {
     const param2 = '?domainType=' + domain;
+    console.log({ param2 });
     return axios.get(BASE_URL + "/inventory/inventory-management/domain-attributes" + param2);
   }
 
-  kitchenAvailability (id, status, storeId) {
+  kitchenAvailability(id, status, storeId) {
     const url = BASE_URL + INVENTORY_PORTAL.kitchenItemStatus;
     const param = "?id=" + id + "&status=" + status + "&storeId=" + storeId;
     console.log(url + param);

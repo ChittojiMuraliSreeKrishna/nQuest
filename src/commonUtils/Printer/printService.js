@@ -99,9 +99,9 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       printer.addPulse();
       printer.send();
     } else if (type === "Invoice") { // For Invoice
-      let esnum = barcode
-      alert(esnum)
-      console.log({ invoiceTax, object })
+      let esnum = barcode;
+      alert(esnum);
+      console.log({ invoiceTax, object });
     }
     else if (type === "INVOICE") {
       let esNum = barcode;
@@ -167,16 +167,16 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       }
       printer.line('________________________________________________');
       printer.newline();
-      printer.text('Total Amount: ' + parseFloat(invoiceTax[0].netPayableAmount).toFixed(2) + '\n');
+      printer.text('Total Amount: ' + parseFloat(invoiceTax[0].grossAmount).toFixed(2) + '\n');
       printer.line('________________________________________________');
       printer.text('Tax  \n');
       printer.line('________________________________________________');
       printer.text('SGST: ' + parseFloat(invoiceTax[0].sgst).toFixed(2) + '\n');
       printer.text('CGST: ' + parseFloat(invoiceTax[0].cgst).toFixed(2) + '\n');
       printer.line('________________________________________________');
-      printer.text('Net Total(tax inc): ' + parseFloat(invoiceTax[0].netPayableAmount).toFixed(2) + '\n');
+      printer.text('Net Total(tax inc): ' + parseFloat(invoiceTax[0].netTotal).toFixed(2) + '\n');
       printer.line('________________________________________________');
-      printer.align('center')
+      printer.align('center');
       printer.barcode({ // For Barcode
         value: barcode,
         // value: "ES113u8241u12",

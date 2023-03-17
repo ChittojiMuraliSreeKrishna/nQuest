@@ -1055,7 +1055,8 @@ class TextilePayment extends Component {
         "totalAmount": (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString(),
         "withoutTaxTotal": this.state.netPayableAmount,
         "TotalAmTax": this.state.totalAmount,
-        "TaxIncExc": this.state.isTaxIncluded
+        "TaxIncExc": this.state.isTaxIncluded,
+        "netTotal": parseFloat(this.state.grossAmount) - parseFloat(this.state.totalPromoDisc) - parseFloat(this.state.manualDisc) - parseFloat(this.state.couponAmount) - parseFloat(this.state.rtAmount)
       };
 
     }
@@ -1928,7 +1929,7 @@ class TextilePayment extends Component {
               <Text style={[scss.textStyleMedium, { color: '#828282', marginLeft: 10, marginTop: 10 }]}> {('CASH SUMMARY')} </Text>
             )}
 
-            {(this.state.isCash === true || this.state.isCardOrCash === true) && (
+            {parseInt(this.state.grandNetAmount) > 0 && (this.state.isCash === true || this.state.isCardOrCash === true) && (
               <View style={[scss.radio_group, { margin: 5 }]}>
                 <TextInput
                   style={[forms.input_fld, { width: "60%", minWidth: "60%", maxWidth: "70%" }]}

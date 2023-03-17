@@ -18,7 +18,7 @@ import CustomerService from '../services/CustomerService';
 import { color } from '../Styles/colorStyles';
 
 import { dateSelector, dateText } from '../Styles/FormFields';
-import { filterBtn, flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleLight, textStyleMedium, textStyleMediumColor } from '../Styles/Styles';
+import { filterBtn, flatListHeaderContainer, flatListMainContainer, flatlistSubContainer, flatListTitle, highText, textContainer, textStyleMedium, textStyleMediumColor } from '../Styles/Styles';
 
 
 
@@ -281,13 +281,13 @@ class GiftVocher extends Component {
         this.setState({ modalVisible: false, flagFilterOpen: false, searchQuery: "", filterStartDate: "", filterEndDate: "" });
       });
     } else {
-      alert("Please Provide Input Fields")
+      alert("Please Provide Input Fields");
     }
   }
 
 
   clearFilter() {
-    this.setState({ filterVouchersData: [], filterStartDate: "", filterEndDate: "", filterGvNumber: "", filterActive: false })
+    this.setState({ filterVouchersData: [], filterStartDate: "", filterEndDate: "", filterGvNumber: "", filterActive: false });
   }
 
   validationField() {
@@ -416,48 +416,54 @@ class GiftVocher extends Component {
             </Modal>
           }
           <>
-            <FlatList
-              ListHeaderComponent={<View style={flatListHeaderContainer}>
-                <Text style={[flatListTitle, { color: color.accent }]}>{I18n.t('Gift Vouchers')}</Text>
-                <TouchableOpacity
-                  style={filterBtn}
-                  onPress={() => this.state.filterActive ? this.clearFilter() : this.filterAction()} >
-                  <FilterIcon
-                    name="sliders"
-                    size={20}
-                    color={this.state.filterActive ? '#ED1C24' : '#000'}
-                  />
-                </TouchableOpacity>
-              </View>}
-              data={this.state.filterVouchersData}
-              scrollEnabled={true}
-              renderItem={({ item, index }) => (
-                <View style={flatListMainContainer} >
-                  <View style={flatlistSubContainer}>
-                    <View style={textContainer}>
-                      <Text style={highText}>S.NO: {index + 1}</Text>
-                      <Text style={textStyleMedium}>{I18n.t("VALUE")}: {item.value}</Text>
-                    </View>
-                    <View style={textContainer}>
-                      <Text style={textStyleMediumColor}>GV NUMBER: <Text selectable={true} style={textStyleMedium}>{item.gvNumber}</Text></Text>
-                      <TouchableOpacity style={[forms.action_buttons, forms.submit_btn, { backgroundColor: item.isActivated === false && item.isApplied === false ? '#009900' : color.disableBackGround, width: "30%" }]} disabled={item.isActivated} onPress={() => this.activeGV(item)}>
-                        <Text style={forms.submit_btn_text}>
-                          {item.isActivated === false && item.isApplied === false ? "Assign" : "Assigned"}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                    <View style={textContainer}>
-                      <Text style={textStyleLight}>{I18n.t("FROM DATE")}: {item.fromDate}</Text>
-                      <Text style={textStyleLight}>{I18n.t("TO DATE")}: {item.toDate}</Text>
+            <View>
+              <FlatList
+                ListHeaderComponent={<View style={flatListHeaderContainer}>
+                  <Text style={[flatListTitle, { color: color.accent }]}>
+                    {this.state.filterVouchersData && this.state.filterVouchersData.length > 0 ?
+                      I18n.t('Gift Vouchers') : ""
+                    }
+                  </Text>
+                  <TouchableOpacity
+                    style={filterBtn}
+                    onPress={() => this.state.filterActive ? this.clearFilter() : this.filterAction()} >
+                    <FilterIcon
+                      name="sliders"
+                      size={20}
+                      color={this.state.filterActive ? '#ED1C24' : '#000'}
+                    />
+                  </TouchableOpacity>
+                </View>}
+                data={this.state.filterVouchersData}
+                scrollEnabled={true}
+                renderItem={({ item, index }) => (
+                  <View style={[flatListMainContainer]}>
+                    <View style={flatlistSubContainer}>
+                      <View style={textContainer}>
+                        <Text style={highText}>S.NO: {index + 1}</Text>
+                        <Text style={textStyleMedium}>{I18n.t("VALUE")}: {item.value}</Text>
+                      </View>
+                      <View style={textContainer}>
+                        <Text style={textStyleMediumColor}>GV NUMBER: <Text selectable={true} style={textStyleMedium}>{item.gvNumber}</Text></Text>
+                        <TouchableOpacity style={[forms.action_buttons, forms.submit_btn, { backgroundColor: item.isActivated === false && item.isApplied === false ? '#009900' : color.disableBackGround, width: "30%" }]} disabled={item.isActivated} onPress={() => this.activeGV(item)}>
+                          <Text style={forms.submit_btn_text}>
+                            {item.isActivated === false && item.isApplied === false ? "Assign" : "Assigned"}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                      <View style={textContainer}>
+                        <Text style={textStyleLight}>{I18n.t("FROM DATE")}: {item.fromDate}</Text>
+                        <Text style={textStyleLight}>{I18n.t("TO DATE")}: {item.toDate}</Text>
+                      </View>
                     </View>
                   </View>
-                </View>
-              )}
-            />
+                )}
+              />
+            </View>
             <ScrollView style={{ padding: 10 }}>
               <Text style={[scss.highText, { fontSize: 18 }]}>{I18n.t('Generate Gift Voucher')}</Text>
               <View style={{ padding: 5 }}>
-                <Text style={scss.textStyleLight}>{I18n.t('GV Number')}</Text>
+                <Text style={scss.textStyleMedium}>{I18n.t('GV Number')}</Text>
                 <TextInput
                   style={[forms.input_fld, { borderColor: gvNumberValid ? '#8F9EB717' : '#dd0000' }]}
                   mode="flat"
@@ -471,7 +477,7 @@ class GiftVocher extends Component {
                 {!gvNumberValid && (
                   <Message imp={true} message={this.state.errors['gvNumber']} />
                 )}
-                <Text style={scss.textStyleLight}>{I18n.t('From Date')}</Text>
+                <Text style={scss.textStyleMedium}>{I18n.t('From Date')}</Text>
                 <TouchableOpacity
                   style={[dateSelector, { borderColor: startDateValid ? '#8F9EB717' : '#dd0000' }]}
                   testID="openModal"
@@ -495,7 +501,7 @@ class GiftVocher extends Component {
                 {!startDateValid && (
                   <Message imp={true} message={this.state.errors['startDate']} />
                 )}
-                <Text style={scss.textStyleLight}>{I18n.t('To Date')}</Text>
+                <Text style={scss.textStyleMedium}>{I18n.t('To Date')}</Text>
                 <TouchableOpacity
                   style={[dateSelector, { borderColor: endDateValid ? '#8F9EB717' : '#dd0000' }]}
                   testID="openModal"
@@ -523,7 +529,7 @@ class GiftVocher extends Component {
                   <Message imp={true} message={this.state.errors['endDate']} />
                 )}
                 <View >
-                  <Text style={scss.textStyleLight}>{I18n.t('Amount')}</Text>
+                  <Text style={scss.textStyleMedium}>{I18n.t('Amount')}</Text>
                   <TextInput
                     style={[forms.input_fld, { borderColor: giftValueValid ? '#8F9EB717' : '#dd0000' }]}
                     label={I18n.t('Enter Amount')}
@@ -537,7 +543,7 @@ class GiftVocher extends Component {
                   {!startDateValid && (
                     <Message imp={true} message={this.state.errors['giftValue']} />
                   )}
-                  <Text style={scss.textStyleLight}>{I18n.t('Description')}</Text>
+                  <Text style={scss.textStyleMedium}>{I18n.t('Description')}</Text>
                   <TextInput
                     mode="flat"
                     activeUnderlineColor='#000'
@@ -604,33 +610,34 @@ class GiftVocher extends Component {
 export default GiftVocher;
 
 const styles = StyleSheet.create({
+  spaceText: {
+    height: Device.isTablet ? 2 : 1,
+    width: deviceWidth,
+    backgroundColor: "lightgray",
+  },
+  date: {
+    width: deviceWidth,
+    height: RH(200),
+    marginTop: RH(50),
+  },
   calenderpng: {
-    position: 'absolute',
+    position: "absolute",
     top: RH(10),
     right: 0,
   },
   dateTopView: {
-    height: RW(280),
+    // height: RW(280),
     width: deviceWidth,
-    backgroundColor: '#ffffff'
+    backgroundColor: "#ffffff",
   },
   dateTop2: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: Device.isTablet ? 15 : RH(10),
     marginLeft: Device.isTablet ? 20 : RW(10),
-    marginRight: Device.isTablet ? 20 : RW(10)
+    marginRight: Device.isTablet ? 20 : RW(10),
   },
-  searchBarStyles: {
-    width: Device.isTablet ? deviceWidth / 1.35 : deviceWidth / 1.3,
-    paddingTop: RF(10),
-    paddingBottom: RF(10),
-    paddingLeft: RF(10)
+  mainContainer: {
+    flex: 1,
   },
-  filterBtnStyle: {
-    padding: RF(10),
-    alignSelf: 'center',
-    width: Device.isTablet ? 100 : 50,
-    height: Device.isTablet ? 55 : 45
-  }
 });;

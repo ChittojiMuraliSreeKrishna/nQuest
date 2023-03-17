@@ -15,7 +15,7 @@ import HomeNavigation from './HomeNavigation';
 
 const Stack = createStackNavigator();
 export default class AuthNavigation extends React.Component {
-  render () {
+  render() {
     return (
 
       <Stack.Navigator>

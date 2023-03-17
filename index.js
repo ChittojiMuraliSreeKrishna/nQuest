@@ -47,7 +47,7 @@ axios.interceptors.request.use(
       };
     });
 
-    req.headers.patch[ 'Content-Type' ] = 'application/json';
+    req.headers.patch['Content-Type'] = 'application/json';
 
     if (ENCRYPTION) {
       // req.headers = {
@@ -56,10 +56,10 @@ axios.interceptors.request.use(
       //   "Authorization": "Bearer" + " " + finalToken,
       //   "clientId": clientId ? clientId : "0"
       // };
-      req.headers[ "Content-Type" ] = "application/json";
-      req.headers[ "enc-key" ] = encryptedKey;
-      req.headers[ "Authorization" ] = "Bearer" + " " + finalToken;
-      req.headers[ "clientId" ] = clientId ? clientId : "0";
+      req.headers["Content-Type"] = "application/json";
+      req.headers["enc-key"] = encryptedKey;
+      req.headers["Authorization"] = "Bearer" + " " + finalToken;
+      req.headers["clientId"] = clientId ? clientId : "0";
       req.data = encryptedBytes;
     }
     console.log(req.headers, "headersReq");

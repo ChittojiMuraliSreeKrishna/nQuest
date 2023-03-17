@@ -700,7 +700,7 @@ export class TopBar extends Component {
               <TouchableOpacity onPress={() => this.openProfilePopup()}
                 style={scss.profileToggleBtn}>
                 <Text style={[scss.heading_title, { fontWeight: "bold" }]}>
-                  {global.username}
+                  {global.username ? global.username : "Loading"}
                 </Text>
                 <Icon
                   name="menu-down"
@@ -708,7 +708,7 @@ export class TopBar extends Component {
                   size={25}
                 ></Icon>
               </TouchableOpacity>
-              <Text style={scss.heading_subtitle}>{global.userrole === "client_support" ? global.userrole : global.storeName}</Text>
+              <Text style={scss.heading_subtitle}>{global.userrole === "client_support" ? global.userrole : global.storeName ? global.storeName : "Loading"}</Text>
             </View>
           </View>
           <View>

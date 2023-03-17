@@ -128,6 +128,7 @@ class EditBarcode extends Component {
     const clientId = await AsyncStorage.getItem("custom:clientId1");
     this.setState({ clientId: clientId });
     const isTaxIncluded = await AsyncStorage.getItem('custom:isTaxIncluded');
+    console.log({ isTaxIncluded });
     this.setState({ isTaxIncluded: isTaxIncluded });
     const storeId = AsyncStorage.getItem("storeId");
     console.log({ storeId: storeId });
@@ -139,14 +140,14 @@ class EditBarcode extends Component {
       this.setState({ navText: "Edit Barcode" });
     }
     else {
-      this.setState({ navText: "View Barcode" })
+      this.setState({ navText: "View Barcode" });
     }
     this.setState({
       isEdit: editBcode.isEdit,
       reBar: editBcode.reBar,
       loading: true,
     });
-    console.log({ editBcode }, editBcode.item.metadata);
+    console.log({ editBcode }, editBcode.item.metadata, "Metadata");
     // alert(editBcode.item.vendorTax)
     this.setState(
       {
@@ -190,10 +191,10 @@ class EditBarcode extends Component {
           this.setState({
             selectedValue: editBcode.item.metadata[0].selectedValue,
             selectedDValue: editBcode.item.metadata[1].selectedValue,
-          })
+          });
         }
         const { selectedDomain } = this.state;
-        console.log({ selectedDomain })
+        console.log({ selectedDomain });
         this.getAllCatogiries(selectedDomain);
         this.getAllstores(selectedDomain);
         this.getAllHSNCodes();
@@ -307,8 +308,8 @@ class EditBarcode extends Component {
   };
 
   handleVendorTax = (value) => {
-    this.setState({ vendorTax: value })
-  }
+    this.setState({ vendorTax: value });
+  };
 
 
   // List Price Actions
@@ -383,8 +384,8 @@ class EditBarcode extends Component {
   }
 
   handleSelectChange = (value) => {
-    this.setState({ selectedDValue: value })
-  }
+    this.setState({ selectedDValue: value });
+  };
 
   // Saving Barcode
   saveBarcode() {
@@ -408,7 +409,7 @@ class EditBarcode extends Component {
         colour: this.state.colour,
         costPrice: parseFloat(this.state.costPrice),
         empId: this.state.empId,
-        hsnCode: this.state.hsnId,
+        hsnCode: this.state.hsnCode,
         itemMrp: parseFloat(this.state.listPrice),
         domainId: 1,
         qty: this.state.quantity,
@@ -763,7 +764,7 @@ class EditBarcode extends Component {
           {!uomValid && (
             <Message imp={true} message={this.state.errors["uom"]} />
           )}
-          {this.state.isTaxIncluded === "true" && this.state.isTaxIncluded !== "nll" && (<View>
+          {this.state.isTaxIncluded !== "null" && (<View>
             <Text style={inputHeading}>
               {I18n.t("HSN Code")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
             </Text>
@@ -807,14 +808,14 @@ class EditBarcode extends Component {
             {I18n.t("Store")} <Text style={{ color: "#aa0000" }}>*</Text>{" "}
           </Text>
           <TextInput
-                editable={false}
-                style={[
-                  forms.inactive_fld,
-                  forms.input_fld
-                ]}
-                placeholder="Store"
-                value={this.state.storeName}
-              />
+            editable={false}
+            style={[
+              forms.inactive_fld,
+              forms.input_fld
+            ]}
+            placeholder="Store"
+            value={this.state.storeName}
+          />
           {!storeValid && (
             <Message imp={true} message={this.state.errors["store"]} />
           )}
@@ -823,21 +824,7 @@ class EditBarcode extends Component {
               {/* <Text>hrys</Text> */}
               {this.state.alist.map((items, index) => {
                 return (<View>
-                  {items.type === "select" && (
-                    <View>
-                      <Text style={inputHeading}>{items.name}</Text>
-                      <TextInput
-                        style={[
-                          forms.inactive_fld,
-                          forms.input_fld
-                        ]}
-                        editable={false}
-                        placeholder="Select"
-                        value={this.state.selectedValue}
-                      />
-                    </View>
-                  )}
-                  {items.type === "input" && (
+                  {items.type && (
                     <View>
                       <Text style={inputHeading}>{items.name}</Text>
                       <TextInput
@@ -853,13 +840,13 @@ class EditBarcode extends Component {
                         placeholderTextColor={"#6f6f6f"}
                         textAlignVertical="center"
                         underlineColor={"#d6d6d6"}
-                        value={this.state.selectedDValue}
+                        value={items.selectedValue}
                         editable={false}
                         onChangeText={(value) => this.handleSelectChange(value, items)}
                       />
                     </View>
                   )}
-                </View>)
+                </View>);
               })}
             </View>
           )}

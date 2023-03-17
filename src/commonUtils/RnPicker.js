@@ -17,7 +17,7 @@ export class RnPicker extends Component {
     };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     let value = this.props;
     let rnitems = this.props.items;
     let editValue = this.props.editValue;
@@ -30,7 +30,7 @@ export class RnPicker extends Component {
     });
   };
 
-  render () {
+  render() {
     return (
       <View style={rnPickerContainer}>
         <RNPickerSelect

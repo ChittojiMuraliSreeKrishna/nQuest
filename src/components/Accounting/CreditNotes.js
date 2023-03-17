@@ -110,7 +110,9 @@ export default class CreditNotes extends Component {
       if (res) {
         console.log({ res }, res.data.content);
         this.setState({ creditNotes: res.data.content }, () => {
-          this.changeNavigation();
+          if (this.state.creditNotes.length > 0) {
+            this.changeNavigation();
+          }
         });
       }
       this.setState({ loading: false });

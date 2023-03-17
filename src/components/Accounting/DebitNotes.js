@@ -112,7 +112,9 @@ export default class DebitNotes extends Component {
       if (res) {
         console.log(res.data);
         this.setState({ debitNotes: res.data.content }, () => {
-          this.changeNavigation();
+          if (this.state.debitNotes.length > 0) {
+            this.changeNavigation();
+          }
         });
       }
       this.setState({ loading: false });

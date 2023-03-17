@@ -1,4 +1,4 @@
-import React, { Component } from 'react';RNPickerSelect
+import React, { Component } from 'react';
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Device from 'react-native-device-detection';
 import I18n from 'react-native-i18n';
@@ -22,7 +22,7 @@ var mobileNumber = '';
 const picketData = [
   { label: 'Male', value: 'male' },
   { label: 'Female', value: 'female' },
-]
+];
 
 export default class AddCustomer extends Component {
 
@@ -172,7 +172,7 @@ export default class AddCustomer extends Component {
           isConfigUser: "false"
         });
 
-      })
+      });
     }
   }
 
@@ -243,7 +243,7 @@ export default class AddCustomer extends Component {
       <View style={[scss.container, { padding: 10 }]}>
         <ScrollView>
           <Text style={[scss.highText, { fontSize: 16, padding: 10 }]}>{I18n.t("Personal Details")}</Text>
-          <Text style={scss.textStyleLight}>{I18n.t("Customer Name")} <Text style={{ color: 'red' }}>*</Text></Text>
+          <Text style={scss.textStyleMedium}>{I18n.t("Customer Name")} <Text style={{ color: 'red' }}>*</Text></Text>
           <TextInput
             style={forms.input_fld}
             mode="flat"
@@ -256,7 +256,7 @@ export default class AddCustomer extends Component {
             onChangeText={(text) => this.handleCustomerName(text)}
           />
           {!nameValid && <Message imp={true} message={this.state.errors["name"]} />}
-          <Text style={scss.textStyleLight}>{I18n.t("Mobile Number")} <Text style={{ color: 'red' }}>*</Text></Text>
+          <Text style={scss.textStyleMedium}>{I18n.t("Mobile Number")} <Text style={{ color: 'red' }}>*</Text></Text>
           <TextInput
             style={forms.input_fld}
             mode="flat"
@@ -271,7 +271,7 @@ export default class AddCustomer extends Component {
             onChangeText={(text) => this.handleMobileNumber(text)}
           />
           {!mobileValid && <Message imp={true} message={this.state.errors["mobile"]} />}
-          <Text style={scss.textStyleLight}>{I18n.t("Email")}</Text>
+          <Text style={scss.textStyleMedium}>{I18n.t("Email")}</Text>
           <TextInput
             style={forms.input_fld}
             // style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
@@ -285,7 +285,7 @@ export default class AddCustomer extends Component {
             onChangeText={(text) => this.handleEmail(text)}
           />
           {!emailValid && <Message imp={false} message={this.state.errors["email"]} />}
-          <Text style={scss.textStyleLight}>{I18n.t("Address")}</Text>
+          <Text style={scss.textStyleMedium}>{I18n.t("Address")}</Text>
           <TextInput
             style={forms.input_fld}
             // style={Device.isTablet ? styles.input_tablet : styles.input_mobile}
@@ -296,7 +296,7 @@ export default class AddCustomer extends Component {
             value={this.state.address}
             onChangeText={(text) => this.handleAddress(text)}
           />
-          <Text style={scss.textStyleLight}>{I18n.t("GST Number")}</Text>
+          <Text style={scss.textStyleMedium}>{I18n.t("GST Number")}</Text>
           <TextInput
             style={forms.input_fld}
             mode="flat"
@@ -308,10 +308,11 @@ export default class AddCustomer extends Component {
             onChangeText={(text) => this.handleGstNumber(text)}
           />
           {!gstValid && <Message imp={false} message={this.state.errors["gst"]} />}
-          <Text style={scss.textStyleLight}>{I18n.t("Gender")}</Text>
+          <Text style={scss.textStyleMedium}>{I18n.t("Gender")}</Text>
           <RnPicker
             items={picketData}
             setValue={this.handlegender}
+            placeHolder={"Gender"}
           />
           <View style={forms.action_buttons_container}>
             <TouchableOpacity
