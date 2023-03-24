@@ -17,7 +17,7 @@ import I18n from "react-native-i18n";
 import { formatListDates } from '../../commonUtils/DateFormate';
 
 
-export class TableManageMent extends Component {
+export class RoomManagement extends Component {
 
     constructor(props) {
         super(props);
@@ -43,7 +43,7 @@ export class TableManageMent extends Component {
     }
 
     getAllTables() {
-        var bookingType = "Table";
+        var bookingType = "Room";
         CustomerService.getTablesList(this.state.storeId, this.state.clientId, bookingType).then((res) => {
             if (res) {
                 let tables = res?.data;
@@ -76,7 +76,7 @@ export class TableManageMent extends Component {
                 numberOfSeats: this.state.availableTableSeats,
                 status: false,
                 storeId: this.state.storeId,
-                bookingType: "Table"
+                bookingType: "Room"
             };
             console.log({ list });
             CustomerService.saveTable(list).then((res) => {
@@ -142,7 +142,7 @@ export class TableManageMent extends Component {
                 <FlatList
                     ListHeaderComponent={
                         <View style={scss.headerContainer}>
-                            <Text style={scss.flat_heading}>Table Management - <Text style={{ color: '#f00' }}>{this.state.tablesList.length}</Text> </Text>
+                            <Text style={scss.flat_heading}>Room Management - <Text style={{ color: '#f00' }}>{this.state.tablesList.length}</Text> </Text>
                             <IconMaa
                                 size={35}
                                 name="playlist-add"
@@ -260,4 +260,4 @@ export class TableManageMent extends Component {
     }
 }
 
-export default TableManageMent;
+export default RoomManagement;

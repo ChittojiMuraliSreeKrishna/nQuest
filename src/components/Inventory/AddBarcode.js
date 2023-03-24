@@ -130,7 +130,7 @@ class AddBarcode extends Component {
   navigateToScanCode() {
     global.barcodeId = 'something';
     this.props.navigation.navigate('ScanBarCode', {
-      isFromNewSale: false, isFromAddProduct: false, invoiceScan: true,
+      isFromNewSale: false, isFromAddProduct: false, invoiceScan: false,
       onGoBack: () => this.refresh(),
     });
   }
@@ -365,12 +365,14 @@ class AddBarcode extends Component {
     let hsnList = [];
     InventoryService.getAllHsnList().then((res) => {
       if (res?.data) {
-        // console.log("HSNS", res.data);
+        console.log("HSNS", res.data);
         for (let i = 0; i < res.data.result.length; i++) {
-          hsnList.push({
-            value: res.data.result[i].hsnCode,
-            label: res.data.result[i].hsnCode,
-          });
+          if (this.state.selectedDomain === res.data.result[i].domainType) {
+            hsnList.push({
+              value: res.data.result[i].hsnCode,
+              label: res.data.result[i].hsnCode,
+            });
+          }
         }
         // console.log({ hsnList });
         this.setState({ hsnCodesList: hsnList });
@@ -762,7 +764,7 @@ class AddBarcode extends Component {
                         underlineColor={"#d6d6d6"}
                         autoCapitalize="none"
                         value={attrbs.selectedValue}
-                        onChangeText={(value) => this.handleSelectChange(value, items)}
+                        onChangeText={(value) => this.handleSelectChange(value, attrbs)}
                       />
                     </View>
                   )}

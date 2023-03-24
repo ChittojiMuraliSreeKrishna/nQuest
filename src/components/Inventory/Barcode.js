@@ -391,7 +391,7 @@ export default class Barcode extends Component {
                         <Text style={scss.textStyleLight}>
                           {I18n.t("MRP")}: ₹{parseFloat(item.itemMrp)}
                         </Text>
-                        <Text style={scss.textStyleLight}>QTY: {item.qty}</Text>
+                        <Text style={scss.textStyleLight}>{item.uom === "Pieces" ? "QTY:" : item.uom === "Meters" ? "MTS:" : item.uom === "Kilograms" ? "KGS:" : "UNITS:"} {item.qty}</Text>
                       </View>
                       <View style={scss.textContainer}>
                         <Text style={scss.textStyleMedium}>

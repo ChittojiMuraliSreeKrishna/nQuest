@@ -455,6 +455,7 @@ export class TopBar extends Component {
         const { privilages } = this.state;
         console.log({ value });
         if (value === "Menu" || value === "Invoice" || value === "Order Status") {
+
           this.getAllTables();
           this.setState({ toggleTableBtn: true, subHeaderName: value });
           if (value === "Invoice") {
@@ -474,7 +475,8 @@ export class TopBar extends Component {
 
   // Tables Category
   getAllTables() {
-    CustomerService.getTablesList(this.state.storeId, this.state.clientId).then((res) => {
+    const type = 'Table';
+    CustomerService.getTablesList(this.state.storeId, this.state.clientId, type).then((res) => {
       if (res?.data) {
         let tabels = res.data;
         tabels.concat({ clicked: false });
@@ -578,7 +580,8 @@ export class TopBar extends Component {
 
   // Room Category
   getAllRooms() {
-    CustomerService.getRoomsList(this.state.storeId, this.state.clientId).then((res) => {
+    const type = "Room";
+    CustomerService.getRoomsList(this.state.storeId, this.state.clientId, type).then((res) => {
       if (res?.data) {
         let rooms = [];
         rooms = res.data;

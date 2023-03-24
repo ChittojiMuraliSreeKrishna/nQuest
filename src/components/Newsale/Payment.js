@@ -216,6 +216,7 @@ class Payment extends Component {
             domainType: parentObj.domainType ? parentObj.domainType : "",
             tableId: parentObj.tableId ? parentObj.tableId : 0,
             userId: userId,
+            bookType: parentObj.bookType ? parentObj.bookType : ""
         });
         this.setState({ isTagCustomer: parentObj.customerPhoneNumber.length >= 10 ? true : false });
         this.getDiscountReasons();
@@ -872,6 +873,7 @@ class Payment extends Component {
     };
 
     pay = () => {
+        // alert(this.state.bookType);
         var grandNetAmount = (parseFloat(this.state.totalAmount) - parseFloat(this.state.redeemedPints / 10)).toString();
         var obj;
         if (this.state.isCash === true && this.state.isCardOrCash === false && this.state.recievedAmount === "") {
@@ -928,8 +930,8 @@ class Payment extends Component {
         let couponCode = this.state.giftCouponsList.map((item) => {
             return item.gvNumber;
         });
-        // alert(this.state.domainType);
-        if (this.state.domainType === "Table") {
+        if (this.state.bookType === "Table") {
+            // alert(this.state.domainType);
             obj = {
                 natureOfSale: "InStore",
                 storeId: this.state.storeId,
@@ -970,7 +972,8 @@ class Payment extends Component {
             delete obj.paymentAmountType;
         }
         console.log({ obj });
-        if (this.state.domainType === "Table") {
+        if (this.state.bookType === "Table") {
+            console.log(NewSaleService.createOrder(), "pathtotable");
             axios.post(NewSaleService.createOrder(), obj).then(async (res) => {
                 console.log("Invoice data", JSON.stringify(res.data));
                 if (res.data && res.data["isSuccess"] === "true") {
@@ -1451,6 +1454,7 @@ class Payment extends Component {
 
 
     render() {
+        // alert(this.state.domainType);
         return (
             <View style={scss.container}>
                 {this.state.loading && <Loader loading={this.state.loading} />}
@@ -1458,7 +1462,7 @@ class Payment extends Component {
                     <Appbar.BackAction
                         onPress={() => this.handleBackButtonClick()}
                     />
-                    <Appbar.Content title="Payment method" />
+                    <Appbar.Content title="Payment method Type" />
                 </Appbar>
                 <ScrollView>
                     <View>

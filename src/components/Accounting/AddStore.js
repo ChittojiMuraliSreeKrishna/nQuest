@@ -115,7 +115,7 @@ export default class AddStore extends Component {
     }
     console.log("storeStaet", this.state.storeState, this.state.districtId);
     setTimeout(() => {
-      this.setState({loading: false})
+      this.setState({ loading: false });
     }, 5000);
 
     // this.getDomainsList();
@@ -129,8 +129,8 @@ export default class AddStore extends Component {
       if (res) {
         let gstResult = res.data;
         console.log({ gstResult });
-        if (res.data.result !== null) {
-          this.setState({ gstNumber: res.data.result.gstNumber, gstEdit: false });
+        if (res.data.gstNumber !== null) {
+          this.setState({ gstNumber: res.data.gstNumber, gstEdit: false });
         } else {
           this.setState({ gstNumber: "", gstEdit: true });
         }
@@ -155,15 +155,15 @@ export default class AddStore extends Component {
           });
         }
       }
-      if(this.state.isEdit) {
-        this.state.states.push({"selectedValue": this.state.stateId})
-        this.setState({states: this.state.states})
+      if (this.state.isEdit) {
+        this.state.states.push({ "selectedValue": this.state.stateId });
+        this.setState({ states: this.state.states });
       }
       console.log(this.state.states, "states");
     });
   }
   handleStoreState = (value) => {
-    if(value){
+    if (value) {
       this.setState({ storeState: value, statecode: value }, () => {
         console.log({ value });
         console.log(this.state.statecode, "yktld", this.state.storeState);
@@ -175,7 +175,7 @@ export default class AddStore extends Component {
 
   // Store Districts
   getMasterDistrictsList(id) {
-    this.setState({dictricts: [], loading: true });
+    this.setState({ dictricts: [], loading: true });
     UrmService.getDistricts(id).then((res) => {
       if (res.data["result"]) {
         let dictricts = [];
@@ -189,9 +189,9 @@ export default class AddStore extends Component {
             dictricts: dictricts,
             loading: false
           });
-          if(this.state.isEdit){
-            this.state.dictricts.push({"selectedValue": this.state.districtId})
-            this.setState({dictricts: this.state.dictricts})
+          if (this.state.isEdit) {
+            this.state.dictricts.push({ "selectedValue": this.state.districtId });
+            this.setState({ dictricts: this.state.dictricts });
           }
         }
       }
@@ -204,7 +204,7 @@ export default class AddStore extends Component {
   };
 
   handleBackButtonClick() {
-    this.setState({loading: true})
+    this.setState({ loading: true });
     this.props.navigation.goBack(null);
     this.props.route.params.onGoBack(null);
     return true;
@@ -358,7 +358,7 @@ export default class AddStore extends Component {
               this.props.route.params.onGoBack();
               this.props.navigation.goBack();
               alert("store added successfully");
-              this.setState({ loading: true })
+              this.setState({ loading: true });
             } else {
               this.setState({ loading: false });
               // alert(res.data.message);

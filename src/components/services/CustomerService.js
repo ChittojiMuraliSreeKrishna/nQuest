@@ -166,14 +166,14 @@ class CustomerService {
   }
 
   getTablesList(storeId, clientId, bookingType) {
-    const sipId = '?clientId=' + clientId + '&storeId=' + storeId + "&bookingType=Table";
+    const sipId = '?clientId=' + clientId + '&storeId=' + storeId + "&bookingType=" + bookingType;
     const url = BASE_URL + menuCategoryService.getAllTables + sipId;
     console.log({ sipId, url });
     return axios.get(url);
   }
 
   getRoomsList(storeId, clientId, bookingType) {
-    const sipId = '?clientId=' + clientId + '&storeId=' + storeId + "&bookingType=Room";
+    const sipId = '?clientId=' + clientId + '&storeId=' + storeId + "&bookingType=" + bookingType;
     const url = BASE_URL + menuCategoryService.getAllTables + sipId;
     console.log({ sipId, url });
     return axios.get(url);

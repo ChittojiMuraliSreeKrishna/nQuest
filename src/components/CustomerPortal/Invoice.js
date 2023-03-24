@@ -37,6 +37,7 @@ export class Invoice extends Component {
     }
 
     getOrderItems() {
+        // alert(this.state.storeId);
         if (this.state.tableId && this.state.tableId !== 0) {
             if (this.state.bookingType === "Table") {
                 CustomerService.getTableItems(this.state.tableId).then((res) => {
@@ -125,6 +126,7 @@ export class Invoice extends Component {
                     SGST: this.state.totalSgst,
                     grandNetAmount: totalValue,
                     enablePayment: true,
+                    bookType: 'Room',
                     onGoBack: () => this.refresh(),
                 };
                 console.log({ obj });
@@ -153,6 +155,7 @@ export class Invoice extends Component {
                             grandNetAmount: totalValue,
                             enablePayment: true,
                             barCodeList: this.state.orderItems,
+                            bookType: 'Table',
                             onGoBack: () => this.refresh(),
                         };
                         this.props.navigation.navigate('Payment', obj, { domain: 'Table' });
@@ -414,7 +417,7 @@ export class Invoice extends Component {
                         <Text style={{ color: '#d00' }}>Payable Amount</Text>
                         <Text style={{ color: '#d00' }}>{parseFloat(this.state.totalSgst + this.state.totalCgst + this.state.totalAmount).toFixed(2)}</Text>
                     </View>
-                    <TouchableOpacity onPress={() => this.navigateToPay()}
+                    <TouchableOpacity onPress={() => {if(this.state.tableId){ this.navigateToPay(); }}}
                         style={[reg.login_btn, { backgroundColor: "#0d0" }]}>
                         <Text style={[reg.login_btn_text]}>GENERATE BILLING</Text>
                     </TouchableOpacity>
@@ -436,7 +439,7 @@ export class Invoice extends Component {
                         <Text style={{ color: '#d00' }}>Payable Amount</Text>
                         <Text style={{ color: '#d00' }}>{parseFloat(this.state.totalSgst + this.state.totalCgst + this.state.totalAmount).toFixed(2)}</Text>
                     </View>
-                    <TouchableOpacity onPress={() => this.navigateToPay()}
+                    <TouchableOpacity onPress={() => { if (this.state.tableId) { this.navigateToPay(); } }}
                         style={[reg.login_btn, { backgroundColor: "#0d0" }]}>
                         <Text style={[reg.login_btn_text]}>Proceed To Pay</Text>
                     </TouchableOpacity>

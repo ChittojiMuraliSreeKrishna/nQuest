@@ -79,7 +79,6 @@ class MenuCategory extends Component {
                     console.error({ err });
                 };
         });
-        // Alert.alert("DataBase", "created Table");
     }
 
 
@@ -176,7 +175,7 @@ class MenuCategory extends Component {
                 let items = new Set();
                 items = res.data.content;
                 console.log({ items });
-                this.handleDataBase(items);
+                // this.handleDataBase(items);
                 this.setState({ menuItems: items }, () => {
                 });
             }
@@ -208,17 +207,7 @@ class MenuCategory extends Component {
             items[index].cart = true;
             items[index].qty = 1;
             console.log({ item });
-            if (this.state.cartItems.length === 0) {
-                this.state.cartItems.push(item);
-            } else {
-                for (let i = 0; i < this.state.cartItems.length; i++) {
-                    if (parseInt(this.state.cartItems[i].id) === item.id) {
-                        this.state.cartItems[i].qty + 1;
-                    } else {
-                        this.state.cartItems.push(item);
-                    }
-                }
-            }
+            this.state.cartItems.push(item);
             this.setState({ menuItems: items, cartItems: this.state.cartItems }, () => {
                 // console.log(this.state.cartItems);
             });
@@ -290,8 +279,8 @@ class MenuCategory extends Component {
                 tableId: this.state.tableId,
                 menu: this.state.cartItems,
                 tableName: this.state.tableName,
-                goBack: () => this.searchItems(),
-                onGoBack: () => this.searchItems()
+                goBack: () => { this.searchItems(); this.setState({ cartItems: [] }); },
+                onGoBack: () => { this.searchItems(); this.setState({ cartItems: [] }); }
             });
         } else {
             alert("plase select the table");
@@ -381,34 +370,17 @@ class MenuCategory extends Component {
                                     />
                                     <Text style={{ textAlign: "center", flexShrink: 1 }} numberOfLines={1} ellipsizeMode="tail">{item.itemName}</Text>
                                     <Text style={{ textAlign: "center" }}>₹{parseFloat(item.itemMrp).toFixed(2)}</Text>
-                                    {item.cart ? <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                        <TouchableOpacity
-                                            onPress={() => this.decreamentForTable(item, index)}>
-                                            <MinusIcon name="minus-circle-outline" size={20} color={"red"} />
-                                        </TouchableOpacity>
-                                        <TextInput
-                                            style={{
-                                                fontFamily: 'regular',
-                                                fontSize: 12,
-                                                height: 20,
-                                                width: 20
-                                            }}
-                                            keyboardType={'numeric'}
-                                            activeUnderlineColor='#000'
-                                            value={String(item.qty)}
-                                            maxLength={10}
-                                            textAlign={'center'}
-                                            onChangeText={(text) => this.updateQuanty(text, index, item)}
-                                        />
-                                        <TouchableOpacity
-                                            onPress={() => this.incrementForTable(item, index)}>
-                                            <PlusIcon name="plus-circle-outline" size={20} color={"red"} />
-                                        </TouchableOpacity>
-                                    </View> : <View>
-                                        <TouchableOpacity onPress={() => this.addToCart(item, index)}>
-                                            <Text style={{ textAlign: 'center', fontSize: 16 }}><PlusIcon name="plus-circle-outline" size={20} color={"red"} />Add to cart</Text>
-                                        </TouchableOpacity>
-                                    </View>}
+                                    <View>
+                                        {item.cart === true ?
+                                            <TouchableOpacity disabled>
+                                                <Text style={{ textAlign: 'center', fontSize: 16 }}><PlusIcon name="plus-circle-outline" size={20} color={"green"} />Added</Text>
+                                            </TouchableOpacity>
+                                            :
+                                            <TouchableOpacity onPress={() => this.addToCart(item, index)}>
+                                                <Text style={{ textAlign: 'center', fontSize: 16 }}><PlusIcon name="plus-circle-outline" size={20} color={"red"} />Add to cart</Text>
+                                            </TouchableOpacity>
+                                        }
+                                    </View>
                                 </View>
                             </View>
                         )}

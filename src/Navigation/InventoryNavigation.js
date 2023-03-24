@@ -15,6 +15,7 @@ import ReBarcode from "../components/Inventory/ReBarcode";
 import RecieveOrder from "../components/Inventory/RecieveOrder";
 import TableManageMent from "../components/Inventory/TableManageMent";
 import ScanBarCode from "../components/Newsale/ScanBarCode";
+import RoomManagement from "../components/Inventory/RoomManagement";
 const Stack = createStackNavigator();
 export default class InventoryNavigation extends Component {
 
@@ -80,6 +81,11 @@ export default class InventoryNavigation extends Component {
             name="Table Management"
             options={{ headerShown: false }}
             component={TableManageMent}
+          />
+          <Stack.Screen
+            name="Room Management"
+            options={{ headerShown: false }}
+            component={RoomManagement}
           />
         </Stack.Navigator>
       </>
