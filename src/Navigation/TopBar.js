@@ -41,7 +41,8 @@ export const screenMapping = {
   "URM Portal": "UrmNavigation",
   "Ticketing Portal": "TicketingNavigation",
   "Kitchen Management": "KitchenNavigation",
-  "Menu Category": "MenuNavigation"
+  "Menu Category": "MenuNavigation",
+  "Hotel Management": "HotelNavigation",
 };
 
 // Getting Images based on privilege name
@@ -156,6 +157,7 @@ export class TopBar extends Component {
     global.previlage7 = "";
     global.previlage8 = "";
     global.privilege9 = "";
+    global.privilege10 = "";
 
     const username = await AsyncStorage.getItem("username");
     const rolename = await AsyncStorage.getItem("rolename");
@@ -238,6 +240,9 @@ export class TopBar extends Component {
                     }
                     if (previlage.name === "Menu Category") {
                       global.privilege9 = "Menu Category";
+                    }
+                    if (previlage.name === "Hotel Management") {
+                      global.privilege10 = "Hotel Management";
                     }
                     privilegesSet.add(previlage.name);
                   }

@@ -20,7 +20,7 @@ import UrmService from "../services/UrmService";
 import {
   inputHeading
 } from "../Styles/FormFields";
-import IconAD from 'react-native-vector-icons/AntDesign'
+import IconAD from 'react-native-vector-icons/AntDesign';
 import RNPickerSelect from "react-native-picker-select";
 import { Chevron } from "react-native-shapes";
 
@@ -215,7 +215,7 @@ export default class CreateRole extends Component {
   // Privileges Mapping Action
   privilageMapping() {
     global.privilages = [];
-    var editParentPrivileges = this.props.route.params.editParentPrivilegesResult
+    var editParentPrivileges = this.props.route.params.editParentPrivilegesResult;
     this.props.navigation.navigate("Privilages", {
       editParentPrivileges: editParentPrivileges,
       domain: this.state.domain,
@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
   },
 
   privilageBtnText: {
-    fontSize: RF(12),
+    fontSize: RF(10),
     fontFamily: "regular",
     color: "#ED1C24",
     textAlign: "center",

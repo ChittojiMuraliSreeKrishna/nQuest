@@ -14,16 +14,17 @@ import ReportsNavigation from "./ReportsNavigation";
 import { TicketingNavigation } from "./TicketingNavigation";
 import TopBar from "./TopBar";
 import UrmNavigation from "./UrmNavigation";
+import HotelNavigation from "./HotelNavigation";
 
 const Stack = createStackNavigator();
 
 export default class TopBarNavigation extends Component {
 
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       showTable: false
-    }
+    };
   }
 
   componentDidMount() {
@@ -33,8 +34,8 @@ export default class TopBarNavigation extends Component {
 
   updateTable = () => {
     this.setState({ showTable: true }, () => {
-    })
-  }
+    });
+  };
 
   render() {
     return (
@@ -104,6 +105,11 @@ export default class TopBarNavigation extends Component {
             options={{ headerShown: false }}
             component={MenuNavigation}
             showTable={this.state.showTable}
+          />
+          <Stack.Screen
+            name="HotelNavigation"
+            options={{ headerShown: false }}
+            component={HotelNavigation}
           />
         </Stack.Navigator>
       </>
