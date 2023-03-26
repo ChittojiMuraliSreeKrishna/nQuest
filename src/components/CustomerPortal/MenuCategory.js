@@ -373,7 +373,7 @@ class MenuCategory extends Component {
                                     <View>
                                         {item.cart === true ?
                                             <TouchableOpacity disabled>
-                                                <Text style={{ textAlign: 'center', fontSize: 16 }}><PlusIcon name="plus-circle-outline" size={20} color={"green"} />Added</Text>
+                                                <Text style={{ textAlign: 'center', fontSize: 16 }}><PlusIcon name="check-circle" size={20} color={"green"} />Added</Text>
                                             </TouchableOpacity>
                                             :
                                             <TouchableOpacity onPress={() => this.addToCart(item, index)}>

@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import JSEncrypt from 'jsencrypt';
 import { AppRegistry, LogBox } from 'react-native';
-import * as CryptoJS from 'react-native-crypto-js';
+import CryptoJS from 'react-native-crypto-js';
 import 'react-native-gesture-handler';
 import { ENCRYPTION } from './src/commonUtils/Base';
 import App from './src/components/App';
@@ -36,6 +36,7 @@ axios.interceptors.request.use(
         mode: CryptoJS.mode.CBC,
       });
       var encryptedBytes = cipher.toString();
+      console.log({ encryptedBytes });
     }
 
     var clientId = await AsyncStorage.getItem("custom:clientId1");

@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, Image, Dimensions, TouchableOpacity } from 'rea
 var deviceWidth = Dimensions.get('window').width;
 import Device from 'react-native-device-detection';
 import I18n, { getLanguages } from 'react-native-i18n';
-import { RH, RW,RF } from '../../Responsive';
+import { RH, RW, RF } from '../../Responsive';
 I18n.fallbacks = true;
 I18n.defaultLocale = 'english';
 
@@ -21,7 +21,7 @@ export default class Welcome extends React.Component {
         this.state = {
             language: 'English',
             languages: [],
-        }
+        };
     }
 
     componentWillMount() {
@@ -41,7 +41,7 @@ export default class Welcome extends React.Component {
 
     setLanguage = (value) => {
 
-    }
+    };
 
 
 
@@ -62,7 +62,7 @@ export default class Welcome extends React.Component {
                 </TouchableOpacity>
             </View>
 
-        )
+        );
     }
 }
 
@@ -89,7 +89,7 @@ const pickerSelectStyles = StyleSheet.create({
         textAlign: 'center',
 
     },
-})
+});
 
 
 
@@ -104,40 +104,36 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: "#FFFFFF",
     },
-    
+
 
 
     // Styles For Mobile
-
     logoImage_mobile: {
         width: RW(302),
         height: RH(275),
         position: 'absolute',
         top: RH(130)
     },
-    
-    // Styles For Mobile
-    headerContainer_mobile: { 
-        flex: 1, 
-        marginTop: RH(450), 
-        width: deviceWidth, 
+    headerContainer_mobile: {
+        flex: 1,
+        marginTop: RH(450),
+        width: deviceWidth,
         height: RH(200)
     },
-    headerGreeting_mobile: { 
-        color: "#353C4050", 
-        fontSize: RF(16), 
-        fontFamily: "bold", 
-        marginLeft: RW(20), 
+    headerGreeting_mobile: {
+        color: "#353C4050",
+        fontSize: RF(16),
+        fontFamily: "bold",
+        marginLeft: RW(20),
         marginTop: RH(20)
     },
     headerTitle_mobile: {
-        color: "#353C40", 
-        fontSize: RF(30), 
-        fontFamily: "bold", 
-        marginLeft: RW(20), 
-        marginTop: RW(20), 
-        flexDirection: 'column', 
-        height: RH(135),
+        color: "#353C40",
+        fontSize: RF(30),
+        fontFamily: "bold",
+        marginLeft: RW(20),
+        marginTop: RW(20),
+        flexDirection: 'column',
         justifyContent: 'center',
     },
     letsGoButton_mobile: {
@@ -167,27 +163,27 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: RH(130)
     },
-    headerContainer_tablet: { 
-        flex: 1, 
-        marginTop: RH(450), 
-        width: deviceWidth, 
-        height: RH(200) 
+    headerContainer_tablet: {
+        flex: 1,
+        marginTop: RH(450),
+        width: deviceWidth,
+        height: RH(200)
     },
-    headerGreeting_tablet: { 
-        color: "#353C4050", 
-        fontSize: RF(26), 
-        fontFamily: "bold", 
-        marginLeft: RW(20), 
-        marginTop: RH(20) 
+    headerGreeting_tablet: {
+        color: "#353C4050",
+        fontSize: RF(26),
+        fontFamily: "bold",
+        marginLeft: RW(20),
+        marginTop: RH(20)
     },
     headerTitle_tablet: {
-        color: "#353C40", 
-        fontSize: RF(40), 
-        fontFamily: "bold", 
-        marginLeft: RW(20), 
-        marginTop: RH(20), 
-        flexDirection: 'column', 
-        height: RH(135),
+        color: "#353C40",
+        fontSize: RF(40),
+        fontFamily: "bold",
+        marginLeft: RW(20),
+        marginTop: RH(20),
+        flexDirection: 'column',
+        // height: RH(135),
         justifyContent: 'center',
     },
     letsGoButton_tablet: {
@@ -210,4 +206,4 @@ const styles = StyleSheet.create({
         fontFamily: "regular",
     },
 
-})
+});

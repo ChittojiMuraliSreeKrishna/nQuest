@@ -125,10 +125,10 @@ export class TopBar extends Component {
           this.setState({ modalVisibleData: false });
         }}
       >
-        <Image
+        {/* <Image
           style={scss.icon}
           source={GetImageBasedOnPrevilageName(previlage.item)}
-        />
+        /> */}
         <Text style={scss.textItem}>{I18n.t(previlage.item)}</Text>
       </TouchableOpacity>
     );
@@ -169,7 +169,6 @@ export class TopBar extends Component {
     global.username = username;
     global.rolename = rolename;
     global.storeName = storename;
-    // alert(userId)
   }
 
   // Getting All Privileges
@@ -279,7 +278,6 @@ export class TopBar extends Component {
   // mapping the firstdisplay name & navigating
   async getData() {
     const { firstDisplayName, firstDisplayNameScreen } = this.state;
-    // console.log("data in get data", firstDisplayName, currentSelection);
     this.setState({ privilages: [] }, () => {
       if (currentSelection === "") {
         currentSelection = firstDisplayName;
