@@ -978,7 +978,7 @@ class Payment extends Component {
                 console.log("Invoice data", JSON.stringify(res.data));
                 if (res.data && res.data["isSuccess"] === "true") {
                     if (this.state.isPrinterConnected === true) {
-                        PrintService('INVOICE', res.data.result, this.state.barCodeList, invoiceTax);
+                        PrintService('RESTAURANT', res.data.result, this.state.barCodeList, invoiceTax);
                     }
 
                     alert("Order created " + res.data["result"]);

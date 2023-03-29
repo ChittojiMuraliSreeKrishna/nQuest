@@ -1,10 +1,17 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { Component } from 'react';
 import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
+import Modal from "react-native-modal";
 import CustomerService from '../services/CustomerService';
 import scss from '../../commonUtils/assets/styles/style.scss';
 import reg from "../../commonUtils/assets/styles/Registation.scss";
 import IconMA from 'react-native-vector-icons/MaterialCommunityIcons';
+import forms from '../../commonUtils/assets/styles/formFields.scss';
+import { color } from '../Styles/colorStyles';
+import { TextInput } from 'react-native-paper';
+import { sucessBtn, sucessBtnText } from '../Styles/PopupStyles';
+import I18n from 'i18n-js';
+import PrintService from '../../commonUtils/Printer/printService';
 
 export class Invoice extends Component {
 
@@ -21,7 +28,10 @@ export class Invoice extends Component {
             tableDetails: [],
             isOrderPlaced: false,
             roomBillPending: false,
-            invoiceRooms: []
+            invoiceRooms: [],
+            showPrinter: false,
+            printerIp: "",
+            printEnabled: false,
         };
     }
 
@@ -223,6 +233,27 @@ export class Invoice extends Component {
         this.setState({ orderItems: this.state.orderItems }, () => {
             let type = "Room";
             this.calculateValues(type);
+        });
+    }
+
+    // Printer Functions
+    handleViewPrinter() {
+        this.setState({ showPrinter: true });
+    }
+
+    handlePrinterIp = (text) => {
+        this.setState({ printerIp: text });
+    };
+
+    connectPrinter() {
+        AsyncStorage.setItem("printerIp", String(this.state.printerIp)).then(() => {
+            this.setState({ showPrinter: false, loading: true });
+            PrintService('start', 'print').then(() => {
+                this.setState({ loading: false, printEnabled: true });
+            }).catch((err) => {
+                this.setState({ loading: false, printEnabled: false });
+                alert(err);
+            });
         });
     }
 
@@ -444,6 +475,39 @@ export class Invoice extends Component {
                         <Text style={[reg.login_btn_text]}>Proceed To Pay</Text>
                     </TouchableOpacity>
                 </View>}
+                <TouchableOpacity style={[forms.button_active, { backgroundColor: color.white, borderColor: color.greyYellow, width: '90%' }]} onPress={() => this.handleViewPrinter()}>
+                    <Text style={[forms.button_text, { color: color.black }]}>Connect Printer</Text>
+                </TouchableOpacity>
+                {this.state.showPrinter && (
+                    <View>
+                        <Modal style={{ margin: 0 }} isVisible={this.state.showPrinter}
+                            onBackButtonPress={() => this.modelCancel()}
+                            onBackdropPress={() => this.modelCancel()} >
+                            <View style={forms.filterModelContainer}>
+                                <Text style={forms.popUp_decorator}>-</Text>
+                                <View style={forms.filterModelSub}>
+                                    <View style={{ alignItems: 'center', marginTop: 20 }}>
+                                        <Text>Printer IP:</Text>
+                                        <Text></Text>
+                                        <TextInput style={{ width: '90%', marginLeft: '5%', marginRight: '5%' }}
+                                            mode="flat"
+                                            activeUnderlineColor='#000'
+                                            underlineColor='#6f6f6f'
+                                            placeholder="Printer ip"
+                                            keyboardType={'number-pad'}
+                                            value={this.state.printerIp}
+                                            onChangeText={(text) => this.handlePrinterIp(text)} />
+                                    </View>
+                                    <TouchableOpacity
+                                        style={sucessBtn} onPress={() => this.connectPrinter()}
+                                    >
+                                        <Text style={sucessBtnText}  > {I18n.t("Connect")} </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </Modal>
+                    </View>
+                )}
             </View>
         );
     }

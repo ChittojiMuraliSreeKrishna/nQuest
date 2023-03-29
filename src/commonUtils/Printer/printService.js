@@ -25,7 +25,8 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
 
     const printing = new EscPosPrinter.printing();
     const printer = await printing;
-    if (type === 'start') {  // For Connecting
+    // For Normal connect
+    if (type === 'start') {
       printer.initialize();
       printer.align('center');
       printer.size(2, 2);
@@ -35,7 +36,9 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       printer.cut();
       printer.addPulse();
       printer.send();
-    } else if (type === 'DSNUM') { // For Delivery Slip
+    }
+    // For Delivery Slip
+    else if (type === 'DSNUM') {
       let dsNum = barcode;
       printer.initialize();
       printer.align('center');
@@ -57,11 +60,7 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
         printer.line(' ' + String(parseInt(i) + 1) + ' ' + object[i].barcode + '  ' + parseInt(object[i].quantity) + '   ' + parseFloat(object[i].itemMrp).toFixed(2) + '  ' + parseFloat(object[i].itemDiscount).toFixed(2) + '  ' + parseFloat(object[i].totalMrp).toFixed(2));
         printer.line('------------------------------------------------');
       }
-      // printer.newline(); // Print Style 2
-      // for (let i = 0; i < object.length; i++) {
-      //   printer.line('S.NO:' + String(parseInt(i) + 1) + ', BARCODE:' + object[i].barcode + ', QTY:' + object[i].quantity + '\n' + 'MRP:' + object[i].itemMrp + ', DISC:' + object[i].itemDiscount + ', AMOUNT' + object[i].totalMrp);
-      //   printer.line('------------------------------------------------');
-      // }
+
       printer.newline();
       printer.align('left');
       let grandTotal = 0;
@@ -98,11 +97,14 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       printer.cut();
       printer.addPulse();
       printer.send();
-    } else if (type === "Invoice") { // For Invoice
+    }
+    // For Testing
+    else if (type === "Invoice") {
       let esnum = barcode;
       alert(esnum);
       console.log({ invoiceTax, object });
     }
+    // For invoice
     else if (type === "INVOICE") {
       let esNum = barcode;
       printer.initialize();
@@ -179,19 +181,77 @@ const PrintService = async (type, barcode, object, invoiceTax) => {
       printer.align('center');
       printer.barcode({ // For Barcode
         value: barcode,
-        // value: "ES113u8241u12",
         type: 'EPOS2_BARCODE_CODE93',
         hri: 'EPOS2_HRI_BELOW',
         width: 3,
         height: 70,
       });
-      // printer.newline()
-      // printer.qrcode({ // For QRCode
-      //   value: barcode,
-      //   // value: 'ES113u8241u12',
-      //   level: 'EPOS2_LEVEL_M',
-      //   width: 7,
-      // })
+      printer.newline(2);
+      printer.size(1, 1);
+      printer.text('THANK YOU');
+      printer.newline();
+      printer.cut();
+      printer.addPulse();
+      printer.send();
+    }
+    else if (type === 'RESTAURANT') {
+      printer.initialize();
+      printer.align('center');
+      printer.size(2, 2);
+      printer.smooth(true);
+      printer.bold(true);
+      printer.line('EASY RETAIL');
+      printer.line('OTSI - Hi-tech city');
+      printer.smooth(false);
+      printer.size(1, 1);
+      printer.align('left');
+      printer.text('GST no: \n');
+      printer.size(2, 1);
+      printer.align('center');
+      printer.text('*Invoice* \n');
+      printer.size(0, 0);
+      printer.text('Date: ' + moment(new Date()).format("DD-MM-YYYY HH:mm::ss").toString());
+      printer.newline();
+      printer.align('left');
+      printer.text('SmNumber: ' + '\n');
+      printer.text('________________________________________________\n');
+      printer.bold(false);
+      printer.align('center');
+      printer.text('* ITEMS LIST * \n');
+      printer.align('left');
+      printer.line('________________________________________________');
+      printer.line('S.NO NAME  QTY    MRP    DISC     AMOUNT');
+      printer.line('________________________________________________');
+      printer.size(0, 0);
+      printer.newline();
+      for (let i = 0; i < object.length; i++) {
+        printer.line(' ' + String(parseInt(i) + 1) + ' ' + object[i].name + '  ' + parseInt(object[i].quantity) + '   ' + parseFloat(object[i].itemPrice).toFixed(2) + '  ' + parseFloat(object[i].manualDiscount + object[i].promoDiscount).toFixed(2) + '  ' + parseFloat(object[i].value).toFixed(2));
+        printer.line('------------------------------------------------');
+      }
+      printer.newline();
+      printer.align('left');
+      let grandTotal = 0;
+      let totalQty = 0;
+      let promoDiscount = 0;
+      object.forEach((bardata) => {
+        grandTotal = grandTotal + bardata?.value;
+        promoDiscount = promoDiscount + bardata?.promoDiscount;
+        totalQty = totalQty + parseInt(bardata.quantity);
+      });
+      let netPayableAmt = grandTotal - promoDiscount;
+      printer.text('Gross Amount: ');
+      printer.align('right');
+      printer.text('' + parseFloat(grandTotal).toFixed(2) + '\n');
+      printer.align('left');
+      printer.text('Promo Discount: ' + parseFloat(promoDiscount).toFixed(2) +
+        '\n');
+      printer.line('________________________________________________');
+      printer.newline();
+      printer.text('Total QTY: ' + totalQty + '\n');
+      printer.line('________________________________________________');
+      printer.text('Net Total(tax inc): ' + parseFloat(netPayableAmt).toFixed(2) + '\n');
+      printer.line('________________________________________________');
+      printer.align('center');
       printer.newline(2);
       printer.size(1, 1);
       printer.text('THANK YOU');
